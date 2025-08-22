@@ -6,13 +6,13 @@ import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.SwipeDiaryYearMonthListBaseAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
 
 internal abstract class DiaryYearMonthListAdapter(
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : SwipeDiaryYearMonthListBaseAdapter<DiaryDayListItem.Standard>(
+) : SwipeDiaryYearMonthListBaseAdapter<DiaryDayListItemUi.Standard>(
     recyclerView,
     themeColor,
     DiffUtilItemCallback()
@@ -20,7 +20,7 @@ internal abstract class DiaryYearMonthListAdapter(
 
     override fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder.Item,
-        item: DiaryYearMonthListItem.Diary<DiaryDayListItem.Standard>
+        item: DiaryYearMonthListItemUi.Diary<DiaryDayListItemUi.Standard>
     ) {
         val diaryDayListAdapter = createDiaryDayListAdapter(holder)
         val diaryDayList = item.diaryDayList.itemList
@@ -34,35 +34,35 @@ internal abstract class DiaryYearMonthListAdapter(
             DiaryDayListAdapter(holder.binding.recyclerDayList, themeColor)
         return diaryDayListAdapter.apply {
             build()
-            registerOnItemClickListener { item: DiaryDayListItem.Standard ->
+            registerOnItemClickListener { item: DiaryDayListItemUi.Standard ->
                 onChildItemClickListener?.onClick(item)
             }
-            registerOnClickDeleteButtonListener { item: DiaryDayListItem.Standard ->
+            registerOnClickDeleteButtonListener { item: DiaryDayListItemUi.Standard ->
                 onChildItemBackgroundButtonClickListener?.onClick(item)
             }
         }
     }
 
     private class DiffUtilItemCallback :
-        DiaryYearMonthListBaseAdapter.DiffUtilItemCallback<DiaryDayListItem.Standard>() {
+        DiaryYearMonthListBaseAdapter.DiffUtilItemCallback<DiaryDayListItemUi.Standard>() {
 
         private val logTag = createLogTag()
 
             override fun areContentsTheSame(
-                oldItem: DiaryYearMonthListItem<DiaryDayListItem.Standard>,
-                newItem: DiaryYearMonthListItem<DiaryDayListItem.Standard>
+                oldItem: DiaryYearMonthListItemUi<DiaryDayListItemUi.Standard>,
+                newItem: DiaryYearMonthListItemUi<DiaryDayListItemUi.Standard>
             ): Boolean {
                 val result =
                     when (oldItem) {
-                        is DiaryYearMonthListItem.Diary -> {
-                            if (newItem !is DiaryYearMonthListItem.Diary<DiaryDayListItem.Standard>) {
+                        is DiaryYearMonthListItemUi.Diary -> {
+                            if (newItem !is DiaryYearMonthListItemUi.Diary<DiaryDayListItemUi.Standard>) {
                                 false
                             } else {
                                 oldItem.diaryDayList == newItem.diaryDayList
                             }
                         }
-                        is DiaryYearMonthListItem.NoDiaryMessage,
-                        is DiaryYearMonthListItem.ProgressIndicator -> {
+                        is DiaryYearMonthListItemUi.NoDiaryMessage,
+                        is DiaryYearMonthListItemUi.ProgressIndicator -> {
                             false
                         }
                     }

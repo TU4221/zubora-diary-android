@@ -4,7 +4,7 @@ import android.net.Uri
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import java.time.LocalDate
 
-internal sealed class DiaryDayListItem(
+internal sealed class DiaryDayListItemUi(
     open val date: LocalDate
 ) {
 
@@ -12,7 +12,7 @@ internal sealed class DiaryDayListItem(
         override val date: LocalDate,
         val title: String,
         val imageUri: Uri?
-    ) : DiaryDayListItem(date)
+    ) : DiaryDayListItemUi(date)
 
     data class WordSearchResult(
         override val date: LocalDate,
@@ -21,5 +21,5 @@ internal sealed class DiaryDayListItem(
         val itemTitle: String,
         val itemComment: String,
         val searchWord: String,
-    ) : DiaryDayListItem(date)
+    ) : DiaryDayListItemUi(date)
 }

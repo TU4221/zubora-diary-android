@@ -11,8 +11,8 @@ import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEd
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diaryitemtitle.ItemTitleSelectionHistoryListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryList
-import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.fragment.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemTitleDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
@@ -161,18 +161,18 @@ class DiaryItemTitleEditDialog :
                 themeColor
             )
         itemTitleSelectionHistoryListAdapter.build()
-        itemTitleSelectionHistoryListAdapter.registerOnItemClickListener { item: SelectionHistoryListItem ->
+        itemTitleSelectionHistoryListAdapter.registerOnItemClickListener { item: SelectionHistoryListItemUi ->
             mainViewModel.onDiaryItemTitleSelectionHistoryItemClick(item)
         }
         itemTitleSelectionHistoryListAdapter
-            .registerOnItemSwipeListener { item: SelectionHistoryListItem ->
+            .registerOnItemSwipeListener { item: SelectionHistoryListItemUi ->
                 mainViewModel.onDiaryItemTitleSelectionHistoryItemSwipe(item)
             }
 
         // 選択履歴読込・表示
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.itemTitleSelectionHistoryList
-                .collectLatest { value: SelectionHistoryList ->
+                .collectLatest { value: SelectionHistoryListUi ->
                     val adapter =
                         checkNotNull(
                             binding.recyclerItemTitleSelectionHistory.adapter

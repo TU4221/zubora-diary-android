@@ -16,13 +16,21 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewestDia
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadOldestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWeatherInfoUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearchResultDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewWordSearchResultListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearchResultListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshWordSearchResultListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySaveConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.UpdateDiaryListFooterUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.UpdateWordSearchResultListFooterUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
 import dagger.Module
@@ -137,11 +145,6 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideLoadDiaryListUseCase(diaryRepository: DiaryRepository) =
-        LoadDiaryListUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
     fun provideCountDiariesUseCase(diaryRepository: DiaryRepository) =
         CountDiariesUseCase(diaryRepository)
 
@@ -159,11 +162,6 @@ internal object DiaryUseCaseModule {
     @Provides
     fun provideLoadOldestDiaryUseCase(diaryRepository: DiaryRepository): LoadOldestDiaryUseCase =
         LoadOldestDiaryUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideLoadWordSearchResultDiaryListUseCase(diaryRepository: DiaryRepository) =
-        LoadWordSearchResultDiaryListUseCase(diaryRepository)
 
     @Singleton
     @Provides
@@ -187,4 +185,79 @@ internal object DiaryUseCaseModule {
     fun provideLoadDiaryItemTitleSelectionHistoryUseCase(
         diaryRepository: DiaryRepository
     ) = LoadDiaryItemTitleSelectionHistoryUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideLoadDiaryListUseCase(
+        diaryRepository: DiaryRepository
+    ) = LoadDiaryListUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideLoadNewDiaryListUseCase(
+        loadDiaryListUseCase: LoadDiaryListUseCase,
+        updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
+    ) = LoadNewDiaryListUseCase(loadDiaryListUseCase, updateDiaryListFooterUseCase)
+
+    @Singleton
+    @Provides
+    fun provideLoadAdditionDiaryListUseCase(
+        loadDiaryListUseCase: LoadDiaryListUseCase,
+        updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
+    ) = LoadAdditionDiaryListUseCase(loadDiaryListUseCase, updateDiaryListFooterUseCase)
+
+    @Singleton
+    @Provides
+    fun provideRefreshDiaryListUseCase(
+        loadDiaryListUseCase: LoadDiaryListUseCase,
+        updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
+    ) = RefreshDiaryListUseCase(loadDiaryListUseCase, updateDiaryListFooterUseCase)
+
+    @Singleton
+    @Provides
+    fun provideUpdateDiaryListFooterUseCase(
+        checkUnloadedDiariesExistUseCase: CheckUnloadedDiariesExistUseCase
+    ) = UpdateDiaryListFooterUseCase(checkUnloadedDiariesExistUseCase)
+
+    @Singleton
+    @Provides
+    fun provideLoadWordSearchResultListUseCase(
+        diaryRepository: DiaryRepository
+    ) = LoadWordSearchResultListUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideLoadNewWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
+    ) = LoadNewWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase
+    )
+
+    @Singleton
+    @Provides
+    fun provideLoadAdditionWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
+    ) = LoadAdditionWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase
+    )
+
+    @Singleton
+    @Provides
+    fun provideRefreshWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
+    ) = RefreshWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase
+    )
+
+    @Singleton
+    @Provides
+    fun provideUpdateWordSearchResultListFooterUseCase(
+        checkUnloadedWordSearchResultDiariesExistUseCase: CheckUnloadedWordSearchResultDiariesExistUseCase
+    ) = UpdateWordSearchResultListFooterUseCase(checkUnloadedWordSearchResultDiariesExistUseCase)
 }

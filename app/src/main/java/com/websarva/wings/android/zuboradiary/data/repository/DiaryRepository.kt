@@ -7,7 +7,6 @@ import com.websarva.wings.android.zuboradiary.data.mapper.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryItem
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryListItem
 import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
@@ -22,6 +21,8 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDele
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadFailureException
+import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.domain.model.list.selectionhistory.SelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -121,7 +122,7 @@ internal class DiaryRepository (
         num: Int,
         offset: Int,
         date: LocalDate?
-    ): List<DiaryListItem> {
+    ): List<DiaryDayListItem.Standard> {
         Log.d(logTag, "loadDiaryList(num = $num, offset = $offset, date = $date)")
         require(num >= 1)
         require(offset >= 0)
@@ -242,7 +243,7 @@ internal class DiaryRepository (
      */
     fun loadDiaryItemTitleSelectionHistory(
         num: Int, offset: Int
-    ): Flow<List<DiaryItemTitleSelectionHistoryItem>> {
+    ): Flow<List<SelectionHistoryListItem>> {
         require(num >= 1)
         require(offset >= 0)
 

@@ -15,18 +15,18 @@ import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBindi
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.ListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter.DiaryYearMonthListViewHolder
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 // TODO:ViewHolderのViewに設定されたリスナを解除するように変更。
 internal abstract class DiaryYearMonthListBaseAdapter<
-        CLIT : DiaryDayListItem
+        CLIT : DiaryDayListItemUi
 > protected constructor(
     recyclerView: RecyclerView,
     themeColor: ThemeColor,
     diffUtilItemCallback: DiffUtilItemCallback<CLIT>
-) : ListBaseAdapter<DiaryYearMonthListItem<CLIT>, DiaryYearMonthListViewHolder>(
+) : ListBaseAdapter<DiaryYearMonthListItemUi<CLIT>, DiaryYearMonthListViewHolder>(
     recyclerView,
     themeColor,
     diffUtilItemCallback
@@ -111,12 +111,12 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
     override fun bindViewHolder(
         holder: DiaryYearMonthListViewHolder,
-        item: DiaryYearMonthListItem<CLIT>
+        item: DiaryYearMonthListItemUi<CLIT>
     ) {
         when (holder) {
             is DiaryYearMonthListViewHolder.Item -> {
-                holder.bind(item as DiaryYearMonthListItem.Diary<*>)
-                createDiaryDayList(holder, item as DiaryYearMonthListItem.Diary<CLIT>)
+                holder.bind(item as DiaryYearMonthListItemUi.Diary<*>)
+                createDiaryDayList(holder, item as DiaryYearMonthListItemUi.Diary<CLIT>)
             }
             is DiaryYearMonthListViewHolder.NoDiaryMessage,
             is DiaryYearMonthListViewHolder.ProgressBar -> {
@@ -128,19 +128,19 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
     abstract fun createDiaryDayList(
         holder: DiaryYearMonthListViewHolder.Item,
-        item: DiaryYearMonthListItem.Diary<CLIT>
+        item: DiaryYearMonthListItemUi.Diary<CLIT>
     )
 
     override fun getItemViewType(position: Int): Int {
-        val item = getItem(position) as DiaryYearMonthListItem<*>
+        val item = getItem(position) as DiaryYearMonthListItemUi<*>
         return when (item) {
-            is DiaryYearMonthListItem.Diary -> {
+            is DiaryYearMonthListItemUi.Diary -> {
                 ViewType.DIARY.viewTypeNumber
             }
-            is DiaryYearMonthListItem.NoDiaryMessage -> {
+            is DiaryYearMonthListItemUi.NoDiaryMessage -> {
                 ViewType.NO_DIARY_MESSAGE.viewTypeNumber
             }
-            is DiaryYearMonthListItem.ProgressIndicator -> {
+            is DiaryYearMonthListItemUi.ProgressIndicator -> {
                 ViewType.PROGRESS_INDICATOR.viewTypeNumber
             }
         }
@@ -153,7 +153,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
         data class Item(
             val binding: RowDiaryYearMonthListBinding
         ) : DiaryYearMonthListViewHolder(binding.root) {
-            fun bind(item: DiaryYearMonthListItem.Diary<*>) {
+            fun bind(item: DiaryYearMonthListItemUi.Diary<*>) {
                 // 対象行の情報を取得
                 val diaryYearMonth = item.yearMonth
 
@@ -178,32 +178,32 @@ internal abstract class DiaryYearMonthListBaseAdapter<
         ) : DiaryYearMonthListViewHolder(binding.root)
     }
 
-    protected abstract class DiffUtilItemCallback<T : DiaryDayListItem>
-        : DiffUtil.ItemCallback<DiaryYearMonthListItem<T>>() {
+    protected abstract class DiffUtilItemCallback<T : DiaryDayListItemUi>
+        : DiffUtil.ItemCallback<DiaryYearMonthListItemUi<T>>() {
 
             private val logTag = createLogTag()
 
             override fun areItemsTheSame(
-                oldItem: DiaryYearMonthListItem<T>,
-                newItem: DiaryYearMonthListItem<T>
+                oldItem: DiaryYearMonthListItemUi<T>,
+                newItem: DiaryYearMonthListItemUi<T>
             ): Boolean {
                 val result =
                     when (oldItem) {
-                        is DiaryYearMonthListItem.Diary -> {
+                        is DiaryYearMonthListItemUi.Diary -> {
                             if (oldItem === newItem) {
                                 true
-                            } else if (newItem !is DiaryYearMonthListItem.Diary<*>) {
+                            } else if (newItem !is DiaryYearMonthListItemUi.Diary<*>) {
                                 false
                             } else {
                                 oldItem.yearMonth == newItem.yearMonth
                             }
                         }
 
-                        is DiaryYearMonthListItem.NoDiaryMessage -> {
-                            newItem is DiaryYearMonthListItem.NoDiaryMessage<*>
+                        is DiaryYearMonthListItemUi.NoDiaryMessage -> {
+                            newItem is DiaryYearMonthListItemUi.NoDiaryMessage<*>
                         }
 
-                        is DiaryYearMonthListItem.ProgressIndicator -> {
+                        is DiaryYearMonthListItemUi.ProgressIndicator -> {
                             // HACK:RecyclerViewの初回アイテム表示時にスクロール初期位置がズレる事がある。
                             //      原因はプログレスバーの存在。最初にアイテムを表示する時、読込中の意味を込めてプログレスバーのみを表示させている。
                             //      スクロール読込機能の仕様により、読込データをRecyclerViewに表示する際、アイテムリスト末尾にプログレスバーを追加している。
@@ -400,10 +400,10 @@ internal abstract class DiaryYearMonthListBaseAdapter<
     }
 
     private fun countChildItems(adapterPosition: Int): Int {
-        return when (val item = currentList[adapterPosition] as DiaryYearMonthListItem<*>) {
-            is DiaryYearMonthListItem.Diary -> item.diaryDayList.countDiaries()
-            is DiaryYearMonthListItem.NoDiaryMessage -> 0
-            is DiaryYearMonthListItem.ProgressIndicator -> 0
+        return when (val item = currentList[adapterPosition] as DiaryYearMonthListItemUi<*>) {
+            is DiaryYearMonthListItemUi.Diary -> item.diaryDayList.countDiaries()
+            is DiaryYearMonthListItemUi.NoDiaryMessage -> 0
+            is DiaryYearMonthListItemUi.ProgressIndicator -> 0
         }
     }
 

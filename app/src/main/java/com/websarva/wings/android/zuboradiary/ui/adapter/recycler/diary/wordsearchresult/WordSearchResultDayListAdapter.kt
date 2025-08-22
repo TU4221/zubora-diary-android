@@ -16,14 +16,14 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.ListBaseAdapte
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDayListBaseDiffUtilItemCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultDayListAdapter.WordSearchResultDayViewHolder
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import java.text.NumberFormat
 
 internal class WordSearchResultDayListAdapter(
     recyclerView: RecyclerView,
     themeColor: ThemeColor
-) : ListBaseAdapter<DiaryDayListItem.WordSearchResult, WordSearchResultDayViewHolder>(
+) : ListBaseAdapter<DiaryDayListItemUi.WordSearchResult, WordSearchResultDayViewHolder>(
     recyclerView,
     themeColor,
     DiffUtilItemCallback()
@@ -48,7 +48,7 @@ internal class WordSearchResultDayListAdapter(
 
     override fun bindViewHolder(
         holder: WordSearchResultDayViewHolder,
-        item: DiaryDayListItem.WordSearchResult
+        item: DiaryDayListItemUi.WordSearchResult
     ) {
         holder.bind(
             item,
@@ -61,9 +61,9 @@ internal class WordSearchResultDayListAdapter(
     ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(
-            item: DiaryDayListItem.WordSearchResult,
+            item: DiaryDayListItemUi.WordSearchResult,
             themeColor: ThemeColor,
-            onItemClick: (DiaryDayListItem.WordSearchResult) -> Unit,
+            onItemClick: (DiaryDayListItemUi.WordSearchResult) -> Unit,
         ) {
             val context = binding.root.context
             binding.apply {
@@ -86,17 +86,17 @@ internal class WordSearchResultDayListAdapter(
             }
         }
 
-        private fun DiaryDayListItem.WordSearchResult
+        private fun DiaryDayListItemUi.WordSearchResult
             .createTitleSpannableString(context: Context, themeColor: ThemeColor): SpannableString {
             return toSpannableString(context, title, searchWord, themeColor)
         }
 
-        private fun DiaryDayListItem.WordSearchResult
+        private fun DiaryDayListItemUi.WordSearchResult
             .createItemTitleSpannableString(context: Context, themeColor: ThemeColor): SpannableString {
             return toSpannableString(context, itemTitle, searchWord, themeColor)
         }
 
-        private fun DiaryDayListItem.WordSearchResult
+        private fun DiaryDayListItemUi.WordSearchResult
             .createItemCommentSpannableString(context: Context, themeColor: ThemeColor): SpannableString {
             return toSpannableString(context, itemComment, searchWord, themeColor)
         }
@@ -136,13 +136,13 @@ internal class WordSearchResultDayListAdapter(
     }
 
     private class DiffUtilItemCallback :
-        DiaryDayListBaseDiffUtilItemCallback<DiaryDayListItem.WordSearchResult>() {
+        DiaryDayListBaseDiffUtilItemCallback<DiaryDayListItemUi.WordSearchResult>() {
 
         private val logTag = createLogTag()
 
         override fun areContentsTheSame(
-            oldItem: DiaryDayListItem.WordSearchResult,
-            newItem: DiaryDayListItem.WordSearchResult
+            oldItem: DiaryDayListItemUi.WordSearchResult,
+            newItem: DiaryDayListItemUi.WordSearchResult
         ): Boolean {
             val result =
                 oldItem.title == newItem.title

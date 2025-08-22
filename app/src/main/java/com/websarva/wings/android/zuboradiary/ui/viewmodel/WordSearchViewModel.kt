@@ -3,20 +3,24 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultDiariesUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearchResultDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewWordSearchResultListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshWordSearchResultListUseCase
+import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayList
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,9 +34,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class WordSearchViewModel @Inject internal constructor(
-    private val loadWordSearchResultDiaryListUseCase: LoadWordSearchResultDiaryListUseCase,
     private val countWordSearchResultDiariesUseCase: CountWordSearchResultDiariesUseCase,
-    private val checkUnloadedWordSearchResultDiariesExistUseCase: CheckUnloadedWordSearchResultDiariesExistUseCase
+    private val loadNewWordSearchResultListUseCase: LoadNewWordSearchResultListUseCase,
+    private val loadAdditionWordSearchResultListUseCase: LoadAdditionWordSearchResultListUseCase,
+    private val refreshWordSearchResultListUseCase: RefreshWordSearchResultListUseCase
 ) : BaseViewModel<WordSearchEvent, WordSearchAppMessage, WordSearchState>(
     WordSearchState.Idle
 ) {
@@ -71,7 +76,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private var wordSearchResultListLoadJob: Job? = initialWordSearchResultListLoadJob // キャンセル用
 
     private val numLoadItems = DiaryListViewModel.NUM_LOAD_ITEMS
-    private val initialWordSearchResultList = DiaryYearMonthList<DiaryDayListItem.WordSearchResult>()
+    private val initialWordSearchResultList = DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>()
     private val _wordSearchResultList = MutableStateFlow(initialWordSearchResultList)
     val wordSearchResultList
         get() = _wordSearchResultList.asStateFlow()
@@ -166,7 +171,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    fun onWordSearchResultListItemClick(item: DiaryDayListItem.WordSearchResult) {
+    fun onWordSearchResultListItemClick(item: DiaryDayListItemUi.WordSearchResult) {
         val date = item.date
         viewModelScope.launch {
             emitUiEvent(WordSearchEvent.NavigateDiaryShowFragment(date))
@@ -246,7 +251,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private suspend fun loadNewWordSearchResultList(
-        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String
     ) {
         loadWordSearchResultList(
@@ -255,14 +260,12 @@ internal class WordSearchViewModel @Inject internal constructor(
             searchWord
         ) { _, lambdaWordSearch ->
             showWordSearchResultListFirstItemProgressIndicator()
-            val value =
-                loadWordSearchResultDiaryList(numLoadItems, 0, lambdaWordSearch)
-            toUiWordSearchResultList(value, lambdaWordSearch)
+            loadNewWordSearchResultListUseCase(numLoadItems, lambdaWordSearch)
         }
     }
 
     private suspend fun loadAdditionWordSearchResultList(
-        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String
     ) {
         loadWordSearchResultList(
@@ -272,20 +275,16 @@ internal class WordSearchViewModel @Inject internal constructor(
         ) { lambdaCurrentList, lambdaWordSearch ->
             require(lambdaCurrentList.isNotEmpty)
 
-            val loadOffset = lambdaCurrentList.countDiaries()
-            val value =
-                loadWordSearchResultDiaryList(numLoadItems, loadOffset, lambdaWordSearch)
-            val loadedResultList = toUiWordSearchResultList(value, lambdaWordSearch)
-            val numLoadedDiaries =
-                lambdaCurrentList.countDiaries() + loadedResultList.countDiaries()
-            val existsUnloadedDiaries =
-                existsUnloadedDiaries(lambdaWordSearch, numLoadedDiaries)
-            lambdaCurrentList.combineDiaryLists(loadedResultList, !existsUnloadedDiaries)
+            loadAdditionWordSearchResultListUseCase(
+                numLoadItems,
+                lambdaCurrentList.toDomainModel(),
+                lambdaWordSearch
+            )
         }
     }
 
     private suspend fun updateWordSearchResultList(
-        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String
     ) {
         loadWordSearchResultList(
@@ -293,32 +292,18 @@ internal class WordSearchViewModel @Inject internal constructor(
             currentResultList,
             searchWord
         ) { lambdaCurrentList, lambdaWordSearch ->
-
-            var numLoadItems = lambdaCurrentList.countDiaries()
-            // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
-            //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
-            //      対策として下記コードを記述。
-            if (numLoadItems < this@WordSearchViewModel.numLoadItems) {
-                numLoadItems = this@WordSearchViewModel.numLoadItems
-            }
-            val value =
-                loadWordSearchResultDiaryList(
-                    numLoadItems,
-                    0,
-                    lambdaWordSearch
-                )
-            toUiWordSearchResultList(value, lambdaWordSearch)
+            refreshWordSearchResultListUseCase(lambdaCurrentList.toDomainModel(), lambdaWordSearch)
         }
     }
 
     private suspend fun loadWordSearchResultList(
         state: WordSearchState,
-        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String,
         processLoad: suspend (
-            currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
+            currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
             searchWord: String
-        ) -> DiaryYearMonthList<DiaryDayListItem.WordSearchResult>
+        ) -> DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>>
     ) {
         require(
             when (state) {
@@ -340,10 +325,12 @@ internal class WordSearchViewModel @Inject internal constructor(
             updateNumWordSearchResults(
                 countWordSearchResultDiaries(searchWord)
             )
-            val updateResultList = processLoad(currentResultList, searchWord)
-            updateWordSearchResultList(
-                processLoad(currentResultList, searchWord)
-            )
+            val updateResultList =
+                when (val result = processLoad(currentResultList, searchWord)) {
+                    is UseCaseResult.Success -> result.value.toUiModel()
+                    is UseCaseResult.Failure -> throw result.exception
+                }
+            updateWordSearchResultList(updateResultList)
             updateUiStateForResultList(updateResultList)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
@@ -357,7 +344,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    private fun updateUiStateForResultList(list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>) {
+    private fun updateUiStateForResultList(list: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>) {
         val state =
             if (list.isNotEmpty) {
                 WordSearchState.ShowingResultList
@@ -369,63 +356,13 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun showWordSearchResultListFirstItemProgressIndicator() {
         updateWordSearchResultList(
-            DiaryYearMonthList(false)
+            DiaryYearMonthListUi(false)
         )
-    }
-
-    @Throws(DomainException::class)
-    private suspend fun loadWordSearchResultDiaryList(
-        numLoadItems: Int,
-        loadOffset: Int,
-        searchWord: String
-    ): List<WordSearchResultListItem> {
-        require(numLoadItems > 0)
-        require(loadOffset >= 0)
-
-        val result =
-            loadWordSearchResultDiaryListUseCase(
-                numLoadItems,
-                loadOffset,
-                searchWord
-            )
-        return when (result) {
-            is UseCaseResult.Success -> result.value
-            is UseCaseResult.Failure -> throw result.exception
-        }
-    }
-
-    @Throws(DomainException::class)
-    private suspend fun toUiWordSearchResultList(
-        list: List<WordSearchResultListItem>,
-        searchWord: String
-    ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
-        Log.d("20250714", list.toString())
-        if (list.isEmpty()) return DiaryYearMonthList()
-
-        val resultDayList =
-            DiaryDayList(
-                list.stream().map { it.toUiModel(searchWord) }.toList()
-            )
-        val existsUnloadedDiaries =
-            existsUnloadedDiaries(
-                searchWord,
-                resultDayList.countDiaries()
-            )
-        return DiaryYearMonthList<DiaryDayListItem.WordSearchResult>(resultDayList, !existsUnloadedDiaries)
     }
 
     @Throws(DomainException::class)
     private suspend fun countWordSearchResultDiaries(searchWord: String): Int {
         when (val result = countWordSearchResultDiariesUseCase(searchWord)) {
-            is UseCaseResult.Success -> return result.value
-            is UseCaseResult.Failure -> throw result.exception
-        }
-    }
-
-    @Throws(DomainException::class)
-    private suspend fun existsUnloadedDiaries(searchWord: String, numLoadedDiaries: Int): Boolean {
-        val result = checkUnloadedWordSearchResultDiariesExistUseCase(searchWord, numLoadedDiaries)
-        when (result) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> throw result.exception
         }
@@ -444,7 +381,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         previousSearchWord = searchWord
     }
 
-    private fun updateWordSearchResultList(list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>) {
+    private fun updateWordSearchResultList(list: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>) {
         _wordSearchResultList.value = list
     }
 

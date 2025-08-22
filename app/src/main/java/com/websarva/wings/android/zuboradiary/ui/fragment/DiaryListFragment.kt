@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
@@ -21,7 +21,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import dagger.hilt.android.AndroidEntryPoint
@@ -158,7 +158,7 @@ class DiaryListFragment :
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.diaryList
-                .collectLatest { value: DiaryYearMonthList<DiaryDayListItem.Standard> ->
+                .collectLatest { value: DiaryYearMonthListUi<DiaryDayListItemUi.Standard> ->
                     if (shouldInitializeListAdapter) {
                         shouldInitializeListAdapter = false
                         //setUpListAdapter()
@@ -191,10 +191,10 @@ class DiaryListFragment :
 
         return diaryListAdapter.apply {
             build()
-            registerOnChildItemClickListener { item: DiaryDayListItem.Standard ->
+            registerOnChildItemClickListener { item: DiaryDayListItemUi.Standard ->
                 mainViewModel.onDiaryListItemClick(item)
             }
-            registerOnChildItemBackgroundButtonClickListener { item: DiaryDayListItem.Standard ->
+            registerOnChildItemBackgroundButtonClickListener { item: DiaryDayListItemUi.Standard ->
                 mainViewModel.onDiaryListItemDeleteButtonClick(item)
             }
         }

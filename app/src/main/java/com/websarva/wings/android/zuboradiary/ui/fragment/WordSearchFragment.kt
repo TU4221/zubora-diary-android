@@ -13,8 +13,8 @@ import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -104,7 +104,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.wordSearchResultList
-                .collectLatest { value: DiaryYearMonthList<DiaryDayListItem.WordSearchResult> ->
+                .collectLatest { value: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult> ->
                     if (shouldInitializeListAdapter) {
                         shouldInitializeListAdapter = false
                         //setUpListAdapter()
@@ -133,7 +133,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
 
         wordSearchResultListAdapter.apply {
             build()
-            registerOnChildItemClickListener { item: DiaryDayListItem.WordSearchResult ->
+            registerOnChildItemClickListener { item: DiaryDayListItemUi.WordSearchResult ->
                 mainViewModel.onWordSearchResultListItemClick(item)
             }
         }

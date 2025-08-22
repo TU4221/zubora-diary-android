@@ -11,8 +11,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputT
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryList
-import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -78,8 +78,8 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             .map { it == InputTextValidationResult.Valid }
             .stateInWhileSubscribed(false)
 
-    private val initialItemTitleSelectionHistoryList = SelectionHistoryList(emptyList())
-    lateinit var itemTitleSelectionHistoryList: StateFlow<SelectionHistoryList>
+    private val initialItemTitleSelectionHistoryList = SelectionHistoryListUi(emptyList())
+    lateinit var itemTitleSelectionHistoryList: StateFlow<SelectionHistoryListUi>
 
     init {
         setUpItemTitleSelectionHistoryList()
@@ -127,7 +127,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryItemClick(item: SelectionHistoryListItem) {
+    fun onDiaryItemTitleSelectionHistoryItemClick(item: SelectionHistoryListItemUi) {
         val itemTitle = item.title
         val itemNumber = _itemNumber.requireValue()
         viewModelScope.launch {
@@ -142,7 +142,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryItemSwipe(item: SelectionHistoryListItem) {
+    fun onDiaryItemTitleSelectionHistoryItemSwipe(item: SelectionHistoryListItemUi) {
         val itemTitle = item.title
         viewModelScope.launch {
             emitUiEvent(
@@ -217,16 +217,12 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                         else -> throw it
                     }
                 }.map { list ->
-                    if (list.isEmpty()) {
+                    if (list.isEmpty) {
                         updateUiState(DiaryItemTitleEditState.NoSelectionHistory)
                     } else {
                         updateUiState(DiaryItemTitleEditState.ShowingSelectionHistory)
                     }
-                    SelectionHistoryList(
-                        list.map { item ->
-                            item.toUiModel()
-                        }
-                    )
+                    list.toUiModel()
                 }.stateInWhileSubscribed(
                     initialItemTitleSelectionHistoryList
                 )

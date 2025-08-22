@@ -10,13 +10,13 @@ import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionH
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeSimpleCallback.LeftSwipeViewHolder
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diaryitemtitle.ItemTitleSelectionHistoryListAdapter.ItemTitleSelectionHistoryViewHolder
-import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.ui.model.list.selectionhistory.SelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal class ItemTitleSelectionHistoryListAdapter(
     recyclerView: SwipeRecyclerView,
     themeColor: ThemeColor
-) : LeftSwipeListBaseAdapter<SelectionHistoryListItem, ItemTitleSelectionHistoryViewHolder>(
+) : LeftSwipeListBaseAdapter<SelectionHistoryListItemUi, ItemTitleSelectionHistoryViewHolder>(
     recyclerView,
     themeColor,
     DiaryItemTitleSelectionHistoryDiffUtilItemCallback()
@@ -52,7 +52,7 @@ internal class ItemTitleSelectionHistoryListAdapter(
 
     override fun bindViewHolder(
         holder: ItemTitleSelectionHistoryViewHolder,
-        item: SelectionHistoryListItem
+        item: SelectionHistoryListItemUi
     ) {
         holder.bind(
             item,
@@ -63,16 +63,16 @@ internal class ItemTitleSelectionHistoryListAdapter(
 
     class ItemTitleSelectionHistoryViewHolder(
         val binding: RowItemTitleSelectionHistoryBinding
-    ) : LeftSwipeViewHolder<SelectionHistoryListItem>(binding) {
+    ) : LeftSwipeViewHolder<SelectionHistoryListItemUi>(binding) {
         override val foregroundView
             get() = binding.textTitle
         override val backgroundButtonView
             get() = RowBackgroundDeleteButtonFullWideBinding.bind(binding.root).imageButtonDelete
 
         override fun bind(
-            item: SelectionHistoryListItem,
-            onItemClick: (SelectionHistoryListItem) -> Unit,
-            onDeleteButtonClick: (SelectionHistoryListItem) -> Unit
+            item: SelectionHistoryListItemUi,
+            onItemClick: (SelectionHistoryListItemUi) -> Unit,
+            onDeleteButtonClick: (SelectionHistoryListItemUi) -> Unit
         ) {
             foregroundView.text = item.title
             setUpForegroundViewOnClickListener {
@@ -85,18 +85,18 @@ internal class ItemTitleSelectionHistoryListAdapter(
     }
 
     internal class DiaryItemTitleSelectionHistoryDiffUtilItemCallback :
-        DiffUtil.ItemCallback<SelectionHistoryListItem>() {
+        DiffUtil.ItemCallback<SelectionHistoryListItemUi>() {
 
         override fun areItemsTheSame(
-            oldItem: SelectionHistoryListItem,
-            newItem: SelectionHistoryListItem
+            oldItem: SelectionHistoryListItemUi,
+            newItem: SelectionHistoryListItemUi
         ): Boolean {
             return oldItem.title == newItem.title
         }
 
         override fun areContentsTheSame(
-            oldItem: SelectionHistoryListItem,
-            newItem: SelectionHistoryListItem
+            oldItem: SelectionHistoryListItemUi,
+            newItem: SelectionHistoryListItemUi
         ): Boolean {
             return false
         }

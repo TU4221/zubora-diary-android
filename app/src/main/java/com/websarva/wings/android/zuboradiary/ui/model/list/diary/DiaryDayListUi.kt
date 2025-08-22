@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.list.diary
 
-internal class DiaryDayList<T: DiaryDayListItem>(itemList: List<T>) {
+internal class DiaryDayListUi<T: DiaryDayListItemUi>(itemList: List<T>) {
 
     val itemList: List<T>
 
@@ -13,7 +13,7 @@ internal class DiaryDayList<T: DiaryDayListItem>(itemList: List<T>) {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other !is DiaryDayList<*>) return false
+        if (other !is DiaryDayListUi<*>) return false
 
         return itemList == other.itemList
     }
@@ -24,12 +24,5 @@ internal class DiaryDayList<T: DiaryDayListItem>(itemList: List<T>) {
 
     fun countDiaries(): Int {
         return itemList.size
-    }
-
-    fun combineDiaryDayLists(additionList: DiaryDayList<T>): DiaryDayList<T> {
-        require(additionList.isNotEmpty)
-
-        val resultItemList = itemList + additionList.itemList
-        return DiaryDayList(resultItemList)
     }
 }
