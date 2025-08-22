@@ -330,20 +330,22 @@ internal class WordSearchViewModel @Inject internal constructor(
                     is UseCaseResult.Failure -> throw result.exception
                 }
             updateWordSearchResultList(updateResultList)
-            updateUiStateForResultList(updateResultList)
+            updateUiStateOnWorSearchResultListLoadCompleted(updateResultList)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
-            updateUiStateForResultList(currentResultList)
+            updateUiStateOnWorSearchResultListLoadCompleted(currentResultList)
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}_失敗", e)
             updateWordSearchResultList(currentResultList)
-            updateUiStateForResultList(currentResultList)
+            updateUiStateOnWorSearchResultListLoadCompleted(currentResultList)
             emitAppMessageEvent(WordSearchAppMessage.SearchResultListLoadFailure)
         }
     }
 
-    private fun updateUiStateForResultList(list: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>) {
+    private fun updateUiStateOnWorSearchResultListLoadCompleted(
+        list: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>
+    ) {
         val state =
             if (list.isNotEmpty) {
                 WordSearchState.ShowingResultList

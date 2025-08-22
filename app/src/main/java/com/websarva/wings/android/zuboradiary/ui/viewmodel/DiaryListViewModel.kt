@@ -107,10 +107,10 @@ internal class DiaryListViewModel @Inject constructor(
                 loadNewDiaryList(currentList)
             } catch (e: CancellationException) {
                 Log.i(logTag, "${logMsg}_キャンセル", e)
-                updateUiStateForDiaryList(currentList)
+                updateUiStateOnDiaryListLoadCompleted(currentList)
             } catch (e: DomainException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
-                updateUiStateForDiaryList(currentList)
+                updateUiStateOnDiaryListLoadCompleted(currentList)
                 emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
                 return@launch
             }
@@ -346,15 +346,15 @@ internal class DiaryListViewModel @Inject constructor(
                     is UseCaseResult.Failure -> throw result.exception
                 }
             updateDiaryList(updateDiaryList)
-            updateUiStateForDiaryList(updateDiaryList)
+            updateUiStateOnDiaryListLoadCompleted(updateDiaryList)
             Log.i(logTag, "${logMsg}_完了")
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
-            updateUiStateForDiaryList(currentList)
+            updateUiStateOnDiaryListLoadCompleted(currentList)
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}_失敗", e)
             updateDiaryList(currentList)
-            updateUiStateForDiaryList(currentList)
+            updateUiStateOnDiaryListLoadCompleted(currentList)
             emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
         }
     }
@@ -381,7 +381,7 @@ internal class DiaryListViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
-                updateUiStateForDiaryList(currentList)
+                updateUiStateOnDiaryListLoadCompleted(currentList)
                 emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
             }
         }
@@ -409,7 +409,9 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private fun updateUiStateForDiaryList(list: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
+    private fun updateUiStateOnDiaryListLoadCompleted(
+        list: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
+    ) {
         val state =
             if (list.isNotEmpty) {
                 DiaryListState.ShowingDiaryList
