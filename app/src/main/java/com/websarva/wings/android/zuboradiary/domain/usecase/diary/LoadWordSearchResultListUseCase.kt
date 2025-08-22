@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.mapper.toDiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
@@ -51,7 +51,7 @@ internal class LoadWordSearchResultListUseCase(
     }
 
     private fun convertWordSearchResultList(
-        diaryList: List<WordSearchResultListItem>,
+        diaryList: List<RawWordSearchResultListItem>,
         searchWord: String
     ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
         if (diaryList.isEmpty()) return DiaryYearMonthList()
@@ -64,7 +64,7 @@ internal class LoadWordSearchResultListUseCase(
     }
 
     private fun convertWordSearchResultListItem(
-        item: WordSearchResultListItem,
+        item: RawWordSearchResultListItem,
         searchWord: String
     ): DiaryDayListItem.WordSearchResult {
         val diaryItem = extractWordSearchResultTargetItem(item, searchWord)
@@ -82,7 +82,7 @@ internal class LoadWordSearchResultListUseCase(
     // MEMO:本来はDataSource側で処理するべき内容だが、対象日記項目のみを抽出するには複雑なロジックになる為、
     //      ドメイン側で処理する。
     private fun extractWordSearchResultTargetItem(
-        item: WordSearchResultListItem,
+        item: RawWordSearchResultListItem,
         searchWord: String
     ): Map<String, Any> {
         val regex = ".*$searchWord.*"

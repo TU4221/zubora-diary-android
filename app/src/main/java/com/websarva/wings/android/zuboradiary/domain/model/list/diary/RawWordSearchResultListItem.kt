@@ -1,8 +1,8 @@
-package com.websarva.wings.android.zuboradiary.domain.model
+package com.websarva.wings.android.zuboradiary.domain.model.list.diary
 
 import java.time.LocalDate
 
-internal data class WordSearchResultListItem(
+internal data class RawWordSearchResultListItem(
     val date: LocalDate,
     val title: String,
     val item1Title: String,

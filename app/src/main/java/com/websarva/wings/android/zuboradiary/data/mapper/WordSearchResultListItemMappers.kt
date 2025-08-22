@@ -1,11 +1,11 @@
 package com.websarva.wings.android.zuboradiary.data.mapper
 
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItemData
-import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
 import java.time.LocalDate
 
-internal fun WordSearchResultListItemData.toDomainModel(): WordSearchResultListItem {
-    return WordSearchResultListItem(
+internal fun WordSearchResultListItemData.toDomainModel(): RawWordSearchResultListItem {
+    return RawWordSearchResultListItem(
         LocalDate.parse(date),
         title,
         item1Title,

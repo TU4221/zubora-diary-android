@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.data.mapper.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
-import com.websarva.wings.android.zuboradiary.domain.model.WordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeleteFailureException
@@ -154,7 +154,7 @@ internal class DiaryRepository (
         num: Int,
         offset: Int,
         searchWord: String
-    ): List<WordSearchResultListItem> {
+    ): List<RawWordSearchResultListItem> {
         require(num >= 1)
         require(offset >= 0)
 
