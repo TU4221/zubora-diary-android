@@ -257,9 +257,9 @@ internal class WordSearchViewModel @Inject internal constructor(
             WordSearchState.Searching,
             currentResultList,
             searchWord
-        ) { _, lambdaWordSearch ->
+        ) { _, lambdaSearchWord ->
             showWordSearchResultListFirstItemProgressIndicator()
-            loadNewWordSearchResultListUseCase(numLoadItems, lambdaWordSearch)
+            loadNewWordSearchResultListUseCase(numLoadItems, lambdaSearchWord)
         }
     }
 
@@ -271,13 +271,13 @@ internal class WordSearchViewModel @Inject internal constructor(
             WordSearchState.AdditionLoading,
             currentResultList,
             searchWord
-        ) { lambdaCurrentList, lambdaWordSearch ->
+        ) { lambdaCurrentList, lambdaSearchWord ->
             require(lambdaCurrentList.isNotEmpty)
 
             loadAdditionWordSearchResultListUseCase(
                 numLoadItems,
                 lambdaCurrentList.toDomainModel(),
-                lambdaWordSearch
+                lambdaSearchWord
             )
         }
     }
@@ -290,8 +290,8 @@ internal class WordSearchViewModel @Inject internal constructor(
             WordSearchState.Updating,
             currentResultList,
             searchWord
-        ) { lambdaCurrentList, lambdaWordSearch ->
-            refreshWordSearchResultListUseCase(lambdaCurrentList.toDomainModel(), lambdaWordSearch)
+        ) { lambdaCurrentList, lambdaSearchWord ->
+            refreshWordSearchResultListUseCase(lambdaCurrentList.toDomainModel(), lambdaSearchWord)
         }
     }
 
