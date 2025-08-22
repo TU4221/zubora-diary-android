@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.domain.NUM_LOAD_ITEMS
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
@@ -17,7 +18,6 @@ internal class LoadAdditionWordSearchResultListUseCase(
     private val logTag = createLogTag()
 
     suspend operator fun invoke(
-        numLoadItems: Int,
         currentList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
         searchWord: String
     ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>> {
@@ -27,7 +27,7 @@ internal class LoadAdditionWordSearchResultListUseCase(
         try {
             val loadedDiaryList =
                 loadDiaryList(
-                    numLoadItems,
+                    NUM_LOAD_ITEMS,
                     currentList.countDiaries(),
                     searchWord
                 )

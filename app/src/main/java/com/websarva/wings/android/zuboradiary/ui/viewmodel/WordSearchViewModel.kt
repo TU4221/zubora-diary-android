@@ -75,7 +75,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val initialWordSearchResultListLoadJob: Job? = null
     private var wordSearchResultListLoadJob: Job? = initialWordSearchResultListLoadJob // キャンセル用
 
-    private val numLoadItems = DiaryListViewModel.NUM_LOAD_ITEMS
     private val initialWordSearchResultList = DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>()
     private val _wordSearchResultList = MutableStateFlow(initialWordSearchResultList)
     val wordSearchResultList
@@ -260,7 +259,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             searchWord
         ) { _, lambdaSearchWord ->
             showWordSearchResultListFirstItemProgressIndicator()
-            loadNewWordSearchResultListUseCase(numLoadItems, lambdaSearchWord)
+            loadNewWordSearchResultListUseCase(lambdaSearchWord)
         }
     }
 
@@ -276,7 +275,6 @@ internal class WordSearchViewModel @Inject internal constructor(
             require(lambdaCurrentList.isNotEmpty)
 
             loadAdditionWordSearchResultListUseCase(
-                numLoadItems,
                 lambdaCurrentList.toDomainModel(),
                 lambdaSearchWord
             )

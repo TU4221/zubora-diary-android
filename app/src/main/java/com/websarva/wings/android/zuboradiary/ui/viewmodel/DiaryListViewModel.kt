@@ -53,12 +53,6 @@ internal class DiaryListViewModel @Inject constructor(
     DiaryListState.Idle
 ) {
 
-    companion object {
-        // MEMO:初期読込時の対象リストが画面全体に表示される値にすること。
-        //      アイテム数が少ないと最後尾のプログラスインディケーターが表示される為。
-        const val NUM_LOAD_ITEMS: Int = 14/*日(2週間分)*/
-    }
-
     private val logTag = createLogTag()
 
     override val isProgressIndicatorVisible =
@@ -288,7 +282,7 @@ internal class DiaryListViewModel @Inject constructor(
             currentList
         ) { _ ->
             showDiaryListFirstItemProgressIndicator()
-            loadNewDiaryListUseCase(NUM_LOAD_ITEMS, sortConditionDate)
+            loadNewDiaryListUseCase(sortConditionDate)
         }
     }
 
@@ -300,7 +294,6 @@ internal class DiaryListViewModel @Inject constructor(
             require(lambdaCurrentList.isNotEmpty)
 
             loadAdditionDiaryListUseCase(
-                NUM_LOAD_ITEMS,
                 lambdaCurrentList.toDomainModel(),
                 sortConditionDate
             )
