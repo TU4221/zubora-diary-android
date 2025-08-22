@@ -36,7 +36,7 @@ internal class LoadWordSearchResultListUseCase(
 
         try {
             val wordSearchResultList =
-                diaryRepository.loadWordSearchResultDiaryList(
+                diaryRepository.loadWordSearchResultList(
                     numLoadItems,
                     loadOffset,
                     searchWord
@@ -69,7 +69,7 @@ internal class LoadWordSearchResultListUseCase(
         item: WordSearchResultListItem,
         searchWord: String
     ): DiaryDayListItem.WordSearchResult {
-        val diaryItem = extractWordSearchTargetItem(item, searchWord)
+        val diaryItem = extractWordSearchResultTargetItem(item, searchWord)
         val itemNumberInt = diaryItem[itemNumberKey] as Int
         return DiaryDayListItem.WordSearchResult(
             item.date,
@@ -81,7 +81,7 @@ internal class LoadWordSearchResultListUseCase(
         )
     }
 
-    private fun extractWordSearchTargetItem(
+    private fun extractWordSearchResultTargetItem(
         item: WordSearchResultListItem,
         searchWord: String
     ): Map<String, Any> {

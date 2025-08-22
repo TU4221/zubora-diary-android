@@ -150,7 +150,7 @@ internal class DiaryRepository (
     }
 
     @Throws(WordSearchResultListLoadFailureException::class)
-    suspend fun loadWordSearchResultDiaryList(
+    suspend fun loadWordSearchResultList(
         num: Int,
         offset: Int,
         searchWord: String
