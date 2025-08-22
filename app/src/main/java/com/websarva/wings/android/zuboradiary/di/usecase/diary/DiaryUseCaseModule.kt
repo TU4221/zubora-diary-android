@@ -5,9 +5,9 @@ import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoReposit
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CanFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultDiariesExistUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultsExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultDiariesUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
@@ -165,14 +165,14 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideCountWordSearchResultDiariesUseCase(diaryRepository: DiaryRepository) =
-        CountWordSearchResultDiariesUseCase(diaryRepository)
+    fun provideCountWordSearchResultsUseCase(diaryRepository: DiaryRepository) =
+        CountWordSearchResultsUseCase(diaryRepository)
 
     @Singleton
     @Provides
-    fun provideCheckUnloadedWordSearchResultDiariesExistUseCase(
-        countWordSearchResultDiariesUseCase: CountWordSearchResultDiariesUseCase
-    ) = CheckUnloadedWordSearchResultDiariesExistUseCase(countWordSearchResultDiariesUseCase)
+    fun provideCheckUnloadedWordSearchResultsExistUseCase(
+        countWordSearchResultsUseCase: CountWordSearchResultsUseCase
+    ) = CheckUnloadedWordSearchResultsExistUseCase(countWordSearchResultsUseCase)
 
     @Singleton
     @Provides
@@ -258,6 +258,6 @@ internal object DiaryUseCaseModule {
     @Singleton
     @Provides
     fun provideUpdateWordSearchResultListFooterUseCase(
-        checkUnloadedWordSearchResultDiariesExistUseCase: CheckUnloadedWordSearchResultDiariesExistUseCase
-    ) = UpdateWordSearchResultListFooterUseCase(checkUnloadedWordSearchResultDiariesExistUseCase)
+        checkUnloadedWordSearchResultsExistUseCase: CheckUnloadedWordSearchResultsExistUseCase
+    ) = UpdateWordSearchResultListFooterUseCase(checkUnloadedWordSearchResultsExistUseCase)
 }

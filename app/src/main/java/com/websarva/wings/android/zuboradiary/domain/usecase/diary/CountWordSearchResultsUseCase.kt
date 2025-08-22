@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResul
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal class CountWordSearchResultDiariesUseCase(
+internal class CountWordSearchResultsUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
@@ -20,7 +20,7 @@ internal class CountWordSearchResultDiariesUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         return try {
-            val numDiaries =diaryRepository.countWordSearchResultDiaries(searchWord)
+            val numDiaries =diaryRepository.countWordSearchResults(searchWord)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(numDiaries)
         } catch (e: DiaryCountFailureException) {

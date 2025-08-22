@@ -139,7 +139,7 @@ internal class DiaryRepository (
     }
 
     @Throws(WordSearchResultCountFailureException::class)
-    suspend fun countWordSearchResultDiaries(searchWord: String): Int {
+    suspend fun countWordSearchResults(searchWord: String): Int {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.countWordSearchResults(searchWord)

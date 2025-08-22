@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResul
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal class UpdateWordSearchResultListFooterUseCase(
-    private val checkUnloadedWordSearchResultDiariesExistUseCase: CheckUnloadedWordSearchResultDiariesExistUseCase
+    private val checkUnloadedWordSearchResultsExistUseCase: CheckUnloadedWordSearchResultsExistUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -24,7 +24,7 @@ internal class UpdateWordSearchResultListFooterUseCase(
         try {
             val numLoadedDiaries = list.countDiaries()
             val resultList =
-                when (val result = checkUnloadedWordSearchResultDiariesExistUseCase(searchWord, numLoadedDiaries)) {
+                when (val result = checkUnloadedWordSearchResultsExistUseCase(searchWord, numLoadedDiaries)) {
                     is UseCaseResult.Success -> {
                         if (result.value) {
                             list

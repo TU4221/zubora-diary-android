@@ -5,8 +5,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResul
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal class CheckUnloadedWordSearchResultDiariesExistUseCase(
-    private val countWordSearchResultDiariesUseCase: CountWordSearchResultDiariesUseCase
+internal class CheckUnloadedWordSearchResultsExistUseCase(
+    private val countWordSearchResultsUseCase: CountWordSearchResultsUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -18,7 +18,7 @@ internal class CheckUnloadedWordSearchResultDiariesExistUseCase(
         val logMsg = "未読込ワード検索結果日記確認_"
         Log.i(logTag, "${logMsg}開始")
 
-        return when (val result = countWordSearchResultDiariesUseCase(searchWord)) {
+        return when (val result = countWordSearchResultsUseCase(searchWord)) {
             is UseCaseResult.Success -> {
                 val numExistingDiaries = result.value
                 val value =

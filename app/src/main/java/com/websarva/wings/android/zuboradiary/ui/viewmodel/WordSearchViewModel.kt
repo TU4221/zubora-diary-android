@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayLi
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultDiariesUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewWordSearchResultListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshWordSearchResultListUseCase
@@ -33,7 +33,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class WordSearchViewModel @Inject internal constructor(
-    private val countWordSearchResultDiariesUseCase: CountWordSearchResultDiariesUseCase,
+    private val countWordSearchResultsUseCase: CountWordSearchResultsUseCase,
     private val loadNewWordSearchResultListUseCase: LoadNewWordSearchResultListUseCase,
     private val loadAdditionWordSearchResultListUseCase: LoadAdditionWordSearchResultListUseCase,
     private val refreshWordSearchResultListUseCase: RefreshWordSearchResultListUseCase
@@ -322,7 +322,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         updateUiState(state)
         try {
             updateNumWordSearchResults(
-                countWordSearchResultDiaries(searchWord)
+                countWordSearchResults(searchWord)
             )
             val updateResultList =
                 when (val result = processLoad(currentResultList, searchWord)) {
@@ -362,8 +362,8 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     @Throws(DomainException::class)
-    private suspend fun countWordSearchResultDiaries(searchWord: String): Int {
-        when (val result = countWordSearchResultDiariesUseCase(searchWord)) {
+    private suspend fun countWordSearchResults(searchWord: String): Int {
+        when (val result = countWordSearchResultsUseCase(searchWord)) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> throw result.exception
         }
