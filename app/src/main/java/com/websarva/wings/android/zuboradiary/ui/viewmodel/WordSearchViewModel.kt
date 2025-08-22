@@ -7,7 +7,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayLi
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewWordSearchResultListUseCase
