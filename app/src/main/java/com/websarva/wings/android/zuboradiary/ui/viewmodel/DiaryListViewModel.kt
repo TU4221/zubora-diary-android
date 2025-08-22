@@ -23,6 +23,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -360,7 +361,12 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private fun showDiaryListFirstItemProgressIndicator() {
-        val list = DiaryYearMonthListUi<DiaryDayListItemUi.Standard>(false)
+        val list =
+            DiaryYearMonthListUi<DiaryDayListItemUi.Standard>(
+                listOf(
+                    DiaryYearMonthListItemUi.ProgressIndicator()
+                )
+            )
         updateDiaryList(list)
     }
 

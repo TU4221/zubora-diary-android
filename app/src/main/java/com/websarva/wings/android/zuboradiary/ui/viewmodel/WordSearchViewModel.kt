@@ -19,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
@@ -357,7 +358,11 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun showWordSearchResultListFirstItemProgressIndicator() {
         updateWordSearchResultList(
-            DiaryYearMonthListUi(false)
+            DiaryYearMonthListUi(
+                listOf(
+                    DiaryYearMonthListItemUi.ProgressIndicator()
+                )
+            )
         )
     }
 

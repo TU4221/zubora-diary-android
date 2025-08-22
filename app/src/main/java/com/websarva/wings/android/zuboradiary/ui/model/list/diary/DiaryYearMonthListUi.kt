@@ -1,28 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.model.list.diary
 
-internal class DiaryYearMonthListUi<T: DiaryDayListItemUi> {
-
-    val itemList: List<DiaryYearMonthListItemUi<T>>
+internal data class DiaryYearMonthListUi<T: DiaryDayListItemUi>(
+    val itemList: List<DiaryYearMonthListItemUi<T>> = emptyList()
+) {
 
     val isNotEmpty get() = itemList.isNotEmpty()
-
-    constructor(itemList: List<DiaryYearMonthListItemUi<T>>) {
-        this.itemList = itemList
-    }
-
-    /**
-     * true:日記なしメッセージのみのリスト作成<br></br>
-     * false:ProgressIndicatorのみのリスト作成
-     */
-    constructor(needsNoDiaryMessage: Boolean) {
-        val emptyList: List<DiaryYearMonthListItemUi<T>> = ArrayList()
-
-        this.itemList = emptyList + DiaryYearMonthListItemUi.ProgressIndicator()
-    }
-
-    constructor() {
-        this.itemList = ArrayList()
-    }
 
     fun countDiaries(): Int {
         var count = 0
