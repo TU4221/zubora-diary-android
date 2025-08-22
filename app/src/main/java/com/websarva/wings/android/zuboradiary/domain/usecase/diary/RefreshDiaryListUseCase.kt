@@ -26,9 +26,14 @@ internal class RefreshDiaryListUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         var numLoadItems = currentList.countDiaries()
-        // HACK:画面全体にリストアイテムが存在しない状態で日記を追加した後にリスト画面に戻ると、
-        //      日記追加前のアイテム数しか表示されない状態となる。また、スクロール更新もできない。
-        //      対策として下記コードを記述。
+        // HACK:リストが空の状態、又は画面サイズより少ないアイテム数で日記を追加し、
+        //      リスト画面に戻った際に以下の問題が発生する回避策。
+        //      問題点:
+        //      1. 新しく追加された日記が表示されず、追加前のアイテム数でリストが描画される。
+        //      2. スクロールによる追加読み込みも機能しない。
+        //      対策:
+        //      NUM_LOAD_ITEMS に満たない場合は、強制的に NUM_LOAD_ITEMS 分の読み込みを行うことで、
+        //      新規追加されたアイテムの表示とスクロール更新を可能にする。
         if (numLoadItems < NUM_LOAD_ITEMS) {
             numLoadItems = NUM_LOAD_ITEMS
         }
