@@ -102,6 +102,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         val listSize = adapter.itemCount
         require(position < listSize)
 
+        // TODO:例外発生(後日調査)
         val viewHolder =
             checkNotNull(recyclerView.findViewHolderForAdapterPosition(position))
 
