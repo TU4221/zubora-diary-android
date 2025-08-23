@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.fragment
+package com.websarva.wings.android.zuboradiary.ui
 
 /**
  * フラグメント間で結果をやり取りする際に使用するリクエストキーの共通プレフィックス。
