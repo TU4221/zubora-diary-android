@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.model.list.diary
 
 internal data class DiaryYearMonthList<T: DiaryDayListItem>(
-    val itemList: List<DiaryYearMonthListItem<T>> = ArrayList()
+    val itemList: List<DiaryYearMonthListItem<T>> = emptyList()
 ) {
 
     val isNotEmpty get() = itemList.isNotEmpty()
