@@ -47,10 +47,6 @@ class MainActivity : LoggingActivity() {
     private var isMainActivityLayoutInflated = false
     private var shouldJumpToInitialState = true
 
-    // BottomNavigation
-    internal var wasSelectedTab = false
-        private set
-
     private val navHostFragment: NavHostFragment
         get() =
             checkNotNull(
@@ -266,7 +262,7 @@ class MainActivity : LoggingActivity() {
         bottomNavigationView.apply {
             setOnItemSelectedListener(
                 CustomOnItemSelectedListener(this, navController) {
-                    wasSelectedTab = true
+                    mainActivityViewModel.onBottomNavigationItemSelect()
                     setUpFragmentTransition()
                 }
             )
@@ -346,11 +342,6 @@ class MainActivity : LoggingActivity() {
 
         //* B-2 → C-2 : Exit → Enter
         //* C-2 → B-2 : Exit → Enter
-    }
-
-    // BottomNavigationタブ選択による画面遷移の遷移先FragmentのTransition設定完了後用リセットメソッド
-    internal fun clearWasSelectedTab() {
-        wasSelectedTab = false
     }
 
     // MEMO:BottomNavigationView経由のFragment間でNavigateUpすると、意図しない遷移エフェクトになる。

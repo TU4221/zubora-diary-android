@@ -94,11 +94,12 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         // HACK:ボトムナビゲーションタブでFragment切替時はEnterTransitionで設定されるエフェクトを変更する。
         //      NavigationStartFragment(DiaryListFragment)はReenterTransitionで設定されたエフェクトが処理される。
         //      遷移元FragmentのエフェクトはMainActivityクラスにて設定。
-        val enterTransitionType: Transition = if (mainActivity.wasSelectedTab) {
-            MaterialFadeThrough()
-        } else {
-            MaterialSharedAxis(MaterialSharedAxis.X, true)
-        }
+        val enterTransitionType: Transition =
+            if (mainActivityViewModel.wasSelectedTab.value) {
+                MaterialFadeThrough()
+            } else {
+                MaterialSharedAxis(MaterialSharedAxis.X, true)
+            }
         enterTransition = enterTransitionType
 
         // FROM - TO の FROM として消えるアニメーション
@@ -108,14 +109,15 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         )
 
         // TO - FROM の FROM として現れるアニメーション
-        val reenterTransitionType: Transition = if (mainActivity.wasSelectedTab) {
-            MaterialFadeThrough()
-        } else {
-            MaterialSharedAxis(
-                MaterialSharedAxis.X,
-                false
-            )
-        }
+        val reenterTransitionType: Transition =
+            if (mainActivityViewModel.wasSelectedTab.value) {
+                MaterialFadeThrough()
+            } else {
+                MaterialSharedAxis(
+                    MaterialSharedAxis.X,
+                    false
+                )
+            }
         reenterTransition = reenterTransitionType
 
         // TO - FROM の TO として消えるアニメーション
@@ -124,7 +126,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
             false
         )
 
-        mainActivity.clearWasSelectedTab()
+        mainActivityViewModel.onFragmentTransitionSetupCompleted()
     }
 
     internal fun addTransitionListener(listener: Transition.TransitionListener) {

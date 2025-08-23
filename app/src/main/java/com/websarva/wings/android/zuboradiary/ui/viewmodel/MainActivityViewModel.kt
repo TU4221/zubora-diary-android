@@ -17,6 +17,9 @@ internal class MainActivityViewModel : ViewModel() {
     private val _isProgressIndicatorVisible = MutableStateFlow(false)
     val isProgressIndicatorVisible get() = _isProgressIndicatorVisible.asStateFlow()
 
+    private val _wasSelectedTab = MutableStateFlow(false)
+    val wasSelectedTab get() = _wasSelectedTab.asStateFlow()
+
     fun onRequestBottomNavigationStateChange(isVisible: Boolean) {
         updateBottomNavigationUiState(isVisible)
     }
@@ -27,6 +30,14 @@ internal class MainActivityViewModel : ViewModel() {
 
     fun onFragmentProgressVisibilityChanged(isVisible: Boolean) {
         updateIsProgressIndicatorVisible(isVisible)
+    }
+
+    fun onBottomNavigationItemSelect() {
+        updateWasSelectedTab(true)
+    }
+
+    fun onFragmentTransitionSetupCompleted() {
+        updateWasSelectedTab(false)
     }
 
     private fun updateBottomNavigationUiState(isVisible: Boolean) {
@@ -54,5 +65,9 @@ internal class MainActivityViewModel : ViewModel() {
 
     private fun updateIsProgressIndicatorVisible(isVisible: Boolean) {
         _isProgressIndicatorVisible.value = isVisible
+    }
+
+    private fun updateWasSelectedTab(wasSelected: Boolean) {
+        _wasSelectedTab.value = wasSelected
     }
 }
