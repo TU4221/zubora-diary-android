@@ -11,7 +11,6 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
-import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
@@ -30,9 +29,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
     private val logTag = createLogTag()
 
-    internal val mainActivity
-        get() = requireActivity() as MainActivity
-
     // View関係
     private var _binding: T? = null
     internal val binding get() = checkNotNull(_binding)
@@ -43,7 +39,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    private val mainActivityViewModel: MainActivityViewModel by activityViewModels()
+    internal val mainActivityViewModel: MainActivityViewModel by activityViewModels()
     @Suppress("unused", "RedundantSuppression")
     internal val settingsViewModel: SettingsViewModel by activityViewModels()
 

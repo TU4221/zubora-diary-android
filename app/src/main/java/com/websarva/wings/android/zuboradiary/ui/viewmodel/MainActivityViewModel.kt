@@ -1,12 +1,21 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.MainActivityUiState
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 internal class MainActivityViewModel : ViewModel() {
+
+    private val _uiEvent = MutableSharedFlow<ConsumableEvent<MainActivityEvent>>(replay = 1)
+    val uiEvent get() = _uiEvent.asSharedFlow()
 
     private val _uiState =
         MutableStateFlow<MainActivityUiState>(
@@ -38,6 +47,18 @@ internal class MainActivityViewModel : ViewModel() {
 
     fun onFragmentTransitionSetupCompleted() {
         updateWasSelectedTab(false)
+    }
+
+    fun onNavigateBackFromBottomNavigationTab() {
+        viewModelScope.launch {
+            updateUiEvent(MainActivityEvent.NavigateStartTabFragment)
+        }
+    }
+
+    private suspend fun updateUiEvent(event: MainActivityEvent) {
+        _uiEvent.emit(
+            ConsumableEvent(event)
+        )
     }
 
     private fun updateBottomNavigationUiState(isVisible: Boolean) {

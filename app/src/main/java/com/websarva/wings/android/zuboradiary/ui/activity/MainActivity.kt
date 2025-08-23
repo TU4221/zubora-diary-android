@@ -29,6 +29,8 @@ import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
+import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.MainActivityUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -81,6 +83,7 @@ class MainActivity : LoggingActivity() {
                         if (isMainActivityLayoutInflated) return@collectLatest
                         setUpMainActivityBinding(value)
                         isMainActivityLayoutInflated = true
+                        setUpUiEvent()
                         setUpUiState()
                         setUpThemeColor()
                         setUpNavigation()
@@ -179,6 +182,20 @@ class MainActivity : LoggingActivity() {
                 lifecycleOwner = this@MainActivity
             }
         setContentView(binding.root)
+    }
+
+    private fun setUpUiEvent() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainActivityViewModel.uiEvent
+                    .collectLatest { value: ConsumableEvent<MainActivityEvent> ->
+                        val event = value.getContentIfNotHandled() ?: return@collectLatest
+                        when (event) {
+                            MainActivityEvent.NavigateStartTabFragment -> navigateBottomNavigationStartTabFragment()
+                        }
+                    }
+            }
+        }
     }
 
     private fun setUpUiState() {
@@ -348,7 +365,7 @@ class MainActivity : LoggingActivity() {
     //      これは遷移エフェクトの設定方法の都合によるものになる。
     //      これを避け、ユーザーがタブを再選択した際と同じ挙動(正しいエフェクト)で開始Fragmentに戻すために、
     //      このメソッドを使用する。
-    internal fun navigateToStartTab() {
+    private fun navigateBottomNavigationStartTabFragment() {
         binding.bottomNavigation.apply {
             selectedItemId =
                 menu.getItem(0).itemId // 初期メニューアイテム(アプリ起動で最初に選択されているアイテム)

@@ -123,7 +123,7 @@ class CalendarFragment :
             is CalendarEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
                     is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        mainActivity.navigateToStartTab()
+                        mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
                     }
                     is CommonUiEvent.NavigateAppMessage -> {
                         navigateAppMessageDialog(event.wrappedEvent.message)
