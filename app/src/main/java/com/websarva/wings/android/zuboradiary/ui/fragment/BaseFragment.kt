@@ -125,20 +125,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         mainActivityViewModel.onFragmentTransitionSetupCompleted()
     }
 
-    internal fun addTransitionListener(listener: Transition.TransitionListener) {
-        val enterTransition = checkNotNull(enterTransition) as MaterialSharedAxis
-        enterTransition.addListener(listener)
-
-        val exitTransition = checkNotNull(exitTransition) as MaterialSharedAxis
-        exitTransition.addListener(listener)
-
-        val reenterTransition = checkNotNull(reenterTransition) as MaterialSharedAxis
-        reenterTransition.addListener(listener)
-
-        val returnTransition = checkNotNull(returnTransition) as MaterialSharedAxis
-        returnTransition.addListener(listener)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
