@@ -280,7 +280,7 @@ class MainActivity : LoggingActivity() {
             setOnItemSelectedListener(
                 CustomOnItemSelectedListener(this, navController) {
                     mainActivityViewModel.onBottomNavigationItemSelect()
-                    setUpFragmentTransition()
+                    setUpFragmentTransitionOnTabSelection()
                 }
             )
             setOnItemReselectedListener {
@@ -327,7 +327,7 @@ class MainActivity : LoggingActivity() {
         }
     }
 
-    private fun setUpFragmentTransition() {
+    private fun setUpFragmentTransitionOnTabSelection() {
         // 表示中のFragmentを取得し、Transitionを設定
         currentFragment.apply {
             exitTransition = MaterialFadeThrough()
