@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -43,7 +44,10 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
         setUpFragmentResultReceiverInternal(key, block)
     }
 
-    private fun <R> setUpFragmentResultReceiverInternal(key: String, block: (R) -> Unit) {
+    private fun <R: NavigationResult> setUpFragmentResultReceiverInternal(
+        key: String,
+        block: (R) -> Unit
+    ) {
         fragmentHelper
             .setUpFragmentResultReceiverInternal(
                 findNavController(),

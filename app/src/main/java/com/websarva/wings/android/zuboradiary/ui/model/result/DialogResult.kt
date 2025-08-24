@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.model.result
 
 import java.io.Serializable
 
-internal sealed class DialogResult<out T> : Serializable {
+internal sealed class DialogResult<out T> : NavigationResult, Serializable {
 
     data class Positive<out T>(
         val data: T

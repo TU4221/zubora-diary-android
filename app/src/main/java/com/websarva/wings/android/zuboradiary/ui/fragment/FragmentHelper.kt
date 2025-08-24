@@ -17,6 +17,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
@@ -47,7 +48,7 @@ internal class FragmentHelper {
         return ThemeColorInflaterCreator().create(inflater, themeColor)
     }
 
-    fun <R> setUpFragmentResultReceiverInternal(
+    fun <R : NavigationResult> setUpFragmentResultReceiverInternal(
         navController: NavController,
         fragmentDestinationId: Int,
         key: String,
