@@ -46,6 +46,11 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
 
     private lateinit var itemTouchHelper: ItemTouchHelper
 
+    // MEMO:スワイプ時、タッチ状態を継続したままRecyclerViewを更新するとonSwiped()が起動するが、
+    //      対象ViewHolderのItemPositionが-1となるため、Overrideで記述したコードで例外が発生する。
+    //      その為、RecyclerViewを更新時はgetSwipeDirs()をOverrideしてスワイプ機能を無効にする。
+    private var isItemInteractionEnabled = true
+
     private val initializePosition = -1
     protected var swipingAdapterPosition: Int = initializePosition
         private set
@@ -198,6 +203,8 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     ): Int {
         Log.d(logTag, "getMovementFlags()_position = " + viewHolder.bindingAdapterPosition)
 
+        if (!isItemInteractionEnabled) return 0
+
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
 
         // アニメーション中スワイプ機能無効
@@ -328,6 +335,10 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
 
     private fun resetInvalidSwipeAdapterPosition() {
         invalidSwipeAdapterPosition = initializePosition
+    }
+
+    fun updateIsItemMovementEnabled(enabled: Boolean) {
+        isItemInteractionEnabled = enabled
     }
 
     fun closeSwipedItem() {

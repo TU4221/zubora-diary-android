@@ -18,8 +18,6 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeR
 
     private var swipingOffset: Float = 0f
 
-    var isSwipeEnabled = true
-
     override fun build() {
         super.build()
         recyclerView.setOnPerformClickListener { view, event ->
@@ -59,20 +57,6 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeR
             return true
         }
         return false
-    }
-
-    // MEMO:スワイプ時、タッチ状態を継続したままRecyclerViewを更新するとonSwiped()が起動するが、
-    //      対象ViewHolderのItemPositionが-1となるため、Overrideで記述したコードで例外が発生する。
-    //      その為、RecyclerViewを更新時はgetSwipeDirs()をOverrideしてスワイプ機能を無効にする。
-    override fun getSwipeDirs(
-        recyclerView: RecyclerView,
-        viewHolder: RecyclerView.ViewHolder
-    ): Int {
-        return if (isSwipeEnabled) {
-            super.getSwipeDirs(recyclerView, viewHolder)
-        } else {
-            0
-        }
     }
 
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {

@@ -87,7 +87,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
 
     fun setSwipeEnabled(enabled: Boolean) {
         for (i in simpleCallbackList) {
-            i.isSwipeEnabled = enabled
+            i.updateIsItemMovementEnabled(enabled)
         }
     }
 }
