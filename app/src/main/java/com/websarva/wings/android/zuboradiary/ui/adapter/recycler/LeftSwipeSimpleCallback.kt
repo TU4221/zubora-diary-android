@@ -171,14 +171,10 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
                 //      スワイプ機能を無効にするようにしている為、クリック機能が有効となる。
                 //      アニメーション中はリスナーを機能させたくないので下記コードを記述。
                 leftSwipeViewHolder.setClickableAllView(false)
-
-                itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView)
-                itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView)
             }
             .withEndAction {
-                // MEMO:StartActionのリセットのみでは、スワイプしたアイテムをタッチしてスワイプ状態を戻した後、
-                //      アイテムをクリックしてもアイテム前面Viewのクリックリスナーが反応しない。
-                //      2回目以降は反応する。対策として下記コードを記述。
+                // MEMO:Viewをアニメーションで視覚的にスワイプ前の状態に戻しても、
+                //      内部(ItemTouchHelper)的にはスワイプ状態が続く為、下記でリセットする。
                 itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView)
                 itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView)
 
