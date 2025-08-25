@@ -6,6 +6,7 @@ import android.view.MotionEvent
 import android.view.View
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
@@ -54,19 +55,62 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     private val previousMotionEventAction
         get() = recyclerView.previousMotionEventAction
 
+    fun interface OnSelectedChangedListener {
+        fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int)
+    }
+    private var onSelectedChangedListener: OnSelectedChangedListener? = null
+
+    private var swipeStatePositionsResetObserver: SwipeStatePositionsResetObserver? = null
+
     open fun build() {
         itemTouchHelper = ItemTouchHelper(this)
         itemTouchHelper.attachToRecyclerView(recyclerView)
         setUpLeftSwipeItem()
+        setUpSwipeStatePositionsResetObserver()
     }
 
     fun clearViewBindings() {
         itemTouchHelper.attachToRecyclerView(null)
+        swipeStatePositionsResetObserver?.let {
+            val adapter = recyclerView.adapter as ListAdapter<*, *>
+            adapter.unregisterAdapterDataObserver(it)
+        }
     }
 
     private fun setUpLeftSwipeItem() {
         recyclerView.setOnTouchUpListener {
             clearInvalidSwipeViewHolder()
+        }
+    }
+
+    private fun setUpSwipeStatePositionsResetObserver() {
+        val adapter = recyclerView.adapter as ListAdapter<*, *>
+        adapter.registerAdapterDataObserver(
+            SwipeStatePositionsResetObserver {
+                clearSwipeStatePositions()
+            }.also {
+                swipeStatePositionsResetObserver = it
+            }
+        )
+    }
+
+    private class SwipeStatePositionsResetObserver(
+        private val processSwipeStatePositionsReset: () -> Unit
+    ) : RecyclerView.AdapterDataObserver() {
+        override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
+            processSwipeStatePositionsReset()
+        }
+
+        override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+            processSwipeStatePositionsReset()
+        }
+
+        override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
+            processSwipeStatePositionsReset()
+        }
+
+        override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
+            processSwipeStatePositionsReset()
         }
     }
 
@@ -102,7 +146,6 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         val listSize = adapter.itemCount
         require(position < listSize)
 
-        // TODO:例外発生(後日調査)
         val viewHolder =
             checkNotNull(recyclerView.findViewHolderForAdapterPosition(position))
 
@@ -193,6 +236,8 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         ) {
             closeSwipedViewHolder(swipedAdapterPosition)
         }
+
+        onSelectedChangedListener?.onSelectedChanged(viewHolder, actionState)
     }
 
     override fun onMove(
@@ -205,6 +250,10 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         if (direction != ItemTouchHelper.LEFT) return
+
+        if (swipingAdapterPosition != viewHolder.getBindingAdapterPosition()) return
+        swipedAdapterPosition = swipingAdapterPosition
+        clearSwipingAdapterPosition()
 
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
         leftSwipeViewHolder.backgroundButtonView.performClick()
@@ -258,7 +307,15 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder
     ) {
         Log.d(logTag, "clearView()_position = " + viewHolder.bindingAdapterPosition)
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
+        leftSwipeViewHolder.foregroundView.translationX = 0F
         super.clearView(recyclerView, viewHolder)
+    }
+
+    private fun clearSwipeStatePositions() {
+        clearSwipingAdapterPosition()
+        clearSwipedAdapterPosition()
+        clearInvalidSwipeAdapterPosition()
     }
 
     protected fun clearSwipingAdapterPosition() {
@@ -276,6 +333,10 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     fun closeSwipedItem() {
         if (swipingAdapterPosition != initializePosition) closeSwipedViewHolder(swipingAdapterPosition)
         if (swipedAdapterPosition != initializePosition) closeSwipedViewHolder(swipedAdapterPosition)
+    }
+
+    fun registerOnSelectedChangedListener(listener: OnSelectedChangedListener) {
+        onSelectedChangedListener = listener
     }
 
     private fun toStringItemTouchHelperActionState(actionState: Int): String {
