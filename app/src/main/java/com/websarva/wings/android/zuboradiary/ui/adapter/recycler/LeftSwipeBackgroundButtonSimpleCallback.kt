@@ -80,15 +80,8 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeR
         return 1 - threshold
     }
 
-    override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-        Log.d(logTag, "onSwiped()_position = " + viewHolder.bindingAdapterPosition)
-        if (direction != ItemTouchHelper.LEFT) return
-
+    override fun processOnSwiped(viewHolder: RecyclerView.ViewHolder) {
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
-
-        if (swipingAdapterPosition != viewHolder.getBindingAdapterPosition()) return
-        swipedAdapterPosition = swipingAdapterPosition
-        resetSwipingAdapterPosition()
         swipingOffset =
             (recyclerView.width - leftSwipeViewHolder.backgroundButtonView.width).toFloat()
     }

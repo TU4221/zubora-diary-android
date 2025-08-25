@@ -52,9 +52,9 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     private var isItemInteractionEnabled = true
 
     private val initializePosition = -1
-    protected var swipingAdapterPosition: Int = initializePosition
-        private set
+    private var swipingAdapterPosition: Int = initializePosition
     protected var swipedAdapterPosition: Int = initializePosition
+        private set
     private var invalidSwipeAdapterPosition: Int = initializePosition
 
     private val previousMotionEventAction
@@ -256,12 +256,17 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     }
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+        Log.d(logTag, "onSwiped()_position = " + viewHolder.bindingAdapterPosition)
         if (direction != ItemTouchHelper.LEFT) return
-
         if (swipingAdapterPosition != viewHolder.getBindingAdapterPosition()) return
+
         swipedAdapterPosition = swipingAdapterPosition
         resetSwipingAdapterPosition()
 
+        processOnSwiped(viewHolder)
+    }
+
+    protected open fun processOnSwiped(viewHolder: RecyclerView.ViewHolder) {
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
         leftSwipeViewHolder.backgroundButtonView.performClick()
     }
@@ -325,7 +330,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         resetInvalidSwipeAdapterPosition()
     }
 
-    protected fun resetSwipingAdapterPosition() {
+    private fun resetSwipingAdapterPosition() {
         swipingAdapterPosition = initializePosition
     }
 
