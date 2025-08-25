@@ -104,7 +104,7 @@ internal open class LeftSwipeBackgroundButtonSimpleCallback(recyclerView: SwipeR
 
         if (swipingAdapterPosition != viewHolder.getBindingAdapterPosition()) return
         swipedAdapterPosition = swipingAdapterPosition
-        clearSwipingAdapterPosition()
+        resetSwipingAdapterPosition()
         swipingOffset =
             (recyclerView.width - leftSwipeViewHolder.backgroundButtonView.width).toFloat()
     }

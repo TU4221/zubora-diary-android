@@ -87,7 +87,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         val adapter = recyclerView.adapter as ListAdapter<*, *>
         adapter.registerAdapterDataObserver(
             SwipeStatePositionsResetObserver {
-                clearSwipeStatePositions()
+                resetSwipeStatePositions()
             }.also {
                 swipeStatePositionsResetObserver = it
             }
@@ -126,7 +126,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         val leftSwipeViewHolder = lockedViewHolder as LeftSwipeViewHolder<*>
         leftSwipeViewHolder.setClickableAllView(true)
 
-        clearInvalidSwipeAdapterPosition()
+        resetInvalidSwipeAdapterPosition()
     }
 
     // MEMO:スワイプメニューを閉じるアニメーション中も onChildDraw が反応する
@@ -177,8 +177,8 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
                 itemTouchHelper.onChildViewDetachedFromWindow(viewHolder.itemView)
                 itemTouchHelper.onChildViewAttachedToWindow(viewHolder.itemView)
 
-                if (swipingAdapterPosition == position) clearSwipingAdapterPosition()
-                if (swipedAdapterPosition == position) clearSwipedAdapterPosition()
+                if (swipingAdapterPosition == position) resetSwipingAdapterPosition()
+                if (swipedAdapterPosition == position) resetSwipedAdapterPosition()
 
                 // MEMO:アニメーション中にスワイプしてそのままタッチを継続されると、
                 //      アニメーション終了後にスワイプ分、前面Viewが移動してしまう。
@@ -253,7 +253,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
 
         if (swipingAdapterPosition != viewHolder.getBindingAdapterPosition()) return
         swipedAdapterPosition = swipingAdapterPosition
-        clearSwipingAdapterPosition()
+        resetSwipingAdapterPosition()
 
         val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
         leftSwipeViewHolder.backgroundButtonView.performClick()
@@ -287,7 +287,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         // 手動でスワイプを戻した時にクリア
         if (dX == 0f) {
             if (swipedAdapterPosition == viewHolder.getBindingAdapterPosition()) {
-                clearSwipedAdapterPosition()
+                resetSwipedAdapterPosition()
             }
         }
 
@@ -312,21 +312,21 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         super.clearView(recyclerView, viewHolder)
     }
 
-    private fun clearSwipeStatePositions() {
-        clearSwipingAdapterPosition()
-        clearSwipedAdapterPosition()
-        clearInvalidSwipeAdapterPosition()
+    private fun resetSwipeStatePositions() {
+        resetSwipingAdapterPosition()
+        resetSwipedAdapterPosition()
+        resetInvalidSwipeAdapterPosition()
     }
 
-    protected fun clearSwipingAdapterPosition() {
+    protected fun resetSwipingAdapterPosition() {
         swipingAdapterPosition = initializePosition
     }
 
-    private fun clearSwipedAdapterPosition() {
+    private fun resetSwipedAdapterPosition() {
         swipedAdapterPosition = initializePosition
     }
 
-    private fun clearInvalidSwipeAdapterPosition() {
+    private fun resetInvalidSwipeAdapterPosition() {
         invalidSwipeAdapterPosition = initializePosition
     }
 
