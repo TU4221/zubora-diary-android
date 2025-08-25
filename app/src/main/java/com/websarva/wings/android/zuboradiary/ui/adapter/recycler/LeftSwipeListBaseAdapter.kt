@@ -26,10 +26,10 @@ internal abstract class LeftSwipeListBaseAdapter <T, VH : RecyclerView.ViewHolde
     }
 
     override fun clearViewBindings() {
-        super.clearViewBindings()
-
         leftSwipeSimpleCallback.clearViewBindings()
         onItemSwipeListener = null
+
+        super.clearViewBindings()
     }
 
     fun registerOnItemSwipeListener(
