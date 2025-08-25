@@ -205,9 +205,12 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
 
         if (!isItemInteractionEnabled) return 0
 
-        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
+        // 他ViewHolderスワイプ中スワイプ機能無効
+        if (swipingAdapterPosition != initializePosition
+            && viewHolder.bindingAdapterPosition != swipingAdapterPosition) return 0
 
         // アニメーション中スワイプ機能無効
+        val leftSwipeViewHolder = viewHolder as LeftSwipeViewHolder<*>
         if (!leftSwipeViewHolder.foregroundView.isClickable) return 0
 
         return super.getMovementFlags(recyclerView, viewHolder)
