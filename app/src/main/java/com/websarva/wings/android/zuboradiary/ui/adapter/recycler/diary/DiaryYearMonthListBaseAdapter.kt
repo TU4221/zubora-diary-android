@@ -15,6 +15,8 @@ import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBindi
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.ListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter.DiaryYearMonthListViewHolder
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryDayListAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultDayListAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -115,8 +117,8 @@ internal abstract class DiaryYearMonthListBaseAdapter<
     ) {
         when (holder) {
             is DiaryYearMonthListViewHolder.Item -> {
-                holder.bind(item as DiaryYearMonthListItemUi.Diary<*>)
-                createDiaryDayList(holder, item as DiaryYearMonthListItemUi.Diary<CLIT>)
+                holder.bind(item as DiaryYearMonthListItemUi.Diary<CLIT>)
+                bindDiaryDayList(holder, item)
             }
             is DiaryYearMonthListViewHolder.NoDiaryMessage,
             is DiaryYearMonthListViewHolder.ProgressBar -> {
@@ -126,7 +128,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
     }
 
-    abstract fun createDiaryDayList(
+    abstract fun bindDiaryDayList(
         holder: DiaryYearMonthListViewHolder.Item,
         item: DiaryYearMonthListItemUi.Diary<CLIT>
     )
@@ -153,7 +155,8 @@ internal abstract class DiaryYearMonthListBaseAdapter<
         data class Item(
             val binding: RowDiaryYearMonthListBinding
         ) : DiaryYearMonthListViewHolder(binding.root) {
-            fun bind(item: DiaryYearMonthListItemUi.Diary<*>) {
+
+            fun <CLIT : DiaryDayListItemUi> bind(item: DiaryYearMonthListItemUi.Diary<CLIT>) {
                 // 対象行の情報を取得
                 val diaryYearMonth = item.yearMonth
 
@@ -166,6 +169,16 @@ internal abstract class DiaryYearMonthListBaseAdapter<
                 binding.textSection.text = diaryDate
                 // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
                 binding.textSection.y = 0f
+            }
+
+            fun bindDiaryDayList(item: DiaryYearMonthListItemUi.Diary<DiaryDayListItemUi.Standard>) {
+                val adapter = binding.recyclerDayList.adapter as DiaryDayListAdapter
+                adapter.submitList(item.diaryDayList.itemList)
+            }
+
+            fun bindWordSearchResultDayList(item: DiaryYearMonthListItemUi.Diary<DiaryDayListItemUi.WordSearchResult>) {
+                val adapter = binding.recyclerDayList.adapter as WordSearchResultDayListAdapter
+                adapter.submitList(item.diaryDayList.itemList)
             }
         }
 

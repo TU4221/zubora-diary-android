@@ -22,7 +22,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
     }
     protected var onChildItemBackgroundButtonClickListener: OnChildItemBackgroundButtonClickListener<CLIT>? = null
 
-    private val simpleCallbackList: MutableList<LeftSwipeBackgroundButtonSimpleCallback> = ArrayList()
+    private val simpleCallbackSet: MutableSet<LeftSwipeBackgroundButtonSimpleCallback> = HashSet()
 
     override fun build() {
         super.build()
@@ -56,7 +56,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
                 simpleCallback.registerOnSelectedChangedListener { _, _ ->
                     closeSwipedItemOtherDayList(simpleCallback)
                 }
-                simpleCallbackList.add(simpleCallback)
+                simpleCallbackSet.add(simpleCallback)
             }
             is DiaryYearMonthListViewHolder.NoDiaryMessage,
             is DiaryYearMonthListViewHolder.ProgressBar -> {
@@ -72,21 +72,19 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
     }
 
     fun closeAllSwipedItem() {
-        for (i in simpleCallbackList) {
+        for (i in simpleCallbackSet) {
             i.closeSwipedItem()
         }
     }
 
     private fun closeSwipedItemOtherDayList(selfSimpleCallback: LeftSwipeBackgroundButtonSimpleCallback) {
-        for (i in simpleCallbackList.indices) {
-            if (simpleCallbackList[i] !== selfSimpleCallback) {
-                simpleCallbackList[i].closeSwipedItem()
-            }
-        }
+        simpleCallbackSet
+            .filter { it !== selfSimpleCallback }
+            .forEach { it.closeSwipedItem() }
     }
 
     fun setSwipeEnabled(enabled: Boolean) {
-        for (i in simpleCallbackList) {
+        for (i in simpleCallbackSet) {
             i.updateIsItemMovementEnabled(enabled)
         }
     }

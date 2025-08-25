@@ -1,12 +1,15 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult
 
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
+import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal abstract class WordSearchResultYearMonthListAdapter(
     recyclerView: RecyclerView,
@@ -17,25 +20,44 @@ internal abstract class WordSearchResultYearMonthListAdapter(
     DiffUtilItemCallback()
 ) {
 
-    override fun createDiaryDayList(
+    override fun createViewHolder(
+        parent: ViewGroup,
+        themeColorInflater: LayoutInflater,
+        viewType: Int
+    ): DiaryYearMonthListViewHolder {
+        val holder = super.createViewHolder(parent, themeColorInflater, viewType)
+
+        when (holder) {
+            is DiaryYearMonthListViewHolder.Item -> {
+                applyDiaryDayListAdapter(holder.binding.recyclerDayList)
+            }
+            is DiaryYearMonthListViewHolder.ProgressBar,
+            is DiaryYearMonthListViewHolder.NoDiaryMessage -> {
+                // 処理不要
+            }
+        }
+
+        return holder
+    }
+
+    private fun applyDiaryDayListAdapter(
+        diaryDayList: SwipeRecyclerView
+    ) {
+        val wordSearchResultDayListAdapter =
+            WordSearchResultDayListAdapter(diaryDayList, themeColor)
+        wordSearchResultDayListAdapter.apply {
+            build()
+            registerOnItemClickListener { item: DiaryDayListItemUi.WordSearchResult ->
+                onChildItemClickListener?.onClick(item)
+            }
+        }
+    }
+
+    override fun bindDiaryDayList(
         holder: DiaryYearMonthListViewHolder.Item,
         item: DiaryYearMonthListItemUi.Diary<DiaryDayListItemUi.WordSearchResult>
     ) {
-        val listAdapter = createWordSearchResultDayListAdapter(holder)
-        listAdapter.submitList(item.diaryDayList.itemList)
-    }
-
-    private fun createWordSearchResultDayListAdapter(
-        holder: DiaryYearMonthListViewHolder.Item
-    ): WordSearchResultDayListAdapter {
-        val wordSearchResultDayListAdapter =
-            WordSearchResultDayListAdapter(holder.binding.recyclerDayList, themeColor)
-        return wordSearchResultDayListAdapter.apply {
-            build()
-            registerOnItemClickListener {
-                onChildItemClickListener?.onClick(it)
-            }
-        }
+        holder.bindWordSearchResultDayList(item)
     }
 
     private class DiffUtilItemCallback :

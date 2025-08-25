@@ -1,6 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary
 
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -8,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYea
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.SwipeDiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
+import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal abstract class DiaryYearMonthListAdapter(
     recyclerView: RecyclerView,
@@ -18,21 +21,32 @@ internal abstract class DiaryYearMonthListAdapter(
     DiffUtilItemCallback()
 ) {
 
-    override fun createDiaryDayList(
-        holder: DiaryYearMonthListViewHolder.Item,
-        item: DiaryYearMonthListItemUi.Diary<DiaryDayListItemUi.Standard>
-    ) {
-        val diaryDayListAdapter = createDiaryDayListAdapter(holder)
-        val diaryDayList = item.diaryDayList.itemList
-        diaryDayListAdapter.submitList(diaryDayList)
+    override fun createViewHolder(
+        parent: ViewGroup,
+        themeColorInflater: LayoutInflater,
+        viewType: Int
+    ): DiaryYearMonthListViewHolder {
+        val holder = super.createViewHolder(parent, themeColorInflater, viewType)
+
+        when (holder) {
+            is DiaryYearMonthListViewHolder.Item -> {
+                applyDiaryDayListAdapter(holder.binding.recyclerDayList)
+            }
+            is DiaryYearMonthListViewHolder.ProgressBar,
+            is DiaryYearMonthListViewHolder.NoDiaryMessage -> {
+                // 処理不要
+            }
+        }
+
+        return holder
     }
 
-    private fun createDiaryDayListAdapter(
-        holder: DiaryYearMonthListViewHolder.Item,
-    ): DiaryDayListAdapter {
+    private fun applyDiaryDayListAdapter(
+        diaryDayList: SwipeRecyclerView
+    ) {
         val diaryDayListAdapter =
-            DiaryDayListAdapter(holder.binding.recyclerDayList, themeColor)
-        return diaryDayListAdapter.apply {
+            DiaryDayListAdapter(diaryDayList, themeColor)
+        diaryDayListAdapter.apply {
             build()
             registerOnItemClickListener { item: DiaryDayListItemUi.Standard ->
                 onChildItemClickListener?.onClick(item)
@@ -41,6 +55,13 @@ internal abstract class DiaryYearMonthListAdapter(
                 onChildItemBackgroundButtonClickListener?.onClick(item)
             }
         }
+    }
+
+    override fun bindDiaryDayList(
+        holder: DiaryYearMonthListViewHolder.Item,
+        item: DiaryYearMonthListItemUi.Diary<DiaryDayListItemUi.Standard>
+    ) {
+        holder.bindDiaryDayList(item)
     }
 
     private class DiffUtilItemCallback :
