@@ -11,10 +11,21 @@ internal abstract class LeftSwipeBackgroundButtonListBaseAdapter <T, VH : Recycl
     diffUtilItemCallback: DiffUtil.ItemCallback<T>
 ) : ListBaseAdapter<T, VH>(recyclerView, themeColor, diffUtilItemCallback) {
 
+    lateinit var leftSwipeBackgroundButtonSimpleCallback: LeftSwipeBackgroundButtonSimpleCallback
+        private set
+
     fun interface OnBackgroundButtonClickListener<T> {
         fun onClick(item: T)
     }
     protected var onBackgroundButtonClickListener: OnBackgroundButtonClickListener<T>? = null
+
+    override fun build() {
+        super.build()
+
+        leftSwipeBackgroundButtonSimpleCallback =
+            LeftSwipeBackgroundButtonSimpleCallback(recyclerView as SwipeRecyclerView)
+                .apply { build() }
+    }
 
     override fun clearViewBindings() {
         super.clearViewBindings()

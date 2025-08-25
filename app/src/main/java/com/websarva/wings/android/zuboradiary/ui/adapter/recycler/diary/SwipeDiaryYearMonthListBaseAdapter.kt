@@ -1,12 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary
 
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
+import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。
@@ -23,7 +22,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
     }
     protected var onChildItemBackgroundButtonClickListener: OnChildItemBackgroundButtonClickListener<CLIT>? = null
 
-    private val simpleCallbackList: MutableList<SwipeDiaryYearMonthListSimpleCallback> = ArrayList()
+    private val simpleCallbackList: MutableList<LeftSwipeBackgroundButtonSimpleCallback> = ArrayList()
 
     override fun build() {
         super.build()
@@ -44,28 +43,26 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
         onChildItemBackgroundButtonClickListener = null
     }
 
-    override fun createViewHolder(
-        parent: ViewGroup,
-        themeColorInflater: LayoutInflater,
-        viewType: Int
-    ): DiaryYearMonthListViewHolder {
-        val holder = super.createViewHolder(parent, themeColorInflater, viewType)
+    override fun bindViewHolder(
+        holder: DiaryYearMonthListViewHolder,
+        item: DiaryYearMonthListItemUi<CLIT>
+    ) {
+        super.bindViewHolder(holder, item)
 
         when (holder) {
             is DiaryYearMonthListViewHolder.Item -> {
-                SwipeDiaryYearMonthListSimpleCallback(recyclerView, holder.binding.recyclerDayList)
-                    .apply {
-                        build()
-                        simpleCallbackList.add(this)
-                    }
+                val adapter = holder.binding.recyclerDayList.adapter as LeftSwipeBackgroundButtonListBaseAdapter<*, *>
+                val simpleCallback = adapter.leftSwipeBackgroundButtonSimpleCallback
+                simpleCallback.registerOnSelectedChangedListener { _, _ ->
+                    closeSwipedItemOtherDayList(simpleCallback)
+                }
+                simpleCallbackList.add(simpleCallback)
             }
             is DiaryYearMonthListViewHolder.NoDiaryMessage,
             is DiaryYearMonthListViewHolder.ProgressBar -> {
                 // 処理不要
             }
         }
-
-        return holder
     }
 
     fun registerOnChildItemBackgroundButtonClickListener(
@@ -80,7 +77,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
         }
     }
 
-    private fun closeSwipedItemOtherDayList(selfSimpleCallback: SwipeDiaryYearMonthListSimpleCallback) {
+    private fun closeSwipedItemOtherDayList(selfSimpleCallback: LeftSwipeBackgroundButtonSimpleCallback) {
         for (i in simpleCallbackList.indices) {
             if (simpleCallbackList[i] !== selfSimpleCallback) {
                 simpleCallbackList[i].closeSwipedItem()
@@ -91,20 +88,6 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
     fun setSwipeEnabled(enabled: Boolean) {
         for (i in simpleCallbackList) {
             i.isSwipeEnabled = enabled
-        }
-    }
-
-    private class SwipeDiaryYearMonthListSimpleCallback(
-        private val parentRecyclerView: RecyclerView,
-        recyclerView: SwipeRecyclerView
-    ) : LeftSwipeBackgroundButtonSimpleCallback(recyclerView) {
-
-        override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-            super.onSelectedChanged(viewHolder, actionState)
-
-            // 他ChildRecyclerView(DayList)のスワイプ状態を閉じる
-            val adapter = parentRecyclerView.adapter as SwipeDiaryYearMonthListBaseAdapter<*>
-            adapter.closeSwipedItemOtherDayList(this)
         }
     }
 }
