@@ -20,7 +20,9 @@ internal object DatabaseModule {
     @Singleton
     @Provides
     fun provideDiaryDatabase(@ApplicationContext context: Context): DiaryDatabase {
-        return databaseBuilder(context, DiaryDatabase::class.java, "diary_db").build()
+        return databaseBuilder(context, DiaryDatabase::class.java, "diary_db")
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     @Singleton

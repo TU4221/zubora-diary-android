@@ -18,7 +18,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomN
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
@@ -28,7 +27,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import java.time.LocalDate
 import java.time.Year
-import java.time.YearMonth
 
 @AndroidEntryPoint
 class DiaryListFragment :
@@ -44,14 +42,6 @@ class DiaryListFragment :
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryListViewModel by viewModels()
-
-    // RecyclerView関係
-    // HACK:RecyclerViewのAdapterにセットするListを全て変更した時、
-    //      変更前のListの内容で初期スクロール位置が定まらない不具合が発生。
-    //      対策としてListを全て変更するタイミングでAdapterを新規でセットする。
-    //      (親子関係でRecyclerViewを使用、又はListAdapterの機能による弊害？)
-    // TODO:下記変数による処理を無効化しても上記不具合の確認ができない為、開発最後に必要か判断
-    private var shouldInitializeListAdapter = false
 
     override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
@@ -82,19 +72,6 @@ class DiaryListFragment :
         setUpDialogResultReceiver(
             StartYearMonthPickerDialogFragment.KEY_RESULT
         ) { result ->
-            Log.d("20250714", "DatePickerDialogResultReceive")
-            // TODO:シールドクラス Action -> Event に変更してから下記コードの処理方法を検討する。
-            //      shouldInitializeListAdapterの必要性がないかもしれない。(変数宣言元のコメント参照)
-            when (result) {
-                is DialogResult.Positive<YearMonth> -> {
-                    shouldInitializeListAdapter = true
-                }
-                DialogResult.Negative,
-                DialogResult.Cancel -> {
-                    // 処理なし
-                }
-            }
-
             mainViewModel.onDatePickerDialogResultReceived(result)
         }
     }
@@ -159,11 +136,6 @@ class DiaryListFragment :
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.diaryList
                 .collectLatest { value: DiaryYearMonthListUi<DiaryDayListItemUi.Standard> ->
-                    if (shouldInitializeListAdapter) {
-                        shouldInitializeListAdapter = false
-                        //setUpListAdapter()
-                    }
-
                     val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
                     listAdapter.submitList(value.itemList) {
                         mainViewModel.onDiaryListUpdateCompleted()

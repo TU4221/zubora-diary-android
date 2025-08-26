@@ -33,14 +33,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: WordSearchViewModel by viewModels()
 
-    // RecyclerView関係
-    // HACK:RecyclerViewのAdapterにセットするListを全て変更した時、
-    //      変更前のListの内容で初期スクロール位置が定まらない不具合が発生。
-    //      対策としてListを全て変更するタイミングでAdapterを新規でセットする。
-    //      (親子関係でRecyclerViewを使用、又はListAdapterの機能による弊害？)
-    // TODO:下記変数による処理を無効化しても上記不具合の確認ができない為、開発最後に必要か判断
-    private var shouldInitializeListAdapter = false
-
     override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): FragmentWordSearchBinding {
@@ -90,8 +82,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.searchWord
                 .collectLatest { value: String ->
-                    if (value.isNotEmpty()) shouldInitializeListAdapter = true
-
                     mainViewModel.onSearchWordChanged(value)
                 }
         }
@@ -105,11 +95,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.wordSearchResultList
                 .collectLatest { value: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult> ->
-                    if (shouldInitializeListAdapter) {
-                        shouldInitializeListAdapter = false
-                        //setUpListAdapter()
-                    }
-
                     val listAdapter =
                         binding.recyclerWordSearchResultList.adapter
                                 as WordSearchResultYearMonthListAdapter
