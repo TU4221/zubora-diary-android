@@ -21,7 +21,7 @@ internal object DatabaseModule {
     @Provides
     fun provideDiaryDatabase(@ApplicationContext context: Context): DiaryDatabase {
         return databaseBuilder(context, DiaryDatabase::class.java, "diary_db")
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration() // TODO:最終的に削除
             .build()
     }
 
