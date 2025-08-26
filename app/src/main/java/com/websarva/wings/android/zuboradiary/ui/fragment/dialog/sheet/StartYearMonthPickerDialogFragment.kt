@@ -14,14 +14,19 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
         val KEY_RESULT = RESULT_KEY_PREFIX + StartYearMonthPickerDialogFragment::class.java.name
     }
 
-    override fun handleOnPositiveButtonClick() {
-        setResultSelectedYearMonth()
+    override fun handleOnPositiveButtonClick(
+        firstPickerValue: Int,
+        secondPickerValue: Int,
+        thirdPickerValue: Int
+    ) {
+        setResultSelectedYearMonth(firstPickerValue, secondPickerValue)
     }
 
-    private fun setResultSelectedYearMonth() {
-        val selectedYear = binding.numberPickerFirst.value
-        val selectedMonth = binding.numberPickerSecond.value
-        val selectedYearMonth = YearMonth.of(selectedYear, selectedMonth)
+    private fun setResultSelectedYearMonth(
+        yearPickerValue: Int,
+        monthPickerValue: Int
+    ) {
+        val selectedYearMonth = YearMonth.of(yearPickerValue, monthPickerValue)
 
         setResult(KEY_RESULT, DialogResult.Positive(selectedYearMonth))
     }

@@ -15,19 +15,24 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         val KEY_RESULT = RESULT_KEY_PREFIX + CalendarStartDayPickerDialogFragment::class.java.name
     }
 
-    override fun handleOnPositiveButtonClick() {
-        setResultSelectedDayOfWeek()
+    override fun handleOnPositiveButtonClick(
+        firstPickerValue: Int,
+        secondPickerValue: Int,
+        thirdPickerValue: Int
+    ) {
+        setResultSelectedDayOfWeek(firstPickerValue)
     }
 
-    private fun setResultSelectedDayOfWeek() {
-        // TODO:handleOnPositiveButtonClick()の引数から選択値を受け取るように変更
-        val selectedValue = binding.numberPickerFirst.value
+    private fun setResultSelectedDayOfWeek(
+        pickerValue: Int
+    ) {
         // MEMO:DayOfWeekはMonday～Sundayの値が1～7となる。Sundayを先頭に表示させたいため、下記コード記述。
-        val selectedDayOfWeek = if (selectedValue == 0) {
-            DayOfWeek.SUNDAY
-        } else {
-            DayOfWeek.of(selectedValue)
-        }
+        val selectedDayOfWeek =
+            if (pickerValue == 0) {
+                DayOfWeek.SUNDAY
+            } else {
+                DayOfWeek.of(pickerValue)
+            }
         setResult(KEY_RESULT, DialogResult.Positive(selectedDayOfWeek))
     }
 

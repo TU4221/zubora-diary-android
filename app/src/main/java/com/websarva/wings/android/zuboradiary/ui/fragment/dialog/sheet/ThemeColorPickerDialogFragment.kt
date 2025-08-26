@@ -13,13 +13,18 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
         val KEY_RESULT = RESULT_KEY_PREFIX + ThemeColorPickerDialogFragment::class.java.name
     }
 
-    override fun handleOnPositiveButtonClick() {
-        setResultSelectedThemeColor()
+    override fun handleOnPositiveButtonClick(
+        firstPickerValue: Int,
+        secondPickerValue: Int,
+        thirdPickerValue: Int
+    ) {
+        setResultSelectedThemeColor(firstPickerValue)
     }
 
-    private fun setResultSelectedThemeColor() {
-        val selectedValue = binding.numberPickerFirst.value
-        val selectedThemeColor = ThemeColor.entries[selectedValue]
+    private fun setResultSelectedThemeColor(
+        pickerValue: Int,
+    ) {
+        val selectedThemeColor = ThemeColor.entries[pickerValue]
 
         setResult(KEY_RESULT, DialogResult.Positive(selectedThemeColor))
     }

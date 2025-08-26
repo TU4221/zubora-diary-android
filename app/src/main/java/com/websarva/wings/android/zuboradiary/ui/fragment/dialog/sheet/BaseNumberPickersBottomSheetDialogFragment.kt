@@ -39,7 +39,11 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
         binding.apply {
             buttonDecision.setOnClickListener {
                 Log.d(logTag, "onClick()_PositiveButton")
-                handleOnPositiveButtonClick()
+                handleOnPositiveButtonClick(
+                    numberPickerFirst.value,
+                    numberPickerSecond.value,
+                    numberPickerThird.value
+                )
                 navigatePreviousFragment()
             }
             buttonCancel.setOnClickListener {
@@ -67,7 +71,11 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     /**
      * BaseBottomSheetDialogFragment.PositiveButtonClickListener#onClick()で呼び出される。
      */
-    internal abstract fun handleOnPositiveButtonClick()
+    internal abstract fun handleOnPositiveButtonClick(
+        firstPickerValue: Int,
+        secondPickerValue: Int,
+        thirdPickerValue: Int
+    )
 
     /**
      * BaseBottomSheetDialogFragment.NegativeButtonClickListener#onClick()で呼び出される。
