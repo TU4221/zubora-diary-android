@@ -38,17 +38,10 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
+
 @Module
 @InstallIn(SingletonComponent::class)
 internal object DiaryUseCaseModule {
-
-    @Singleton
-    @Provides
-    fun provideDoesDiaryExistUseCase(
-        diaryRepository: DiaryRepository
-    ): DoesDiaryExistUseCase {
-        return DoesDiaryExistUseCase(diaryRepository)
-    }
 
     @Singleton
     @Provides
@@ -56,6 +49,53 @@ internal object DiaryUseCaseModule {
         weatherInfoRepository: WeatherInfoRepository
     ): CanFetchWeatherInfoUseCase {
         return CanFetchWeatherInfoUseCase(weatherInfoRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideCheckUnloadedDiariesExistUseCase(countDiariesUseCase: CountDiariesUseCase) =
+        CheckUnloadedDiariesExistUseCase(countDiariesUseCase)
+
+    @Singleton
+    @Provides
+    fun provideCheckUnloadedWordSearchResultsExistUseCase(
+        countWordSearchResultsUseCase: CountWordSearchResultsUseCase
+    ) = CheckUnloadedWordSearchResultsExistUseCase(countWordSearchResultsUseCase)
+
+    @Singleton
+    @Provides
+    fun provideCountDiariesUseCase(diaryRepository: DiaryRepository) =
+        CountDiariesUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideCountWordSearchResultsUseCase(diaryRepository: DiaryRepository) =
+        CountWordSearchResultsUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideDeleteDiaryItemTitleSelectionHistoryItemUseCase(
+        diaryRepository: DiaryRepository
+    ) = DeleteDiaryItemTitleSelectionHistoryItemUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideDeleteDiaryUseCase(
+        diaryRepository: DiaryRepository,
+        releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase,
+    ): DeleteDiaryUseCase {
+        return DeleteDiaryUseCase(
+            diaryRepository,
+            releasePersistableUriPermissionUseCase
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideDoesDiaryExistUseCase(
+        diaryRepository: DiaryRepository
+    ): DoesDiaryExistUseCase {
+        return DoesDiaryExistUseCase(diaryRepository)
     }
 
     @Singleton
@@ -68,6 +108,113 @@ internal object DiaryUseCaseModule {
             weatherInfoRepository,
             canFetchWeatherInfoUseCase
         )
+    }
+
+    @Singleton
+    @Provides
+    fun provideLoadAdditionDiaryListUseCase(
+        loadDiaryListUseCase: LoadDiaryListUseCase,
+        updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
+    ) = LoadAdditionDiaryListUseCase(loadDiaryListUseCase, updateDiaryListFooterUseCase)
+
+    @Singleton
+    @Provides
+    fun provideLoadAdditionWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
+    ) = LoadAdditionWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase
+    )
+
+    @Singleton
+    @Provides
+    fun provideLoadDiaryItemTitleSelectionHistoryListUseCase(
+        diaryRepository: DiaryRepository
+    ) = LoadDiaryItemTitleSelectionHistoryListUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideLoadDiaryListUseCase(
+        diaryRepository: DiaryRepository
+    ) = LoadDiaryListUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideLoadDiaryUseCase(
+        diaryRepository: DiaryRepository
+    ): LoadDiaryUseCase {
+        return LoadDiaryUseCase(diaryRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideLoadNewDiaryListUseCase(
+        loadDiaryListUseCase: LoadDiaryListUseCase,
+        updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
+    ) = LoadNewDiaryListUseCase(loadDiaryListUseCase, updateDiaryListFooterUseCase)
+
+    @Singleton
+    @Provides
+    fun provideLoadNewestDiaryUseCase(diaryRepository: DiaryRepository) =
+        LoadNewestDiaryUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideLoadNewWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
+    ) = LoadNewWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase
+    )
+
+    @Singleton
+    @Provides
+    fun provideLoadOldestDiaryUseCase(diaryRepository: DiaryRepository): LoadOldestDiaryUseCase =
+        LoadOldestDiaryUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideLoadWordSearchResultListUseCase(
+        diaryRepository: DiaryRepository
+    ) = LoadWordSearchResultListUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideRefreshDiaryListUseCase(
+        loadDiaryListUseCase: LoadDiaryListUseCase,
+        updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
+    ) = RefreshDiaryListUseCase(loadDiaryListUseCase, updateDiaryListFooterUseCase)
+
+    @Singleton
+    @Provides
+    fun provideRefreshWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
+    ) = RefreshWordSearchResultListUseCase(
+        loadWordSearchResultListUseCase,
+        updateWordSearchResultListFooterUseCase
+    )
+
+    @Singleton
+    @Provides
+    fun provideSaveDiaryUseCase(
+        diaryRepository: DiaryRepository,
+        takePersistableUriPermissionUseCase: TakePersistableUriPermissionUseCase,
+        releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase,
+    ): SaveDiaryUseCase {
+        return SaveDiaryUseCase(
+            diaryRepository,
+            takePersistableUriPermissionUseCase,
+            releasePersistableUriPermissionUseCase
+        )
+    }
+
+    @Singleton
+    @Provides
+    fun provideShouldFetchWeatherInfoUseCase(): ShouldFetchWeatherInfoUseCase {
+        return ShouldFetchWeatherInfoUseCase()
     }
 
     @Singleton
@@ -92,6 +239,11 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
+    fun provideShouldRequestExitWithoutDiarySaveConfirmationUseCase() =
+        ShouldRequestExitWithoutDiarySaveConfirmationUseCase()
+
+    @Singleton
+    @Provides
     fun provideShouldRequestWeatherInfoConfirmationUseCase(
         shouldFetchWeatherInfoUseCase: ShouldFetchWeatherInfoUseCase
     ): ShouldRequestWeatherInfoConfirmationUseCase {
@@ -100,160 +252,9 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideLoadDiaryUseCase(
-        diaryRepository: DiaryRepository
-    ): LoadDiaryUseCase {
-        return LoadDiaryUseCase(diaryRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideSaveDiaryUseCase(
-        diaryRepository: DiaryRepository,
-        takePersistableUriPermissionUseCase: TakePersistableUriPermissionUseCase,
-        releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase,
-    ): SaveDiaryUseCase {
-        return SaveDiaryUseCase(
-            diaryRepository,
-            takePersistableUriPermissionUseCase,
-            releasePersistableUriPermissionUseCase
-        )
-    }
-
-    @Singleton
-    @Provides
-    fun provideDeleteDiaryUseCase(
-        diaryRepository: DiaryRepository,
-        releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase,
-    ): DeleteDiaryUseCase {
-        return DeleteDiaryUseCase(
-            diaryRepository,
-            releasePersistableUriPermissionUseCase
-        )
-    }
-
-    @Singleton
-    @Provides
-    fun provideShouldFetchWeatherInfoUseCase(): ShouldFetchWeatherInfoUseCase {
-        return ShouldFetchWeatherInfoUseCase()
-    }
-
-    @Singleton
-    @Provides
-    fun provideShouldRequestExitWithoutDiarySaveConfirmationUseCase() =
-        ShouldRequestExitWithoutDiarySaveConfirmationUseCase()
-
-    @Singleton
-    @Provides
-    fun provideCountDiariesUseCase(diaryRepository: DiaryRepository) =
-        CountDiariesUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideCheckUnloadedDiariesExistUseCase(countDiariesUseCase:CountDiariesUseCase) =
-        CheckUnloadedDiariesExistUseCase(countDiariesUseCase)
-
-    @Singleton
-    @Provides
-    fun provideLoadNewestDiaryUseCase(diaryRepository: DiaryRepository) =
-        LoadNewestDiaryUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideLoadOldestDiaryUseCase(diaryRepository: DiaryRepository): LoadOldestDiaryUseCase =
-        LoadOldestDiaryUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideCountWordSearchResultsUseCase(diaryRepository: DiaryRepository) =
-        CountWordSearchResultsUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideCheckUnloadedWordSearchResultsExistUseCase(
-        countWordSearchResultsUseCase: CountWordSearchResultsUseCase
-    ) = CheckUnloadedWordSearchResultsExistUseCase(countWordSearchResultsUseCase)
-
-    @Singleton
-    @Provides
-    fun provideDeleteDiaryItemTitleSelectionHistoryItemUseCase(
-        diaryRepository: DiaryRepository
-    ) = DeleteDiaryItemTitleSelectionHistoryItemUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideLoadDiaryItemTitleSelectionHistoryListUseCase(
-        diaryRepository: DiaryRepository
-    ) = LoadDiaryItemTitleSelectionHistoryListUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideLoadDiaryListUseCase(
-        diaryRepository: DiaryRepository
-    ) = LoadDiaryListUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideLoadNewDiaryListUseCase(
-        loadDiaryListUseCase: LoadDiaryListUseCase,
-        updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
-    ) = LoadNewDiaryListUseCase(loadDiaryListUseCase, updateDiaryListFooterUseCase)
-
-    @Singleton
-    @Provides
-    fun provideLoadAdditionDiaryListUseCase(
-        loadDiaryListUseCase: LoadDiaryListUseCase,
-        updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
-    ) = LoadAdditionDiaryListUseCase(loadDiaryListUseCase, updateDiaryListFooterUseCase)
-
-    @Singleton
-    @Provides
-    fun provideRefreshDiaryListUseCase(
-        loadDiaryListUseCase: LoadDiaryListUseCase,
-        updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
-    ) = RefreshDiaryListUseCase(loadDiaryListUseCase, updateDiaryListFooterUseCase)
-
-    @Singleton
-    @Provides
     fun provideUpdateDiaryListFooterUseCase(
         checkUnloadedDiariesExistUseCase: CheckUnloadedDiariesExistUseCase
     ) = UpdateDiaryListFooterUseCase(checkUnloadedDiariesExistUseCase)
-
-    @Singleton
-    @Provides
-    fun provideLoadWordSearchResultListUseCase(
-        diaryRepository: DiaryRepository
-    ) = LoadWordSearchResultListUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideLoadNewWordSearchResultListUseCase(
-        loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
-        updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
-    ) = LoadNewWordSearchResultListUseCase(
-        loadWordSearchResultListUseCase,
-        updateWordSearchResultListFooterUseCase
-    )
-
-    @Singleton
-    @Provides
-    fun provideLoadAdditionWordSearchResultListUseCase(
-        loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
-        updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
-    ) = LoadAdditionWordSearchResultListUseCase(
-        loadWordSearchResultListUseCase,
-        updateWordSearchResultListFooterUseCase
-    )
-
-    @Singleton
-    @Provides
-    fun provideRefreshWordSearchResultListUseCase(
-        loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
-        updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
-    ) = RefreshWordSearchResultListUseCase(
-        loadWordSearchResultListUseCase,
-        updateWordSearchResultListFooterUseCase
-    )
 
     @Singleton
     @Provides
