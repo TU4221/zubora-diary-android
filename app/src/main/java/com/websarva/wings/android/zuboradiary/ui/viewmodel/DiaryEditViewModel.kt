@@ -364,14 +364,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 diaryItemTitleSelectionHistoryList,
                 originalDiary,
                 isNewDiary
-            ) {
-                saveDiary(
-                    diary,
-                    diaryItemTitleSelectionHistoryList,
-                    originalDiary,
-                    isNewDiary
-                )
-            }
+            )
         }
     }
 
@@ -729,7 +722,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val previousDate = previousDate
         val originalDate = _originalDiary.requireValue().date
         val isNewDiary = isNewDiary.value
-        requestDiaryLoadConfirmationAndFetchWeatherIfNeeded(
+        requestDiaryLoadConfirmation(
             date,
             previousDate,
             originalDate,
@@ -828,23 +821,11 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun requestDiaryLoadConfirmationAndFetchWeatherIfNeeded(
-        date: LocalDate,
-        previousDate: LocalDate?,
-        originalDate: LocalDate,
-        isNewDiary: Boolean
-    ) {
-        requestDiaryLoadConfirmation(date, previousDate, originalDate, isNewDiary) {
-            processWeatherInfoFetch(date, previousDate)
-        }
-    }
-
     private suspend fun requestDiaryLoadConfirmation(
         date: LocalDate,
         previousDate: LocalDate?,
         originalDate: LocalDate,
-        isNewDiary: Boolean,
-        onConfirmationNotNeeded: suspend () -> Unit
+        isNewDiary: Boolean
     ) {
         updateUiState(DiaryEditState.CheckingDiaryInfo)
         val result =
@@ -860,7 +841,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         )
                     )
                 } else {
-                    onConfirmationNotNeeded()
+                    processWeatherInfoFetch(date, previousDate)
                 }
             }
             is UseCaseResult.Failure -> {
@@ -874,8 +855,7 @@ internal class DiaryEditViewModel @Inject constructor(
         diary: Diary,
         diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
         originalDiary: Diary,
-        isNewDiary: Boolean,
-        onConfirmationNotNeeded: suspend () -> Unit
+        isNewDiary: Boolean
     ) {
         updateUiState(DiaryEditState.CheckingDiaryInfo)
         val date = diary.date
@@ -894,7 +874,12 @@ internal class DiaryEditViewModel @Inject constructor(
                         DiaryEditEvent.NavigateDiaryUpdateDialog(parameters)
                     )
                 } else {
-                    onConfirmationNotNeeded()
+                    saveDiary(
+                        diary,
+                        diaryItemTitleSelectionHistoryList,
+                        originalDiary,
+                        isNewDiary
+                    )
                 }
             }
             is UseCaseResult.Failure -> {
@@ -907,7 +892,6 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報取得関係
-    // TODO:コールバック構成の代替案を検討する。(他処理メソッドも同様に)
     // TODO:State更新タイミングの代替案を検討する。(他処理メソッドも同様に)
     private suspend fun processWeatherInfoFetch(date: LocalDate, previousDate: LocalDate?) {
         updateUiState(DiaryEditState.CheckingWeatherAvailability)
@@ -917,35 +901,25 @@ internal class DiaryEditViewModel @Inject constructor(
             return
         }
 
-        requestWeatherInfoConfirmation(
-            date,
-            previousDate
-        ) {
-
-            val shouldLoad = shouldFetchWeatherInfoUseCase(date, previousDate).value
-            if (!shouldLoad) {
-                return@requestWeatherInfoConfirmation
-            }
-
-            val parameters = WeatherInfoFetchParameters(date)
-            checkPermissionBeforeWeatherInfoFetch(parameters)
-        }
+        requestWeatherInfoConfirmation(date, previousDate)
     }
 
     private suspend fun requestWeatherInfoConfirmation(
         date: LocalDate,
-        previousDate: LocalDate?,
-        onConfirmationNotNeeded: suspend () -> Unit
+        previousDate: LocalDate?
     ) {
-        val result =
-            shouldRequestWeatherInfoConfirmationUseCase(date, previousDate)
+        val result = shouldRequestWeatherInfoConfirmationUseCase(date, previousDate)
         if (result.value) {
             val parameters = WeatherInfoFetchParameters(date)
             emitUiEvent(
                 DiaryEditEvent.NavigateWeatherInfoFetchDialog(parameters)
             )
         } else {
-            onConfirmationNotNeeded()
+            val shouldLoad = shouldFetchWeatherInfoUseCase(date, previousDate).value
+            if (!shouldLoad) return
+
+            val parameters = WeatherInfoFetchParameters(date)
+            checkPermissionBeforeWeatherInfoFetch(parameters)
         }
     }
 
@@ -998,7 +972,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val previousDate = previousDate
         // MEMO:下記処理をdate(StateFlow)変数のCollectorから呼び出すと、
         //      画面回転時にも不要に呼び出してしまう為、下記にて処理。
-        requestDiaryLoadConfirmationAndFetchWeatherIfNeeded(
+        requestDiaryLoadConfirmation(
             date,
             previousDate,
             originalDate,
