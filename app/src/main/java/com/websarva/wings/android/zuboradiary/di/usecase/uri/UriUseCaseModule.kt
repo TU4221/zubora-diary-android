@@ -25,18 +25,18 @@ internal object UriUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideTakePersistableUriPermissionUseCase(
-        uriRepository: UriRepository
-    ): TakePersistableUriPermissionUseCase {
-        return TakePersistableUriPermissionUseCase(uriRepository)
-    }
-
-    @Singleton
-    @Provides
     fun provideReleasePersistableUriPermissionUseCase(
         uriRepository: UriRepository,
         diaryRepository: DiaryRepository
     ): ReleasePersistableUriPermissionUseCase {
         return ReleasePersistableUriPermissionUseCase(uriRepository, diaryRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideTakePersistableUriPermissionUseCase(
+        uriRepository: UriRepository
+    ): TakePersistableUriPermissionUseCase {
+        return TakePersistableUriPermissionUseCase(uriRepository)
     }
 }
