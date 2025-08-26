@@ -55,13 +55,21 @@ internal class DiaryDayListAdapter
     //      このAdapter再生成は、そのちらつきを軽減するための策。
     //      (ViewHolderの完全再生成によるパフォーマンス影響に注意)
     fun refreshAdapter(): DiaryDayListAdapter {
+        val oldAdapter = this
         val newAdapter =
             DiaryDayListAdapter(
-                recyclerView as SwipeRecyclerView,
-                themeColor,
-                leftSwipeBackgroundButtonSimpleCallback
-            ).apply { build() }
-        leftSwipeBackgroundButtonSimpleCallback.build()
+                oldAdapter.recyclerView as SwipeRecyclerView,
+                oldAdapter.themeColor,
+                oldAdapter.leftSwipeBackgroundButtonSimpleCallback
+            ).apply {
+                build()
+                oldAdapter.onItemClickListener?.let {
+                    registerOnItemClickListener(it)
+                }
+                oldAdapter.onBackgroundButtonClickListener?.let {
+                    registerOnClickDeleteButtonListener(it)
+                }
+            }
         return newAdapter
     }
 

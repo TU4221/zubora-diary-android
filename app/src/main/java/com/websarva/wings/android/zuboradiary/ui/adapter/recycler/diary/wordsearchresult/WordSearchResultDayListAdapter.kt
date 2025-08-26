@@ -47,11 +47,15 @@ internal class WordSearchResultDayListAdapter(
     //      このAdapter再生成は、そのちらつきを軽減するための策。
     //      (ViewHolderの完全再生成によるパフォーマンス影響に注意)
     fun refreshAdapter(): WordSearchResultDayListAdapter {
+        val oldAdapter = this
         val newAdapter =
             WordSearchResultDayListAdapter(
-                recyclerView as SwipeRecyclerView,
-                themeColor
-            ).apply { build() }
+                oldAdapter.recyclerView as SwipeRecyclerView,
+                oldAdapter.themeColor
+            ).apply {
+                build()
+                oldAdapter.onItemClickListener?.let { registerOnItemClickListener(it) }
+            }
         return newAdapter
     }
 

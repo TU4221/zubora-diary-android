@@ -32,7 +32,9 @@ internal abstract class LeftSwipeBackgroundButtonListBaseAdapter <T, VH : Recycl
     override fun build() {
         super.build()
 
-        if (!this::leftSwipeBackgroundButtonSimpleCallback.isInitialized) {
+        if (this::leftSwipeBackgroundButtonSimpleCallback.isInitialized) {
+            leftSwipeBackgroundButtonSimpleCallback.build()
+        } else {
             leftSwipeBackgroundButtonSimpleCallback =
                 LeftSwipeBackgroundButtonSimpleCallback(recyclerView as SwipeRecyclerView)
                     .apply { build() }
