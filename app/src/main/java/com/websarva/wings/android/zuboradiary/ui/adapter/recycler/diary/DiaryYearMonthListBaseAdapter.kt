@@ -173,12 +173,14 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
             fun bindDiaryDayList(item: DiaryYearMonthListItemUi.Diary<DiaryDayListItemUi.Standard>) {
                 val adapter = binding.recyclerDayList.adapter as DiaryDayListAdapter
-                adapter.submitList(item.diaryDayList.itemList)
+                val newAdapter = adapter.refreshAdapter()
+                newAdapter.submitList(item.diaryDayList.itemList)
             }
 
             fun bindWordSearchResultDayList(item: DiaryYearMonthListItemUi.Diary<DiaryDayListItemUi.WordSearchResult>) {
                 val adapter = binding.recyclerDayList.adapter as WordSearchResultDayListAdapter
-                adapter.submitList(item.diaryDayList.itemList)
+                val newAdapter = adapter.refreshAdapter()
+                newAdapter.submitList(item.diaryDayList.itemList)
             }
         }
 

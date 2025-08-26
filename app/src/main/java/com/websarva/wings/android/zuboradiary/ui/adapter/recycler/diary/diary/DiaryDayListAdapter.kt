@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonListBaseAdapter
+import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeSimpleCallback.LeftSwipeViewHolder
@@ -16,18 +17,52 @@ import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekStrin
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 import java.text.NumberFormat
 
-internal class DiaryDayListAdapter(recyclerView: SwipeRecyclerView, themeColor: ThemeColor)
-    : LeftSwipeBackgroundButtonListBaseAdapter<DiaryDayListItemUi.Standard, DiaryDayListViewHolder>(
+internal class DiaryDayListAdapter
+    : LeftSwipeBackgroundButtonListBaseAdapter<DiaryDayListItemUi.Standard, DiaryDayListViewHolder> {
+    constructor(
+        recyclerView: SwipeRecyclerView,
+        themeColor: ThemeColor
+    ): super(
         recyclerView,
         themeColor,
         DiffUtilItemCallback()
-    ) {
+    )
 
+    constructor(
+        recyclerView: SwipeRecyclerView,
+        themeColor: ThemeColor,
+        leftSwipeBackgroundButtonSimpleCallback: LeftSwipeBackgroundButtonSimpleCallback
+    ): super(
+        recyclerView,
+        themeColor,
+        DiffUtilItemCallback(),
+        leftSwipeBackgroundButtonSimpleCallback
+    )
     override fun build() {
         super.build()
 
         // MEMO:DiaryYearMonthListBaseAdapter#build()内にて理由記載)
         recyclerView.itemAnimator = null
+    }
+
+    // HACK:ネストされたRecyclerViewの描画タイミングの問題への対応。
+    //      Adapterインスタンスを再生成することで、親と子のリストのレイアウトパスが
+    //      より同期的に実行されるようになり、表示のズレが軽減される模様。
+    //      通常のデータ更新方法（空リストsubmit後に新データをsubmit等）では、
+    //      このタイミング問題は十分に解決できなかった。
+    //      親リスト(DiaryYearMonthList)のアイテムが、子リスト(DiaryDayList)の内容よりも
+    //      先に描画されてしまうため、リスト更新時にセクションバーが一瞬ちらつく。
+    //      このAdapter再生成は、そのちらつきを軽減するための策。
+    //      (ViewHolderの完全再生成によるパフォーマンス影響に注意)
+    fun refreshAdapter(): DiaryDayListAdapter {
+        val newAdapter =
+            DiaryDayListAdapter(
+                recyclerView as SwipeRecyclerView,
+                themeColor,
+                leftSwipeBackgroundButtonSimpleCallback
+            ).apply { build() }
+        leftSwipeBackgroundButtonSimpleCallback.build()
+        return newAdapter
     }
 
     override fun createViewHolder(

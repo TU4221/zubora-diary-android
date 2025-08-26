@@ -18,6 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDay
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultDayListAdapter.WordSearchResultDayViewHolder
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
+import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 import java.text.NumberFormat
 
 internal class WordSearchResultDayListAdapter(
@@ -34,6 +35,24 @@ internal class WordSearchResultDayListAdapter(
 
         // MEMO:DiaryYearMonthListBaseAdapter#build()内にて理由記載)
         recyclerView.itemAnimator = null
+    }
+
+    // HACK:ネストされたRecyclerViewの描画タイミングの問題への対応。
+    //      Adapterインスタンスを再生成することで、親と子のリストのレイアウトパスが
+    //      より同期的に実行されるようになり、表示のズレが軽減される模様。
+    //      通常のデータ更新方法（空リストsubmit後に新データをsubmit等）では、
+    //      このタイミング問題は十分に解決できなかった。
+    //      親リスト(DiaryYearMonthList)のアイテムが、子リスト(DiaryDayList)の内容よりも
+    //      先に描画されてしまうため、リスト更新時にセクションバーが一瞬ちらつく。
+    //      このAdapter再生成は、そのちらつきを軽減するための策。
+    //      (ViewHolderの完全再生成によるパフォーマンス影響に注意)
+    fun refreshAdapter(): WordSearchResultDayListAdapter {
+        val newAdapter =
+            WordSearchResultDayListAdapter(
+                recyclerView as SwipeRecyclerView,
+                themeColor
+            ).apply { build() }
+        return newAdapter
     }
 
     override fun createViewHolder(
