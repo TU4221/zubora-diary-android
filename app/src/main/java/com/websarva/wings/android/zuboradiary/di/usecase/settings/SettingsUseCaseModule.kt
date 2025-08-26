@@ -27,6 +27,7 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object SettingsUseCaseModule {
+
     @Singleton
     @Provides
     fun provideDeleteAllDataUseCase(
@@ -48,6 +49,22 @@ internal object SettingsUseCaseModule {
         releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase
     ): DeleteAllDiariesUseCase {
         return DeleteAllDiariesUseCase(diaryRepository, releaseAllPersistableUriPermissionUseCase)
+    }
+
+    @Singleton
+    @Provides
+    fun provideInitializeAllSettingsUseCase(
+        userPreferencesRepository: UserPreferencesRepository
+    ): InitializeAllSettingsUseCase {
+        return InitializeAllSettingsUseCase(userPreferencesRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideIsWeatherInfoFetchEnabledUseCase(
+        loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase
+    ): IsWeatherInfoFetchEnabledUseCase {
+        return IsWeatherInfoFetchEnabledUseCase(loadWeatherInfoFetchSettingUseCase)
     }
 
     @Singleton
@@ -88,22 +105,6 @@ internal object SettingsUseCaseModule {
         userPreferencesRepository: UserPreferencesRepository
     ): LoadWeatherInfoFetchSettingUseCase {
         return LoadWeatherInfoFetchSettingUseCase(userPreferencesRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideInitializeAllSettingsUseCase(
-        userPreferencesRepository: UserPreferencesRepository
-    ): InitializeAllSettingsUseCase {
-        return InitializeAllSettingsUseCase(userPreferencesRepository)
-    }
-
-    @Singleton
-    @Provides
-    fun provideIsWeatherInfoFetchEnabledUseCase(
-        loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase
-    ): IsWeatherInfoFetchEnabledUseCase {
-        return IsWeatherInfoFetchEnabledUseCase(loadWeatherInfoFetchSettingUseCase)
     }
 
     @Singleton
