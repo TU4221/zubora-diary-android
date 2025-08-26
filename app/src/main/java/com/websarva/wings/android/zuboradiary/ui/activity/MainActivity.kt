@@ -14,12 +14,9 @@ import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.NavigationUI.setupWithNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.android.material.navigation.NavigationBarView
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -277,12 +274,11 @@ class MainActivity : LoggingActivity() {
         setupWithNavController(bottomNavigationView, navController)
 
         bottomNavigationView.apply {
-            setOnItemSelectedListener(
-                CustomOnItemSelectedListener(this, navController) {
-                    mainActivityViewModel.onBottomNavigationItemSelect()
-                    setUpFragmentTransitionOnTabSelection()
-                }
-            )
+            setOnItemSelectedListener { menuItem: MenuItem ->
+                mainActivityViewModel.onBottomNavigationItemSelect()
+                setUpFragmentTransitionOnTabSelection()
+                onNavDestinationSelected(menuItem, navController)
+            }
             setOnItemReselectedListener {
                 val currentFragment = currentFragment
                 if (currentFragment !is ReselectableFragment) return@setOnItemReselectedListener
@@ -290,40 +286,6 @@ class MainActivity : LoggingActivity() {
                 Log.i(logTag, "ボトムナビゲーション_リセレクト")
                 currentFragment.onBottomNavigationItemReselected()
             }
-        }
-    }
-
-    // TODO:このListenerが必要か最後に検討
-    private class CustomOnItemSelectedListener(
-        private val bottomNavigationView: BottomNavigationView,
-        private val navController: NavController,
-        private val onItemSelected: () -> Unit
-    ) : NavigationBarView.OnItemSelectedListener {
-
-        private val selectedBottomNavigationMenuItem: MenuItem
-            get() {
-                return bottomNavigationView.run {
-                    menu.findItem(selectedItemId)
-                }
-            }
-
-        // MEMO:下記動作を行った時にタブのアイコンが更新されない問題があるため、
-        //      新しく"OnItemSelectedListener"をセットする。
-        //      参考:https://inside.luchegroup.com/entry/2023/05/08/113236
-        //      タブA切替 → タブA上で別fragmentへ切替 → タブB切替 → タブA切替(fragmentA表示)
-        //      → タブAのアイコンが選択状態に更新されない
-        //      デフォルトの"OnItemSelectedListener"はNavigationUI#onNavDestinationSelected()処理後、
-        //      表示フラグメントと選択タブに設定されているフラグメントを比較し、同じでないと"true"が返されない。
-        //      その為常時"true"が返す。
-        //      (現在タブに設定されたFragmentから別Fragmentを表示する時は、BottomNavigationを非表示にしている為、
-        //      本不具合は発生しないが、対策コードは残しておく。)
-        override fun onNavigationItemSelected(menuItem: MenuItem): Boolean {
-            // BottomNavigationのタブ選択による画面遷移
-            if (selectedBottomNavigationMenuItem === menuItem) return true
-
-            onItemSelected()
-            onNavDestinationSelected(menuItem, navController)
-            return true
         }
     }
 
