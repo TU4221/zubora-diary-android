@@ -387,11 +387,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             .setAdapter(WeatherSpinnerAdapter(requireContext(), themeColor))
 
         binding.autoCompleteTextWeather1.onItemClickListener =
-            OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                val listAdapter = binding.autoCompleteTextWeather1.adapter
-                val arrayAdapter = listAdapter as ArrayAdapter<*>
-                val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
-                val weather = Weather.of(requireContext(), strWeather)
+            OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                requireNotNull(parent)
+                val arrayAdapter = parent.adapter as ArrayAdapter<*>
+                val weatherString = arrayAdapter.getItem(position) as String
+                val weather = Weather.of(requireContext(), weatherString)
                 mainViewModel.onWeather1InputFieldItemClick(weather)
             }
 
@@ -407,11 +407,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
 
         binding.autoCompleteTextWeather2.onItemClickListener =
-            OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                val listAdapter = binding.autoCompleteTextWeather2.adapter
-                val arrayAdapter = listAdapter as ArrayAdapter<*>
-                val strWeather = checkNotNull(arrayAdapter.getItem(position)) as String
-                val weather = Weather.of(requireContext(), strWeather)
+            OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                requireNotNull(parent)
+                val arrayAdapter = parent.adapter as ArrayAdapter<*>
+                val weatherString = arrayAdapter.getItem(position) as String
+                val weather = Weather.of(requireContext(), weatherString)
                 mainViewModel.onWeather2InputFieldItemClick(weather)
             }
 
@@ -432,12 +432,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             )
 
         binding.autoCompleteTextCondition.onItemClickListener =
-            OnItemClickListener { _: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                // TODO:引数からで取得できないか確認。(取得できるようならclearViewBindingsからリスナ解除処理削除)
-                val listAdapter = binding.autoCompleteTextCondition.adapter
-                val arrayAdapter = listAdapter as ArrayAdapter<*>
-                val strCondition = arrayAdapter.getItem(position) as String
-                val condition = Condition.of(requireContext(), strCondition)
+            OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                requireNotNull(parent)
+                val arrayAdapter = parent.adapter as ArrayAdapter<*>
+                val conditionString = arrayAdapter.getItem(position) as String
+                val condition = Condition.of(requireContext(), conditionString)
                 mainViewModel.onConditionInputFieldItemClick(condition)
             }
 
