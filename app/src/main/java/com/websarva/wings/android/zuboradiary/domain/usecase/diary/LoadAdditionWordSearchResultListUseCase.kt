@@ -27,7 +27,6 @@ internal class LoadAdditionWordSearchResultListUseCase(
         try {
             val loadedDiaryList =
                 loadDiaryList(
-                    NUM_LOAD_ITEMS,
                     currentList.countDiaries(),
                     searchWord
                 )
@@ -44,13 +43,12 @@ internal class LoadAdditionWordSearchResultListUseCase(
 
     @Throws(DomainException::class)
     private suspend fun loadDiaryList(
-        numLoadItems: Int,
         loadOffset: Int,
         searchWord: String
     ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
         val result =
             loadWordSearchResultListUseCase(
-                numLoadItems,
+                NUM_LOAD_ITEMS,
                 loadOffset,
                 searchWord
             )

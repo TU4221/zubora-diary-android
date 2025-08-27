@@ -40,7 +40,6 @@ internal class RefreshWordSearchResultListUseCase(
             val loadedDiaryList =
                 loadDiaryList(
                     numLoadItems,
-                    0,
                     searchWord
                 )
             val resultList = updateDiaryListFooter(loadedDiaryList, searchWord)
@@ -56,13 +55,12 @@ internal class RefreshWordSearchResultListUseCase(
     @Throws(DomainException::class)
     private suspend fun loadDiaryList(
         numLoadItems: Int,
-        loadOffset: Int,
         searchWord: String
     ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
         val result =
             loadWordSearchResultListUseCase(
                 numLoadItems,
-                loadOffset,
+                0,
                 searchWord
             )
         return when (result) {

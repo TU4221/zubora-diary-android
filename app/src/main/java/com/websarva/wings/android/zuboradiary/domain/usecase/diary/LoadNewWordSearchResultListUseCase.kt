@@ -24,12 +24,7 @@ internal class LoadNewWordSearchResultListUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            val loadedDiaryList =
-                loadDiaryList(
-                    NUM_LOAD_ITEMS,
-                    0,
-                    searchWord
-                )
+            val loadedDiaryList = loadDiaryList(searchWord)
             val resultList = updateDiaryListFooter(loadedDiaryList, searchWord)
 
             Log.i(logTag, "${logMsg}完了")
@@ -42,14 +37,12 @@ internal class LoadNewWordSearchResultListUseCase(
 
     @Throws(DomainException::class)
     private suspend fun loadDiaryList(
-        numLoadItems: Int,
-        loadOffset: Int,
         searchWord: String
     ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
         val result =
             loadWordSearchResultListUseCase(
-                numLoadItems,
-                loadOffset,
+                NUM_LOAD_ITEMS,
+                0,
                 searchWord
             )
         return when (result) {

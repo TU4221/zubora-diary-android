@@ -28,7 +28,6 @@ internal class LoadAdditionDiaryListUseCase(
         try {
             val loadedDiaryList =
                 loadDiaryList(
-                    NUM_LOAD_ITEMS,
                     currentList.countDiaries(),
                     startDate
                 )
@@ -45,13 +44,12 @@ internal class LoadAdditionDiaryListUseCase(
 
     @Throws(DomainException::class)
     private suspend fun loadDiaryList(
-        numLoadItems: Int,
         loadOffset: Int,
         startDate: LocalDate?
     ): DiaryYearMonthList<DiaryDayListItem.Standard> {
         val result =
             loadDiaryListUseCase(
-                numLoadItems,
+                NUM_LOAD_ITEMS,
                 loadOffset,
                 startDate
             )
