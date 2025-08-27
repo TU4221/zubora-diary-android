@@ -641,7 +641,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
     private fun selectItemMotionLayoutListener(itemNumber: ItemNumber): ItemMotionLayoutListener {
         val arrayNumber = itemNumber.value - ItemNumber.MIN_NUMBER
-        return checkNotNull(itemMotionLayoutListeners).get(arrayNumber)
+        return checkNotNull(itemMotionLayoutListeners)[arrayNumber]
     }
 
     private fun setUpItemsLayout(numItems: Int) {
