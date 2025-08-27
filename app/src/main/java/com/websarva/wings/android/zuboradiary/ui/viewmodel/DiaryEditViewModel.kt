@@ -985,17 +985,14 @@ internal class DiaryEditViewModel @Inject constructor(
         return diaryStateFlow.getItemStateFlow(itemNumber).title
     }
 
+    // MEMO:日記項目追加処理完了時のUi更新(編集中)は日記項目追加完了イベントメソッドにて処理
     private suspend fun addDiaryItem() {
         updateUiState(DiaryEditState.AddingItem)
         emitUiEvent(DiaryEditEvent.ItemAddition)
         diaryStateFlow.incrementVisibleItemsCount()
     }
 
-    private fun deleteItem(itemNumber: ItemNumber) {
-        diaryStateFlow.deleteItem(itemNumber)
-        updateUiState(DiaryEditState.Editing)
-    }
-
+    // MEMO:日記項目削除処理完了時のUi更新(編集中)は日記項目削除メソッドにて処理
     private suspend fun requestDiaryItemDeleteTransition(itemNumber: ItemNumber) {
         val numVisibleItems = numVisibleItems.requireValue()
 
@@ -1007,11 +1004,16 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditEvent.TransitionDiaryItemToInvisibleState(itemNumber)
             )
         }
-        // MEMO:deleteItem(itemNumber)でEditingStateに更新する為、下記コード不要。
-        //updateUiState(DiaryEditState.Editing)
+    }
+
+    // MEMO:日記項目削除処理開始時のUi更新(項目削除中)は日記項目削除トランジション要求メソッドにて処理
+    private fun deleteItem(itemNumber: ItemNumber) {
+        diaryStateFlow.deleteItem(itemNumber)
+        updateUiState(DiaryEditState.Editing)
     }
 
     // 添付画像関係
+    // MEMO:画像選択完了時のUi更新(編集中)は画像選択完了イベントメソッドにて処理
     private suspend fun selectImage() {
         updateUiState(DiaryEditState.SelectingImage)
         emitUiEvent(DiaryEditEvent.SelectImage)
