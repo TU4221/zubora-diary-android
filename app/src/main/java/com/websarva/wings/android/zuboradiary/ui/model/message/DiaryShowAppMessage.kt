@@ -7,14 +7,6 @@ internal sealed class DiaryShowAppMessage(
     dialogMessageStringResId: Int
 ) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
 
-    data object DiaryLoadFailure :  DiaryShowAppMessage(
-        R.string.dialog_app_message_title_access_error,
-        R.string.dialog_diary_show_app_message_diary_load_failure
-    ) {
-        // デシリアライズ時のシングルトン性を維持
-        private fun readResolve(): Any = DiaryLoadFailure
-    }
-
     data object DiaryDeleteFailure :  DiaryShowAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_show_app_message_diary_delete_failure
