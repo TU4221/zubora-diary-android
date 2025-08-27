@@ -27,14 +27,6 @@ internal abstract class ListBaseAdapter <T, VH : RecyclerView.ViewHolder> protec
         }
     }
 
-    open fun clearViewBindings() {
-        recyclerView.apply {
-            adapter = null
-            layoutManager = null
-        }
-        onItemClickListener = null
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val inflater = LayoutInflater.from(parent.context)
         val themeColorInflater = ThemeColorInflaterCreator().create(inflater, themeColor)

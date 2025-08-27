@@ -31,15 +31,6 @@ internal class DiaryItemTitleSelectionHistoryListAdapter(
         }
     }
 
-    override fun clearViewBindings() {
-        super.clearViewBindings()
-        recyclerView.apply {
-            for (i in 0 until itemDecorationCount) {
-                removeItemDecorationAt(0)
-            }
-        }
-    }
-
     override fun createViewHolder(
         parent: ViewGroup,
         themeColorInflater: LayoutInflater,

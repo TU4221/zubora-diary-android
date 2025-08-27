@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnLayoutChangeListener
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -35,8 +34,6 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 ) {
 
     private val logTag = createLogTag()
-
-    private var onLayoutChangeListener: OnLayoutChangeListener? = null
 
     fun interface OnChildItemClickListener<T> {
         fun onClick(item: T)
@@ -72,17 +69,6 @@ internal abstract class DiaryYearMonthListBaseAdapter<
                 }
             )
         }
-    }
-
-    override fun clearViewBindings() {
-        super.clearViewBindings()
-
-        recyclerView.apply {
-            clearOnScrollListeners()
-            removeOnLayoutChangeListener(onLayoutChangeListener)
-        }
-        onLayoutChangeListener = null
-        onChildItemClickListener = null
     }
 
     override fun createViewHolder(
@@ -291,11 +277,9 @@ internal abstract class DiaryYearMonthListBaseAdapter<
                     }
                 }
             )
-            onLayoutChangeListener =
-                OnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
-                    updateVisibleSectionBarPosition(v as RecyclerView)
-                }
-            addOnLayoutChangeListener(onLayoutChangeListener)
+            addOnLayoutChangeListener { v, _, _, _, _, _, _, _, _ ->
+                updateVisibleSectionBarPosition(v as RecyclerView)
+            }
         }
     }
 

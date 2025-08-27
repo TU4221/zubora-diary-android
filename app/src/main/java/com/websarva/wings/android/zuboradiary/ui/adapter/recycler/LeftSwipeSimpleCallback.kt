@@ -65,25 +65,12 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     }
     private var onSelectedChangedListener: OnSelectedChangedListener? = null
 
-    private var swipeStatePositionsResetObserver: SwipeStatePositionsResetObserver? = null
-
-    private var swipedItemCloseOnScrollListener: RecyclerView.OnScrollListener? = null
-
     open fun build() {
         itemTouchHelper = ItemTouchHelper(this)
         itemTouchHelper.attachToRecyclerView(recyclerView)
         setUpLeftSwipeItem()
         setUpSwipeStatePositionsResetObserver()
         setUpSwipedItemCloseOnScrollListener()
-    }
-
-    fun clearViewBindings() {
-        itemTouchHelper.attachToRecyclerView(null)
-        swipeStatePositionsResetObserver?.let {
-            val adapter = recyclerView.adapter as ListAdapter<*, *>
-            adapter.unregisterAdapterDataObserver(it)
-        }
-        swipedItemCloseOnScrollListener?.let { recyclerView.removeOnScrollListener(it) }
     }
 
     private fun setUpLeftSwipeItem() {
@@ -97,8 +84,6 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
         adapter.registerAdapterDataObserver(
             SwipeStatePositionsResetObserver {
                 resetSwipeStatePositions()
-            }.also {
-                swipeStatePositionsResetObserver = it
             }
         )
     }
@@ -112,7 +97,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
                 // スクロール時スワイプ閉
                 closeSwipedItem()
             }
-        }.also { swipedItemCloseOnScrollListener = it })
+        })
     }
 
     private class SwipeStatePositionsResetObserver(

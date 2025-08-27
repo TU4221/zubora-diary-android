@@ -37,12 +37,6 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
         })
     }
 
-    override fun clearViewBindings() {
-        super.clearViewBindings()
-
-        onChildItemBackgroundButtonClickListener = null
-    }
-
     override fun bindViewHolder(
         holder: DiaryYearMonthListViewHolder,
         item: DiaryYearMonthListItemUi<CLIT>

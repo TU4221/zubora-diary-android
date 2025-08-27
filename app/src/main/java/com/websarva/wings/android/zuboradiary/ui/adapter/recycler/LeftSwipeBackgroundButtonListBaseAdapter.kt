@@ -41,12 +41,6 @@ internal abstract class LeftSwipeBackgroundButtonListBaseAdapter <T, VH : Recycl
         }
     }
 
-    override fun clearViewBindings() {
-        super.clearViewBindings()
-
-        onBackgroundButtonClickListener = null
-    }
-
     fun registerOnClickDeleteButtonListener(
         listener: OnBackgroundButtonClickListener<T>
     ) {
