@@ -233,14 +233,4 @@ class DiaryListFragment :
 
         mainViewModel.onUiGone()
     }
-
-    override fun clearViewBindings() {
-        binding.materialToolbarTopAppBar.setOnMenuItemClickListener(null)
-        binding.recyclerDiaryList.apply {
-            val listAdapter = adapter as DiaryYearMonthListAdapter
-            listAdapter.clearViewBindings()
-        }
-
-        super.clearViewBindings()
-    }
 }
