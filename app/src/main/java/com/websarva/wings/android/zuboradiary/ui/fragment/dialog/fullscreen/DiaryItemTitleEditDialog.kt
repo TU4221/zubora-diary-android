@@ -207,12 +207,4 @@ class DiaryItemTitleEditDialog :
             )
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
-
-    override fun clearViewBindings() {
-        val adapter =
-            binding.recyclerItemTitleSelectionHistory.adapter as DiaryItemTitleSelectionHistoryListAdapter
-        adapter.clearViewBindings()
-
-        super.clearViewBindings()
-    }
 }
