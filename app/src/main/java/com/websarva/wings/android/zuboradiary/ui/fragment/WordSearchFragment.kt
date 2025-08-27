@@ -170,15 +170,4 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         super.onDestroyView()
         mainViewModel.onUiGone()
     }
-
-    override fun clearViewBindings() {
-        binding.recyclerWordSearchResultList.apply {
-            val listAdapter = adapter as WordSearchResultYearMonthListAdapter
-            listAdapter.clearViewBindings()
-            clearOnScrollListeners()
-        }
-        binding.floatingActionButtonTopScroll.setOnClickListener(null)
-
-        super.clearViewBindings()
-    }
 }
