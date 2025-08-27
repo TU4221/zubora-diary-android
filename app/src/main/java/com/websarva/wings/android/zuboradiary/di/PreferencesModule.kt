@@ -21,7 +21,5 @@ internal object PreferencesModule {
     fun provideUserPreferences(
         @ApplicationContext context: Context,
         @ApplicationScope appScope: CoroutineScope
-    ): UserPreferences {
-        return UserPreferences(context, appScope)
-    }
+    ): UserPreferences = UserPreferences(context, appScope)
 }

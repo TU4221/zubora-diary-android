@@ -17,7 +17,5 @@ internal object LocationModule {
     @Provides
     fun provideFusedLocationDataSource(
         @ApplicationContext context: Context
-    ):  FusedLocationDataSource {
-        return FusedLocationDataSource(context)
-    }
+    ):  FusedLocationDataSource = FusedLocationDataSource(context)
 }

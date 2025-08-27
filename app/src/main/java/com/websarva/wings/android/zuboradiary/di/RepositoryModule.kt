@@ -25,36 +25,34 @@ internal object RepositoryModule {
     @Provides
     fun provideDiaryRepository(
         diaryDataSource: DiaryDataSource
-    ): DiaryRepository {
-        return DiaryRepository(diaryDataSource)
-    }
+    ): DiaryRepository = DiaryRepository(diaryDataSource)
 
     @Singleton
     @Provides
-    fun provideUserPreferencesRepository(userPreferences: UserPreferences): UserPreferencesRepository {
-        return UserPreferencesRepository(userPreferences)
-    }
+    fun provideUserPreferencesRepository(
+        userPreferences: UserPreferences
+    ): UserPreferencesRepository = UserPreferencesRepository(userPreferences)
 
     @Singleton
     @Provides
-    fun provideWorkerRepository(workManager: ReminderNotificationWorkManager): WorkerRepository {
-        return WorkerRepository(workManager)
-    }
+    fun provideWorkerRepository(
+        workManager: ReminderNotificationWorkManager
+    ): WorkerRepository = WorkerRepository(workManager)
 
     @Singleton
     @Provides
     fun provideWeatherApiRepository(
         weatherApiDataSource: WeatherApiDataSource,
         fusedLocationDataSource: FusedLocationDataSource
-    ): WeatherInfoRepository {
-        return WeatherInfoRepository(weatherApiDataSource, fusedLocationDataSource)
-    }
+    ): WeatherInfoRepository =
+        WeatherInfoRepository(
+            weatherApiDataSource,
+            fusedLocationDataSource
+        )
 
     @Singleton
     @Provides
     fun provideUriRepository(
         uriPermissionDataSource: UriPermissionDataSource
-    ): UriRepository {
-        return UriRepository(uriPermissionDataSource)
-    }
+    ): UriRepository = UriRepository(uriPermissionDataSource)
 }

@@ -17,7 +17,5 @@ internal object UriModule {
     @Provides
     fun provideUriPermissionDataSource(
         @ApplicationContext context: Context
-    ):  UriPermissionDataSource {
-        return UriPermissionDataSource(context.contentResolver)
-    }
+    ):  UriPermissionDataSource = UriPermissionDataSource(context.contentResolver)
 }

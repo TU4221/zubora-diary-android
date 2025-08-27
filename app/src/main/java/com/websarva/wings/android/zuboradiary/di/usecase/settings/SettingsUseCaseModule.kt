@@ -34,94 +34,86 @@ internal object SettingsUseCaseModule {
         diaryRepository: DiaryRepository,
         releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase,
         initializeAllSettingsUseCase: InitializeAllSettingsUseCase
-    ): DeleteAllDataUseCase {
-        return DeleteAllDataUseCase(
+    ): DeleteAllDataUseCase =
+        DeleteAllDataUseCase(
             diaryRepository,
             releaseAllPersistableUriPermissionUseCase,
             initializeAllSettingsUseCase
         )
-    }
 
     @Singleton
     @Provides
     fun provideDeleteAllDiariesUseCase(
         diaryRepository: DiaryRepository,
         releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase
-    ): DeleteAllDiariesUseCase {
-        return DeleteAllDiariesUseCase(diaryRepository, releaseAllPersistableUriPermissionUseCase)
-    }
+    ): DeleteAllDiariesUseCase =
+        DeleteAllDiariesUseCase(
+            diaryRepository,
+            releaseAllPersistableUriPermissionUseCase
+        )
 
     @Singleton
     @Provides
     fun provideInitializeAllSettingsUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): InitializeAllSettingsUseCase {
-        return InitializeAllSettingsUseCase(userPreferencesRepository)
-    }
+    ): InitializeAllSettingsUseCase =
+        InitializeAllSettingsUseCase(userPreferencesRepository)
 
     @Singleton
     @Provides
     fun provideIsWeatherInfoFetchEnabledUseCase(
         loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase
-    ): IsWeatherInfoFetchEnabledUseCase {
-        return IsWeatherInfoFetchEnabledUseCase(loadWeatherInfoFetchSettingUseCase)
-    }
+    ): IsWeatherInfoFetchEnabledUseCase =
+        IsWeatherInfoFetchEnabledUseCase(loadWeatherInfoFetchSettingUseCase)
 
     @Singleton
     @Provides
     fun provideLoadCalendarStartDayOfWeekSettingUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): LoadCalendarStartDayOfWeekSettingUseCase {
-        return LoadCalendarStartDayOfWeekSettingUseCase(userPreferencesRepository)
-    }
+    ): LoadCalendarStartDayOfWeekSettingUseCase =
+        LoadCalendarStartDayOfWeekSettingUseCase(userPreferencesRepository)
 
     @Singleton
     @Provides
     fun provideLoadPasscodeLockSettingUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): LoadPasscodeLockSettingUseCase {
-        return LoadPasscodeLockSettingUseCase(userPreferencesRepository)
-    }
+    ): LoadPasscodeLockSettingUseCase =
+        LoadPasscodeLockSettingUseCase(userPreferencesRepository)
 
     @Singleton
     @Provides
     fun provideLoadReminderNotificationSettingUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): LoadReminderNotificationSettingUseCase {
-        return LoadReminderNotificationSettingUseCase(userPreferencesRepository)
-    }
+    ): LoadReminderNotificationSettingUseCase =
+        LoadReminderNotificationSettingUseCase(userPreferencesRepository)
 
     @Singleton
     @Provides
     fun provideLoadThemeColorSettingUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): LoadThemeColorSettingUseCase {
-        return LoadThemeColorSettingUseCase(userPreferencesRepository)
-    }
+    ): LoadThemeColorSettingUseCase =
+        LoadThemeColorSettingUseCase(userPreferencesRepository)
 
     @Singleton
     @Provides
     fun provideLoadWeatherInfoFetchSettingUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): LoadWeatherInfoFetchSettingUseCase {
-        return LoadWeatherInfoFetchSettingUseCase(userPreferencesRepository)
-    }
+    ): LoadWeatherInfoFetchSettingUseCase =
+        LoadWeatherInfoFetchSettingUseCase(userPreferencesRepository)
 
     @Singleton
     @Provides
     fun provideSaveCalendarStartDayOfWeekUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): SaveCalendarStartDayOfWeekUseCase {
-        return SaveCalendarStartDayOfWeekUseCase(userPreferencesRepository)
-    }
+    ): SaveCalendarStartDayOfWeekUseCase =
+        SaveCalendarStartDayOfWeekUseCase(userPreferencesRepository)
 
     @Singleton
     @Provides
     fun provideSavePasscodeLockSettingUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): SavePasscodeLockSettingUseCase {
-        return SavePasscodeLockSettingUseCase(userPreferencesRepository)
-    }
+    ): SavePasscodeLockSettingUseCase =
+        SavePasscodeLockSettingUseCase(userPreferencesRepository)
 
     @Singleton
     @Provides
@@ -129,27 +121,24 @@ internal object SettingsUseCaseModule {
         userPreferencesRepository: UserPreferencesRepository,
         workerRepository: WorkerRepository,
         loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase
-    ): SaveReminderNotificationSettingUseCase {
-        return SaveReminderNotificationSettingUseCase(
+    ): SaveReminderNotificationSettingUseCase =
+        SaveReminderNotificationSettingUseCase(
             userPreferencesRepository,
             workerRepository,
             loadReminderNotificationSettingUseCase
         )
-    }
 
     @Singleton
     @Provides
     fun provideSaveThemeColorSettingUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): SaveThemeColorSettingUseCase {
-        return SaveThemeColorSettingUseCase(userPreferencesRepository)
-    }
+    ): SaveThemeColorSettingUseCase =
+        SaveThemeColorSettingUseCase(userPreferencesRepository)
 
     @Singleton
     @Provides
     fun provideSaveWeatherInfoFetchSettingUseCase(
         userPreferencesRepository: UserPreferencesRepository
-    ): SaveWeatherInfoFetchSettingUseCase {
-        return SaveWeatherInfoFetchSettingUseCase(userPreferencesRepository)
-    }
+    ): SaveWeatherInfoFetchSettingUseCase =
+        SaveWeatherInfoFetchSettingUseCase(userPreferencesRepository)
 }

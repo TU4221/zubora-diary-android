@@ -16,15 +16,12 @@ internal object WorkerModule {
 
     @Singleton
     @Provides
-    fun provideWorkManager(@ApplicationContext context: Context): WorkManager {
-        return WorkManager.getInstance(context)
-    }
+    fun provideWorkManager(@ApplicationContext context: Context): WorkManager =
+        WorkManager.getInstance(context)
 
     @Singleton
     @Provides
     fun provideReminderNotificationWorkManager(
         workManager: WorkManager
-    ): ReminderNotificationWorkManager {
-        return ReminderNotificationWorkManager(workManager)
-    }
+    ): ReminderNotificationWorkManager = ReminderNotificationWorkManager(workManager)
 }

@@ -19,23 +19,20 @@ internal object DatabaseModule {
 
     @Singleton
     @Provides
-    fun provideDiaryDatabase(@ApplicationContext context: Context): DiaryDatabase {
-        return databaseBuilder(context, DiaryDatabase::class.java, "diary_db")
+    fun provideDiaryDatabase(@ApplicationContext context: Context): DiaryDatabase =
+        databaseBuilder(context, DiaryDatabase::class.java, "diary_db")
             .fallbackToDestructiveMigration() // TODO:最終的に削除
             .build()
-    }
 
     @Singleton
     @Provides
-    fun provideDiaryDao(diaryDatabase: DiaryDatabase): DiaryDao {
-        return diaryDatabase.createDiaryDao()
-    }
+    fun provideDiaryDao(diaryDatabase: DiaryDatabase): DiaryDao =
+        diaryDatabase.createDiaryDao()
 
     @Singleton
     @Provides
-    fun provideSelectedItemTitlesHistoryDao(diaryDatabase: DiaryDatabase): DiaryItemTitleSelectionHistoryDao {
-        return diaryDatabase.createDiaryItemTitleSelectionHistoryDao()
-    }
+    fun provideSelectedItemTitlesHistoryDao(diaryDatabase: DiaryDatabase): DiaryItemTitleSelectionHistoryDao =
+        diaryDatabase.createDiaryItemTitleSelectionHistoryDao()
 
     @Singleton
     @Provides
@@ -43,11 +40,10 @@ internal object DatabaseModule {
         diaryDatabase: DiaryDatabase,
         diaryDao: DiaryDao,
         diaryItemTitleSelectionHistoryDao: DiaryItemTitleSelectionHistoryDao
-    ): DiaryDataSource {
-        return DiaryDataSource(
+    ): DiaryDataSource =
+        DiaryDataSource(
             diaryDatabase,
             diaryDao,
             diaryItemTitleSelectionHistoryDao
         )
-    }
 }

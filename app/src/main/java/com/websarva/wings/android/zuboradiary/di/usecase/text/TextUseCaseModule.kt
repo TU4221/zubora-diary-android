@@ -13,7 +13,5 @@ internal object TextUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideValidateInputTextUseCase(): ValidateInputTextUseCase {
-        return ValidateInputTextUseCase()
-    }
+    fun provideValidateInputTextUseCase(): ValidateInputTextUseCase = ValidateInputTextUseCase()
 }

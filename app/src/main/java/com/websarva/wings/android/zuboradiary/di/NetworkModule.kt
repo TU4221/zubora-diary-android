@@ -18,40 +18,36 @@ internal object NetworkModule {
 
     @Singleton
     @Provides
-    fun provideKotlinJsonAdapterFactory(): KotlinJsonAdapterFactory {
-        return KotlinJsonAdapterFactory()
-    }
+    fun provideKotlinJsonAdapterFactory(): KotlinJsonAdapterFactory =
+        KotlinJsonAdapterFactory()
 
     @Singleton
     @Provides
-    fun provideMoshi(kotlinJsonAdapterFactory: KotlinJsonAdapterFactory): Moshi {
-        return Moshi.Builder().add(kotlinJsonAdapterFactory).build()
-    }
+    fun provideMoshi(kotlinJsonAdapterFactory: KotlinJsonAdapterFactory): Moshi =
+        Moshi.Builder()
+            .add(kotlinJsonAdapterFactory)
+            .build()
 
     @Singleton
     @Provides
-    fun provideMoshiConverterFactory(moshi: Moshi): MoshiConverterFactory {
-        return MoshiConverterFactory.create(moshi)
-    }
+    fun provideMoshiConverterFactory(moshi: Moshi): MoshiConverterFactory =
+        MoshiConverterFactory.create(moshi)
 
     @Singleton
     @Provides
-    fun provideWeatherApiRetrofit(moshiConverterFactory: MoshiConverterFactory): Retrofit {
-        return Retrofit.Builder()
-                .baseUrl("https://api.open-meteo.com/v1/")
-                .addConverterFactory(moshiConverterFactory)
-                .build()
-    }
+    fun provideWeatherApiRetrofit(moshiConverterFactory: MoshiConverterFactory): Retrofit =
+        Retrofit.Builder()
+            .baseUrl("https://api.open-meteo.com/v1/")
+            .addConverterFactory(moshiConverterFactory)
+            .build()
 
     @Singleton
     @Provides
-    fun provideWeatherApiService(retrofit: Retrofit): WeatherApiService {
-        return retrofit.create(WeatherApiService::class.java)
-    }
+    fun provideWeatherApiService(retrofit: Retrofit): WeatherApiService =
+        retrofit.create(WeatherApiService::class.java)
 
     @Singleton
     @Provides
-    fun provideWeatherApiDataSource(weatherApiService: WeatherApiService): WeatherApiDataSource {
-        return WeatherApiDataSource(weatherApiService)
-    }
+    fun provideWeatherApiDataSource(weatherApiService: WeatherApiService): WeatherApiDataSource =
+        WeatherApiDataSource(weatherApiService)
 }
