@@ -70,7 +70,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
     private val motionLayoutTransitionTime = 500 /*ms*/
 
-    private lateinit var itemMotionLayoutListeners: Array<ItemMotionLayoutListener>
+    private var itemMotionLayoutListeners: Array<ItemMotionLayoutListener>? = null
 
     private var shouldTransitionItemMotionLayout = false
 
@@ -641,7 +641,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
     private fun selectItemMotionLayoutListener(itemNumber: ItemNumber): ItemMotionLayoutListener {
         val arrayNumber = itemNumber.value - ItemNumber.MIN_NUMBER
-        return itemMotionLayoutListeners[arrayNumber]
+        return checkNotNull(itemMotionLayoutListeners).get(arrayNumber)
     }
 
     private fun setUpItemsLayout(numItems: Int) {
@@ -851,6 +851,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         binding.autoCompleteTextCondition.onItemClickListener = null
         binding.autoCompleteTextWeather1.onItemClickListener = null
         binding.autoCompleteTextWeather2.onItemClickListener = null
+        itemMotionLayoutListeners = null
 
         super.clearViewBindings()
     }
