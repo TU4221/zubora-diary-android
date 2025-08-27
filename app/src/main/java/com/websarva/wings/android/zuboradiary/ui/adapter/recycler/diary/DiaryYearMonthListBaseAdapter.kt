@@ -20,7 +20,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListIt
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-// TODO:ViewHolderのViewに設定されたリスナを解除するように変更。
 internal abstract class DiaryYearMonthListBaseAdapter<
         CLIT : DiaryDayListItemUi
 > protected constructor(
