@@ -12,7 +12,7 @@ internal abstract class LeftSwipeBackgroundButtonListBaseAdapter <T, VH : Recycl
 ) : ListBaseAdapter<T, VH>(recyclerView, themeColor, diffUtilItemCallback) {
 
     lateinit var leftSwipeBackgroundButtonSimpleCallback: LeftSwipeBackgroundButtonSimpleCallback
-        protected set
+        private set
 
     fun interface OnBackgroundButtonClickListener<T> {
         fun onClick(item: T)
