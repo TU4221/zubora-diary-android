@@ -848,9 +848,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     }
 
     override fun clearViewBindings() {
-        binding.autoCompleteTextCondition.onItemClickListener = null
-        binding.autoCompleteTextWeather1.onItemClickListener = null
-        binding.autoCompleteTextWeather2.onItemClickListener = null
         itemMotionLayoutListeners = null
 
         super.clearViewBindings()
