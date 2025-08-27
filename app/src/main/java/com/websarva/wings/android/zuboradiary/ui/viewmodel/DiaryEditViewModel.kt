@@ -892,7 +892,6 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報取得関係
-    // TODO:State更新タイミングの代替案を検討する。(他処理メソッドも同様に)
     private suspend fun processWeatherInfoFetch(date: LocalDate, previousDate: LocalDate?) {
         updateUiState(DiaryEditState.CheckingWeatherAvailability)
         val isEnabled = isWeatherInfoFetchEnabledUseCase().value
