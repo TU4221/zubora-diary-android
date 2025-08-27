@@ -68,7 +68,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         val KEY_RESULT = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
     }
 
+    val logTag = createLogTag()
+
     private val motionLayoutTransitionTime = 500 /*ms*/
+
+    private val motionLayoutJumpTime = 1 /*ms*/
 
     private var itemMotionLayoutListeners: Array<ItemMotionLayoutListener>? = null
 
@@ -583,7 +587,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                     onDiaryItemTransitionToVisibleCompleted(itemNumber)
                 }
             }
-            Log.d(logTag, "onTransitionCompleted()_CompletedState = $completedStateLogMsg")
+            Log.d(logTag, "onTransitionCompleted()_itemNumber = $itemNumber, CompletedState = $completedStateLogMsg")
 
             isTriggeredBySmooth = false
         }
@@ -645,6 +649,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     }
 
     private fun setUpItemsLayout(numItems: Int) {
+        Log.d(logTag, "setUpItemsLayout()_numItems = $numItems")
         require(!(numItems < ItemNumber.MIN_NUMBER || numItems > ItemNumber.MAX_NUMBER))
 
         // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
@@ -669,12 +674,19 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     }
 
     private fun transitionDiaryItemToInvisible(itemNumber: ItemNumber, isJump: Boolean) {
+        Log.d("logTag", "transitionDiaryItemToInvisible()_itemNumber = $itemNumber, isJump = $isJump")
         val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber)
         val itemMotionLayout = selectItemMotionLayout(itemNumber)
         if (isJump) {
             itemMotionLayoutListener.markTransitionAsJump()
+            // HACK: 画面回転後など、特定の条件下で jumpToState() を使用すると、
+            //       意図した状態に遷移せず、異なる状態（例: EndStateの指示でStartState状態に遷移）になる場合があった。
+            //       transitionToState() に変更し、短いduration（ほぼ0に近い値）を指定することで同等の表示を行う。
             itemMotionLayout
-                .jumpToState(R.id.motion_scene_edit_diary_item_invisible_state)
+                .transitionToState(
+                    R.id.motion_scene_edit_diary_item_invisible_state,
+                    motionLayoutJumpTime
+                )
         } else {
             itemMotionLayoutListener.markTransitionAsSmooth()
             itemMotionLayout
@@ -686,12 +698,19 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     }
 
     private fun transitionDiaryItemToVisible(itemNumber: ItemNumber, isJump: Boolean) {
+        Log.d("logTag", "transitionDiaryItemToVisible()_itemNumber = $itemNumber, isJump = $isJump")
         val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber)
         val itemMotionLayout = selectItemMotionLayout(itemNumber)
         if (isJump) {
             itemMotionLayoutListener.markTransitionAsJump()
+            // HACK: 画面回転後など、特定の条件下で jumpToState() を使用すると、
+            //       意図した状態に遷移せず、異なる状態（例: EndStateの指示でStartState状態に遷移）になる場合があった。
+            //       transitionToState() に変更し、短いduration（ほぼ0に近い値）を指定することで同等の表示を行う。
             itemMotionLayout
-                .jumpToState(R.id.motion_scene_edit_diary_item_visible_state)
+                .transitionToState(
+                    R.id.motion_scene_edit_diary_item_visible_state,
+                    motionLayoutJumpTime
+                )
         } else {
             itemMotionLayoutListener.markTransitionAsSmooth()
             itemMotionLayout
