@@ -601,14 +601,4 @@ class CalendarFragment :
     private fun scrollToTop() {
         binding.nestedScrollFullScreen.smoothScrollTo(0, 0)
     }
-
-    override fun clearViewBindings() {
-        binding.calendar.apply {
-            monthScrollListener = null
-            dayBinder = null
-            monthHeaderBinder = null
-        }
-
-        super.clearViewBindings()
-    }
 }
