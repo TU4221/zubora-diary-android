@@ -34,15 +34,21 @@ internal object RepositoryModule {
 
     @Singleton
     @Provides
+    fun provideSchedulingRepository(
+        workManager: NotificationSchedulingDataSource
+    ): SchedulingRepository = SchedulingRepositoryImpl(workManager)
+
+    @Singleton
+    @Provides
     fun provideSettingsRepository(
         userPreferencesDataSource: UserPreferencesDataSource
     ): SettingsRepository = SettingsRepositoryImpl(userPreferencesDataSource)
 
     @Singleton
     @Provides
-    fun provideSchedulingRepository(
-        workManager: NotificationSchedulingDataSource
-    ): SchedulingRepository = SchedulingRepositoryImpl(workManager)
+    fun provideUriRepository(
+        uriPermissionDataSource: UriPermissionDataSource
+    ): UriRepository = UriRepositoryImpl(uriPermissionDataSource)
 
     @Singleton
     @Provides
@@ -54,10 +60,4 @@ internal object RepositoryModule {
             weatherApiDataSource,
             fusedLocationDataSource
         )
-
-    @Singleton
-    @Provides
-    fun provideUriRepository(
-        uriPermissionDataSource: UriPermissionDataSource
-    ): UriRepository = UriRepositoryImpl(uriPermissionDataSource)
 }
