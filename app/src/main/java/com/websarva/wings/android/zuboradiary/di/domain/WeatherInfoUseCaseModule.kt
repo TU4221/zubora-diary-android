@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.di.usecase.weatherinfo
+package com.websarva.wings.android.zuboradiary.di.domain
 
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.CanFetchWeatherInfoUseCase

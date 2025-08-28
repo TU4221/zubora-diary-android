@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.di.usecase.settings
+package com.websarva.wings.android.zuboradiary.di.domain
 
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository

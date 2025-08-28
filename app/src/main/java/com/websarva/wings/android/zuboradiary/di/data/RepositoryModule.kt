@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.di
+package com.websarva.wings.android.zuboradiary.di.data
 
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource

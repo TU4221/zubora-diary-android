@@ -11,7 +11,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import com.websarva.wings.android.zuboradiary.di.ApplicationScope
+import com.websarva.wings.android.zuboradiary.di.data.ApplicationScope
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow

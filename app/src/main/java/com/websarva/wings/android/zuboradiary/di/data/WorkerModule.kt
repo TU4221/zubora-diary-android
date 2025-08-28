@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.di
+package com.websarva.wings.android.zuboradiary.di.data
 
 import android.content.Context
 import androidx.work.WorkManager

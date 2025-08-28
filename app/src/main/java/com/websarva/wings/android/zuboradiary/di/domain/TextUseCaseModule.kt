@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.di.usecase.text
+package com.websarva.wings.android.zuboradiary.di.domain
 
 import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputTextUseCase
 import dagger.Module
