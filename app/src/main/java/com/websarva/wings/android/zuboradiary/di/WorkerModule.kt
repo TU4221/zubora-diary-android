@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.di
 
 import android.content.Context
 import androidx.work.WorkManager
-import com.websarva.wings.android.zuboradiary.data.worker.ReminderNotificationWorkManager
+import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,7 +21,7 @@ internal object WorkerModule {
 
     @Singleton
     @Provides
-    fun provideReminderNotificationWorkManager(
+    fun provideNotificationSchedulingDataSource(
         workManager: WorkManager
-    ): ReminderNotificationWorkManager = ReminderNotificationWorkManager(workManager)
+    ): NotificationSchedulingDataSource = NotificationSchedulingDataSource(workManager)
 }

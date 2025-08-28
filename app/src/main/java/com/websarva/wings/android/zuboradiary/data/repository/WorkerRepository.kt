@@ -1,12 +1,12 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
-import com.websarva.wings.android.zuboradiary.data.worker.ReminderNotificationWorkManager
+import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
 import com.websarva.wings.android.zuboradiary.data.worker.WorkProfileAccessFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException
 import java.time.LocalTime
 
-internal class WorkerRepository (private val workManager: ReminderNotificationWorkManager) {
+internal class WorkerRepository (private val workManager: NotificationSchedulingDataSource) {
 
     @Throws(ReminderNotificationRegistrationFailureException::class)
     fun registerReminderNotificationWorker(settingTime: LocalTime) {

@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
-import com.websarva.wings.android.zuboradiary.data.worker.ReminderNotificationWorkManager
+import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,7 +36,7 @@ internal object RepositoryModule {
     @Singleton
     @Provides
     fun provideWorkerRepository(
-        workManager: ReminderNotificationWorkManager
+        workManager: NotificationSchedulingDataSource
     ): WorkerRepository = WorkerRepository(workManager)
 
     @Singleton
