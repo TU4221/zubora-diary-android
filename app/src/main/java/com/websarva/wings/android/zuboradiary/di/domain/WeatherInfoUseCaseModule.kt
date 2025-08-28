@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.di.domain
 
-import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.CanFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.FetchWeatherInfoUseCase
 import dagger.Module

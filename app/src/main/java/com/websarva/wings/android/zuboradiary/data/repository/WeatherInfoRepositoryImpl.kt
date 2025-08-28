@@ -7,21 +7,22 @@ import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiException
 import com.websarva.wings.android.zuboradiary.domain.exception.weather.WeatherInfoFetchException
+import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
-internal class WeatherInfoRepository (
+internal class WeatherInfoRepositoryImpl (
     private val weatherApiDataSource: WeatherApiDataSource,
     private val fusedLocationDataSource: FusedLocationDataSource
-) {
+) : WeatherInfoRepository {
 
-    fun canFetchWeatherInfo(date: LocalDate): Boolean {
+    override fun canFetchWeatherInfo(date: LocalDate): Boolean {
         return weatherApiDataSource.canFetchWeatherInfo(date)
     }
 
     @Throws(WeatherInfoFetchException::class)
-    suspend fun fetchWeatherInfo(date: LocalDate): Weather {
+    override suspend fun fetchWeatherInfo(date: LocalDate): Weather {
         return withContext(Dispatchers.IO) {
             try {
                 val location = fusedLocationDataSource.fetchCurrentLocation()

@@ -4,11 +4,12 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
+import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
 import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
 import dagger.Module
@@ -45,7 +46,7 @@ internal object RepositoryModule {
         weatherApiDataSource: WeatherApiDataSource,
         fusedLocationDataSource: FusedLocationDataSource
     ): WeatherInfoRepository =
-        WeatherInfoRepository(
+        WeatherInfoRepositoryImpl(
             weatherApiDataSource,
             fusedLocationDataSource
         )

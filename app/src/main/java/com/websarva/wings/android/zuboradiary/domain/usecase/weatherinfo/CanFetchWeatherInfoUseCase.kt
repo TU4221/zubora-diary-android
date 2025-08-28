@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
