@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.usecase.diary
+package com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult

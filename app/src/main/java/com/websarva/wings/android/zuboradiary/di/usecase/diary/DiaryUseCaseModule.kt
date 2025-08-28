@@ -1,9 +1,7 @@
 package com.websarva.wings.android.zuboradiary.di.usecase.diary
 
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CanFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultsExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
@@ -15,7 +13,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseC
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadOldestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.FetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListUseCase
@@ -42,12 +39,6 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 internal object DiaryUseCaseModule {
-
-    @Singleton
-    @Provides
-    fun provideCanFetchWeatherInfoUseCase(
-        weatherInfoRepository: WeatherInfoRepository
-    ): CanFetchWeatherInfoUseCase = CanFetchWeatherInfoUseCase(weatherInfoRepository)
 
     @Singleton
     @Provides
@@ -94,14 +85,6 @@ internal object DiaryUseCaseModule {
     fun provideDoesDiaryExistUseCase(
         diaryRepository: DiaryRepository
     ): DoesDiaryExistUseCase = DoesDiaryExistUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideFetchWeatherInfoUseCase(
-        weatherInfoRepository: WeatherInfoRepository,
-        canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase
-    ): FetchWeatherInfoUseCase =
-        FetchWeatherInfoUseCase(weatherInfoRepository, canFetchWeatherInfoUseCase)
 
     @Singleton
     @Provides
