@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.di.domain
 
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultsExistUseCase

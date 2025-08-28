@@ -3,10 +3,11 @@ package com.websarva.wings.android.zuboradiary.di.data
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
+import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepositoryImpl
 import com.websarva.wings.android.zuboradiary.domain.repository.UriRepository
@@ -29,7 +30,7 @@ internal object RepositoryModule {
     @Provides
     fun provideDiaryRepository(
         diaryDataSource: DiaryDataSource
-    ): DiaryRepository = DiaryRepository(diaryDataSource)
+    ): DiaryRepository = DiaryRepositoryImpl(diaryDataSource)
 
     @Singleton
     @Provides

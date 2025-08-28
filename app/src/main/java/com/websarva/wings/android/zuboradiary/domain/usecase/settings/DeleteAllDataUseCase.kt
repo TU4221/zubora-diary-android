@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDataUseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase

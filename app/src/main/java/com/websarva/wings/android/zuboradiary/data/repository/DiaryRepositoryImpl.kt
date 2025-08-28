@@ -23,6 +23,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTi
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -33,15 +34,15 @@ import java.time.LocalDate
 import kotlin.Throws
 
 
-internal class DiaryRepository (
+internal class DiaryRepositoryImpl (
     private val diaryDataSource: DiaryDataSource
-) {
+) : DiaryRepository {
 
     private val logTag = createLogTag()
 
     //region Diary
     @Throws(DiaryCountFailureException::class)
-    suspend fun countDiaries(): Int {
+    override suspend fun countDiaries(): Int {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.countDiaries()
@@ -53,7 +54,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiaryCountFailureException::class)
-    suspend fun countDiaries(date: LocalDate): Int {
+    override suspend fun countDiaries(date: LocalDate): Int {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.countDiaries(date)
@@ -64,7 +65,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiaryExistenceCheckFailureException::class)
-    suspend fun existsDiary(date: LocalDate): Boolean {
+    override suspend fun existsDiary(date: LocalDate): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.existsDiary(date)
@@ -75,7 +76,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiaryImageUriUsageCheckFailureException::class)
-    suspend fun existsImageUri(uriString: String): Boolean {
+    override suspend fun existsImageUri(uriString: String): Boolean {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.existsImageUri(uriString)
@@ -86,7 +87,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiaryLoadFailureException::class)
-    suspend fun loadDiary(date: LocalDate): Diary? {
+    override suspend fun loadDiary(date: LocalDate): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectDiary(date)?.toDomainModel()
@@ -97,7 +98,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiaryLoadFailureException::class)
-    suspend fun loadNewestDiary(): Diary? {
+    override suspend fun loadNewestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectNewestDiary()?.toDomainModel()
@@ -108,7 +109,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiaryLoadFailureException::class)
-    suspend fun loadOldestDiary(): Diary? {
+    override suspend fun loadOldestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectOldestDiary()?.toDomainModel()
@@ -119,7 +120,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiaryListLoadFailureException::class)
-    suspend fun loadDiaryList(
+    override suspend fun loadDiaryList(
         num: Int,
         offset: Int,
         date: LocalDate?
@@ -140,7 +141,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiarySaveFailureException::class)
-    suspend fun saveDiary(
+    override suspend fun saveDiary(
         diary: Diary,
         historyItemList: List<DiaryItemTitleSelectionHistory>
     ) {
@@ -157,7 +158,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiarySaveFailureException::class)
-    suspend fun deleteAndSaveDiary(
+    override suspend fun deleteAndSaveDiary(
         deleteDiaryDate: LocalDate,
         newDiary: Diary,
         historyItemList: List<DiaryItemTitleSelectionHistory>
@@ -176,7 +177,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiaryDeleteFailureException::class)
-    suspend fun deleteDiary(date: LocalDate) {
+    override suspend fun deleteDiary(date: LocalDate) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteDiary(date)
@@ -187,7 +188,7 @@ internal class DiaryRepository (
     }
 
     @Throws(AllDiariesDeleteFailureException::class)
-    suspend fun deleteAllDiaries() {
+    override suspend fun deleteAllDiaries() {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteAllDiaries()
@@ -200,7 +201,7 @@ internal class DiaryRepository (
 
     //region WordSearchResult
     @Throws(WordSearchResultCountFailureException::class)
-    suspend fun countWordSearchResults(searchWord: String): Int {
+    override suspend fun countWordSearchResults(searchWord: String): Int {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.countWordSearchResults(searchWord)
@@ -211,7 +212,7 @@ internal class DiaryRepository (
     }
 
     @Throws(WordSearchResultListLoadFailureException::class)
-    suspend fun loadWordSearchResultList(
+    override suspend fun loadWordSearchResultList(
         num: Int,
         offset: Int,
         searchWord: String
@@ -235,7 +236,7 @@ internal class DiaryRepository (
     /**
      * @throws DiaryItemTitleSelectionHistoryLoadFailureException
      */
-    fun loadDiaryItemTitleSelectionHistoryList(
+    override fun loadDiaryItemTitleSelectionHistoryList(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryListItem>> {
         require(num >= 1)
@@ -252,7 +253,7 @@ internal class DiaryRepository (
     }
 
     @Throws(DiaryItemTitleSelectionHistoryItemDeleteFailureException::class)
-    suspend fun deleteDiaryItemTitleSelectionHistory(title: String) {
+    override suspend fun deleteDiaryItemTitleSelectionHistory(title: String) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteHistoryItem(title)
@@ -265,7 +266,7 @@ internal class DiaryRepository (
 
     //region Options
     @Throws(AllDataDeleteFailureException::class)
-    suspend fun deleteAllData() {
+    override suspend fun deleteAllData() {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteAllData()

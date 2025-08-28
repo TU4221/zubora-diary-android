@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
