@@ -7,6 +7,7 @@ import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
+import androidx.core.view.updatePadding
 import androidx.databinding.BindingAdapter
 import com.google.android.material.appbar.MaterialToolbar
 
@@ -66,6 +67,47 @@ internal object BindingAdapters {
                     if (applyRight) rightMargin = initialViewMarginRight + insets.right
                     if (applyBottom) bottomMargin = initialViewMarginBottom + insets.bottom
                 }
+                WindowInsetsCompat.CONSUMED
+            }
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter(
+        value = [
+            "applySystemInsetsToPaddingLeft",
+            "applySystemInsetsToPaddingTop",
+            "applySystemInsetsToPaddingRight",
+            "applySystemInsetsToPaddingBottom"
+        ],
+        requireAll = false // いずれかの属性が指定されれば呼び出される
+    )
+    fun applySystemInsetsToPadding(
+        view: View,
+        applyLeft: Boolean = false,
+        applyTop: Boolean = false,
+        applyRight: Boolean = false,
+        applyBottom: Boolean = false
+    ) {
+        val initialViewPaddingLeft = view.paddingLeft
+        val initialViewPaddingTop = view.paddingTop
+        val initialViewPaddingRight = view.paddingRight
+        val initialViewPaddingBottom = view.paddingBottom
+        view.apply {
+            ViewCompat.setOnApplyWindowInsetsListener(
+                this
+            ) { view, windowInsets ->
+                val insets =
+                    windowInsets.getInsets(
+                        WindowInsetsCompat.Type.systemBars()
+                                or WindowInsetsCompat.Type.displayCutout()
+                    )
+                view.updatePadding(
+                    left = if (applyLeft) initialViewPaddingLeft + insets.left else view.paddingLeft,
+                    top = if (applyTop) initialViewPaddingTop + insets.top else view.paddingTop,
+                    right = if (applyRight) initialViewPaddingRight + insets.right else view.paddingRight,
+                    bottom = if (applyBottom) initialViewPaddingBottom + insets.bottom else view.paddingBottom
+                )
                 WindowInsetsCompat.CONSUMED
             }
         }
