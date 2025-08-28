@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.reminder.Reminder
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException
 import java.time.LocalTime
 
-internal class WorkerRepository (private val workManager: NotificationSchedulingDataSource) {
+internal class SchedulingRepository (private val workManager: NotificationSchedulingDataSource) {
 
     @Throws(ReminderNotificationRegistrationFailureException::class)
     fun registerReminderNotificationWorker(settingTime: LocalTime) {

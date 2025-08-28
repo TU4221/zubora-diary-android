@@ -5,10 +5,10 @@ import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSou
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
-import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
+import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
+import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
 import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
 import dagger.Module
@@ -29,15 +29,15 @@ internal object RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideUserPreferencesRepository(
+    fun provideSettingsRepository(
         userPreferences: UserPreferences
-    ): UserPreferencesRepository = UserPreferencesRepository(userPreferences)
+    ): SettingsRepository = SettingsRepository(userPreferences)
 
     @Singleton
     @Provides
-    fun provideWorkerRepository(
+    fun provideSchedulingRepository(
         workManager: NotificationSchedulingDataSource
-    ): WorkerRepository = WorkerRepository(workManager)
+    ): SchedulingRepository = SchedulingRepository(workManager)
 
     @Singleton
     @Provides

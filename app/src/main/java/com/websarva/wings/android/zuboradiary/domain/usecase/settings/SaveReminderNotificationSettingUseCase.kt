@@ -3,8 +3,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
-import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
-import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
+import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
+import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException
@@ -20,8 +20,8 @@ import kotlinx.coroutines.withContext
 import java.time.LocalTime
 
 internal class SaveReminderNotificationSettingUseCase(
-    private val userPreferencesRepository: UserPreferencesRepository,
-    private val workerRepository: WorkerRepository,
+    private val settingsRepository: SettingsRepository,
+    private val schedulingRepository: SchedulingRepository,
     private val loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase
 ) {
 
@@ -58,14 +58,14 @@ internal class SaveReminderNotificationSettingUseCase(
     private suspend fun saveReminderNotificationValid(notificationTime: LocalTime) {
         try {
             val preferenceValue = ReminderNotificationSetting.Enabled(notificationTime)
-            userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
-            workerRepository.registerReminderNotificationWorker(notificationTime)
+            settingsRepository.saveReminderNotificationPreference(preferenceValue)
+            schedulingRepository.registerReminderNotificationWorker(notificationTime)
         } catch (e: ReminderNotificationSettingUpdateFailureException) {
             throw e
         } catch (e: ReminderNotificationRegistrationFailureException) {
             try {
                 val preferenceValue = ReminderNotificationSetting.Disabled
-                userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
+                settingsRepository.saveReminderNotificationPreference(preferenceValue)
             } catch (e: ReminderNotificationSettingUpdateFailureException) {
                 throw e
             }
@@ -82,13 +82,13 @@ internal class SaveReminderNotificationSettingUseCase(
         val backupSettingValue = fetchCurrentReminderNotificationSetting()
         try {
             val preferenceValue = ReminderNotificationSetting.Disabled
-            userPreferencesRepository.saveReminderNotificationPreference(preferenceValue)
-            workerRepository.cancelReminderNotificationWorker()
+            settingsRepository.saveReminderNotificationPreference(preferenceValue)
+            schedulingRepository.cancelReminderNotificationWorker()
         } catch (e: ReminderNotificationSettingUpdateFailureException) {
             throw e
         } catch (e: ReminderNotificationCancellationFailureException) {
             try {
-                userPreferencesRepository.saveReminderNotificationPreference(backupSettingValue)
+                settingsRepository.saveReminderNotificationPreference(backupSettingValue)
             } catch (e: ReminderNotificationSettingUpdateFailureException) {
                 throw e
             }

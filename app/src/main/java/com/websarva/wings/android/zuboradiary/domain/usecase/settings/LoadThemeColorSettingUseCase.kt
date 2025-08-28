@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
+import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 internal class LoadThemeColorSettingUseCase(
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val settingsRepository: SettingsRepository
 ) {
 
     private val logTag = createLogTag()
@@ -22,7 +22,7 @@ internal class LoadThemeColorSettingUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         val value =
-            userPreferencesRepository
+            settingsRepository
                 .loadThemeColorPreference()
                 .map { result: UserSettingDataSourceResult<ThemeColorSetting> ->
                     when (result) {

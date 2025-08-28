@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
+import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResul
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal class InitializeAllSettingsUseCase(
-    private val userPreferencesRepository: UserPreferencesRepository
+    private val settingsRepository: SettingsRepository
 ) {
 
     private val logTag = createLogTag()
@@ -23,17 +23,17 @@ internal class InitializeAllSettingsUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            userPreferencesRepository.saveThemeColorPreference(ThemeColorSetting())
-            userPreferencesRepository.saveCalendarStartDayOfWeekPreference(
+            settingsRepository.saveThemeColorPreference(ThemeColorSetting())
+            settingsRepository.saveCalendarStartDayOfWeekPreference(
                 CalendarStartDayOfWeekSetting()
             )
-            userPreferencesRepository.saveReminderNotificationPreference(
+            settingsRepository.saveReminderNotificationPreference(
                 ReminderNotificationSetting.Disabled
             )
-            userPreferencesRepository.savePasscodeLockPreference(
+            settingsRepository.savePasscodeLockPreference(
                 PasscodeLockSetting.Disabled
             )
-            userPreferencesRepository.saveWeatherInfoFetchPreference(
+            settingsRepository.saveWeatherInfoFetchPreference(
                 WeatherInfoFetchSetting()
             )
         } catch (e: DomainException) {

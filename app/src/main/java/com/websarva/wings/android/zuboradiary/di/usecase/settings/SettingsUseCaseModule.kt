@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.di.usecase.settings
 
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.repository.UserPreferencesRepository
-import com.websarva.wings.android.zuboradiary.data.repository.WorkerRepository
+import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
+import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
@@ -55,9 +55,9 @@ internal object SettingsUseCaseModule {
     @Singleton
     @Provides
     fun provideInitializeAllSettingsUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        settingsRepository: SettingsRepository
     ): InitializeAllSettingsUseCase =
-        InitializeAllSettingsUseCase(userPreferencesRepository)
+        InitializeAllSettingsUseCase(settingsRepository)
 
     @Singleton
     @Provides
@@ -69,76 +69,76 @@ internal object SettingsUseCaseModule {
     @Singleton
     @Provides
     fun provideLoadCalendarStartDayOfWeekSettingUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        settingsRepository: SettingsRepository
     ): LoadCalendarStartDayOfWeekSettingUseCase =
-        LoadCalendarStartDayOfWeekSettingUseCase(userPreferencesRepository)
+        LoadCalendarStartDayOfWeekSettingUseCase(settingsRepository)
 
     @Singleton
     @Provides
     fun provideLoadPasscodeLockSettingUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        settingsRepository: SettingsRepository
     ): LoadPasscodeLockSettingUseCase =
-        LoadPasscodeLockSettingUseCase(userPreferencesRepository)
+        LoadPasscodeLockSettingUseCase(settingsRepository)
 
     @Singleton
     @Provides
     fun provideLoadReminderNotificationSettingUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        settingsRepository: SettingsRepository
     ): LoadReminderNotificationSettingUseCase =
-        LoadReminderNotificationSettingUseCase(userPreferencesRepository)
+        LoadReminderNotificationSettingUseCase(settingsRepository)
 
     @Singleton
     @Provides
     fun provideLoadThemeColorSettingUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        settingsRepository: SettingsRepository
     ): LoadThemeColorSettingUseCase =
-        LoadThemeColorSettingUseCase(userPreferencesRepository)
+        LoadThemeColorSettingUseCase(settingsRepository)
 
     @Singleton
     @Provides
     fun provideLoadWeatherInfoFetchSettingUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        settingsRepository: SettingsRepository
     ): LoadWeatherInfoFetchSettingUseCase =
-        LoadWeatherInfoFetchSettingUseCase(userPreferencesRepository)
+        LoadWeatherInfoFetchSettingUseCase(settingsRepository)
 
     @Singleton
     @Provides
     fun provideSaveCalendarStartDayOfWeekUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        settingsRepository: SettingsRepository
     ): SaveCalendarStartDayOfWeekUseCase =
-        SaveCalendarStartDayOfWeekUseCase(userPreferencesRepository)
+        SaveCalendarStartDayOfWeekUseCase(settingsRepository)
 
     @Singleton
     @Provides
     fun provideSavePasscodeLockSettingUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        settingsRepository: SettingsRepository
     ): SavePasscodeLockSettingUseCase =
-        SavePasscodeLockSettingUseCase(userPreferencesRepository)
+        SavePasscodeLockSettingUseCase(settingsRepository)
 
     @Singleton
     @Provides
     fun provideSaveReminderNotificationSettingUseCase(
-        userPreferencesRepository: UserPreferencesRepository,
-        workerRepository: WorkerRepository,
+        settingsRepository: SettingsRepository,
+        schedulingRepository: SchedulingRepository,
         loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase
     ): SaveReminderNotificationSettingUseCase =
         SaveReminderNotificationSettingUseCase(
-            userPreferencesRepository,
-            workerRepository,
+            settingsRepository,
+            schedulingRepository,
             loadReminderNotificationSettingUseCase
         )
 
     @Singleton
     @Provides
     fun provideSaveThemeColorSettingUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        settingsRepository: SettingsRepository
     ): SaveThemeColorSettingUseCase =
-        SaveThemeColorSettingUseCase(userPreferencesRepository)
+        SaveThemeColorSettingUseCase(settingsRepository)
 
     @Singleton
     @Provides
     fun provideSaveWeatherInfoFetchSettingUseCase(
-        userPreferencesRepository: UserPreferencesRepository
+        settingsRepository: SettingsRepository
     ): SaveWeatherInfoFetchSettingUseCase =
-        SaveWeatherInfoFetchSettingUseCase(userPreferencesRepository)
+        SaveWeatherInfoFetchSettingUseCase(settingsRepository)
 }

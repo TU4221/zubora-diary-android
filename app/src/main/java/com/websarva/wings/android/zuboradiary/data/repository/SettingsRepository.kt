@@ -22,7 +22,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-internal class UserPreferencesRepository(private val userPreferences: UserPreferences) {
+internal class SettingsRepository(private val userPreferences: UserPreferences) {
 
     fun loadThemeColorPreference(): Flow<UserSettingDataSourceResult<ThemeColorSetting>> {
         return userPreferences.loadThemeColorPreference()
