@@ -2,7 +2,8 @@ package com.websarva.wings.android.zuboradiary.di.usecase.settings
 
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
+import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.RegisterReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
@@ -119,13 +120,15 @@ internal object SettingsUseCaseModule {
     @Provides
     fun provideSaveReminderNotificationSettingUseCase(
         settingsRepository: SettingsRepository,
-        schedulingRepository: SchedulingRepository,
-        loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase
+        loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase,
+        registerReminderNotificationUseCase: RegisterReminderNotificationUseCase,
+        cancelReminderNotificationUseCase: CancelReminderNotificationUseCase
     ): SaveReminderNotificationSettingUseCase =
         SaveReminderNotificationSettingUseCase(
             settingsRepository,
-            schedulingRepository,
-            loadReminderNotificationSettingUseCase
+            loadReminderNotificationSettingUseCase,
+            registerReminderNotificationUseCase,
+            cancelReminderNotificationUseCase
         )
 
     @Singleton

@@ -4,7 +4,6 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException
@@ -12,6 +11,8 @@ import com.websarva.wings.android.zuboradiary.domain.exception.settings.Reminder
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.RegisterReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -21,8 +22,9 @@ import java.time.LocalTime
 
 internal class SaveReminderNotificationSettingUseCase(
     private val settingsRepository: SettingsRepository,
-    private val schedulingRepository: SchedulingRepository,
-    private val loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase
+    private val loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase,
+    private val registerReminderNotificationUseCase: RegisterReminderNotificationUseCase,
+    private val cancelReminderNotificationUseCase: CancelReminderNotificationUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -59,7 +61,7 @@ internal class SaveReminderNotificationSettingUseCase(
         try {
             val preferenceValue = ReminderNotificationSetting.Enabled(notificationTime)
             settingsRepository.saveReminderNotificationPreference(preferenceValue)
-            schedulingRepository.registerReminderNotificationWorker(notificationTime)
+            registerReminderNotification(notificationTime)
         } catch (e: ReminderNotificationSettingUpdateFailureException) {
             throw e
         } catch (e: ReminderNotificationRegistrationFailureException) {
@@ -73,6 +75,18 @@ internal class SaveReminderNotificationSettingUseCase(
         }
     }
 
+    @Throws(ReminderNotificationRegistrationFailureException::class)
+    private fun registerReminderNotification(notificationTime: LocalTime) {
+        when (val result = registerReminderNotificationUseCase(notificationTime)) {
+            is UseCaseResult.Success -> {
+                // 処理不要
+            }
+            is UseCaseResult.Failure -> {
+                throw result.exception
+            }
+        }
+    }
+
     @Throws(
         ReminderNotificationSettingUpdateFailureException::class,
         ReminderNotificationCancellationFailureException::class,
@@ -83,7 +97,7 @@ internal class SaveReminderNotificationSettingUseCase(
         try {
             val preferenceValue = ReminderNotificationSetting.Disabled
             settingsRepository.saveReminderNotificationPreference(preferenceValue)
-            schedulingRepository.cancelReminderNotificationWorker()
+            cancelReminderNotification()
         } catch (e: ReminderNotificationSettingUpdateFailureException) {
             throw e
         } catch (e: ReminderNotificationCancellationFailureException) {
@@ -106,6 +120,18 @@ internal class SaveReminderNotificationSettingUseCase(
                         is UserSettingResult.Failure -> throw result.exception
                     }
                 }.first()
+        }
+    }
+
+    @Throws(ReminderNotificationCancellationFailureException::class)
+    private fun cancelReminderNotification() {
+        when (val result = cancelReminderNotificationUseCase()) {
+            is UseCaseResult.Success -> {
+                // 処理不要
+            }
+            is UseCaseResult.Failure -> {
+                throw result.exception
+            }
         }
     }
 }
