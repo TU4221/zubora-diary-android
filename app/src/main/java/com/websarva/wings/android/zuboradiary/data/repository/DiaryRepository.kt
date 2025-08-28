@@ -39,6 +39,7 @@ internal class DiaryRepository (
 
     private val logTag = createLogTag()
 
+    //region Diary
     @Throws(DiaryCountFailureException::class)
     suspend fun countDiaries(): Int {
         return withContext(Dispatchers.IO) {
@@ -138,37 +139,6 @@ internal class DiaryRepository (
         }
     }
 
-    @Throws(WordSearchResultCountFailureException::class)
-    suspend fun countWordSearchResults(searchWord: String): Int {
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.countWordSearchResults(searchWord)
-            } catch (e: DataBaseAccessFailureException) {
-                throw WordSearchResultCountFailureException(searchWord, e)
-            }
-        }
-    }
-
-    @Throws(WordSearchResultListLoadFailureException::class)
-    suspend fun loadWordSearchResultList(
-        num: Int,
-        offset: Int,
-        searchWord: String
-    ): List<RawWordSearchResultListItem> {
-        require(num >= 1)
-        require(offset >= 0)
-
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource
-                    .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
-                    .map { it.toDomainModel() }
-            } catch (e: DataBaseAccessFailureException) {
-                throw WordSearchResultListLoadFailureException(searchWord, e)
-            }
-        }
-    }
-
     @Throws(DiarySaveFailureException::class)
     suspend fun saveDiary(
         diary: Diary,
@@ -226,18 +196,42 @@ internal class DiaryRepository (
             }
         }
     }
+    //endregion
 
-    @Throws(AllDataDeleteFailureException::class)
-    suspend fun deleteAllData() {
-        withContext(Dispatchers.IO) {
+    //region WordSearchResult
+    @Throws(WordSearchResultCountFailureException::class)
+    suspend fun countWordSearchResults(searchWord: String): Int {
+        return withContext(Dispatchers.IO) {
             try {
-                diaryDataSource.deleteAllData()
+                diaryDataSource.countWordSearchResults(searchWord)
             } catch (e: DataBaseAccessFailureException) {
-                throw AllDataDeleteFailureException(e)
+                throw WordSearchResultCountFailureException(searchWord, e)
             }
         }
     }
 
+    @Throws(WordSearchResultListLoadFailureException::class)
+    suspend fun loadWordSearchResultList(
+        num: Int,
+        offset: Int,
+        searchWord: String
+    ): List<RawWordSearchResultListItem> {
+        require(num >= 1)
+        require(offset >= 0)
+
+        return withContext(Dispatchers.IO) {
+            try {
+                diaryDataSource
+                    .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
+                    .map { it.toDomainModel() }
+            } catch (e: DataBaseAccessFailureException) {
+                throw WordSearchResultListLoadFailureException(searchWord, e)
+            }
+        }
+    }
+    //endregion
+
+    //region DiaryItemTitleSelectionHistory
     /**
      * @throws DiaryItemTitleSelectionHistoryLoadFailureException
      */
@@ -267,4 +261,18 @@ internal class DiaryRepository (
             }
         }
     }
+    //endregion
+
+    //region Options
+    @Throws(AllDataDeleteFailureException::class)
+    suspend fun deleteAllData() {
+        withContext(Dispatchers.IO) {
+            try {
+                diaryDataSource.deleteAllData()
+            } catch (e: DataBaseAccessFailureException) {
+                throw AllDataDeleteFailureException(e)
+            }
+        }
+    }
+    //endregion
 }

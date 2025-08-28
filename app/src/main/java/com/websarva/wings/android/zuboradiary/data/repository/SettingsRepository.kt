@@ -123,19 +123,6 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
             }
     }
 
-    private fun mapPreferenceExceptionToSettingsException(
-        preferenceException: UserPreferencesException
-    ): UserSettingsException {
-        return when (preferenceException) {
-            is UserPreferencesException.DataStoreAccessFailure -> {
-                UserSettingsException.AccessFailure(preferenceException)
-            }
-            is UserPreferencesException.DataNotFound -> {
-                UserSettingsException.DataNotFound(preferenceException)
-            }
-        }
-    }
-
     @Throws(ThemeColorSettingUpdateFailureException::class)
     suspend fun saveThemeColorPreference(setting: ThemeColorSetting) {
         withContext(Dispatchers.IO) {
@@ -206,6 +193,19 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
                 userPreferences.saveWeatherInfoFetchPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw WeatherInfoFetchSettingUpdateFailureException(setting.isEnabled, e)
+            }
+        }
+    }
+
+    private fun mapPreferenceExceptionToSettingsException(
+        preferenceException: UserPreferencesException
+    ): UserSettingsException {
+        return when (preferenceException) {
+            is UserPreferencesException.DataStoreAccessFailure -> {
+                UserSettingsException.AccessFailure(preferenceException)
+            }
+            is UserPreferencesException.DataNotFound -> {
+                UserSettingsException.DataNotFound(preferenceException)
             }
         }
     }
