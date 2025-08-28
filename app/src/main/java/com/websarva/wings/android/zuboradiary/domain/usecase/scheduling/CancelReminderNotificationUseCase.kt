@@ -18,7 +18,7 @@ internal class CancelReminderNotificationUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            schedulingRepository.cancelReminderNotificationWorker()
+            schedulingRepository.cancelReminderNotification()
         } catch (e: ReminderNotificationCancellationFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)

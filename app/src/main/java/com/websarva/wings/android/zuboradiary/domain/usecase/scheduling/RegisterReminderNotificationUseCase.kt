@@ -19,7 +19,7 @@ internal class RegisterReminderNotificationUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            schedulingRepository.registerReminderNotificationWorker(notificationTime)
+            schedulingRepository.registerReminderNotification(notificationTime)
         } catch (e: ReminderNotificationRegistrationFailureException) {
             Log.e(logTag, "${logMsg}失敗", e)
             return UseCaseResult.Failure(e)

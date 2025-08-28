@@ -9,7 +9,7 @@ import java.time.LocalTime
 internal class SchedulingRepository (private val workManager: NotificationSchedulingDataSource) {
 
     @Throws(ReminderNotificationRegistrationFailureException::class)
-    fun registerReminderNotificationWorker(settingTime: LocalTime) {
+    fun registerReminderNotification(settingTime: LocalTime) {
         try {
             workManager.registerReminderNotificationWorker(settingTime)
         } catch (e: WorkProfileAccessFailureException) {
@@ -19,7 +19,7 @@ internal class SchedulingRepository (private val workManager: NotificationSchedu
     }
 
     @Throws(ReminderNotificationCancellationFailureException::class)
-    fun cancelReminderNotificationWorker() {
+    fun cancelReminderNotification() {
         try {
             workManager.cancelReminderNotificationWorker()
         } catch (e: WorkProfileAccessFailureException) {
