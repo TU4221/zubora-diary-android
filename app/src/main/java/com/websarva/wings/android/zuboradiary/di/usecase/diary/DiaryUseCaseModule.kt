@@ -21,6 +21,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewWordSe
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearchResultListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshWordSearchResultListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ReleaseDiaryImageUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadConfirmationUseCase
@@ -76,9 +77,9 @@ internal object DiaryUseCaseModule {
     @Provides
     fun provideDeleteDiaryUseCase(
         diaryRepository: DiaryRepository,
-        releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase,
+        releaseDiaryImageUriPermissionUseCase: ReleaseDiaryImageUriPermissionUseCase
     ): DeleteDiaryUseCase =
-        DeleteDiaryUseCase(diaryRepository, releasePersistableUriPermissionUseCase)
+        DeleteDiaryUseCase(diaryRepository, releaseDiaryImageUriPermissionUseCase)
 
     @Singleton
     @Provides
@@ -182,15 +183,26 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
+    fun provideReleaseDiaryImageUriPermissionUseCase(
+        diaryRepository: DiaryRepository,
+        releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase
+    ): ReleaseDiaryImageUriPermissionUseCase =
+        ReleaseDiaryImageUriPermissionUseCase(
+            diaryRepository,
+            releasePersistableUriPermissionUseCase
+        )
+
+    @Singleton
+    @Provides
     fun provideSaveDiaryUseCase(
         diaryRepository: DiaryRepository,
         takePersistableUriPermissionUseCase: TakePersistableUriPermissionUseCase,
-        releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase,
+        releaseDiaryImageUriPermissionUseCase: ReleaseDiaryImageUriPermissionUseCase
     ): SaveDiaryUseCase =
         SaveDiaryUseCase(
             diaryRepository,
             takePersistableUriPermissionUseCase,
-            releasePersistableUriPermissionUseCase
+            releaseDiaryImageUriPermissionUseCase
         )
 
     @Singleton

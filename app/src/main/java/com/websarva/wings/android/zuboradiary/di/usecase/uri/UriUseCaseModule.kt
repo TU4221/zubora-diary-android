@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.di.usecase.uri
 
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
@@ -25,10 +24,9 @@ internal object UriUseCaseModule {
     @Singleton
     @Provides
     fun provideReleasePersistableUriPermissionUseCase(
-        uriRepository: UriRepository,
-        diaryRepository: DiaryRepository
+        uriRepository: UriRepository
     ): ReleasePersistableUriPermissionUseCase =
-        ReleasePersistableUriPermissionUseCase(uriRepository, diaryRepository)
+        ReleasePersistableUriPermissionUseCase(uriRepository)
 
     @Singleton
     @Provides

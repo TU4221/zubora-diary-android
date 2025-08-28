@@ -2,31 +2,20 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.uri
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriUsageCheckFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.uri.PersistableUriPermissionReleaseFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal class ReleasePersistableUriPermissionUseCase(
-    private val uriRepository: UriRepository,
-    private val diaryRepository: DiaryRepository
+    private val uriRepository: UriRepository
 ) {
 
     private val logTag = createLogTag()
 
-    suspend operator fun invoke(uriString: String): DefaultUseCaseResult<Unit> {
+    operator fun invoke(uriString: String): DefaultUseCaseResult<Unit> {
         val logMsg = "URIの永続的権限解放_"
         Log.i(logTag, "${logMsg}開始")
-
-        try {
-            val existsImageUri = diaryRepository.existsImageUri(uriString)
-            if (existsImageUri) return UseCaseResult.Success(Unit)
-        } catch (e: DiaryImageUriUsageCheckFailureException) {
-            Log.e(logTag, "${logMsg}失敗", e)
-            return UseCaseResult.Failure(e)
-        }
 
         try {
             uriRepository.releasePersistableUriPermission(uriString)

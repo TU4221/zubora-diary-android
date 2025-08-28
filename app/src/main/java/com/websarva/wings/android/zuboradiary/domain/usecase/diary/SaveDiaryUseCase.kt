@@ -8,7 +8,6 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFa
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -16,7 +15,7 @@ import java.time.LocalDate
 internal class SaveDiaryUseCase(
     private val diaryRepository: DiaryRepository,
     private val takePersistableUriPermissionUseCase: TakePersistableUriPermissionUseCase,
-    private val releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase,
+    private val releaseDiaryImageUriPermissionUseCase: ReleaseDiaryImageUriPermissionUseCase,
 ) {
 
     private val logTag = createLogTag()
@@ -112,7 +111,7 @@ internal class SaveDiaryUseCase(
         }
 
         Log.i(logTag, "${logMsg}開始")
-        when (val result = releasePersistableUriPermissionUseCase(uriString)) {
+        when (val result = releaseDiaryImageUriPermissionUseCase(uriString)) {
             is UseCaseResult.Success -> {
                 // 処理なし
             }
