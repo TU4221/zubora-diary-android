@@ -7,8 +7,9 @@ import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
+import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepositoryImpl
 import com.websarva.wings.android.zuboradiary.domain.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
@@ -39,7 +40,7 @@ internal object RepositoryModule {
     @Provides
     fun provideSchedulingRepository(
         workManager: NotificationSchedulingDataSource
-    ): SchedulingRepository = SchedulingRepository(workManager)
+    ): SchedulingRepository = SchedulingRepositoryImpl(workManager)
 
     @Singleton
     @Provides

@@ -4,14 +4,15 @@ import com.websarva.wings.android.zuboradiary.data.worker.NotificationScheduling
 import com.websarva.wings.android.zuboradiary.data.worker.WorkProfileAccessFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException
+import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
 import java.time.LocalTime
 
-internal class SchedulingRepository(
+internal class SchedulingRepositoryImpl(
     private val notificationSchedulingDataSource: NotificationSchedulingDataSource
-) {
+) : SchedulingRepository {
 
     @Throws(ReminderNotificationRegistrationFailureException::class)
-    fun registerReminderNotification(settingTime: LocalTime) {
+    override fun registerReminderNotification(settingTime: LocalTime) {
         try {
             notificationSchedulingDataSource.registerReminderNotificationWorker(settingTime)
         } catch (e: WorkProfileAccessFailureException) {
@@ -21,7 +22,7 @@ internal class SchedulingRepository(
     }
 
     @Throws(ReminderNotificationCancellationFailureException::class)
-    fun cancelReminderNotification() {
+    override fun cancelReminderNotification() {
         try {
             notificationSchedulingDataSource.cancelReminderNotificationWorker()
         } catch (e: WorkProfileAccessFailureException) {

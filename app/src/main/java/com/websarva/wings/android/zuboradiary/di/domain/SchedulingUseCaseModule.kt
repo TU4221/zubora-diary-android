@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.di.domain
 
-import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.RegisterReminderNotificationUseCase
 import dagger.Module

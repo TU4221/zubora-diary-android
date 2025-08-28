@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.scheduling
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
