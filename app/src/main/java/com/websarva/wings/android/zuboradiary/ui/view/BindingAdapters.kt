@@ -30,12 +30,27 @@ internal object BindingAdapters {
     }
 
     @JvmStatic
-    @BindingAdapter("applyNavigationBarBottomMargin")
-    fun applyNavigationBarBottomMargin(view: View, apply: Boolean) {
-        if (!apply) return
-
-        val initialViewBottomMargin =
-            (view.layoutParams as ViewGroup.MarginLayoutParams).bottomMargin
+    @BindingAdapter(
+        value = [
+            "applySystemInsetsToMarginLeft",
+            "applySystemInsetsToMarginTop",
+            "applySystemInsetsToMarginRight",
+            "applySystemInsetsToMarginBottom"
+        ],
+        requireAll = false // いずれかの属性が指定されれば呼び出される
+    )
+    fun applySystemInsetsToMargin(
+        view: View,
+        applyLeft: Boolean = false,
+        applyTop: Boolean = false,
+        applyRight: Boolean = false,
+        applyBottom: Boolean = false
+    ) {
+        val initialViewMargin = (view.layoutParams as ViewGroup.MarginLayoutParams)
+        val initialViewMarginLeft = initialViewMargin.leftMargin
+        val initialViewMarginTop = initialViewMargin.topMargin
+        val initialViewMarginRight = initialViewMargin.rightMargin
+        val initialViewMarginBottom = initialViewMargin.bottomMargin
         view.apply {
             ViewCompat.setOnApplyWindowInsetsListener(
                 this
@@ -46,7 +61,10 @@ internal object BindingAdapters {
                                 or WindowInsetsCompat.Type.displayCutout()
                     )
                 view.updateLayoutParams<ViewGroup.MarginLayoutParams> {
-                    bottomMargin = initialViewBottomMargin + insets.bottom
+                    if (applyLeft) leftMargin = initialViewMarginLeft + insets.left
+                    if (applyTop) topMargin = initialViewMarginTop + insets.top
+                    if (applyRight) rightMargin = initialViewMarginRight + insets.right
+                    if (applyBottom) bottomMargin = initialViewMarginBottom + insets.bottom
                 }
                 WindowInsetsCompat.CONSUMED
             }
