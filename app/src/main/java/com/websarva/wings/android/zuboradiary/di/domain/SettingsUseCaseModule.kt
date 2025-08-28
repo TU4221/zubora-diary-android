@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.di.domain
 
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.RegisterReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase

@@ -17,14 +17,17 @@ import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeCol
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
+import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-internal class SettingsRepository(private val userPreferencesDataSource: UserPreferencesDataSource) {
+internal class SettingsRepositoryImpl(
+    private val userPreferencesDataSource: UserPreferencesDataSource
+) : SettingsRepository {
 
-    fun loadThemeColorPreference(): Flow<UserSettingDataSourceResult<ThemeColorSetting>> {
+    override fun loadThemeColorPreference(): Flow<UserSettingDataSourceResult<ThemeColorSetting>> {
         return userPreferencesDataSource.loadThemeColorPreference()
             .map { result ->
                 when (result) {
@@ -43,7 +46,7 @@ internal class SettingsRepository(private val userPreferencesDataSource: UserPre
             }
     }
 
-    fun loadCalendarStartDayOfWeekPreference():
+    override fun loadCalendarStartDayOfWeekPreference():
             Flow<UserSettingDataSourceResult<CalendarStartDayOfWeekSetting>> {
         return userPreferencesDataSource.loadCalendarStartDayOfWeekPreference()
             .map { result ->
@@ -63,7 +66,7 @@ internal class SettingsRepository(private val userPreferencesDataSource: UserPre
             }
     }
 
-    fun loadReminderNotificationPreference():
+    override fun loadReminderNotificationPreference():
             Flow<UserSettingDataSourceResult<ReminderNotificationSetting>> {
         return userPreferencesDataSource.loadReminderNotificationPreference()
             .map { result ->
@@ -83,7 +86,7 @@ internal class SettingsRepository(private val userPreferencesDataSource: UserPre
             }
     }
 
-    fun loadPasscodeLockPreference():
+    override fun loadPasscodeLockPreference():
             Flow<UserSettingDataSourceResult<PasscodeLockSetting>> {
         return userPreferencesDataSource.loadPasscodeLockPreference()
             .map { result ->
@@ -103,7 +106,7 @@ internal class SettingsRepository(private val userPreferencesDataSource: UserPre
             }
     }
 
-    fun loadWeatherInfoFetchPreference():
+    override fun loadWeatherInfoFetchPreference():
             Flow<UserSettingDataSourceResult<WeatherInfoFetchSetting>> {
         return userPreferencesDataSource.loadWeatherInfoFetchPreference()
             .map { result ->
@@ -124,7 +127,7 @@ internal class SettingsRepository(private val userPreferencesDataSource: UserPre
     }
 
     @Throws(ThemeColorSettingUpdateFailureException::class)
-    suspend fun saveThemeColorPreference(setting: ThemeColorSetting) {
+    override suspend fun saveThemeColorPreference(setting: ThemeColorSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
@@ -136,7 +139,7 @@ internal class SettingsRepository(private val userPreferencesDataSource: UserPre
     }
 
     @Throws(CalendarStartDayOfWeekSettingUpdateFailureException::class)
-    suspend fun saveCalendarStartDayOfWeekPreference(setting: CalendarStartDayOfWeekSetting) {
+    override suspend fun saveCalendarStartDayOfWeekPreference(setting: CalendarStartDayOfWeekSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
@@ -148,7 +151,7 @@ internal class SettingsRepository(private val userPreferencesDataSource: UserPre
     }
 
     @Throws(ReminderNotificationSettingUpdateFailureException::class)
-    suspend fun saveReminderNotificationPreference(setting: ReminderNotificationSetting) {
+    override suspend fun saveReminderNotificationPreference(setting: ReminderNotificationSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
@@ -167,7 +170,7 @@ internal class SettingsRepository(private val userPreferencesDataSource: UserPre
     }
 
     @Throws(PassCodeSettingUpdateFailureException::class)
-    suspend fun savePasscodeLockPreference(setting: PasscodeLockSetting) {
+    override suspend fun savePasscodeLockPreference(setting: PasscodeLockSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
@@ -186,7 +189,7 @@ internal class SettingsRepository(private val userPreferencesDataSource: UserPre
     }
 
     @Throws(WeatherInfoFetchSettingUpdateFailureException::class)
-    suspend fun saveWeatherInfoFetchPreference(setting: WeatherInfoFetchSetting) {
+    override suspend fun saveWeatherInfoFetchPreference(setting: WeatherInfoFetchSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
