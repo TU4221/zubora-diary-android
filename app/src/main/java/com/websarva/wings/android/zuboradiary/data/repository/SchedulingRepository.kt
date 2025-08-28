@@ -6,12 +6,14 @@ import com.websarva.wings.android.zuboradiary.domain.exception.reminder.Reminder
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException
 import java.time.LocalTime
 
-internal class SchedulingRepository (private val workManager: NotificationSchedulingDataSource) {
+internal class SchedulingRepository(
+    private val notificationSchedulingDataSource: NotificationSchedulingDataSource
+) {
 
     @Throws(ReminderNotificationRegistrationFailureException::class)
     fun registerReminderNotification(settingTime: LocalTime) {
         try {
-            workManager.registerReminderNotificationWorker(settingTime)
+            notificationSchedulingDataSource.registerReminderNotificationWorker(settingTime)
         } catch (e: WorkProfileAccessFailureException) {
             // WorkManagerが未初期化、または内部状態が不正な場合に発生しうるためキャッチ
             throw ReminderNotificationRegistrationFailureException(e)
@@ -21,7 +23,7 @@ internal class SchedulingRepository (private val workManager: NotificationSchedu
     @Throws(ReminderNotificationCancellationFailureException::class)
     fun cancelReminderNotification() {
         try {
-            workManager.cancelReminderNotificationWorker()
+            notificationSchedulingDataSource.cancelReminderNotificationWorker()
         } catch (e: WorkProfileAccessFailureException) {
             // WorkManagerが未初期化、または内部状態が不正な場合に発生しうるためキャッチ
             throw ReminderNotificationCancellationFailureException(e)
