@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
@@ -30,8 +30,8 @@ internal object RepositoryModule {
     @Singleton
     @Provides
     fun provideSettingsRepository(
-        userPreferences: UserPreferences
-    ): SettingsRepository = SettingsRepository(userPreferences)
+        userPreferencesDataSource: UserPreferencesDataSource
+    ): SettingsRepository = SettingsRepository(userPreferencesDataSource)
 
     @Singleton
     @Provides

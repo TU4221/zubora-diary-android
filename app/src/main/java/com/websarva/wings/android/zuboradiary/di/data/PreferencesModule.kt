@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.di.data
 
 import android.content.Context
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -21,5 +21,5 @@ internal object PreferencesModule {
     fun provideUserPreferences(
         @ApplicationContext context: Context,
         @ApplicationScope appScope: CoroutineScope
-    ): UserPreferences = UserPreferences(context, appScope)
+    ): UserPreferencesDataSource = UserPreferencesDataSource(context, appScope)
 }

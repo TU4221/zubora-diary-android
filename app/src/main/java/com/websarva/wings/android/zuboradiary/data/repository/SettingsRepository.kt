@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLock
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlowResult
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferences
+import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.CalendarStartDayOfWeekSettingUpdateFailureException
@@ -22,10 +22,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
-internal class SettingsRepository(private val userPreferences: UserPreferences) {
+internal class SettingsRepository(private val userPreferencesDataSource: UserPreferencesDataSource) {
 
     fun loadThemeColorPreference(): Flow<UserSettingDataSourceResult<ThemeColorSetting>> {
-        return userPreferences.loadThemeColorPreference()
+        return userPreferencesDataSource.loadThemeColorPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
@@ -45,7 +45,7 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
 
     fun loadCalendarStartDayOfWeekPreference():
             Flow<UserSettingDataSourceResult<CalendarStartDayOfWeekSetting>> {
-        return userPreferences.loadCalendarStartDayOfWeekPreference()
+        return userPreferencesDataSource.loadCalendarStartDayOfWeekPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
@@ -65,7 +65,7 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
 
     fun loadReminderNotificationPreference():
             Flow<UserSettingDataSourceResult<ReminderNotificationSetting>> {
-        return userPreferences.loadReminderNotificationPreference()
+        return userPreferencesDataSource.loadReminderNotificationPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
@@ -85,7 +85,7 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
 
     fun loadPasscodeLockPreference():
             Flow<UserSettingDataSourceResult<PasscodeLockSetting>> {
-        return userPreferences.loadPasscodeLockPreference()
+        return userPreferencesDataSource.loadPasscodeLockPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
@@ -105,7 +105,7 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
 
     fun loadWeatherInfoFetchPreference():
             Flow<UserSettingDataSourceResult<WeatherInfoFetchSetting>> {
-        return userPreferences.loadWeatherInfoFetchPreference()
+        return userPreferencesDataSource.loadWeatherInfoFetchPreference()
             .map { result ->
                 when (result) {
                     is UserPreferenceFlowResult.Success -> {
@@ -128,7 +128,7 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
-                userPreferences.saveThemeColorPreference(preference)
+                userPreferencesDataSource.saveThemeColorPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw ThemeColorSettingUpdateFailureException(setting.themeColor, e)
             }
@@ -140,7 +140,7 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
-                userPreferences.saveCalendarStartDayOfWeekPreference(preference)
+                userPreferencesDataSource.saveCalendarStartDayOfWeekPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw CalendarStartDayOfWeekSettingUpdateFailureException(setting.dayOfWeek,e)
             }
@@ -152,7 +152,7 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
-                userPreferences.saveReminderNotificationPreference(preference)
+                userPreferencesDataSource.saveReminderNotificationPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw ReminderNotificationSettingUpdateFailureException(
                     setting.isEnabled,
@@ -171,7 +171,7 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
-                userPreferences.savePasscodeLockPreference(preference)
+                userPreferencesDataSource.savePasscodeLockPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw PassCodeSettingUpdateFailureException(
                     setting.isEnabled,
@@ -190,7 +190,7 @@ internal class SettingsRepository(private val userPreferences: UserPreferences) 
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
-                userPreferences.saveWeatherInfoFetchPreference(preference)
+                userPreferencesDataSource.saveWeatherInfoFetchPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw WeatherInfoFetchSettingUpdateFailureException(setting.isEnabled, e)
             }

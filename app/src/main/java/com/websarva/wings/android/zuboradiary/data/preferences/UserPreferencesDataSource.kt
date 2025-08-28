@@ -27,7 +27,7 @@ import javax.inject.Inject
 @Suppress( "unused", "RedundantSuppression") //MEMO:警告対策。(初期化してない為、Unusedの警告が表示される)
 internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "UserPreferences")
 
-internal class UserPreferences @Inject constructor(
+internal class UserPreferencesDataSource @Inject constructor(
     private val context: Context,
     @ApplicationScope private val appScope: CoroutineScope
 ) {
