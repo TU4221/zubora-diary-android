@@ -7,8 +7,9 @@ import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
-import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepository
+import com.websarva.wings.android.zuboradiary.data.repository.UriRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
 import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
@@ -55,5 +56,5 @@ internal object RepositoryModule {
     @Provides
     fun provideUriRepository(
         uriPermissionDataSource: UriPermissionDataSource
-    ): UriRepository = UriRepository(uriPermissionDataSource)
+    ): UriRepository = UriRepositoryImpl(uriPermissionDataSource)
 }

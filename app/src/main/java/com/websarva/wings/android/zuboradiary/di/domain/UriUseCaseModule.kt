@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.di.domain
 
-import com.websarva.wings.android.zuboradiary.data.repository.UriRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
