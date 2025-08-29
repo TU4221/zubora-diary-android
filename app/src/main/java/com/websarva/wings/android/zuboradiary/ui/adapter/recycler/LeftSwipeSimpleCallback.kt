@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
+import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRecyclerView) :
@@ -19,7 +20,7 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
 
     abstract class LeftSwipeViewHolder<T>(
         binding: ViewBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+    ) : WindowInsetsViewHolder(binding.root) {
 
         abstract val foregroundView: View
         abstract val backgroundButtonView: View

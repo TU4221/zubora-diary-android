@@ -1,23 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <include
-        layout="@layout/row_background_delete_button_full_wide"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content" >
 
-    <TextView
-        style="@style/DiaryItemSelectionHistoryTextViewStyle"
-        android:id="@+id/text_title"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:textAppearance="@style/AppTextViewTextAppearance"
-        android:gravity="center_vertical"
-        android:paddingHorizontal="8dp"
-        android:paddingVertical="4dp"
-        tools:text="item title" />
+        <!-- TODO:DeleteButtonのIconの位置が画面回転で変わる為、修正(ImageButtonのPadding設定による不具合) -->
+        <include
+            layout="@layout/row_background_delete_button_full_wide"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
 
-</FrameLayout>
+        <TextView
+            style="@style/DiaryItemSelectionHistoryTextViewStyle"
+            android:id="@+id/text_title"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:textAppearance="@style/AppTextViewTextAppearance"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="8dp"
+            android:paddingVertical="4dp"
+            tools:text="item title"
+            app:applySystemInsetsToPaddingLeft="@{true}"
+            app:applySystemInsetsToPaddingRight="@{true}" />
+
+    </FrameLayout>
+</layout>
