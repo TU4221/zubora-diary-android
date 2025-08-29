@@ -10,6 +10,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.databinding.BindingAdapter
 import com.google.android.material.appbar.MaterialToolbar
+import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
 
 internal object BindingAdapters {
     // MEMO:既存"app:drawableStartCompat"は"@drawable/～"を代入すれば反映されるが、
@@ -67,7 +68,7 @@ internal object BindingAdapters {
                     if (applyRight) rightMargin = initialViewMarginRight + insets.right
                     if (applyBottom) bottomMargin = initialViewMarginBottom + insets.bottom
                 }
-                WindowInsetsCompat.CONSUMED
+                windowInsets
             }
         }
     }
@@ -108,7 +109,7 @@ internal object BindingAdapters {
                     right = if (applyRight) initialViewPaddingRight + insets.right else view.paddingRight,
                     bottom = if (applyBottom) initialViewPaddingBottom + insets.bottom else view.paddingBottom
                 )
-                WindowInsetsCompat.CONSUMED
+                windowInsets
             }
         }
     }
