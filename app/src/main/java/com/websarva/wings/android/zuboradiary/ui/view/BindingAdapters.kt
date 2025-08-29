@@ -31,6 +31,25 @@ internal object BindingAdapters {
         toolbar.setNavigationOnClickListener(listener)
     }
 
+
+
+    /**
+     * 指定されたViewのマージンにシステムバー（ステータスバー、ナビゲーションバーなど）や
+     * ディスプレイカットアウトのインセット値を加算。
+     *
+     * このBindingAdapterは、ViewがシステムUI要素によって隠れないようにするために使用。(Edge-to-Edge対応)
+     *
+     * **RecyclerViewのアイテムビューで使用する場合の重要な注意点:**
+     *  このBindingAdapterがアイテムの初期表示時にインセットを確実に反映するためには、
+     *  対応するViewHolder([WindowInsetsViewHolder]) を継承する必要あり。
+     *  これにより、ViewHolderのItemViewがウィンドウにアタッチされた際にインセットの適用が要求され、初期表示時にインセットが反映。
+     *
+     * @param view マージンを調整するView。
+     * @param applyLeft trueの場合、左マージンにインセットを適用します。
+     * @param applyTop trueの場合、上マージンにインセットを適用します。
+     * @param applyRight trueの場合、右マージンにインセットを適用します。
+     * @param applyBottom trueの場合、下マージンにインセットを適用します。
+     */
     @JvmStatic
     @BindingAdapter(
         value = [
@@ -73,6 +92,23 @@ internal object BindingAdapters {
         }
     }
 
+    /**
+     * 指定されたViewのパディングにシステムバー（ステータスバー、ナビゲーションバーなど）や
+     * ディスプレイカットアウトのインセット値を加算。
+     *
+     * このBindingAdapterは、ViewがシステムUI要素によって隠れないようにするために使用。(Edge-to-Edge対応)
+     *
+     * **RecyclerViewのアイテムビューで使用する場合の重要な注意点:**
+     *  このBindingAdapterがアイテムの初期表示時にインセットを確実に反映するためには、
+     *  対応するViewHolder([WindowInsetsViewHolder]) を継承する必要あり。
+     *  これにより、ViewHolderのItemViewがウィンドウにアタッチされた際にインセットの適用が要求され、初期表示時にインセットが反映。
+     *
+     * @param view パディングを調整するView。
+     * @param applyLeft trueの場合、左パディングにインセットを適用します。
+     * @param applyTop trueの場合、上パディングにインセットを適用します。
+     * @param applyRight trueの場合、右パディングにインセットを適用します。
+     * @param applyBottom trueの場合、下パディングにインセットを適用します。
+     */
     @JvmStatic
     @BindingAdapter(
         value = [
