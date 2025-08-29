@@ -3,33 +3,45 @@
               RecyclerViewのスクロール位置でセクションViewを移動させた時に、
               RecyclerViewの前面でセクションViewを移動させたい為。
               (FrameLayoutとLinearLayoutの組み合わせでも可能) -->
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--
+     MEMO:このレイアウトはRecyclerViewのアイテムとして使用され、システムインセットを考慮した
+          パディング調整を行う (例: app:applySystemInsetsToPaddingLeft)。
+          このアイテムのViewHolderは、初期表示時にインセットを正しく適用するために、
+          WindowInsetsViewHolderを継承するか、同様の仕組みを実装する必要があります。
+-->
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
-        style="@style/DiaryListRecyclerViewStyle"
-        android:id="@+id/recycler_day_list"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="@dimen/row_diary_year_month_list_padding_bottom"
-        android:nestedScrollingEnabled="false"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/text_section" />
+        android:layout_height="wrap_content">
 
-    <!-- MEMO:セクション(TextView)をリスト(RecyclerView)の前面に配置したい為、TextViewを下記に記載 -->
-    <TextView
-        style="@style/DiaryYearMonthListSectionTextViewStyle"
-        android:id="@+id/text_section"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAppearance="@style/DiaryListYearMonthSectionTextAppearance"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:hint="0000年00月" />
+        <com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
+            style="@style/DiaryListRecyclerViewStyle"
+            android:id="@+id/recycler_day_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="@dimen/row_diary_year_month_list_padding_bottom"
+            android:nestedScrollingEnabled="false"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/text_section"
+            app:applySystemInsetsToMarginLeft="@{true}"
+            app:applySystemInsetsToMarginRight="@{true}" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- MEMO:セクション(TextView)をリスト(RecyclerView)の前面に配置したい為、TextViewを下記に記載 -->
+        <TextView
+            style="@style/DiaryYearMonthListSectionTextViewStyle"
+            android:id="@+id/text_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/DiaryListYearMonthSectionTextAppearance"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:applySystemInsetsToPaddingLeft="@{true}"
+            tools:hint="0000年00月" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

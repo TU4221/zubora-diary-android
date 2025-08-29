@@ -33,7 +33,9 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" >
+                    android:layout_height="wrap_content"
+                    app:applySystemInsetsToPaddingLeft="@{true}"
+                    app:applySystemInsetsToPaddingRight="@{true}" >
 
                     <com.google.android.material.appbar.MaterialToolbar
                         style="@style/AppToolbarNavBackStyle"
@@ -48,7 +50,7 @@
                         android:layout_gravity="center"
                         android:orientation="horizontal"
                         android:layout_marginHorizontal="48dp"
-                        android:background="@drawable/bg_word_search_input_bar">
+                        android:background="@drawable/bg_word_search_input_bar" >
 
                         <com.google.android.material.textfield.TextInputLayout
                             style="@style/WordSearchTextInputLayoutStyle"
@@ -105,6 +107,7 @@
                         android:text="@{Integer.toString(viewModel.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
                         android:padding="8dp"
                         android:visibility="@{viewModel.isNumResultsVisible ? View.VISIBLE : View.INVISIBLE}"
+                        app:applySystemInsetsToPaddingLeft="@{true}"
                         tools:visibility="visible" />
 
                     <!-- MEMO:スクロールバーを表示させたいが、子RecyclerViewに反応してスクロールバーの長さが安定しない。
@@ -114,7 +117,9 @@
                         android:id="@+id/recycler_word_search_result_list"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:scrollbars="none" />
+                        android:scrollbars="none"
+                        android:clipToPadding="false"
+                        app:applySystemInsetsToPaddingBottom="@{true}"/>
 
                 </LinearLayout>
 
@@ -133,6 +138,7 @@
             android:src="@drawable/ic_arrow_upward_24px"
             android:contentDescription="@string/fragment_word_search_fab_top_scroll"
             android:enabled="@{viewModel.uiState instanceof WordSearchState.Updating ? false : true}"
+            app:applySystemInsetsToMarginRight="@{true}"
             app:applySystemInsetsToMarginBottom="@{true}" />
 
     </FrameLayout>

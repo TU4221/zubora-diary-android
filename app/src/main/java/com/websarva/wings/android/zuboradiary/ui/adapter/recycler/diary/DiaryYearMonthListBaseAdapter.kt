@@ -18,6 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.Di
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultDayListAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
+import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal abstract class DiaryYearMonthListBaseAdapter<
@@ -135,7 +136,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
     sealed class DiaryYearMonthListViewHolder(
         itemView: View
-    ) : RecyclerView.ViewHolder(itemView) {
+    ) : WindowInsetsViewHolder(itemView) {
 
         data class Item(
             val binding: RowDiaryYearMonthListBinding

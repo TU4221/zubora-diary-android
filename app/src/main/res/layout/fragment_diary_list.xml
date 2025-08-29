@@ -35,7 +35,9 @@
                     app:navigationIcon="@drawable/ic_calendar_month_24px"
                     app:navigationContentDescription="@string/fragment_diary_list_toolbar_navigation_top_year_month_switching"
                     app:onNavigationIconClick="@{() -> viewModel.onNavigationIconClick()}"
-                    app:title="@string/fragment_diary_list_toolbar_title" />
+                    app:title="@string/fragment_diary_list_toolbar_title"
+                    app:applySystemInsetsToPaddingLeft="@{true}"
+                    app:applySystemInsetsToPaddingRight="@{true}" />
 
             </com.google.android.material.appbar.AppBarLayout>
 
@@ -80,7 +82,8 @@
             android:src="@drawable/ic_edit_24px"
             android:contentDescription="@string/fragment_diary_list_fab_new_diary_creation"
             android:enabled="@{viewModel.uiState instanceof DiaryListState.UpdatingDiaryList ? false : true}"
-            android:onClick="@{() -> viewModel.onDiaryEditButtonClick()}"/>
+            android:onClick="@{() -> viewModel.onDiaryEditButtonClick()}"
+            app:applySystemInsetsToMarginRight="@{true}" />
 
     </FrameLayout>
 
