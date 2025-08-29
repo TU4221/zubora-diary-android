@@ -211,7 +211,17 @@ internal class DiaryListViewModel @Inject constructor(
     fun onUiReady() {
         if (!shouldUpdateDiaryList) return
         updateShouldUpdateDiaryList(false)
-        if (uiState.value != DiaryListState.ShowingDiaryList) return
+        when (uiState.value) {
+            DiaryListState.Idle,
+            DiaryListState.LoadingNewDiaryList,
+            DiaryListState.LoadingAdditionDiaryList,
+            DiaryListState.UpdatingDiaryList,
+            DiaryListState.DeletingDiary,
+            DiaryListState.LoadingDiaryInfo -> return
+
+            DiaryListState.ShowingDiaryList,
+            DiaryListState.NoDiaries -> { /* 処理継続 */ }
+        }
 
         val currentList = _diaryList.value
         cancelPreviousLoadJob()
