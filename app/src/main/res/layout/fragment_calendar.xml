@@ -59,7 +59,7 @@
                     android:layout_height="match_parent"
                     android:paddingHorizontal="@dimen/fragment_padding_horizontal"
                     android:paddingTop="@dimen/fragment_padding_vertical"
-                    android:paddingBottom="@dimen/fragment_padding_bottom"
+                    android:paddingBottom="@dimen/fragment_padding_bottom_for_fab"
                     android:orientation="vertical">
 
                     <com.kizitonwose.calendar.view.CalendarView
