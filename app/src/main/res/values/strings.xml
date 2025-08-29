@@ -74,6 +74,7 @@
     <!--*****************************************************************************************-->
 
     <!-- fragment_settings -->
+    <string name="fragment_settings_main_title_setting">設定</string>
     <string name="fragment_settings_item_value_not_set">未設定</string>
     <string name="fragment_settings_section_title_design">デザイン</string>
     <string name="fragment_settings_item_title_theme_color">テーマカラー</string>

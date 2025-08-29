@@ -33,7 +33,7 @@
                     android:id="@+id/material_toolbar_top_app_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:title="設定" />
+                    app:title="@string/fragment_settings_main_title_setting" />
 
             </com.google.android.material.appbar.AppBarLayout>
 
