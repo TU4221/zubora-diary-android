@@ -4,6 +4,31 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
+
+/**
+ * 日記の単一のエントリを表すRoomエンティティクラス。
+ *
+ * このクラスは、データベースの "diaries" テーブルの各行に対応する。
+ * 日記内容を保持する。
+ *
+ * @property date 日記の日付。このエンティティの主キー。
+ * @property log 日記の更新日付。
+ * @property weather1 1つ目の天気情報を示す整数値。具体的な値はアプリの定義による。
+ * @property weather2 2つ目の天気情報を示す整数値。オプションであり、1つ目と異なる場合や補足的な情報として使用。
+ * @property condition その日の体調や気分を示す整数値。具体的な値はアプリの定義による。
+ * @property title 日記のタイトル。
+ * @property item1Title 1つ目の項目のタイトル。
+ * @property item1Comment 1つ目の項目のコメント。
+ * @property item2Title 2つ目の項目のタイトル (オプショナル)。
+ * @property item2Comment 2つ目の項目のコメント (オプショナル)。
+ * @property item3Title 3つ目の項目のタイトル (オプショナル)。
+ * @property item3Comment 3つ目の項目のコメント (オプショナル)。
+ * @property item4Title 4つ目の項目のタイトル (オプショナル)。
+ * @property item4Comment 4つ目の項目のコメント (オプショナル)。
+ * @property item5Title 5つ目の項目のタイトル (オプショナル)。
+ * @property item5Comment 5つ目の項目のコメント (オプショナル)。
+ * @property imageUriString 日記に添付した画像のURI文字列 (オプショナル)。
+ */
 @Entity(tableName = "diaries")
 internal data class DiaryEntity(
     @PrimaryKey
