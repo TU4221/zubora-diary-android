@@ -14,6 +14,15 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.TimeoutException
 
+/**
+ * Fused Location Provider APIを利用して位置情報を取得するデータソースクラス。
+ *
+ * このクラスは、デバイスの現在位置を取得する機能を提供する。
+ * 位置情報へのアクセス権限がない場合や、タイムアウトが発生した場合に発生する特定の例外を
+ * [FusedLocationAccessFailureException] にラップする。
+ *
+ * @property context アプリケーションコンテキスト。
+ */
 internal class FusedLocationDataSource(
     private val context: Context
 ) {
@@ -25,8 +34,16 @@ internal class FusedLocationDataSource(
 
     // MEMO:fusedLocationProviderClient.lastLocation()を記述する時、Permission確認コードが必須となるが、
     //      Permission確認はプロパティで管理する為、@SuppressLintで警告抑制。
+    /**
+     * デバイスの現在位置を取得する。
+     *
+     * 指定されたタイムアウト時間内に位置情報を取得できなかった場合、または位置情報へのアクセス権限がない場合は例外をスローする。
+     *
+     * @param timeoutMillis タイムアウトまでの時間 (ミリ秒単位)。デフォルトは10000ミリ秒。
+     * @return 取得した位置情報。
+     * @throws FusedLocationAccessFailureException 位置情報の取得に失敗した場合 (権限不足、タイムアウト、その他の内部エラー)。
+     */
     @SuppressLint("MissingPermission")
-    @Throws(FusedLocationAccessFailureException::class)
     suspend fun fetchCurrentLocation(timeoutMillis: Long = 10000L): Location {
         val logMsg = "現在位置取得"
         Log.i(logTag, "${logMsg}_開始")
