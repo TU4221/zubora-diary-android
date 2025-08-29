@@ -40,6 +40,8 @@
                     android:layout_height="wrap_content"
                     app:onNavigationIconClick="@{() -> viewModel.onNavigationIconClick()}"
                     app:menu="@menu/diary_show_toolbar_menu"
+                    app:applySystemInsetsToPaddingLeft="@{true}"
+                    app:applySystemInsetsToPaddingRight="@{true}"
                     tools:title="@string/fragment_diary_show_toolbar_title"/>
 
             </com.google.android.material.appbar.AppBarLayout>
@@ -57,8 +59,10 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginHorizontal="@dimen/fragment_margin_horizontal"
-                    android:layout_marginTop="@dimen/fragment_margin_vertical"
-                    android:layout_marginBottom="@dimen/fragment_margin_bottom" >
+                    android:layout_marginVertical="@dimen/fragment_margin_vertical"
+                    app:applySystemInsetsToPaddingLeft="@{true}"
+                    app:applySystemInsetsToPaddingRight="@{true}"
+                    app:applySystemInsetsToPaddingBottom="@{true}" >
 
                     <include
                         layout="@layout/layout_diary_show"
