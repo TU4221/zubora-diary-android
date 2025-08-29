@@ -8,5 +8,5 @@ package com.websarva.wings.android.zuboradiary.data.location
  * @param cause 位置情報取得失敗の根本原因となったThrowable。
  */
 internal class FusedLocationAccessFailureException (
-    cause: Throwable? = null // TODO:非null変更
+    cause: Throwable
 ) : Exception("位置情報の取得に失敗しました。", cause)
