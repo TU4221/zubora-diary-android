@@ -7,7 +7,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
-        <!-- TODO:DeleteButtonのIconの位置が画面回転で変わる為、修正(ImageButtonのPadding設定による不具合) -->
         <include
             layout="@layout/row_background_delete_button_full_wide"
             android:layout_width="match_parent"
