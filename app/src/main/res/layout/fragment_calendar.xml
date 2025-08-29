@@ -57,9 +57,9 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_marginHorizontal="@dimen/fragment_margin_horizontal"
-                    android:layout_marginTop="@dimen/fragment_margin_vertical"
-                    android:layout_marginBottom="@dimen/fragment_margin_bottom"
+                    android:paddingHorizontal="@dimen/fragment_padding_horizontal"
+                    android:paddingTop="@dimen/fragment_padding_vertical"
+                    android:paddingBottom="@dimen/fragment_padding_bottom"
                     android:orientation="vertical">
 
                     <com.kizitonwose.calendar.view.CalendarView
