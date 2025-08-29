@@ -35,6 +35,8 @@
                     app:title="@{viewModel.isNewDiary ? @string/fragment_diary_edit_toolbar_title_create_new : @string/fragment_diary_edit_toolbar_title_edit}"
                     app:onNavigationIconClick="@{() -> viewModel.onNavigationClick()}"
                     app:menu="@menu/diary_edit_toolbar_menu"
+                    app:applySystemInsetsToPaddingLeft="@{true}"
+                    app:applySystemInsetsToPaddingRight="@{true}"
                     tools:title="@string/fragment_diary_edit_toolbar_title_value_tools" />
 
             </com.google.android.material.appbar.AppBarLayout>
@@ -61,9 +63,11 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginHorizontal="@dimen/fragment_margin_horizontal"
-                        android:layout_marginTop="@dimen/fragment_margin_vertical"
-                        android:layout_marginBottom="@dimen/fragment_margin_bottom"
-                        android:orientation="vertical">
+                        android:layout_marginVertical="@dimen/fragment_margin_vertical"
+                        android:orientation="vertical"
+                        app:applySystemInsetsToPaddingLeft="@{true}"
+                        app:applySystemInsetsToPaddingRight="@{true}"
+                        app:applySystemInsetsToPaddingBottom="@{true}" >
 
                         <TextView
                             android:id="@+id/text_editing_diary"
