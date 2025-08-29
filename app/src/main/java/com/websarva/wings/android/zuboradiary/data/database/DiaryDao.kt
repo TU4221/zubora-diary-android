@@ -26,10 +26,9 @@ internal interface DiaryDao {
     /**
      * 指定された日付より前の日記の総数を取得する。
      *
-     * @param startDate この日付より前の日記をカウントする (この日付は含まない)。
+     * @param startDate この日付以前の日記をカウントする (この日付を含む)。
      * @return 指定された日付より前の日記の総数。
      */
-    //TODO:WHERE date < :startDate -> WHERE date <= :startDate
     @Query("SELECT COUNT(*) FROM diaries WHERE date < :startDate")
     suspend fun countDiaries(startDate: String): Int
 
