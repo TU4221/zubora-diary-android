@@ -38,6 +38,8 @@
                     android:id="@+id/material_toolbar_top_app_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:applySystemInsetsToPaddingLeft="@{true}"
+                    app:applySystemInsetsToPaddingRight="@{true}"
                     tools:title="@string/fragment_calendar_month_header_tools_value"/>
 
             </com.google.android.material.appbar.AppBarLayout>
@@ -84,7 +86,9 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:visibility="@{viewModel.uiState instanceof CalendarState.LoadDiarySuccess ? View.VISIBLE : View.GONE}" >
+                            android:visibility="@{viewModel.uiState instanceof CalendarState.LoadDiarySuccess ? View.VISIBLE : View.GONE}"
+                            app:applySystemInsetsToPaddingLeft="@{true}"
+                            app:applySystemInsetsToPaddingRight="@{true}" >
 
                             <include
                                 layout="@layout/layout_diary_show"
@@ -121,7 +125,8 @@
             android:layout_marginEnd="@dimen/fab_margin_end"
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_edit_24px"
-            android:contentDescription="@string/fragment_calendar_fab_content_description"/>
+            android:contentDescription="@string/fragment_calendar_fab_content_description"
+            app:applySystemInsetsToMarginRight="@{true}" />
 
     </FrameLayout>
 
