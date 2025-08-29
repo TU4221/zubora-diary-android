@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
-import com.websarva.wings.android.zuboradiary.databinding.RowBackgroundDeleteButtonFullWideBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeSimpleCallback.LeftSwipeViewHolder
@@ -58,7 +57,7 @@ internal class DiaryItemTitleSelectionHistoryListAdapter(
         override val foregroundView
             get() = binding.textTitle
         override val backgroundButtonView
-            get() = RowBackgroundDeleteButtonFullWideBinding.bind(binding.root).imageButtonDelete
+            get() = binding.includeBackground.imageButtonDelete
 
         override fun bind(
             item: DiaryItemTitleSelectionHistoryListItemUi,
