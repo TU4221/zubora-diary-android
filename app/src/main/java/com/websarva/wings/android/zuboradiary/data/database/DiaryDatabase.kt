@@ -21,7 +21,7 @@ import java.time.LocalDate
  */
 @Database(
     entities = [DiaryEntity::class, DiaryItemTitleSelectionHistoryEntity::class],
-    version = 5, //TODO:version1に変更
+    version = 1,
     exportSchema = false
 )
 internal abstract class DiaryDatabase : RoomDatabase() {
