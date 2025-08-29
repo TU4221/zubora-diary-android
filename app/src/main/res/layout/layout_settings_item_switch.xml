@@ -35,7 +35,9 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:minHeight="@dimen/fragment_settings_section_layout_min_height" >
+        android:minHeight="@dimen/fragment_settings_section_layout_min_height"
+        app:applySystemInsetsToPaddingLeft="@{true}"
+        app:applySystemInsetsToPaddingRight="@{true}" >
 
         <!-- HACK:警告で"android:drawableStart"から"app:drawableStartCompat"に変更するように促されるが、
                   "app:drawableStartCompat"はリソースしか受け付けない為、"android:drawableStart"を使用

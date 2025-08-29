@@ -33,7 +33,9 @@
                     android:id="@+id/material_toolbar_top_app_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:title="@string/fragment_settings_main_title_setting" />
+                    app:title="@string/fragment_settings_main_title_setting"
+                    app:applySystemInsetsToPaddingLeft="@{true}"
+                    app:applySystemInsetsToPaddingRight="@{true}" />
 
             </com.google.android.material.appbar.AppBarLayout>
 
@@ -64,7 +66,8 @@
                             android:layout_height="wrap_content"
                             android:minHeight="@dimen/fragment_settings_section_layout_min_height"
                             android:textAppearance="@style/SettingsSectionTextViewTextAppearance"
-                            android:text="@string/fragment_settings_section_title_design"/>
+                            android:text="@string/fragment_settings_section_title_design"
+                            app:applySystemInsetsToPaddingLeft="@{true}" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_theme_color_setting"
@@ -97,7 +100,8 @@
                             android:layout_height="wrap_content"
                             android:minHeight="@dimen/fragment_settings_section_layout_min_height"
                             android:textAppearance="@style/SettingsSectionTextViewTextAppearance"
-                            android:text="@string/fragment_settings_section_title_setting" />
+                            android:text="@string/fragment_settings_section_title_setting"
+                            app:applySystemInsetsToPaddingLeft="@{true}" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_calendar_start_day_setting"
@@ -202,7 +206,8 @@
                             android:layout_height="wrap_content"
                             android:minHeight="@dimen/fragment_settings_section_layout_min_height"
                             android:textAppearance="@style/SettingsSectionTextViewTextAppearance"
-                            android:text="@string/fragment_settings_section_title_data"/>
+                            android:text="@string/fragment_settings_section_title_data"
+                            app:applySystemInsetsToPaddingLeft="@{true}" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_all_diaries_delete_setting"
@@ -262,7 +267,8 @@
                             android:layout_height="wrap_content"
                             android:minHeight="@dimen/fragment_settings_section_layout_min_height"
                             android:textAppearance="@style/SettingsSectionTextViewTextAppearance"
-                            android:text="@string/fragment_settings_section_title_other"/>
+                            android:text="@string/fragment_settings_section_title_other"
+                            app:applySystemInsetsToPaddingLeft="@{true}" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_open_source_licenses_setting"
