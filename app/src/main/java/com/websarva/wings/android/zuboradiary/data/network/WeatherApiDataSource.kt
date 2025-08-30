@@ -101,7 +101,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
      * @return 取得した今日の天気情報データ ([WeatherApiData])。
      * @throws WeatherApiException.ApiAccessFailure APIアクセスに失敗した場合。
      */
-    suspend fun fetchTodayWeatherInfo(
+    private suspend fun fetchTodayWeatherInfo(
         @FloatRange(from = -90.0, to = 90.0)
         latitude: Double,
         @FloatRange(from = -180.0, to = 180.0)
@@ -131,7 +131,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
      * @throws WeatherApiException.ApiAccessFailure APIアクセスに失敗した場合。
      * @throws IllegalArgumentException numPastDaysが不正な範囲の場合。
      */
-    suspend fun fetchPastDayWeatherInfo(
+    private suspend fun fetchPastDayWeatherInfo(
         @FloatRange(from = -90.0, to = 90.0)
         latitude: Double,
         @FloatRange(from = -180.0, to = 180.0)
