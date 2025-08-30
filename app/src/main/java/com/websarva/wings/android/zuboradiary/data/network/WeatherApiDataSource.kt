@@ -12,6 +12,14 @@ import java.time.LocalDate
 import java.time.temporal.ChronoUnit
 import javax.net.ssl.SSLException
 
+/**
+ * 天気情報APIへのデータアクセスを行うデータソースクラス。
+ *
+ * このクラスは、[WeatherApiService] を使用してOpen-Meteo APIから天気情報を取得する。
+ * APIへのアクセス失敗等で発生する特定の例外を[WeatherApiException] にラップする。
+ *
+ * @property weatherApiService Retrofitサービスインターフェースのインスタンス。
+ */
 internal class WeatherApiDataSource(private val weatherApiService: WeatherApiService) {
 
     private val logTag = createLogTag()
@@ -20,14 +28,26 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
     //      その為、@Suppress("RedundantSuppression")で警告回避。
     @Suppress("unused", "RedundantSuppression") // MEMO:@IntRangeで使用する為、@Suppressで警告回避。
     companion object {
-        const val MIN_PAST_DAYS = 1 //過去天気情報取得可能最小日
-        const val MAX_PAST_DAYS = 92 //過去天気情報取得可能最大日
+        /** 過去天気情報取得可能最小日数。 */
+        const val MIN_PAST_DAYS = 1
+        /** 過去天気情報取得可能最大日数。 */
+        const val MAX_PAST_DAYS = 92
     }
 
     private val queryDailyParameter = "weather_code"
     private val queryTimeZoneParameter = "Asia/Tokyo"
 
-    @Throws(WeatherApiException::class)
+    /**
+     * 指定された日付、緯度、経度に基づいて天気情報を取得する。
+     *
+     * 現在日付の場合は当日の天気情報を、過去日の場合は過去の天気情報を取得する。
+     *
+     * @param date 天気情報を取得する日付。
+     * @param latitude 天気情報を取得する地点の緯度 (-90.0 から 90.0 の範囲)。
+     * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
+     * @return 取得した天気情報データ。
+     * @throws WeatherApiException APIアクセスに失敗した場合、または日付が範囲外の場合。
+     */
     suspend fun fetchWeatherInfo(
         date: LocalDate,
         @FloatRange(from = -90.0, to = 90.0)
@@ -51,6 +71,14 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         }
     }
 
+    /**
+     * 指定された日付の天気情報が取得可能かどうかを判定する。
+     *
+     * 未来の日付、または[MAX_PAST_DAYS]で定義された最大過去日数より前の日付は取得不可とする。
+     *
+     * @param date 判定する日付。
+     * @return 取得可能であればtrue、そうでなければfalse。
+     */
     fun canFetchWeatherInfo(date: LocalDate): Boolean {
         val currentDate = LocalDate.now()
 
@@ -65,7 +93,14 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return result
     }
 
-    @Throws(WeatherApiException.ApiAccessFailure::class)
+    /**
+     * 今日の天気情報を取得する。
+     *
+     * @param latitude 天気情報を取得する地点の緯度 (-90.0 から 90.0 の範囲)。
+     * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
+     * @return 取得した今日の天気情報データ ([WeatherApiData])。
+     * @throws WeatherApiException.ApiAccessFailure APIアクセスに失敗した場合。
+     */
     suspend fun fetchTodayWeatherInfo(
         @FloatRange(from = -90.0, to = 90.0)
         latitude: Double,
@@ -86,7 +121,16 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return toWeatherApiData(response)
     }
 
-    @Throws(WeatherApiException.ApiAccessFailure::class)
+    /**
+     * 指定された過去日数の天気情報を取得する。
+     *
+     * @param latitude 天気情報を取得する地点の緯度 (-90.0 から 90.0 の範囲)。
+     * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
+     * @param numPastDays 何日前の天気情報を取得するか ([MIN_PAST_DAYS] から [MAX_PAST_DAYS] の範囲)。
+     * @return 取得した過去の天気情報データ。
+     * @throws WeatherApiException.ApiAccessFailure APIアクセスに失敗した場合。
+     * @throws IllegalArgumentException numPastDaysが不正な範囲の場合。
+     */
     suspend fun fetchPastDayWeatherInfo(
         @FloatRange(from = -90.0, to = 90.0)
         latitude: Double,
@@ -112,7 +156,16 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         return toWeatherApiData(response)
     }
 
-    @Throws(WeatherApiException.ApiAccessFailure::class)
+    /**
+     * Retrofitの[Response]を[WeatherApiData]に変換する。
+     *
+     * レスポンスが成功し、かつボディが存在する場合はそれを返す。
+     * それ以外の場合は[WeatherApiException.ApiAccessFailure]をスローする。
+     *
+     * @param response Retrofitからのレスポンスオブジェクト。
+     * @return 変換された[WeatherApiData]。
+     * @throws WeatherApiException.ApiAccessFailure レスポンスが不成功またはボディがnullの場合。
+     */
     private fun toWeatherApiData(response: Response<WeatherApiData>): WeatherApiData {
         Log.d(logTag, "code = " + response.code())
         Log.d(logTag, "message = :" + response.message())
@@ -136,7 +189,21 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         }
     }
 
-    @Throws(WeatherApiException.ApiAccessFailure::class)
+    /**
+     * Web API操作を実行し、一般的なネットワーク関連の例外をラップする。
+     *
+     * [UnknownHostException] (DNS解決失敗など)、
+     * [ConnectException] (サーバー接続失敗など)、
+     * [java.net.SocketTimeoutException] (タイムアウト)、
+     * [SSLException] (SSL/TLSハンドシェイクエラー)、
+     * またはその他の [java.io.IOException] (予期せぬ接続切断など) が発生した場合、
+     * それを [WeatherApiException.ApiAccessFailure] でラップして再スローする。
+     *
+     * @param R 操作の結果の型。
+     * @param operation 実行するsuspend関数形式のWeb API操作。
+     * @return Web API操作の結果。
+     * @throws WeatherApiException.ApiAccessFailure Web APIアクセスに失敗した場合。
+     */
     private suspend fun <R> executeWebApiOperation(
         operation: suspend () -> R
     ): R {
