@@ -66,30 +66,6 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
     }
 
     @Throws(WeatherApiException.ApiAccessFailure::class)
-    private suspend fun <R> executeWebApiOperation(
-        operation: suspend () -> R
-    ): R {
-        return try {
-            operation()
-        } catch (e: UnknownHostException) {
-            // DNS解決に失敗した場合 (例: インターネット接続なし、ホスト名間違い)
-            throw WeatherApiException.ApiAccessFailure(e)
-        } catch (e: ConnectException) {
-            // サーバーへのTCP接続に失敗した場合 (例: サーバーダウン、ポートが開いていない)
-            throw WeatherApiException.ApiAccessFailure(e)
-        } catch (e: java.net.SocketTimeoutException) {
-            // 接続または読み取りタイムアウト
-            throw WeatherApiException.ApiAccessFailure(e)
-        } catch (e: SSLException) {
-            // SSL/TLS ハンドシェイクエラー
-            throw WeatherApiException.ApiAccessFailure(e)
-        } catch (e: IOException) {
-            // 上記以外の一般的なI/Oエラー (例: 予期せぬ接続切断など)
-            throw WeatherApiException.ApiAccessFailure(e)
-        }
-    }
-
-    @Throws(WeatherApiException.ApiAccessFailure::class)
     suspend fun fetchTodayWeatherInfo(
         @FloatRange(from = -90.0, to = 90.0)
         latitude: Double,
@@ -157,6 +133,30 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
                 )
             }
             throw WeatherApiException.ApiAccessFailure(IOException())
+        }
+    }
+
+    @Throws(WeatherApiException.ApiAccessFailure::class)
+    private suspend fun <R> executeWebApiOperation(
+        operation: suspend () -> R
+    ): R {
+        return try {
+            operation()
+        } catch (e: UnknownHostException) {
+            // DNS解決に失敗した場合 (例: インターネット接続なし、ホスト名間違い)
+            throw WeatherApiException.ApiAccessFailure(e)
+        } catch (e: ConnectException) {
+            // サーバーへのTCP接続に失敗した場合 (例: サーバーダウン、ポートが開いていない)
+            throw WeatherApiException.ApiAccessFailure(e)
+        } catch (e: java.net.SocketTimeoutException) {
+            // 接続または読み取りタイムアウト
+            throw WeatherApiException.ApiAccessFailure(e)
+        } catch (e: SSLException) {
+            // SSL/TLS ハンドシェイクエラー
+            throw WeatherApiException.ApiAccessFailure(e)
+        } catch (e: IOException) {
+            // 上記以外の一般的なI/Oエラー (例: 予期せぬ接続切断など)
+            throw WeatherApiException.ApiAccessFailure(e)
         }
     }
 }
