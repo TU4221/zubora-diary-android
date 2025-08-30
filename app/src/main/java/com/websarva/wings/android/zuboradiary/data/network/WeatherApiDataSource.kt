@@ -24,7 +24,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         const val MAX_PAST_DAYS = 92 //過去天気情報取得可能最大日
     }
 
-    private val queryDiaryParameter = "weather_code"
+    private val queryDailyParameter = "weather_code"
     private val queryTimeZoneParameter = "Asia/Tokyo"
 
     @Throws(WeatherApiException::class)
@@ -101,7 +101,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
                 weatherApiService.getWeather(
                     latitude.toString(),
                     longitude.toString(),
-                    queryDiaryParameter,
+                    queryDailyParameter,
                     queryTimeZoneParameter,
                     "0",  /*today*/
                     "1" /*1日分*/
@@ -127,7 +127,7 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
                 weatherApiService.getWeather(
                     latitude.toString(),
                     longitude.toString(),
-                    queryDiaryParameter,
+                    queryDailyParameter,
                     queryTimeZoneParameter,
                     numPastDays.toString(),
                     "0" /*1日分(過去日から1日分取得する場合"0"を代入)*/
