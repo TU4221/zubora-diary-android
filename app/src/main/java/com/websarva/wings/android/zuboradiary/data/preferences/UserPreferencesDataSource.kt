@@ -222,19 +222,6 @@ internal class UserPreferencesDataSource @Inject constructor(
     }
 
     @Throws(UserPreferencesException.DataStoreAccessFailure::class)
-    private suspend fun executeDataStoreEditOperation(
-        operation: suspend (MutablePreferences) -> Unit
-    ): Preferences {
-        return try {
-            context.dataStore.edit { preferences ->
-                operation(preferences)
-            }
-        } catch (e: IOException) {
-            throw UserPreferencesException.DataStoreAccessFailure(e)
-        }
-    }
-
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveThemeColorPreference(value: ThemeColorPreference) {
         executeDataStoreEditOperation { preferences ->
             saveThemeColorPreferenceValue(preferences, value)
@@ -304,5 +291,18 @@ internal class UserPreferencesDataSource @Inject constructor(
         value: WeatherInfoFetchPreference
     ) {
         preferences[isEnabledWeatherInfoFetchPreferenceKey] = value.isEnabled
+    }
+
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
+    private suspend fun executeDataStoreEditOperation(
+        operation: suspend (MutablePreferences) -> Unit
+    ): Preferences {
+        return try {
+            context.dataStore.edit { preferences ->
+                operation(preferences)
+            }
+        } catch (e: IOException) {
+            throw UserPreferencesException.DataStoreAccessFailure(e)
+        }
     }
 }
