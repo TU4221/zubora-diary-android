@@ -12,19 +12,19 @@ internal fun WeatherApiData.toDomainModel(): Weather {
 private fun toWeatherInfo(date: WeatherApiData, logTag: String): Weather {
     val daily = date.daily
     Log.d(logTag, "toWeatherInfo()_latitude = ${date.latitude}, longitude = ${date.longitude}")
-    if (daily.times.isNotEmpty()
-        && daily.weatherCodes.isNotEmpty()
-        && daily.times.size == daily.weatherCodes.size) {
-        for (i in  0 ..< daily.times.size) {
+    if (daily.timeList.isNotEmpty()
+        && daily.weatherCodeList.isNotEmpty()
+        && daily.timeList.size == daily.weatherCodeList.size) {
+        for (i in  0 ..< daily.timeList.size) {
             Log.d(
                 logTag,
-                "toWeatherInfo()_time = " + daily.times[i] +
-                        ", weatherCode = " + daily.weatherCodes[i]
+                "toWeatherInfo()_time = " + daily.timeList[i] +
+                        ", weatherCode = " + daily.weatherCodeList[i]
             )
         }
     }
 
-    val weatherCodes = daily.weatherCodes
+    val weatherCodes = daily.weatherCodeList
     val weatherCode = weatherCodes[0]
     return convertWeathers(weatherCode, logTag)
 }

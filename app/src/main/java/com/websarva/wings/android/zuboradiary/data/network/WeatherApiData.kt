@@ -16,26 +16,8 @@ internal data class WeatherApiData @Suppress("unused") constructor(
     // MEMO:constructorは直接使用されていないがRetrofit2(Moshi)にてインスタンス化している為、@Suppressで警告回避。
     data class WeatherApiResponseDairy @Suppress("unused") constructor(
         @Json(name = "time")
-        val times: Array<String>,
+        val timeList: List<String>,
         @Json(name = "weather_code")
-        val weatherCodes: IntArray
-    ) {
-        override fun equals(other: Any?): Boolean {
-            if (this === other) return true
-            if (javaClass != other?.javaClass) return false
-
-            other as WeatherApiResponseDairy
-
-            if (!times.contentEquals(other.times)) return false
-            if (!weatherCodes.contentEquals(other.weatherCodes)) return false
-
-            return true
-        }
-
-        override fun hashCode(): Int {
-            var result = times.contentHashCode()
-            result = 31 * result + weatherCodes.contentHashCode()
-            return result
-        }
-    }
+        val weatherCodeList: List<Int>
+    )
 }
