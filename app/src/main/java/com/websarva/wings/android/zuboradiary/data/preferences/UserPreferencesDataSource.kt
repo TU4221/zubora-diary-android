@@ -22,11 +22,29 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
 
+/**
+ * [Context] の拡張プロパティとして、
+ * アプリケーションのユーザー設定[Preferences]を格納する [DataStore] インスタンスを提供する。
+ *
+ * このDataStoreは "UserPreferences" という名前で識別される。
+ */
 // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
 //      その為、@Suppress("RedundantSuppression")で警告回避。
 @Suppress( "unused", "RedundantSuppression") //MEMO:警告対策。(初期化してない為、Unusedの警告が表示される)
 internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "UserPreferences")
 
+/**
+ * ユーザー設定 (Preferences DataStore) へのアクセスを提供するデータソースクラス。
+ *
+ * このクラスは、テーマカラー、カレンダー設定、通知設定など、アプリケーション全体のユーザー設定の
+ * 読み書きを担当する。各設定項目は、対応する [UserPreference] を実装したデータクラスとして扱う。
+ *
+ * 設定の読み込みはFlowとして提供し、変更をリアクティブに監視できる。
+ * 設定の書き込みはsuspend関数として提供。
+ *
+ * @property context アプリケーションコンテキスト。DataStoreインスタンスの取得に使用。
+ * @property appScope アプリケーションスコープのコルーチンスコープ。Flowの共有などに使用。
+ */
 internal class UserPreferencesDataSource @Inject constructor(
     private val context: Context,
     @ApplicationScope private val appScope: CoroutineScope
@@ -51,6 +69,14 @@ internal class UserPreferencesDataSource @Inject constructor(
     private val isEnabledWeatherInfoFetchPreferenceKey =
         booleanPreferencesKey("is_enabled_weather_info_fetch")
 
+    /**
+     * DataStoreから全てのユーザー設定を読み込み、その結果を[UserPreferencesLoadResult]として
+     * [kotlinx.coroutines.flow.StateFlow]で提供する内部Flow。
+     *
+     * このFlowはアプリケーションスコープでEagerlyに開始され、最新の設定状態を保持する。
+     * DataStoreアクセス時に[IOException]が発生した場合は、[UserPreferencesLoadResult.Failure]をemitする。
+     * それ以外の例外は再スローされる。
+     */
     private val userPreferencesFlow =
         context.dataStore.data
             .map { preferences ->
@@ -73,8 +99,16 @@ internal class UserPreferencesDataSource @Inject constructor(
                 appScope,
                 SharingStarted.Eagerly,
                 null
-            ).filterNotNull()
+            ).filterNotNull() // 初期値nullを除外
 
+    /**
+     * テーマカラー設定 ([ThemeColorPreference]) をFlowとして読み込む。
+     *
+     * データが存在しない場合は [UserPreferenceFlowResult.Failure] に
+     * [UserPreferencesException.DataNotFound] を設定して返す。
+     *
+     * @return テーマカラー設定の読み込み結果を通知するFlow。
+     */
     fun loadThemeColorPreference(): Flow<UserPreferenceFlowResult<ThemeColorPreference>> {
         return userPreferencesFlow.map { result ->
             when (result) {
@@ -95,11 +129,25 @@ internal class UserPreferencesDataSource @Inject constructor(
         }
     }
 
+    /**
+     * [Preferences] オブジェクトから [ThemeColorPreference] を生成する。
+     *
+     * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
+     * @return 生成された [ThemeColorPreference]、またはデータが存在しない場合はnull。
+     */
     private fun createThemeColorPreference(preferences: Preferences): ThemeColorPreference? {
         val themeColorNumber = preferences[themeColorPreferenceKey] ?: return null
         return ThemeColorPreference(themeColorNumber)
     }
 
+    /**
+     * カレンダーの開始曜日設定 ([CalendarStartDayOfWeekPreference]) をFlowとして読み込む。
+     *
+     * データが存在しない場合は [UserPreferenceFlowResult.Failure] に
+     * [UserPreferencesException.DataNotFound] を設定して返す。
+     *
+     * @return カレンダー開始曜日設定の読み込み結果を通知するFlow。
+     */
     fun loadCalendarStartDayOfWeekPreference():
             Flow<UserPreferenceFlowResult<CalendarStartDayOfWeekPreference>> {
         return userPreferencesFlow.map { result ->
@@ -123,6 +171,12 @@ internal class UserPreferencesDataSource @Inject constructor(
         }
     }
 
+    /**
+     * [Preferences] オブジェクトから [CalendarStartDayOfWeekPreference] を生成する。
+     *
+     * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
+     * @return 生成された [CalendarStartDayOfWeekPreference]、またはデータが存在しない場合はnull。
+     */
     private fun createCalendarStartDayOfWeekPreference(
         preferences: Preferences
     ): CalendarStartDayOfWeekPreference? {
@@ -131,6 +185,14 @@ internal class UserPreferencesDataSource @Inject constructor(
         return CalendarStartDayOfWeekPreference(dayOfWeekNumber)
     }
 
+    /**
+     * リマインダー通知設定 ([ReminderNotificationPreference]) をFlowとして読み込む。
+
+     * データが存在しない場合は [UserPreferenceFlowResult.Failure] に
+     * [UserPreferencesException.DataNotFound] を設定して返す。
+     *
+     * @return リマインダー通知設定の読み込み結果を通知するFlow。
+     */
     fun loadReminderNotificationPreference():
             Flow<UserPreferenceFlowResult<ReminderNotificationPreference>> {
         return userPreferencesFlow.map { result ->
@@ -154,6 +216,12 @@ internal class UserPreferencesDataSource @Inject constructor(
         }
     }
 
+    /**
+     * [Preferences] オブジェクトから [ReminderNotificationPreference] を生成する。
+     *
+     * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
+     * @return 生成された [ReminderNotificationPreference]、またはデータが存在しない場合はnull。
+     */
     private fun createReminderNotificationPreference(
         preferences: Preferences
     ): ReminderNotificationPreference? {
@@ -164,6 +232,14 @@ internal class UserPreferencesDataSource @Inject constructor(
         return ReminderNotificationPreference(isEnabled, notificationTimeString)
     }
 
+    /**
+     * パスコードロック設定 ([PasscodeLockPreference]) をFlowとして読み込む。
+     *
+     * データが存在しない場合は [UserPreferenceFlowResult.Failure] に
+     * [UserPreferencesException.DataNotFound] を設定して返す。
+     *
+     * @return パスコードロック設定の読み込み結果を通知するFlow。
+     */
     fun loadPasscodeLockPreference():
             Flow<UserPreferenceFlowResult<PasscodeLockPreference>> {
         return userPreferencesFlow.map { result ->
@@ -187,12 +263,26 @@ internal class UserPreferencesDataSource @Inject constructor(
         }
     }
 
+    /**
+     * [Preferences] オブジェクトから [PasscodeLockPreference] を生成する。
+     *
+     * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
+     * @return 生成された [PasscodeLockPreference]、またはデータが存在しない場合はnull。
+     */
     private fun createPasscodeLockPreference(preferences: Preferences): PasscodeLockPreference? {
         val isEnabled = preferences[isEnabledPasscodeLockPreferenceKey] ?: return null
         val passCode = preferences[passcodePreferenceKey] ?: return null
         return PasscodeLockPreference(isEnabled, passCode)
     }
 
+    /**
+     * 天気情報取得設定 ([WeatherInfoFetchPreference]) をFlowとして読み込む。
+     *
+     * データが存在しない場合は [UserPreferenceFlowResult.Failure] に
+     * [UserPreferencesException.DataNotFound] を設定して返す。
+     *
+     * @return 天気情報取得設定の読み込み結果を通知するFlow。
+     */
     fun loadWeatherInfoFetchPreference():
             Flow<UserPreferenceFlowResult<WeatherInfoFetchPreference>> {
         return userPreferencesFlow.map { result ->
@@ -214,6 +304,12 @@ internal class UserPreferencesDataSource @Inject constructor(
         }
     }
 
+    /**
+     * [Preferences] オブジェクトから [WeatherInfoFetchPreference] を生成する。
+     *
+     * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
+     * @return 生成された [WeatherInfoFetchPreference]、またはデータが存在しない場合はnull。
+     */
     private fun createWeatherInfoFetchPreference(
         preferences: Preferences
     ): WeatherInfoFetchPreference? {
@@ -221,13 +317,24 @@ internal class UserPreferencesDataSource @Inject constructor(
         return WeatherInfoFetchPreference(isEnabled)
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
+    /**
+     * テーマカラー設定 ([ThemeColorPreference]) をDataStoreに保存する。
+     *
+     * @param value 保存するテーマカラー設定。
+     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     */
     suspend fun saveThemeColorPreference(value: ThemeColorPreference) {
         executeDataStoreEditOperation { preferences ->
             saveThemeColorPreferenceValue(preferences, value)
         }
     }
 
+    /**
+     * [MutablePreferences] にテーマカラー設定値を書き込む。
+     *
+     * @param preferences 書き込み先のMutablePreferences。
+     * @param value 書き込むテーマカラー設定。
+     */
     private fun saveThemeColorPreferenceValue(
         preferences: MutablePreferences,
         value: ThemeColorPreference
@@ -235,13 +342,24 @@ internal class UserPreferencesDataSource @Inject constructor(
         preferences[themeColorPreferenceKey] = value.themeColorNumber
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
+    /**
+     * カレンダーの開始曜日設定 ([CalendarStartDayOfWeekPreference]) をDataStoreに保存する。
+     *
+     * @param value 保存するカレンダー開始曜日設定。
+     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     */
     suspend fun saveCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
         executeDataStoreEditOperation { preferences ->
             saveCalendarStartDayOfWeekPreferenceValue(preferences, value)
         }
     }
 
+    /**
+     * [MutablePreferences] にカレンダーの開始曜日設定値を書き込む。
+     *
+     * @param preferences 書き込み先のMutablePreferences。
+     * @param value 書き込むカレンダー開始曜日設定。
+     */
     private fun saveCalendarStartDayOfWeekPreferenceValue(
         preferences: MutablePreferences,
         value: CalendarStartDayOfWeekPreference
@@ -249,13 +367,24 @@ internal class UserPreferencesDataSource @Inject constructor(
         preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
+    /**
+     * リマインダー通知設定 ([ReminderNotificationPreference]) をDataStoreに保存する。
+     *
+     * @param value 保存するリマインダー通知設定。
+     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     */
     suspend fun saveReminderNotificationPreference(value: ReminderNotificationPreference) {
         executeDataStoreEditOperation { preferences ->
             saveReminderNotificationPreferenceValue(preferences, value)
         }
     }
 
+    /**
+     * [MutablePreferences] にリマインダー通知設定値を書き込む。
+     *
+     * @param preferences 書き込み先のMutablePreferences。
+     * @param value 書き込むリマインダー通知設定。
+     */
     private fun saveReminderNotificationPreferenceValue(
         preferences: MutablePreferences,
         value: ReminderNotificationPreference
@@ -264,13 +393,24 @@ internal class UserPreferencesDataSource @Inject constructor(
         preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
+    /**
+     * パスコードロック設定 ([PasscodeLockPreference]) をDataStoreに保存する。
+     *
+     * @param value 保存するパスコードロック設定。
+     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     */
     suspend fun savePasscodeLockPreference(value: PasscodeLockPreference) {
         executeDataStoreEditOperation { preferences ->
             savePasscodeLockPreferenceValue(preferences, value)
         }
     }
 
+    /**
+     * [MutablePreferences] にパスコードロック設定値を書き込む。
+     *
+     * @param preferences 書き込み先のMutablePreferences。
+     * @param value 書き込むパスコードロック設定。
+     */
     private fun savePasscodeLockPreferenceValue(
         preferences: MutablePreferences,
         value: PasscodeLockPreference
@@ -279,13 +419,24 @@ internal class UserPreferencesDataSource @Inject constructor(
         preferences[passcodePreferenceKey] = value.passcode
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
+    /**
+     * 天気情報取得設定 ([WeatherInfoFetchPreference]) をDataStoreに保存する。
+     *
+     * @param value 保存する天気情報取得設定。
+     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     */
     suspend fun saveWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
         executeDataStoreEditOperation { preferences ->
             saveWeatherInfoFetchPreferenceValue(preferences, value)
         }
     }
 
+    /**
+     * [MutablePreferences] に天気情報取得設定値を書き込む。
+     *
+     * @param preferences 書き込み先のMutablePreferences。
+     * @param value 書き込む天気情報取得設定。
+     */
     private fun saveWeatherInfoFetchPreferenceValue(
         preferences: MutablePreferences,
         value: WeatherInfoFetchPreference
@@ -293,7 +444,17 @@ internal class UserPreferencesDataSource @Inject constructor(
         preferences[isEnabledWeatherInfoFetchPreferenceKey] = value.isEnabled
     }
 
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
+    /**
+     * DataStoreの編集操作を実行するための共通ヘルパー関数。
+     *
+     * 指定された [operation] を [DataStore.edit] ブロック内で実行する。
+     * [IOException] が発生した場合は、それをキャッチし、
+     * [UserPreferencesException.DataStoreAccessFailure] としてラップして再スローする。
+     *
+     * @param operation [MutablePreferences] を引数に取り、DataStoreへの書き込み処理を行うsuspend関数。
+     * @return DataStoreの編集操作後の [Preferences] オブジェクト。
+     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへのアクセスに失敗した場合。
+     */
     private suspend fun executeDataStoreEditOperation(
         operation: suspend (MutablePreferences) -> Unit
     ): Preferences {
