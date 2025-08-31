@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.di.data
+package com.websarva.wings.android.zuboradiary.di
 
 import dagger.Module
 import dagger.Provides

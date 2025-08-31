@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.di.data
 
 import android.content.Context
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
+import com.websarva.wings.android.zuboradiary.di.ApplicationScope
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
