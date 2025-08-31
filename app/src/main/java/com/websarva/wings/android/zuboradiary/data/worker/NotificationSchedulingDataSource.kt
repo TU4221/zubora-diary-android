@@ -9,6 +9,13 @@ import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
+/**
+ * [WorkManager] を使用して通知のスケジュール登録とキャンセルを行うデータソースクラス。
+ *
+ * [ReminderNotificationWorker] の定期実行を管理する。
+ *
+ * @property workManager WorkManagerのインスタンス。
+ */
 internal class NotificationSchedulingDataSource(private val workManager: WorkManager) {
 
     private val reminderNotificationWorkTag = "ReminderNotification"
@@ -16,6 +23,16 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
 
     private val logTag = createLogTag()
 
+    /**
+     * WorkManagerの操作を安全に実行するための共通ヘルパー関数。
+     *
+     * 指定された [operation] を実行し、[IllegalStateException] が発生した場合は
+     * [WorkProfileAccessFailureException] としてラップして再スローする。
+     * これは、WorkManagerが未初期化、または内部状態が不正な場合に発生する。
+     *
+     * @param operation WorkManagerに対する操作を行う関数。
+     * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
+     */
     @Throws(WorkProfileAccessFailureException::class)
     private fun executeWorkOperation(
         operation: () -> Unit
@@ -28,6 +45,14 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
         }
     }
 
+    /**
+     * リマインダー通知ワーカー ([ReminderNotificationWorker]) を指定された時刻に毎日実行するようにスケジュール登録する。
+     *
+     * 既存の同じ名前のワーカーが存在する場合は、キャンセルしてから新しいワーカーを登録する
+     *
+     * @param settingTime 通知を毎日表示する時刻。
+     * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
+     */
     @Throws(WorkProfileAccessFailureException::class)
     fun registerReminderNotificationWorker(settingTime: LocalTime) {
         cancelReminderNotificationWorker()
@@ -53,6 +78,16 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
         }
     }
 
+    /**
+     * 指定された開始時刻と終了時刻の間の秒数を計算する。
+     *
+     * 終了時刻が開始時刻より前の場合は、翌日の同じ時刻までの秒数を計算する
+     * (例: 開始23:00, 終了01:00 の場合、2時間分の秒数を返す)。
+     *
+     * @param startTime 開始時刻。
+     * @param endTime 終了時刻。
+     * @return 開始時刻から終了時刻までの秒数。
+     */
     private fun calculationBetweenSeconds(startTime: LocalTime, endTime: LocalTime): Long {
         val betweenSeconds = ChronoUnit.SECONDS.between(startTime, endTime)
         if (betweenSeconds < 0) {
@@ -61,6 +96,11 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
         return betweenSeconds
     }
 
+    /**
+     * 現在スケジュールされているリマインダー通知ワーカーを全てキャンセルする。
+     *
+     * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
+     */
     @Throws(WorkProfileAccessFailureException::class)
     fun cancelReminderNotificationWorker() {
         executeWorkOperation {

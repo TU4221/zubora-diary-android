@@ -23,6 +23,20 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.time.LocalDate
 
+/**
+ * 日記の記入を促すリマインダー通知をスケジュール実行するためのワーカー。
+ *
+ * このワーカーは、ユーザーが設定した時刻に起動し、以下の条件を満たす場合に通知を表示する。
+ * - アプリがフォアグラウンドで実行されていない。
+ * - 当日の日記がまだ保存されていない。
+ * - 通知のパーミッションが付与されている (Android 13以降)。
+ *
+ * 通知をタップすると、日記一覧画面 ([R.id.navigation_diary_list_fragment]) に遷移する。
+ *
+ * @param context アプリケーションコンテキスト。
+ * @param workerParams ワーカーのパラメータ。
+ * @property doesDiaryExistUseCase 当日の日記が存在するかどうかを確認するためのユースケース。
+ */
 @HiltWorker
 internal class ReminderNotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
@@ -43,6 +57,11 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
         prepareNotificationManager()
     }
 
+    /**
+     * 通知チャネルを準備する。
+     * Android O (API 26) 以降では、通知を表示する前に通知チャネルを作成する必要がある。
+     * このメソッドは、リマインダー通知用のチャネルを作成し、設定する。
+     */
     private fun prepareNotificationManager() {
         val notificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -61,6 +80,13 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
         }
     }
 
+    /**
+     * ワーカーのメイン処理を実行する。
+     *
+     * アプリがフォアグラウンドでない、かつ当日の日記が未保存の場合にリマインダー通知を表示する。
+     *
+     * @return ワーカーの実行結果。
+     */
     override suspend fun doWork(): Result {
         val application = applicationContext as ZuboraDiaryApplication
         if (application.isAppInForeground) return Result.success()
@@ -69,6 +95,11 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
         return showHeadsUpNotification()
     }
 
+    /**
+     * 当日の日記が既に保存されているかどうかを確認する。
+     *
+     * @return 当日の日記が存在する場合はtrue、存在しないまたは確認に失敗した場合はfalse。
+     */
     private suspend fun existsSavedTodayDiary(): Boolean {
         return when (val result = doesDiaryExistUseCase(LocalDate.now())) {
             is UseCaseResult.Success -> result.value
@@ -76,6 +107,13 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
         }
     }
 
+    /**
+     * HeadsUp通知を表示する。
+     *
+     * 通知をタップすると、日記一覧画面に遷移するPendingIntentが設定される。
+     *
+     * @return 通知の表示に成功した場合は [Result.success]、パーミッションがない場合は [Result.failure]。
+     */
     @SuppressLint("MissingPermission")
     private fun showHeadsUpNotification(): Result {
         val isPermission =
