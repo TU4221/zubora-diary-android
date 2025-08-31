@@ -323,23 +323,11 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param value 保存するテーマカラー設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveThemeColorPreference(value: ThemeColorPreference) {
         executeDataStoreEditOperation { preferences ->
-            saveThemeColorPreferenceValue(preferences, value)
+            preferences[themeColorPreferenceKey] = value.themeColorNumber
         }
-    }
-
-    /**
-     * [MutablePreferences] にテーマカラー設定値を書き込む。
-     *
-     * @param preferences 書き込み先のMutablePreferences。
-     * @param value 書き込むテーマカラー設定。
-     */
-    private fun saveThemeColorPreferenceValue(
-        preferences: MutablePreferences,
-        value: ThemeColorPreference
-    ) {
-        preferences[themeColorPreferenceKey] = value.themeColorNumber
     }
 
     /**
@@ -348,23 +336,11 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param value 保存するカレンダー開始曜日設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
         executeDataStoreEditOperation { preferences ->
-            saveCalendarStartDayOfWeekPreferenceValue(preferences, value)
+            preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
         }
-    }
-
-    /**
-     * [MutablePreferences] にカレンダーの開始曜日設定値を書き込む。
-     *
-     * @param preferences 書き込み先のMutablePreferences。
-     * @param value 書き込むカレンダー開始曜日設定。
-     */
-    private fun saveCalendarStartDayOfWeekPreferenceValue(
-        preferences: MutablePreferences,
-        value: CalendarStartDayOfWeekPreference
-    ) {
-        preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
     }
 
     /**
@@ -373,24 +349,12 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param value 保存するリマインダー通知設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveReminderNotificationPreference(value: ReminderNotificationPreference) {
         executeDataStoreEditOperation { preferences ->
-            saveReminderNotificationPreferenceValue(preferences, value)
+            preferences[isEnabledReminderNotificationPreferenceKey] = value.isEnabled
+            preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
         }
-    }
-
-    /**
-     * [MutablePreferences] にリマインダー通知設定値を書き込む。
-     *
-     * @param preferences 書き込み先のMutablePreferences。
-     * @param value 書き込むリマインダー通知設定。
-     */
-    private fun saveReminderNotificationPreferenceValue(
-        preferences: MutablePreferences,
-        value: ReminderNotificationPreference
-    ) {
-        preferences[isEnabledReminderNotificationPreferenceKey] = value.isEnabled
-        preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
     }
 
     /**
@@ -399,24 +363,12 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param value 保存するパスコードロック設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun savePasscodeLockPreference(value: PasscodeLockPreference) {
         executeDataStoreEditOperation { preferences ->
-            savePasscodeLockPreferenceValue(preferences, value)
+            preferences[isEnabledPasscodeLockPreferenceKey] = value.isEnabled
+            preferences[passcodePreferenceKey] = value.passcode
         }
-    }
-
-    /**
-     * [MutablePreferences] にパスコードロック設定値を書き込む。
-     *
-     * @param preferences 書き込み先のMutablePreferences。
-     * @param value 書き込むパスコードロック設定。
-     */
-    private fun savePasscodeLockPreferenceValue(
-        preferences: MutablePreferences,
-        value: PasscodeLockPreference
-    ) {
-        preferences[isEnabledPasscodeLockPreferenceKey] = value.isEnabled
-        preferences[passcodePreferenceKey] = value.passcode
     }
 
     /**
@@ -425,23 +377,11 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param value 保存する天気情報取得設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
+    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
         executeDataStoreEditOperation { preferences ->
-            saveWeatherInfoFetchPreferenceValue(preferences, value)
+            preferences[isEnabledWeatherInfoFetchPreferenceKey] = value.isEnabled
         }
-    }
-
-    /**
-     * [MutablePreferences] に天気情報取得設定値を書き込む。
-     *
-     * @param preferences 書き込み先のMutablePreferences。
-     * @param value 書き込む天気情報取得設定。
-     */
-    private fun saveWeatherInfoFetchPreferenceValue(
-        preferences: MutablePreferences,
-        value: WeatherInfoFetchPreference
-    ) {
-        preferences[isEnabledWeatherInfoFetchPreferenceKey] = value.isEnabled
     }
 
     /**
@@ -453,7 +393,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param operation [MutablePreferences] を引数に取り、DataStoreへの書き込み処理を行うsuspend関数。
      * @return DataStoreの編集操作後の [Preferences] オブジェクト。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへのアクセスに失敗した場合。
+     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
     private suspend fun executeDataStoreEditOperation(
         operation: suspend (MutablePreferences) -> Unit
