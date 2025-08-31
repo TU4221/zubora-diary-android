@@ -24,28 +24,6 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
     private val logTag = createLogTag()
 
     /**
-     * WorkManagerの操作を安全に実行するための共通ヘルパー関数。
-     *
-     * 指定された [operation] を実行し、[IllegalStateException] が発生した場合は
-     * [WorkProfileAccessFailureException] としてラップして再スローする。
-     * これは、WorkManagerが未初期化、または内部状態が不正な場合に発生する。
-     *
-     * @param operation WorkManagerに対する操作を行う関数。
-     * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
-     */
-    @Throws(WorkProfileAccessFailureException::class)
-    private fun executeWorkOperation(
-        operation: () -> Unit
-    ) {
-        try {
-            operation()
-        } catch (e: IllegalStateException) {
-            // WorkManagerが未初期化、または内部状態が不正な場合に発生しうるためキャッチ
-            throw WorkProfileAccessFailureException(e)
-        }
-    }
-
-    /**
      * リマインダー通知ワーカー ([ReminderNotificationWorker]) を指定された時刻に毎日実行するようにスケジュール登録する。
      *
      * 既存の同じ名前のワーカーが存在する場合は、キャンセルしてから新しいワーカーを登録する
@@ -108,6 +86,28 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
                 cancelAllWorkByTag(reminderNotificationWorkTag)
                 cancelUniqueWork(reminderNotificationUniqueWorkName)
             }
+        }
+    }
+
+    /**
+     * WorkManagerの操作を安全に実行するための共通ヘルパー関数。
+     *
+     * 指定された [operation] を実行し、[IllegalStateException] が発生した場合は
+     * [WorkProfileAccessFailureException] としてラップして再スローする。
+     * これは、WorkManagerが未初期化、または内部状態が不正な場合に発生する。
+     *
+     * @param operation WorkManagerに対する操作を行う関数。
+     * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
+     */
+    @Throws(WorkProfileAccessFailureException::class)
+    private fun executeWorkOperation(
+        operation: () -> Unit
+    ) {
+        try {
+            operation()
+        } catch (e: IllegalStateException) {
+            // WorkManagerが未初期化、または内部状態が不正な場合に発生しうるためキャッチ
+            throw WorkProfileAccessFailureException(e)
         }
     }
 }
