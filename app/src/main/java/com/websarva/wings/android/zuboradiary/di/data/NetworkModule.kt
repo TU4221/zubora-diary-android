@@ -12,6 +12,16 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import javax.inject.Singleton
 
+/**
+ * ネットワーク通信関連の依存性を提供するHiltモジュール。
+ *
+ * このモジュールは、[SingletonComponent] にインストールされ、
+ * アプリケーション全体で共有されるシングルトンインスタンスを提供する。
+ *
+ * Retrofit関連の生成を担当する。
+ *
+ * 各インスタンスは、対応する `@Provides` アノテーションが付与されたメソッドによって生成される。
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 internal object NetworkModule {

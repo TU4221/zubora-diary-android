@@ -11,8 +11,16 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
-
-
+/**
+ * 設定関連の依存性を提供するHiltモジュール。
+ *
+ * このモジュールは、[SingletonComponent] にインストールされ、
+ * アプリケーション全体で共有されるシングルトンインスタンスを提供する。
+ *
+ * Preferences DataStore関連の生成を担当する。
+ *
+ * 各インスタンスは、対応する `@Provides` アノテーションが付与されたメソッドによって生成される。
+ */
 @Module
 @InstallIn(SingletonComponent::class)
 internal object PreferencesModule {
