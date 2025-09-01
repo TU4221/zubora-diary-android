@@ -41,7 +41,7 @@ import java.time.LocalDate
 internal class ReminderNotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val doesDiaryExistUseCase: DoesDiaryExistUseCase
+    private val doesDiaryExistUseCase: DoesDiaryExistUseCase //TODO:UseCaseを引数で受け取るのではなく、日記確認処理のラムダ関数を受け取るように変更する。
 ) : CoroutineWorker(context, workerParams) {
 
     private val logTag = createLogTag()
