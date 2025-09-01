@@ -35,4 +35,4 @@ internal data class RawWordSearchResultListItem(
     val item4Comment: String?,
     val item5Title: String?,
     val item5Comment: String?
-) // TODO:初期化ブロックでタイトルとコメントがペア(両方nullor非null)になっているか確認
+)
