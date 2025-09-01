@@ -14,8 +14,6 @@ internal data class DiaryDayList<T: DiaryDayListItem>(
     val itemList: List<T>
 ) {
 
-    val isNotEmpty get() = itemList.isNotEmpty()  // TODO:削除
-
     init {
         require(itemList.isNotEmpty()) { "空のDiaryDayListはインスタンス化できません。" }
     }
@@ -36,8 +34,6 @@ internal data class DiaryDayList<T: DiaryDayListItem>(
      * @return ２つのリストを結合した新しい [DiaryDayList]。
      */
     fun combineDiaryDayLists(additionList: DiaryDayList<T>): DiaryDayList<T> {
-        require(additionList.isNotEmpty)
-
         val resultItemList = itemList + additionList.itemList
         return DiaryDayList(resultItemList)
     }

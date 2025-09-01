@@ -27,7 +27,6 @@ internal fun DiaryDayList<DiaryDayListItem.WordSearchResult>.toDiaryYearMonthLis
 private fun <T: DiaryDayListItem> createDiaryYearMonthListItemList(
     diaryDayList: DiaryDayList<T>
 ): List<DiaryYearMonthListItem<T>> {
-    require(diaryDayList.isNotEmpty)
 
     var sortingDayItemList: MutableList<T> = ArrayList()
     val diaryYearMonthListItemList: MutableList<DiaryYearMonthListItem<T>> = ArrayList()
