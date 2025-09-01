@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
+import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -102,7 +103,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             LocalDateTime.now(),
             weather1.value,
             weather2.value,
-            condition.value,
+            condition.value.toDomainModel(),
             title.value.trim(),
             items[0].title.value?.trim()
                 ?: throw IllegalStateException("項目1タイトルなし(null)"),

@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.FetchWeatherInfoUseCaseException
-import com.websarva.wings.android.zuboradiary.domain.model.Condition
+import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
@@ -414,7 +414,7 @@ internal class DiaryEditViewModel @Inject constructor(
         updateWeather2(weather)
     }
 
-    fun onConditionInputFieldItemClick(condition: Condition) {
+    fun onConditionInputFieldItemClick(condition: ConditionUi) {
         updateCondition(condition)
     }
 
@@ -1099,7 +1099,7 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.weather2.value = weather
     }
 
-    private fun updateCondition(condition: Condition) {
+    private fun updateCondition(condition: ConditionUi) {
         diaryStateFlow.condition.value = condition
     }
 
@@ -1160,8 +1160,8 @@ internal class DiaryEditViewModel @Inject constructor(
                     updateWeather1(Weather.of(weather1Int))
                     val weather2Int = Random.nextInt(1, Weather.entries.size)
                     updateWeather2(Weather.of(weather2Int))
-                    val conditionInt = Random.nextInt(1, Condition.entries.size)
-                    updateCondition(Condition.of(conditionInt))
+                    val conditionInt = Random.nextInt(1, ConditionUi.entries.size)
+                    updateCondition(ConditionUi.of(conditionInt))
                     val title = generateRandomAlphanumericString(15)
                     updateTitle(title)
                     val numItems = Random.nextInt(ItemNumber.MIN_NUMBER, ItemNumber.MAX_NUMBER + 1)

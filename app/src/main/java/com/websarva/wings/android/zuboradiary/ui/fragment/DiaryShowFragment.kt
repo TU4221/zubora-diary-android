@@ -9,7 +9,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
-import com.websarva.wings.android.zuboradiary.domain.model.Condition
+import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
@@ -179,7 +179,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
     private fun setUpConditionLayout() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.condition
-                .collectLatest { value: Condition ->
+                .collectLatest { value: ConditionUi ->
                     DiaryConditionTextUpdater()
                         .update(
                             requireContext(),

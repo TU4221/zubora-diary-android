@@ -1,10 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import android.net.Uri
-import com.websarva.wings.android.zuboradiary.domain.model.Condition
+import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -27,7 +28,7 @@ internal open class DiaryStateFlow {
     open val weather1 = MutableStateFlow(initialWeather)
     open val weather2 = MutableStateFlow(initialWeather)
 
-    protected val initialCondition = initialDiary.condition
+    protected val initialCondition = initialDiary.condition.toUiModel()
     open val condition = MutableStateFlow(initialCondition)
 
     protected val initialTitle = initialDiary.title
@@ -77,7 +78,7 @@ internal open class DiaryStateFlow {
             updateDate(date)
             updateWeather1(weather1)
             updateWeather2(weather2)
-            updateCondition(condition)
+            updateCondition(condition.toUiModel())
             updateTitle(title)
 
             updateItem(ItemNumber(1), item1Title, item1Comment)
@@ -114,7 +115,7 @@ internal open class DiaryStateFlow {
         this.weather2.value = weather
     }
 
-    private fun updateCondition(condition: Condition) {
+    private fun updateCondition(condition: ConditionUi) {
         this.condition.value = condition
     }
 

@@ -20,7 +20,7 @@ import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.domain.model.Condition
+import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
@@ -440,13 +440,13 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 requireNotNull(parent)
                 val arrayAdapter = parent.adapter as ArrayAdapter<*>
                 val conditionString = arrayAdapter.getItem(position) as String
-                val condition = Condition.of(requireContext(), conditionString)
+                val condition = ConditionUi.of(requireContext(), conditionString)
                 mainViewModel.onConditionInputFieldItemClick(condition)
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.condition
-                .collectLatest { value: Condition ->
+                .collectLatest { value: ConditionUi ->
                     val strCondition = value.toString(requireContext())
                     binding.autoCompleteTextCondition.setText(strCondition, false)
                 }
