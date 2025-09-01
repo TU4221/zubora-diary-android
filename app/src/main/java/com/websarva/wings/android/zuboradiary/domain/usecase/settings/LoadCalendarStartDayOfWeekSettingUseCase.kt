@@ -40,7 +40,7 @@ internal class LoadCalendarStartDayOfWeekSettingUseCase(
                                 }
                                 is UserSettingsLoadException.DataNotFound -> {
                                     UserSettingResult.Success(
-                                        CalendarStartDayOfWeekSetting() // TODO:初期値defaultSettingValue代入
+                                        defaultSettingValue
                                     )
                                 }
                             }
