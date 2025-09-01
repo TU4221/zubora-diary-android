@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet
 
 import android.view.View
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -24,7 +24,7 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
     private fun setResultSelectedThemeColor(
         pickerValue: Int,
     ) {
-        val selectedThemeColor = ThemeColor.entries[pickerValue]
+        val selectedThemeColor = ThemeColorUi.entries[pickerValue]
 
         setResult(KEY_RESULT, DialogResult.Positive(selectedThemeColor))
     }
@@ -38,7 +38,7 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
     }
 
     override fun setUpNumberPickers() {
-        val maxNumThemeColors = ThemeColor.entries.size
+        val maxNumThemeColors = ThemeColorUi.entries.size
         binding.numberPickerFirst.maxValue = maxNumThemeColors - 1
         binding.numberPickerFirst.minValue = 0
         setUpInitialValue()
@@ -54,9 +54,9 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
     }
 
     private fun setUpDisplayedValues() {
-        val maxNumThemeColors = ThemeColor.entries.size
+        val maxNumThemeColors = ThemeColorUi.entries.size
         val themeColorList = arrayOfNulls<String>(maxNumThemeColors)
-        for (item in ThemeColor.entries) {
+        for (item in ThemeColorUi.entries) {
             val ordinal = item.ordinal
             themeColorList[ordinal] = item.toSting(requireContext())
         }

@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.exception.settings
 
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 
 /**
  * テーマカラー設定の更新処理中に予期せぬエラーが発生した場合にスローされる例外。

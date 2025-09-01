@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback
@@ -21,7 +21,7 @@ internal class DiaryDayListAdapter
     : LeftSwipeBackgroundButtonListBaseAdapter<DiaryDayListItemUi.Standard, DiaryDayListViewHolder> {
     constructor(
         recyclerView: SwipeRecyclerView,
-        themeColor: ThemeColor
+        themeColor: ThemeColorUi
     ): super(
         recyclerView,
         themeColor,
@@ -30,7 +30,7 @@ internal class DiaryDayListAdapter
 
     constructor(
         recyclerView: SwipeRecyclerView,
-        themeColor: ThemeColor,
+        themeColor: ThemeColorUi,
         leftSwipeBackgroundButtonSimpleCallback: LeftSwipeBackgroundButtonSimpleCallback
     ): super(
         recyclerView,
@@ -93,7 +93,7 @@ internal class DiaryDayListAdapter
 
     class DiaryDayListViewHolder(
         val binding: RowDiaryDayListBinding,
-        val themeColor: ThemeColor
+        val themeColor: ThemeColorUi
     ) : LeftSwipeViewHolder<DiaryDayListItemUi.Standard>(binding) {
 
         override val foregroundView

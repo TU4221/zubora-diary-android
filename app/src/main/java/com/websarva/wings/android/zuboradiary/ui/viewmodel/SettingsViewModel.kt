@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
@@ -26,6 +26,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveRemind
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
+import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.SettingsAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -123,7 +125,7 @@ internal class SettingsViewModel @Inject constructor(
 
     // MEMO:StateFlow型設定値変数の値はデータソースからの値のみを代入したいので、
     //      代入されるまでの間(初回設定値読込中)はnullとする。
-    lateinit var themeColor: StateFlow<ThemeColor?>
+    lateinit var themeColor: StateFlow<ThemeColorUi?>
         private set
 
     lateinit var calendarStartDayOfWeek: StateFlow<DayOfWeek?>
@@ -208,7 +210,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun setUpThemeColorSettingValue() {
-        val initialValue = handle.get<ThemeColor>(SAVED_THEME_COLOR_STATE_KEY)
+        val initialValue = handle.get<ThemeColorUi>(SAVED_THEME_COLOR_STATE_KEY)
         themeColor =
             loadThemeColorSettingUseCase()
                 .value
@@ -216,14 +218,14 @@ internal class SettingsViewModel @Inject constructor(
                     when (it) {
                         is UserSettingResult.Success -> {
                             onUserSettingsFetchSuccess()
-                            it.setting.themeColor
+                            it.setting.themeColor.toUiModel()
                         }
                         is UserSettingResult.Failure -> {
                             onUserSettingsFetchFailure()
-                            it.fallbackSetting.themeColor
+                            it.fallbackSetting.themeColor.toUiModel()
                         }
                     }
-                }.onEach { value: ThemeColor ->
+                }.onEach { value: ThemeColorUi ->
                     handle[SAVED_THEME_COLOR_STATE_KEY] = value
                 }.stateInEagerly(initialValue)
     }
@@ -463,9 +465,9 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     // Fragmentからの結果受取処理
-    fun onThemeColorSettingDialogResultReceived(result: DialogResult<ThemeColor>) {
+    fun onThemeColorSettingDialogResultReceived(result: DialogResult<ThemeColorUi>) {
         when (result) {
-            is DialogResult.Positive<ThemeColor> -> {
+            is DialogResult.Positive<ThemeColorUi> -> {
                 handleThemeColorSettingDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
@@ -475,7 +477,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun handleThemeColorSettingDialogPositiveResult(themeColor: ThemeColor) {
+    private fun handleThemeColorSettingDialogPositiveResult(themeColor: ThemeColorUi) {
         viewModelScope.launch {
             saveThemeColor(themeColor)
         }
@@ -708,9 +710,9 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun saveThemeColor(value: ThemeColor) {
+    private suspend fun saveThemeColor(value: ThemeColorUi) {
         executeSettingUpdate(
-            { saveThemeColorSettingUseCase(value) }
+            { saveThemeColorSettingUseCase(value.toDomainModel()) }
         )
     }
 

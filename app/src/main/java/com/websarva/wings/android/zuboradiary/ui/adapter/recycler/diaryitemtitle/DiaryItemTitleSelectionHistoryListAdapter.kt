@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.DividerItemDecoration
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.RowItemTitleSelectionHistoryBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeSimpleCallback.LeftSwipeViewHolder
@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal class DiaryItemTitleSelectionHistoryListAdapter(
     recyclerView: SwipeRecyclerView,
-    themeColor: ThemeColor
+    themeColor: ThemeColorUi
 ) : LeftSwipeListBaseAdapter<DiaryItemTitleSelectionHistoryListItemUi, ItemTitleSelectionHistoryViewHolder>(
     recyclerView,
     themeColor,

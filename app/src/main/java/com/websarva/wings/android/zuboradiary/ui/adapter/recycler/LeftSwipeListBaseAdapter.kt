@@ -2,12 +2,12 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.recycler
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal abstract class LeftSwipeListBaseAdapter <T, VH : RecyclerView.ViewHolder> protected constructor(
     recyclerView: SwipeRecyclerView,
-    themeColor: ThemeColor,
+    themeColor: ThemeColorUi,
     diffUtilItemCallback: DiffUtil.ItemCallback<T>
 ) : ListBaseAdapter<T, VH>(recyclerView, themeColor, diffUtilItemCallback) {
 

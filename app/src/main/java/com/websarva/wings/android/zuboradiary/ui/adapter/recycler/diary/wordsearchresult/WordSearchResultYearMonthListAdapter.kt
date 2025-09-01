@@ -4,7 +4,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal abstract class WordSearchResultYearMonthListAdapter(
     recyclerView: RecyclerView,
-    themeColor: ThemeColor
+    themeColor: ThemeColorUi
 ) : DiaryYearMonthListBaseAdapter<DiaryDayListItemUi.WordSearchResult>(
     recyclerView,
     themeColor,

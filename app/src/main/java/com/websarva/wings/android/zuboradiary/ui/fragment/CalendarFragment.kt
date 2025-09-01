@@ -20,7 +20,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
@@ -184,7 +184,7 @@ class CalendarFragment :
     }
 
     // カレンダーBind設定
-    private fun configureCalendarBinders(daysOfWeek: List<DayOfWeek>, themeColor: ThemeColor) {
+    private fun configureCalendarBinders(daysOfWeek: List<DayOfWeek>, themeColor: ThemeColorUi) {
         binding.calendar.dayBinder =
             CalendarMonthDayBinder(
                 themeColor,
@@ -200,7 +200,7 @@ class CalendarFragment :
     }
 
     private class CalendarMonthDayBinder(
-        private val themeColor: ThemeColor,
+        private val themeColor: ThemeColorUi,
         private val onDateClick: (date: LocalDate) -> Unit,
         private val processDiaryExistCheck: (date: LocalDate) -> Unit
     ) : MonthDayBinder<DayViewContainer> {
@@ -311,7 +311,7 @@ class CalendarFragment :
 
     private class CalendarMonthHeaderFooterBinder(
         private val daysOfWeek: List<DayOfWeek>,
-        private val themeColor: ThemeColor,
+        private val themeColor: ThemeColorUi,
         private val headerDateFormat: String
     ) : MonthHeaderFooterBinder<MonthViewContainer> {
 

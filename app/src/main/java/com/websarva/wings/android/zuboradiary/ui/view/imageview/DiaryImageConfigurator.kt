@@ -6,14 +6,14 @@ import android.util.Log
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 internal class DiaryImageConfigurator {
 
     private val logTag = createLogTag()
 
-    fun setUpImageOnDiary(imageView: ImageView, uri: Uri?, themeColor: ThemeColor) {
+    fun setUpImageOnDiary(imageView: ImageView, uri: Uri?, themeColor: ThemeColorUi) {
         if (uri == null) {
             setUpDefaultIconOnDiary(imageView, themeColor)
             return
@@ -30,21 +30,21 @@ internal class DiaryImageConfigurator {
         }
     }
 
-    private fun setUpDefaultIconOnDiary(imageView: ImageView, themeColor: ThemeColor) {
+    private fun setUpDefaultIconOnDiary(imageView: ImageView, themeColor: ThemeColorUi) {
         val iconColorInt = getIconColorOnDiary(imageView.context, themeColor)
         setUpIcon(imageView, R.drawable.diary_edit_image_ic_photo_library_24px, iconColorInt)
     }
 
-    private fun setUpPermissionDenialIconOnDiary(imageView: ImageView, themeColor: ThemeColor) {
+    private fun setUpPermissionDenialIconOnDiary(imageView: ImageView, themeColor: ThemeColorUi) {
         val iconColorInt = getIconColorOnDiary(imageView.context, themeColor)
         setUpIcon(imageView, R.drawable.diary_image_ic_hide_image_24px, iconColorInt)
     }
 
-    private fun getIconColorOnDiary(context: Context, themeColor: ThemeColor): Int {
+    private fun getIconColorOnDiary(context: Context, themeColor: ThemeColorUi): Int {
         return themeColor.getOnSurfaceVariantColor(context.resources)
     }
 
-    fun setUpImageOnDiaryList(imageView: ImageView, uri: Uri?, themeColor: ThemeColor) {
+    fun setUpImageOnDiaryList(imageView: ImageView, uri: Uri?, themeColor: ThemeColorUi) {
         if (uri == null) {
             setUpDefaultIconOnDiaryList(imageView, themeColor)
             return
@@ -61,17 +61,17 @@ internal class DiaryImageConfigurator {
         }
     }
 
-    private fun setUpDefaultIconOnDiaryList(imageView: ImageView, themeColor: ThemeColor) {
+    private fun setUpDefaultIconOnDiaryList(imageView: ImageView, themeColor: ThemeColorUi) {
         val iconColorInt = getIconColorOnDiaryList(imageView.context, themeColor)
         setUpIcon(imageView, R.drawable.ic_image_24px, iconColorInt)
     }
 
-    private fun setUpPermissionDenialIconOnDiaryList(imageView: ImageView, themeColor: ThemeColor) {
+    private fun setUpPermissionDenialIconOnDiaryList(imageView: ImageView, themeColor: ThemeColorUi) {
         val iconColorInt = getIconColorOnDiaryList(imageView.context, themeColor)
         setUpIcon(imageView, R.drawable.ic_hide_image_24px, iconColorInt)
     }
 
-    private fun getIconColorOnDiaryList(context: Context, themeColor: ThemeColor): Int {
+    private fun getIconColorOnDiaryList(context: Context, themeColor: ThemeColorUi): Int {
         return themeColor.getOnSecondaryContainerColor(context.resources)
     }
 

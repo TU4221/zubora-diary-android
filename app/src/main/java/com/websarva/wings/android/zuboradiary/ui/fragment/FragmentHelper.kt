@@ -9,7 +9,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.squareup.leakcanary.core.BuildConfig
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
@@ -43,7 +43,7 @@ internal class FragmentHelper {
 
     fun createThemeColorInflater(
         inflater: LayoutInflater,
-        themeColor: ThemeColor
+        themeColor: ThemeColorUi
     ): LayoutInflater {
         return ThemeColorInflaterCreator().create(inflater, themeColor)
     }

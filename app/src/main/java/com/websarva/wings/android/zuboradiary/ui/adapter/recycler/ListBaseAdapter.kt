@@ -6,12 +6,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 
 internal abstract class ListBaseAdapter <T, VH : RecyclerView.ViewHolder> protected constructor(
     protected val recyclerView: RecyclerView,
-    protected val themeColor: ThemeColor,
+    protected val themeColor: ThemeColorUi,
     diffUtilItemCallback: DiffUtil.ItemCallback<T>
 ) : ListAdapter<T, VH>(diffUtilItemCallback) {
 

@@ -4,10 +4,10 @@ import android.os.Build
 import android.view.Window
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.DialogFragment
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 
-internal fun DialogFragment.enableEdgeToEdge(themeColor: ThemeColor) {
+internal fun DialogFragment.enableEdgeToEdge(themeColor: ThemeColorUi) {
     val window = dialog?.window ?: return
     setUpEdgeToEdge(window)
     setUpStatusBarAndNavigationBarIconColor(window, themeColor)
@@ -20,7 +20,7 @@ private fun setUpEdgeToEdge(window: Window) {
     }
 }
 
-private fun setUpStatusBarAndNavigationBarIconColor(window: Window, themeColor: ThemeColor) {
+private fun setUpStatusBarAndNavigationBarIconColor(window: Window, themeColor: ThemeColorUi) {
     val changer = ThemeColorChanger()
     changer.applyNavigationBarIconColor(window, themeColor)
 }

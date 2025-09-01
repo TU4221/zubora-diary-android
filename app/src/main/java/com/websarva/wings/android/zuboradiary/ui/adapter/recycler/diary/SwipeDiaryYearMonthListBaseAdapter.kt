@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary
 
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
@@ -13,7 +13,7 @@ internal abstract class SwipeDiaryYearMonthListBaseAdapter<
         CLIT : DiaryDayListItemUi
 > protected constructor(
     recyclerView: RecyclerView,
-    themeColor: ThemeColor,
+    themeColor: ThemeColorUi,
     diffUtilItemCallback: DiffUtilItemCallback<CLIT>
 ) : DiaryYearMonthListBaseAdapter<CLIT>(recyclerView, themeColor, diffUtilItemCallback) {
 

@@ -20,7 +20,7 @@ import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
@@ -76,7 +76,7 @@ class MainActivity : LoggingActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsViewModel.themeColor.filterNotNull()
-                    .collectLatest { value: ThemeColor ->
+                    .collectLatest { value: ThemeColorUi ->
                         if (isMainActivityLayoutInflated) return@collectLatest
                         setUpMainActivityBinding(value)
                         isMainActivityLayoutInflated = true
@@ -171,7 +171,7 @@ class MainActivity : LoggingActivity() {
         }
     }
 
-    private fun setUpMainActivityBinding(themeColor: ThemeColor) {
+    private fun setUpMainActivityBinding(themeColor: ThemeColorUi) {
         val themeColorInflater = ThemeColorInflaterCreator().create(layoutInflater, themeColor)
         _binding =
             ActivityMainBinding.inflate(themeColorInflater).apply {
@@ -243,14 +243,14 @@ class MainActivity : LoggingActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 settingsViewModel.themeColor.filterNotNull()
-                    .collectLatest { themeColor: ThemeColor ->
+                    .collectLatest { themeColor: ThemeColorUi ->
                         switchThemeColor(themeColor)
                     }
             }
         }
     }
 
-    private fun switchThemeColor(themeColor: ThemeColor) {
+    private fun switchThemeColor(themeColor: ThemeColorUi) {
         val changer = ThemeColorChanger()
         changer.applyStatusBarIconColor(window, themeColor)
         changer.applyNavigationBarIconColor(window, themeColor)

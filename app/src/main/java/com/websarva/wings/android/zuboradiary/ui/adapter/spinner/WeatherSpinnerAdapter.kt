@@ -4,12 +4,12 @@ import android.content.Context
 import android.widget.ArrayAdapter
 import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 
 internal class WeatherSpinnerAdapter(
     context: Context,
-    themeColor: ThemeColor,
+    themeColor: ThemeColorUi,
     vararg ignoreWeathers: WeatherUi
 ) : ArrayAdapter<String>(
     ContextThemeWrapper(context, themeColor.themeResId),

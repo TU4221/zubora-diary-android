@@ -10,7 +10,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.RowWordSearchResultListBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.ListBaseAdapter
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -23,7 +23,7 @@ import java.text.NumberFormat
 
 internal class WordSearchResultDayListAdapter(
     recyclerView: RecyclerView,
-    themeColor: ThemeColor
+    themeColor: ThemeColorUi
 ) : ListBaseAdapter<DiaryDayListItemUi.WordSearchResult, WordSearchResultDayViewHolder>(
     recyclerView,
     themeColor,
@@ -85,7 +85,7 @@ internal class WordSearchResultDayListAdapter(
 
         fun bind(
             item: DiaryDayListItemUi.WordSearchResult,
-            themeColor: ThemeColor,
+            themeColor: ThemeColorUi,
             onItemClick: (DiaryDayListItemUi.WordSearchResult) -> Unit,
         ) {
             val context = binding.root.context
@@ -110,17 +110,17 @@ internal class WordSearchResultDayListAdapter(
         }
 
         private fun DiaryDayListItemUi.WordSearchResult
-            .createTitleSpannableString(context: Context, themeColor: ThemeColor): SpannableString {
+            .createTitleSpannableString(context: Context, themeColor: ThemeColorUi): SpannableString {
             return toSpannableString(context, title, searchWord, themeColor)
         }
 
         private fun DiaryDayListItemUi.WordSearchResult
-            .createItemTitleSpannableString(context: Context, themeColor: ThemeColor): SpannableString {
+            .createItemTitleSpannableString(context: Context, themeColor: ThemeColorUi): SpannableString {
             return toSpannableString(context, itemTitle, searchWord, themeColor)
         }
 
         private fun DiaryDayListItemUi.WordSearchResult
-            .createItemCommentSpannableString(context: Context, themeColor: ThemeColor): SpannableString {
+            .createItemCommentSpannableString(context: Context, themeColor: ThemeColorUi): SpannableString {
             return toSpannableString(context, itemComment, searchWord, themeColor)
         }
 
@@ -129,7 +129,7 @@ internal class WordSearchResultDayListAdapter(
             context: Context,
             string: String,
             targetWord: String,
-            themeColor: ThemeColor
+            themeColor: ThemeColorUi
         ): SpannableString {
             val spannableString = SpannableString(string)
             var fromIndex = 0
