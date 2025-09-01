@@ -69,7 +69,7 @@ internal open class DiaryStateFlow {
     }
 
     fun getItemStateFlow(itemNumber: ItemNumber): DiaryItemStateFlow {
-        val arrayNumber = itemNumber.value - 1
+        val arrayNumber = itemNumber.value - ItemNumber.MIN_NUMBER
         return items[arrayNumber]
     }
 

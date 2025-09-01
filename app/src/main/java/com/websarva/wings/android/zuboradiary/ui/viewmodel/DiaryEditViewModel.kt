@@ -997,7 +997,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val numVisibleItems = numVisibleItems.requireValue()
 
         updateUiState(DiaryEditState.DeletingItem)
-        if (itemNumber.value == 1 && numVisibleItems == itemNumber.value) {
+        if (itemNumber.isMinNumber && itemNumber.value == numVisibleItems) {
             deleteItem(itemNumber)
         } else {
             emitUiEvent(

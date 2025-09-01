@@ -10,6 +10,11 @@ internal value class ItemNumber(val value: Int) : Serializable, Comparable<ItemN
         const val MAX_NUMBER: Int = 5
     }
 
+    val isMinNumber get() = value == MIN_NUMBER
+
+    val isMaxNumber get() = value == MAX_NUMBER
+
+
     init {
         require(value >= MIN_NUMBER)
         require(value <= MAX_NUMBER)

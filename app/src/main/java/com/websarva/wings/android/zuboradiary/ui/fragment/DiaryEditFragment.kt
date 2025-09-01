@@ -593,7 +593,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
 
         private fun isNextItemInvisibleState(): Boolean {
-            if (itemNumber.value == ItemNumber.MAX_NUMBER) return true
+            if (itemNumber.isMaxNumber) return true
             val nextItemNumber = itemNumber.inc()
             val motionLayout = processItemMotionLayoutSelection(nextItemNumber)
             return motionLayout.currentState == R.id.motion_scene_edit_diary_item_invisible_state
