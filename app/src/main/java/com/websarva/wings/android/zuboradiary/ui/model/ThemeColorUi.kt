@@ -13,7 +13,7 @@ import java.util.Arrays
 @Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
 internal enum class ThemeColorUi @Suppress("unused") constructor(
-    private val number: Int,
+    val number: Int,
     private val stringResId: Int
 ) {
 
@@ -28,12 +28,8 @@ internal enum class ThemeColorUi @Suppress("unused") constructor(
         @JvmStatic
         fun of(number: Int): ThemeColorUi {
             return Arrays.stream(entries.toTypedArray())
-                .filter { x: ThemeColorUi -> x.toNumber() == number }.findFirst().get()
+                .filter { x: ThemeColorUi -> x.number == number }.findFirst().get()
         }
-    }
-
-    fun toNumber(): Int {
-        return number
     }
 
     fun toSting(context: Context): String {

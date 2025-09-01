@@ -14,7 +14,7 @@ import java.util.Arrays
 @Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
 internal enum class Condition @Suppress("unused") constructor(
-    private val number: Int
+    val number: Int
 ) {
 
     /** 不明な状態。 */
@@ -50,16 +50,7 @@ internal enum class Condition @Suppress("unused") constructor(
          */
         fun of(number: Int): Condition {
             return Arrays.stream(entries.toTypedArray())
-                .filter { x: Condition -> x.toNumber() == number }.findFirst().get()
+                .filter { x: Condition -> x.number == number }.findFirst().get()
         }
-    }
-
-    /**
-     * この体調の状態を表す整数値を返す。
-     *
-     * @return 体調の整数値。
-     */
-    fun toNumber(): Int {
-        return number
     }
 }

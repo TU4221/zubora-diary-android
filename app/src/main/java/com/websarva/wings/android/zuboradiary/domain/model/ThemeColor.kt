@@ -14,7 +14,7 @@ import java.util.Arrays
 @Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
 internal enum class ThemeColor @Suppress("unused") constructor(
-    private val number: Int
+    val number: Int
 ) {
 
     /** 白色テーマ。 */
@@ -46,16 +46,7 @@ internal enum class ThemeColor @Suppress("unused") constructor(
         @JvmStatic
         fun of(number: Int): ThemeColor {
             return Arrays.stream(entries.toTypedArray())
-                .filter { x: ThemeColor -> x.toNumber() == number }.findFirst().get()
+                .filter { x: ThemeColor -> x.number == number }.findFirst().get()
         }
-    }
-
-    /**
-     * このテーマカラーを表す整数値を返す。
-     *
-     * @return テーマカラーの整数値。
-     */
-    fun toNumber(): Int {
-        return number
     }
 }

@@ -9,7 +9,7 @@ import java.util.Arrays
 @Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
 internal enum class ConditionUi @Suppress("unused") constructor(
-    private val number: Int,
+    val number: Int,
     private val stringResId: Int
 ) {
 
@@ -28,7 +28,7 @@ internal enum class ConditionUi @Suppress("unused") constructor(
     companion object {
         fun of(number: Int): ConditionUi {
             return Arrays.stream(entries.toTypedArray())
-                .filter { x: ConditionUi -> x.toNumber() == number }.findFirst().get()
+                .filter { x: ConditionUi -> x.number == number }.findFirst().get()
         }
 
         fun of(context: Context, strCondition: String): ConditionUi {
@@ -39,9 +39,5 @@ internal enum class ConditionUi @Suppress("unused") constructor(
 
     fun toString(context: Context): String {
         return context.getString(stringResId)
-    }
-
-    fun toNumber(): Int {
-        return number
     }
 }

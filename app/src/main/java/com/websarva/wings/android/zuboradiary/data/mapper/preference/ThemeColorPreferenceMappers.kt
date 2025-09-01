@@ -10,5 +10,5 @@ internal fun ThemeColorPreference.toDomainModel(): ThemeColorSetting {
 }
 
 internal fun ThemeColorSetting.toDataModel(): ThemeColorPreference {
-    return ThemeColorPreference(themeColor.toNumber())
+    return ThemeColorPreference(themeColor.number)
 }

@@ -14,7 +14,7 @@ import java.util.Arrays
 @Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
 internal enum class Weather @Suppress("unused") constructor(
-    private val number: Int
+    val number: Int
 ) {
 
     /** 不明な天気。 */
@@ -42,16 +42,7 @@ internal enum class Weather @Suppress("unused") constructor(
          */
         fun of(number: Int): Weather {
             return Arrays.stream(entries.toTypedArray())
-                .filter { x: Weather -> x.toNumber() == number }.findFirst().get()
+                .filter { x: Weather -> x.number == number }.findFirst().get()
         }
-    }
-
-    /**
-     * この天気の状態を表す整数値を返す。
-     *
-     * @return 天気の整数値。
-     */
-    fun toNumber(): Int {
-        return number
     }
 }

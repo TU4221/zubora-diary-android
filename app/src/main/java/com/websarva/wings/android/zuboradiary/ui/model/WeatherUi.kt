@@ -9,7 +9,7 @@ import java.util.Arrays
 @Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
 internal enum class WeatherUi @Suppress("unused") constructor(
-    private val number: Int,
+    val number: Int,
     private val stringResId: Int
 ) {
 
@@ -22,7 +22,7 @@ internal enum class WeatherUi @Suppress("unused") constructor(
     companion object {
         fun of(number: Int): WeatherUi {
             return Arrays.stream(entries.toTypedArray())
-                .filter { x: WeatherUi -> x.toNumber() == number }.findFirst().get()
+                .filter { x: WeatherUi -> x.number == number }.findFirst().get()
         }
 
         fun of(context: Context, strWeather: String): WeatherUi {
@@ -33,9 +33,5 @@ internal enum class WeatherUi @Suppress("unused") constructor(
 
     fun toString(context: Context): String {
         return context.getString(stringResId)
-    }
-
-    fun toNumber(): Int {
-        return number
     }
 }

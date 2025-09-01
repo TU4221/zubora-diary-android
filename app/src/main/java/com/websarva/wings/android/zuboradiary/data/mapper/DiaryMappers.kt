@@ -33,9 +33,9 @@ internal fun Diary.toDataModel(): DiaryEntity {
     return DiaryEntity(
         date.toString(),
         log.toString(),
-        weather1.toNumber(),
-        weather2.toNumber(),
-        condition.toNumber(),
+        weather1.number,
+        weather2.number,
+        condition.number,
         title,
         item1Title,
         item1Comment,
