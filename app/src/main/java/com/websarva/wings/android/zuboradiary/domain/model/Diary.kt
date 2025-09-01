@@ -5,6 +5,34 @@ import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+/**
+ * 日記を表すデータクラス。
+ *
+ * このクラスは、特定の日付の日記の内容（天気、体調、タイトル、項目、画像URIなど）を保持する。
+ *
+ * アイテムは最大5つまで設定でき、itemXTitle と itemXComment はペアでnullまたは非nullである必要がある。
+ * また、item(N)が設定されている場合、item(N-1)も設定されている必要がある。
+ *
+ * @property date 日記の日付。デフォルトは現在の日付。
+ * @property log 最終更新日時。デフォルトは現在のローカル日時。
+ * @property weather1 その日の天気（1つ目）。デフォルトは [Weather.UNKNOWN]。
+ * @property weather2 その日の天気（2つ目、任意）。デフォルトは [Weather.UNKNOWN]。
+ * @property condition その日の体調。デフォルトは [Condition.UNKNOWN]。
+ * @property title 日記のタイトル。デフォルトは空文字列。
+ * @property item1Title 1番目の日記項目のタイトル。デフォルトは空文字列。
+ * @property item1Comment 1番目の日記項目のコメント。デフォルトは空文字列。
+ * @property item2Title 2番目の日記項目のタイトル。null許容。
+ * @property item2Comment 2番目の日記項目のコメント。null許容。
+ * @property item3Title 3番目の日記項目のタイトル。null許容。
+ * @property item3Comment 3番目の日記項目のコメント。null許容。
+ * @property item4Title 4番目の日記項目のタイトル。null許容。
+ * @property item4Comment 4番目の日記項目のコメント。null許容。
+ * @property item5Title 5番目の日記項目のタイトル。null許容。
+ * @property item5Comment 5番目の日記項目のコメント。null許容。
+ * @property imageUriString 関連付けられた画像のURI文字列。null許容。
+ * @constructor 新しい [Diary] インスタンスを作成する。
+ * @throws IllegalArgumentException 日記項目のタイトルとコメントのnull整合性、または日記項目の順序整合性に違反する場合。
+ */
 @Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
 internal data class Diary(
     val date: LocalDate = LocalDate.now(),
@@ -44,7 +72,7 @@ internal data class Diary(
             if (currentTitle == null && currentComment == null) continue
             if (currentTitle == null) {
                 throw IllegalArgumentException(
-                    "item$currentItemNumber}Titleがnullの為、item${currentItemNumber}Commentもnullであるべきです。"
+                    "item${currentItemNumber}Titleがnullの為、item${currentItemNumber}Commentもnullであるべきです。"
                 )
             }
             if (currentComment == null) {
@@ -61,10 +89,10 @@ internal data class Diary(
     }
 
     /**
-     * Diaryオブジェクトの内容を比較します。
-     * `log` プロパティは比較対象から除外されます。
+     * Diaryオブジェクトの内容を比較する。
+     * `log` プロパティは比較対象から除外される。
      *
-     * @param other 比較対象のDiaryオブジェクト。nullの場合はfalseを返します。
+     * @param other 比較対象のDiaryオブジェクト。
      * @return `log` を除いた他の全てのプロパティが等しい場合はtrue、そうでない場合はfalse。
      */
     fun isContentEqualToIgnoringLog(other: Diary?): Boolean {

@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.model
 
 import java.io.Serializable
 
+// TODO:ValueClassに変更
 internal class ItemNumber(value: Int) : Serializable, Comparable<ItemNumber> {
 
     companion object {

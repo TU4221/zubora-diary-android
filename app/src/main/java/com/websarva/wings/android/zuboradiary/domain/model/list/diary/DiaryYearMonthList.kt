@@ -1,9 +1,26 @@
 package com.websarva.wings.android.zuboradiary.domain.model.list.diary
 
+/**
+ * 年月ごとの日記リストアイテムを保持する汎用的なリストクラス。
+ *
+ * このクラスは、[DiaryYearMonthListItem] を継承する任意の型のアイテムのリストをカプセル化する。
+ * リストの末尾が [DiaryYearMonthListItem.Diary] でないことを保証し、
+ * 基本、末尾は [DiaryYearMonthListItem.ProgressIndicator]となる。
+ * フッター(リスト最終アイテム)を「日記なし」メッセージに置き換える機能を提供する。
+ *
+ * @param T [DiaryDayListItem] を実装するアイテムの型。
+ * @property itemList [DiaryYearMonthListItem<T>] 型のアイテムのリスト。デフォルトは空のリスト。
+ * @throws IllegalArgumentException [itemList] が空でなく、かつ最後のアイテムが [DiaryYearMonthListItem.Diary] の場合。
+ */
 internal data class DiaryYearMonthList<T: DiaryDayListItem>(
     val itemList: List<DiaryYearMonthListItem<T>> = emptyList()
 ) {
 
+    /**
+     * リストにアイテムが1つ以上含まれているかどうかを示す。
+     *
+     * @return アイテムリストが空でない場合は `true`、空の場合は `false`。
+     */
     val isNotEmpty get() = itemList.isNotEmpty()
 
     init {
@@ -16,16 +33,33 @@ internal data class DiaryYearMonthList<T: DiaryDayListItem>(
         )
     }
 
+    /**
+     * アイテムリストの末尾にプログレスインジケータを追加した新しいリストを返す。
+     *
+     * @param itemList 元のアイテムリスト。
+     * @return 末尾に [DiaryYearMonthListItem.ProgressIndicator] が追加された新しいリスト。
+     */
     private fun addLastItemProgressIndicator(itemList: List<DiaryYearMonthListItem<T>>)
         : List<DiaryYearMonthListItem<T>> {
-        return itemList + DiaryYearMonthListItem.ProgressIndicator()
+        return itemList + DiaryYearMonthListItem.ProgressIndicator() // TODO:引数Dayのみとなるようにフィルター掛けた方が良い
     }
 
+    /**
+     * アイテムリストの末尾に「日記なし」メッセージアイテムを追加した新しいリストを返す。
+     *
+     * @param itemList 元のアイテムリスト。
+     * @return 末尾に [DiaryYearMonthListItem.NoDiaryMessage] が追加された新しいリスト。
+     */
     private fun addLastItemNoDiaryMessage(itemList: List<DiaryYearMonthListItem<T>>)
         : List<DiaryYearMonthListItem<T>> {
-        return itemList + DiaryYearMonthListItem.NoDiaryMessage()
+        return itemList + DiaryYearMonthListItem.NoDiaryMessage() // TODO:引数Dayのみとなるようにフィルター掛けた方が良い
     }
 
+    /**
+     * リストに含まれる日記の総数をカウントする。
+     *
+     * @return 日記の総数。
+     */
     fun countDiaries(): Int {
         var count = 0
         for (item in itemList) {
@@ -36,6 +70,16 @@ internal data class DiaryYearMonthList<T: DiaryDayListItem>(
         return count
     }
 
+    /**
+     * このリストと指定された別の [DiaryYearMonthList] を結合し、新しい [DiaryYearMonthList] を返す。
+     *
+     * 結合処理では、年月が同じアイテムがあれば、その中の日記リスト ([DiaryDayList]) を結合する。
+     * 結合後のリストの末尾にはプログレスインジケータが追加される。
+     *
+     * @param additionList このリストに結合する [DiaryYearMonthList]。空であってはならない。
+     * @return ２つのリストを結合し、末尾にプログレスインジケータが追加された新しい [DiaryYearMonthList]。
+     * @throws IllegalArgumentException [additionList] が空の場合。
+     */
     fun combineDiaryLists(
         additionList: DiaryYearMonthList<T>
     ): DiaryYearMonthList<T> {
@@ -77,6 +121,14 @@ internal data class DiaryYearMonthList<T: DiaryDayListItem>(
         return DiaryYearMonthList(addLastItemProgressIndicator(resultItemList))
     }
 
+    /**
+     * リストのフッター（通常はプログレスインジケータ）を「日記なし」メッセージに置き換えた新しい [DiaryYearMonthList] を返す。
+     *
+     * この操作は、リストが空でない場合にのみ有効。
+     *
+     * @return フッターが「日記なし」メッセージに置き換えられた新しい [DiaryYearMonthList]。
+     *         元のリストが空の場合は、元のリストをそのまま返す。
+     */
     fun replaceFooterWithNoDiaryMessage(): DiaryYearMonthList<T> {
         if (itemList.isEmpty()) return this
 
