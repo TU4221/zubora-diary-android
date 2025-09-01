@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
@@ -90,7 +90,7 @@ internal class SaveReminderNotificationSettingUseCase(
     @Throws(
         ReminderNotificationSettingUpdateFailureException::class,
         ReminderNotificationCancellationFailureException::class,
-        UserSettingsException::class
+        UserSettingsLoadException::class
     )
     private suspend fun saveReminderNotificationInvalid() {
         val backupSettingValue = fetchCurrentReminderNotificationSetting()
@@ -110,7 +110,7 @@ internal class SaveReminderNotificationSettingUseCase(
         }
     }
 
-    @Throws(UserSettingsException::class)
+    @Throws(UserSettingsLoadException::class)
     private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationSetting {
         return withContext(Dispatchers.IO) {
             loadReminderNotificationSettingUseCase().value

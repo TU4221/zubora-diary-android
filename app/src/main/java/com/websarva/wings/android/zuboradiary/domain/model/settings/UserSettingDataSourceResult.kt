@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
 
 /**
  * リポジトリから返される、ユーザー設定のデータ取得に関する直接的な結果。
@@ -16,6 +16,6 @@ internal sealed class UserSettingDataSourceResult<out T : UserSetting> {
      * データソースからの設定値取得に失敗したことを示す。
      */
     data class Failure<out T : UserSetting>(
-        val exception: UserSettingsException
+        val exception: UserSettingsLoadException
     ) : UserSettingDataSourceResult<T>()
 }

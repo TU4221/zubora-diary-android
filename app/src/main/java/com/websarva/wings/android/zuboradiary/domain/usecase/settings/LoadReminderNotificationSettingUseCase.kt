@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -32,13 +32,13 @@ internal class LoadReminderNotificationSettingUseCase(
                         is UserSettingDataSourceResult.Failure -> {
                             val defaultSettingValue = ReminderNotificationSetting.Disabled
                             when (result.exception) {
-                                is UserSettingsException.AccessFailure -> {
+                                is UserSettingsLoadException.AccessFailure -> {
                                     UserSettingResult.Failure(
                                         result.exception,
                                         defaultSettingValue
                                     )
                                 }
-                                is UserSettingsException.DataNotFound -> {
+                                is UserSettingsLoadException.DataNotFound -> {
                                     UserSettingResult.Success(
                                         defaultSettingValue
                                     )

@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
 
 /**
  * UseCaseによってビジネスルールが適用された後の、ユーザー設定に関する最終的な結果。
@@ -19,7 +19,7 @@ internal sealed class UserSettingResult<out T : UserSetting> {
      * そのエラーに対応するドメイン定義のフォールバック値が提供される。
      */
     data class Failure<out T : UserSetting>(
-        val exception: UserSettingsException,
+        val exception: UserSettingsLoadException,
         val fallbackSetting: T
     ) : UserSettingResult<T>()
 }

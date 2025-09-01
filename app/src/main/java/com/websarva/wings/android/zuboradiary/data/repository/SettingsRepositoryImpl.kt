@@ -15,7 +15,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCode
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import kotlinx.coroutines.Dispatchers
@@ -202,13 +202,13 @@ internal class SettingsRepositoryImpl(
 
     private fun mapPreferenceExceptionToSettingsException(
         preferenceException: UserPreferencesException
-    ): UserSettingsException {
+    ): UserSettingsLoadException {
         return when (preferenceException) {
             is UserPreferencesException.DataStoreAccessFailure -> {
-                UserSettingsException.AccessFailure(preferenceException)
+                UserSettingsLoadException.AccessFailure(preferenceException)
             }
             is UserPreferencesException.DataNotFound -> {
-                UserSettingsException.DataNotFound(preferenceException)
+                UserSettingsLoadException.DataNotFound(preferenceException)
             }
         }
     }
