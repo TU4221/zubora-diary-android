@@ -1,11 +1,12 @@
 package com.websarva.wings.android.zuboradiary.data.mapper.weather
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiData
+import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-internal fun WeatherApiData.toDomainModel(): Weather {
+internal fun WeatherApiData.toDomainModel(): Weather
+{
     return toWeatherInfo(this, createLogTag())
 }
 

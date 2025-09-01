@@ -10,7 +10,7 @@ import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryConditionTextUpdater
@@ -153,7 +153,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
     private fun setUpWeatherLayout() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather1
-                .collectLatest { value: Weather ->
+                .collectLatest { value: WeatherUi ->
                     DiaryWeatherTextUpdater()
                         .update(
                             requireContext(),
@@ -165,7 +165,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather2
-                .collectLatest { value: Weather ->
+                .collectLatest { value: WeatherUi ->
                     DiaryWeatherTextUpdater()
                         .update(
                             requireContext(),

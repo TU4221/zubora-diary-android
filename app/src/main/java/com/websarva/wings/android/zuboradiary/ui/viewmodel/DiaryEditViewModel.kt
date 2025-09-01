@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.exception.FetchWeatherInfoUseCaseException
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
@@ -22,6 +22,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequest
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySaveConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
@@ -406,11 +407,11 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onWeather1InputFieldItemClick(weather: Weather) {
+    fun onWeather1InputFieldItemClick(weather: WeatherUi) {
         updateWeather1(weather)
     }
 
-    fun onWeather2InputFieldItemClick(weather: Weather) {
+    fun onWeather2InputFieldItemClick(weather: WeatherUi) {
         updateWeather2(weather)
     }
 
@@ -938,8 +939,8 @@ internal class DiaryEditViewModel @Inject constructor(
         when (val result = fetchWeatherInfoUseCase(isGranted, date)) {
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)
-                updateWeather1(result.value)
-                updateWeather2(Weather.UNKNOWN)
+                updateWeather1(result.value.toUiModel())
+                updateWeather2(WeatherUi.UNKNOWN)
             }
             is UseCaseResult.Failure -> {
                 updateUiState(DiaryEditState.Editing)
@@ -1090,12 +1091,12 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.title.value = title
     }
 
-    private fun updateWeather1(weather: Weather) {
+    private fun updateWeather1(weather: WeatherUi) {
         diaryStateFlow.weather1.value = weather
-        if (weather == Weather.UNKNOWN || isEqualWeathers) updateWeather2(Weather.UNKNOWN)
+        if (weather == WeatherUi.UNKNOWN || isEqualWeathers) updateWeather2(WeatherUi.UNKNOWN)
     }
 
-    private fun updateWeather2(weather: Weather) {
+    private fun updateWeather2(weather: WeatherUi) {
         diaryStateFlow.weather2.value = weather
     }
 
@@ -1156,10 +1157,10 @@ internal class DiaryEditViewModel @Inject constructor(
                     }
                     diaryStateFlow.initialize()
                     updateDate(saveDate)
-                    val weather1Int = Random.nextInt(1, Weather.entries.size)
-                    updateWeather1(Weather.of(weather1Int))
-                    val weather2Int = Random.nextInt(1, Weather.entries.size)
-                    updateWeather2(Weather.of(weather2Int))
+                    val weather1Int = Random.nextInt(1, WeatherUi.entries.size)
+                    updateWeather1(WeatherUi.of(weather1Int))
+                    val weather2Int = Random.nextInt(1, WeatherUi.entries.size)
+                    updateWeather2(WeatherUi.of(weather2Int))
                     val conditionInt = Random.nextInt(1, ConditionUi.entries.size)
                     updateCondition(ConditionUi.of(conditionInt))
                     val title = generateRandomAlphanumericString(15)

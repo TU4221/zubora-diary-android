@@ -5,7 +5,7 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.domain.model.Weather" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.WeatherUi" />
         <variable
             name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel" />

@@ -19,7 +19,7 @@ import com.kizitonwose.calendar.view.ViewContainer
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
@@ -476,7 +476,7 @@ class CalendarFragment :
     private fun setUpDiaryShow() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather1
-                .collectLatest { value: Weather ->
+                .collectLatest { value: WeatherUi ->
                     DiaryWeatherTextUpdater()
                         .update(
                             requireContext(),
@@ -488,7 +488,7 @@ class CalendarFragment :
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather2
-                .collectLatest { value: Weather ->
+                .collectLatest { value: WeatherUi ->
                     DiaryWeatherTextUpdater()
                         .update(
                             requireContext(),

@@ -101,8 +101,8 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         return Diary(
             date.value ?:throw IllegalStateException("日付なし(null)"),
             LocalDateTime.now(),
-            weather1.value,
-            weather2.value,
+            weather1.value.toDomainModel(),
+            weather2.value.toDomainModel(),
             condition.value.toDomainModel(),
             title.value.trim(),
             items[0].title.value?.trim()

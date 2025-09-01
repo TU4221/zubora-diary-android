@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
@@ -25,7 +25,7 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
         get() = diaryStateFlow.weather2.asStateFlow()
     val isWeather2Visible =
         combine(weather1, weather2) { weather1, weather2 ->
-            return@combine weather1 != Weather.UNKNOWN && weather2 != Weather.UNKNOWN
+            return@combine weather1 != WeatherUi.UNKNOWN && weather2 != WeatherUi.UNKNOWN
         }.stateInWhileSubscribed(
             false
         )

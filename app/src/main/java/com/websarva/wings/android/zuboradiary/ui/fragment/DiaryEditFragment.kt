@@ -22,7 +22,7 @@ import androidx.navigation.fragment.findNavController
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -395,13 +395,13 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 requireNotNull(parent)
                 val arrayAdapter = parent.adapter as ArrayAdapter<*>
                 val weatherString = arrayAdapter.getItem(position) as String
-                val weather = Weather.of(requireContext(), weatherString)
+                val weather = WeatherUi.of(requireContext(), weatherString)
                 mainViewModel.onWeather1InputFieldItemClick(weather)
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather1
-                .collectLatest { value: Weather ->
+                .collectLatest { value: WeatherUi ->
                     Log.d("20250428", "Weather collectLatest()")
                     val strWeather = value.toString(requireContext())
                     binding.autoCompleteTextWeather1.setText(strWeather, false)
@@ -415,13 +415,13 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 requireNotNull(parent)
                 val arrayAdapter = parent.adapter as ArrayAdapter<*>
                 val weatherString = arrayAdapter.getItem(position) as String
-                val weather = Weather.of(requireContext(), weatherString)
+                val weather = WeatherUi.of(requireContext(), weatherString)
                 mainViewModel.onWeather2InputFieldItemClick(weather)
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather2
-                .collectLatest { value: Weather ->
+                .collectLatest { value: WeatherUi ->
                     val strWeather = value.toString(requireContext())
                     binding.autoCompleteTextWeather2.setText(strWeather, false)
                 }

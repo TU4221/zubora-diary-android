@@ -4,7 +4,7 @@ import android.net.Uri
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
@@ -24,7 +24,7 @@ internal open class DiaryStateFlow {
     open val date =
         MutableStateFlow<LocalDate?>(initialDate) // MEMO:初期化時日付が未定の為、null許容型とする。
 
-    protected val initialWeather = initialDiary.weather1
+    protected val initialWeather = initialDiary.weather1.toUiModel()
     open val weather1 = MutableStateFlow(initialWeather)
     open val weather2 = MutableStateFlow(initialWeather)
 
@@ -76,8 +76,8 @@ internal open class DiaryStateFlow {
     fun update(diary: Diary) {
         diary.run {
             updateDate(date)
-            updateWeather1(weather1)
-            updateWeather2(weather2)
+            updateWeather1(weather1.toUiModel())
+            updateWeather2(weather2.toUiModel())
             updateCondition(condition.toUiModel())
             updateTitle(title)
 
@@ -107,11 +107,11 @@ internal open class DiaryStateFlow {
         this.date.value = date
     }
 
-    private fun updateWeather1(weather: Weather) {
+    private fun updateWeather1(weather: WeatherUi) {
         this.weather1.value = weather
     }
 
-    private fun updateWeather2(weather: Weather) {
+    private fun updateWeather2(weather: WeatherUi) {
         this.weather2.value = weather
     }
 

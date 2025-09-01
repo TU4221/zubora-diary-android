@@ -3,10 +3,10 @@ package com.websarva.wings.android.zuboradiary.data.repository
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationAccessFailureException
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.mapper.weather.toDomainModel
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiException
 import com.websarva.wings.android.zuboradiary.domain.exception.weather.WeatherInfoFetchException
+import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
