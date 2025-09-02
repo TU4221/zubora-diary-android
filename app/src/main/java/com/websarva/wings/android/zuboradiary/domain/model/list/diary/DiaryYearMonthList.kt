@@ -34,25 +34,27 @@ internal data class DiaryYearMonthList<T: DiaryDayListItem>(
     }
 
     /**
-     * アイテムリストの末尾にプログレスインジケータを追加した新しいリストを返す。
+     * アイテムリストの末尾をプログレスインジケータにした新しいリストを返す。
      *
      * @param itemList 元のアイテムリスト。
      * @return 末尾に [DiaryYearMonthListItem.ProgressIndicator] が追加された新しいリスト。
      */
-    private fun addLastItemProgressIndicator(itemList: List<DiaryYearMonthListItem<T>>)
+    private fun applyProgressIndicatorAsLastItem(itemList: List<DiaryYearMonthListItem<T>>)
         : List<DiaryYearMonthListItem<T>> {
-        return itemList + DiaryYearMonthListItem.ProgressIndicator() // TODO:引数Dayのみとなるようにフィルター掛けた方が良い
+        return itemList.filterIsInstance<DiaryYearMonthListItem.Diary<T>>() +
+                DiaryYearMonthListItem.ProgressIndicator()
     }
 
     /**
-     * アイテムリストの末尾に「日記なし」メッセージアイテムを追加した新しいリストを返す。
+     * アイテムリストの末尾を「日記なし」メッセージアイテムにした新しいリストを返す。
      *
      * @param itemList 元のアイテムリスト。
      * @return 末尾に [DiaryYearMonthListItem.NoDiaryMessage] が追加された新しいリスト。
      */
-    private fun addLastItemNoDiaryMessage(itemList: List<DiaryYearMonthListItem<T>>)
+    private fun applyNoDiaryMessageAsLastItem(itemList: List<DiaryYearMonthListItem<T>>)
         : List<DiaryYearMonthListItem<T>> {
-        return itemList + DiaryYearMonthListItem.NoDiaryMessage() // TODO:引数Dayのみとなるようにフィルター掛けた方が良い
+        return itemList.filterIsInstance<DiaryYearMonthListItem.Diary<T>>() +
+                DiaryYearMonthListItem.NoDiaryMessage()
     }
 
     /**
@@ -118,7 +120,9 @@ internal data class DiaryYearMonthList<T: DiaryDayListItem>(
         }
 
         val resultItemList = originalItemList + additionItemList
-        return DiaryYearMonthList(addLastItemProgressIndicator(resultItemList))
+        return DiaryYearMonthList(
+            applyProgressIndicatorAsLastItem(resultItemList)
+        )
     }
 
     /**
@@ -133,9 +137,7 @@ internal data class DiaryYearMonthList<T: DiaryDayListItem>(
         if (itemList.isEmpty()) return this
 
         return DiaryYearMonthList(
-            addLastItemNoDiaryMessage(
-                itemList.filterIsInstance<DiaryYearMonthListItem.Diary<T>>()
-            )
+            applyNoDiaryMessageAsLastItem(itemList)
         )
     }
 }
