@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountF
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryExistenceCheckFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriUsageCheckFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultCountFailureException
@@ -38,13 +38,13 @@ internal interface DiaryRepository {
     @Throws(DiaryImageUriUsageCheckFailureException::class)
     suspend fun existsImageUri(uriString: String): Boolean
 
-    @Throws(DiaryLoadFailureException::class)
+    @Throws(DiaryLoadException.AccessFailure::class)
     suspend fun loadDiary(date: LocalDate): Diary?
 
-    @Throws(DiaryLoadFailureException::class)
+    @Throws(DiaryLoadException.AccessFailure::class)
     suspend fun loadNewestDiary(): Diary?
 
-    @Throws(DiaryLoadFailureException::class)
+    @Throws(DiaryLoadException.AccessFailure::class)
     suspend fun loadOldestDiary(): Diary?
 
     @Throws(DiaryListLoadFailureException::class)

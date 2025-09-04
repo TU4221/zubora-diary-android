@@ -3,9 +3,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -26,19 +25,24 @@ internal class LoadNewestDiaryUseCase(
      * ユースケースを実行し、最新の日記データを返す。
      *
      * @return 最新の日記データが存在する場合は [UseCaseResult.Success] にその [Diary] オブジェクトを格納して返す。
-     *   日記が存在しない場合は `null` が格納される。読み込みに失敗した場合は [UseCaseResult.Failure] を返す。
+     *   日記が存在しない場合、読み込みに失敗した場合は [UseCaseResult.Failure] を返す。
      */
-    suspend operator fun invoke(): DefaultUseCaseResult<Diary?> {
+    suspend operator fun invoke(): UseCaseResult<Diary, DiaryLoadException> {
         Log.i(logTag, "${logMsg}開始")
 
         try {
             val diary = diaryRepository.loadNewestDiary()
 
-            // TODO:結果がnullの時の対応を検討(LoadDiaryUseCaseに習う、nullかどうかの判断をViewModelではさせずに例外をスローさせた方がよいかも)
-            val resultMessage = diary?.date?.toString() ?: "なし"
-            Log.i(logTag, "${logMsg}完了 (結果: $resultMessage)")
+            if (diary == null) {
+                Log.e(logTag, "${logMsg}失敗_保存された日記が存在しない")
+                return UseCaseResult.Failure(
+                    DiaryLoadException.DataNotFound()
+                )
+            }
+
+            Log.i(logTag, "${logMsg}完了 (結果: $diary)")
             return UseCaseResult.Success(diary)
-        } catch (e: DiaryLoadFailureException) {
+        } catch (e: DiaryLoadException) {
             Log.e(logTag, "${logMsg}失敗_読込処理エラー", e)
             return UseCaseResult.Failure(e)
         }

@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountF
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeleteFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryExistenceCheckFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriUsageCheckFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultCountFailureException
@@ -86,35 +86,35 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(DiaryLoadFailureException::class)
+    @Throws(DiaryLoadException.AccessFailure::class)
     override suspend fun loadDiary(date: LocalDate): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectDiary(date)?.toDomainModel()
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryLoadFailureException("日付 '$date' の日記の読込に失敗しました。", e)
+                throw DiaryLoadException.AccessFailure(date, e)
             }
         }
     }
 
-    @Throws(DiaryLoadFailureException::class)
+    @Throws(DiaryLoadException.AccessFailure::class)
     override suspend fun loadNewestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectNewestDiary()?.toDomainModel()
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryLoadFailureException("最新の日記の読込に失敗しました。", e)
+                throw DiaryLoadException.AccessFailure(cause = e)
             }
         }
     }
 
-    @Throws(DiaryLoadFailureException::class)
+    @Throws(DiaryLoadException.AccessFailure::class)
     override suspend fun loadOldestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectOldestDiary()?.toDomainModel()
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryLoadFailureException("最古の日記の読込に失敗しました。", e)
+                throw DiaryLoadException.AccessFailure(cause = e)
             }
         }
     }

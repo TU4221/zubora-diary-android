@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
@@ -398,10 +399,17 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun loadNewestSavedDiaryDate(): LocalDate? {
         when (val result = loadNewestDiaryUseCase()) {
-            is UseCaseResult.Success -> return result.value?.date
+            is UseCaseResult.Success -> return result.value.date
             is UseCaseResult.Failure -> {
-                Log.e(logTag, "最新日記読込_失敗", result.exception)
-                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                when (result.exception) {
+                    is DiaryLoadException.AccessFailure -> {
+                        Log.e(logTag, "最新日記読込_失敗", result.exception)
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                    }
+                    is DiaryLoadException.DataNotFound -> {
+                        // 処理なし
+                    }
+                }
                 return null
             }
         }
@@ -409,10 +417,17 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun loadOldestSavedDiaryDate(): LocalDate? {
         when (val result = loadOldestDiaryUseCase()) {
-            is UseCaseResult.Success -> return result.value?.date
+            is UseCaseResult.Success -> return result.value.date
             is UseCaseResult.Failure -> {
-                Log.e(logTag, "最古日記読込_失敗", result.exception)
-                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                when (result.exception) {
+                    is DiaryLoadException.AccessFailure -> {
+                        Log.e(logTag, "最古日記読込_失敗", result.exception)
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                    }
+                    is DiaryLoadException.DataNotFound -> {
+                        // 処理なし
+                    }
+                }
                 return null
             }
         }

@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -38,16 +38,17 @@ internal class LoadDiaryUseCase(
         try {
             val diary = diaryRepository.loadDiary(date)
 
-            // TODO:DataSource側 or Domain側で日記なし例外作成
             if (diary == null) {
-                Log.e(logTag, "${logMsg}失敗_対象日記無し (日付: $date)")
-                return UseCaseResult.Failure(DiaryLoadFailureException("対象日記無し", IllegalStateException()))
+                Log.e(logTag, "${logMsg}失敗_該当日記が存在しない (日付: $date)")
+                return UseCaseResult.Failure(
+                    DiaryLoadException.DataNotFound(date)
+                )
             }
 
             Log.i(logTag, "${logMsg}完了 (取得日記: $diary)")
             return UseCaseResult.Success(diary)
-        } catch (e: DiaryLoadFailureException) {
-            Log.e(logTag, "${logMsg}失敗_日記読込処理エラー (日付: $date)", e)
+        } catch (e: DiaryLoadException) {
+            Log.e(logTag, "${logMsg}失敗_読込処理エラー (日付: $date)", e)
             return UseCaseResult.Failure(e)
         }
     }
