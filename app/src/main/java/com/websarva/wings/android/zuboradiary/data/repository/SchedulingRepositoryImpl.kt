@@ -11,7 +11,6 @@ internal class SchedulingRepositoryImpl(
     private val notificationSchedulingDataSource: NotificationSchedulingDataSource
 ) : SchedulingRepository {
 
-    @Throws(ReminderNotificationRegistrationFailureException::class)
     override fun registerReminderNotification(settingTime: LocalTime) {
         try {
             notificationSchedulingDataSource.registerReminderNotificationWorker(settingTime)
@@ -21,7 +20,6 @@ internal class SchedulingRepositoryImpl(
         }
     }
 
-    @Throws(ReminderNotificationCancellationFailureException::class)
     override fun cancelReminderNotification() {
         try {
             notificationSchedulingDataSource.cancelReminderNotificationWorker()

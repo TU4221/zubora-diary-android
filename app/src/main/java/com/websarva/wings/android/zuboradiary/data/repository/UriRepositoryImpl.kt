@@ -12,7 +12,6 @@ internal class UriRepositoryImpl (
     private val dataSource: UriPermissionDataSource
 ) : UriRepository {
 
-    @Throws(PersistableUriPermissionTakeFailureException::class)
     override fun takePersistableUriPermission(uriString: String) {
         val uri = Uri.parse(uriString)
         try {
@@ -22,7 +21,6 @@ internal class UriRepositoryImpl (
         }
     }
 
-    @Throws(PersistableUriPermissionReleaseFailureException::class)
     override fun releasePersistableUriPermission(uriString: String) {
         val uri = Uri.parse(uriString)
         try {
@@ -32,7 +30,6 @@ internal class UriRepositoryImpl (
         }
     }
 
-    @Throws(AllPersistableUriPermissionReleaseFailureException::class)
     override fun releaseAllPersistableUriPermission() {
         try {
             dataSource.releaseAllPersistableUriPermission()

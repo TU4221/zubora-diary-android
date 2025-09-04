@@ -21,7 +21,6 @@ internal class WeatherInfoRepositoryImpl (
         return weatherApiDataSource.canFetchWeatherInfo(date)
     }
 
-    @Throws(WeatherInfoFetchException::class)
     override suspend fun fetchWeatherInfo(date: LocalDate): Weather {
         return withContext(Dispatchers.IO) {
             try {

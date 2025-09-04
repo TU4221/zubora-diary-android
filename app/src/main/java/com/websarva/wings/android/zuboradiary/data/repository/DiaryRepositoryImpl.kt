@@ -41,7 +41,6 @@ internal class DiaryRepositoryImpl (
     private val logTag = createLogTag()
 
     //region Diary
-    @Throws(DiaryCountFailureException::class)
     override suspend fun countDiaries(): Int {
         return withContext(Dispatchers.IO) {
             try {
@@ -53,7 +52,6 @@ internal class DiaryRepositoryImpl (
 
     }
 
-    @Throws(DiaryCountFailureException::class)
     override suspend fun countDiaries(date: LocalDate): Int {
         return withContext(Dispatchers.IO) {
             try {
@@ -64,7 +62,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(DiaryExistenceCheckFailureException::class)
     override suspend fun existsDiary(date: LocalDate): Boolean {
         return withContext(Dispatchers.IO) {
             try {
@@ -75,7 +72,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(DiaryImageUriUsageCheckFailureException::class)
     override suspend fun existsImageUri(uriString: String): Boolean {
         return withContext(Dispatchers.IO) {
             try {
@@ -86,7 +82,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(DiaryLoadException.AccessFailure::class)
     override suspend fun loadDiary(date: LocalDate): Diary? {
         return withContext(Dispatchers.IO) {
             try {
@@ -97,7 +92,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(DiaryLoadException.AccessFailure::class)
     override suspend fun loadNewestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
@@ -108,7 +102,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(DiaryLoadException.AccessFailure::class)
     override suspend fun loadOldestDiary(): Diary? {
         return withContext(Dispatchers.IO) {
             try {
@@ -119,7 +112,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(DiaryListLoadFailureException::class)
     override suspend fun loadDiaryList(
         num: Int,
         offset: Int,
@@ -140,7 +132,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(DiarySaveFailureException::class)
     override suspend fun saveDiary(
         diary: Diary,
         historyItemList: List<DiaryItemTitleSelectionHistory>
@@ -157,7 +148,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(DiarySaveFailureException::class)
     override suspend fun deleteAndSaveDiary(
         deleteDiaryDate: LocalDate,
         newDiary: Diary,
@@ -176,7 +166,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(DiaryDeleteFailureException::class)
     override suspend fun deleteDiary(date: LocalDate) {
         withContext(Dispatchers.IO) {
             try {
@@ -187,7 +176,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(AllDiariesDeleteFailureException::class)
     override suspend fun deleteAllDiaries() {
         withContext(Dispatchers.IO) {
             try {
@@ -200,7 +188,6 @@ internal class DiaryRepositoryImpl (
     //endregion
 
     //region WordSearchResult
-    @Throws(WordSearchResultCountFailureException::class)
     override suspend fun countWordSearchResults(searchWord: String): Int {
         return withContext(Dispatchers.IO) {
             try {
@@ -211,7 +198,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    @Throws(WordSearchResultListLoadFailureException::class)
     override suspend fun loadWordSearchResultList(
         num: Int,
         offset: Int,
@@ -252,7 +238,6 @@ internal class DiaryRepositoryImpl (
             }
     }
 
-    @Throws(DiaryItemTitleSelectionHistoryItemDeleteFailureException::class)
     override suspend fun deleteDiaryItemTitleSelectionHistory(title: String) {
         withContext(Dispatchers.IO) {
             try {
@@ -265,7 +250,6 @@ internal class DiaryRepositoryImpl (
     //endregion
 
     //region Options
-    @Throws(AllDataDeleteFailureException::class)
     override suspend fun deleteAllData() {
         withContext(Dispatchers.IO) {
             try {

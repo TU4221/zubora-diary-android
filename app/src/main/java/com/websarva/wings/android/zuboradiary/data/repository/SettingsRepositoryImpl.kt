@@ -126,7 +126,6 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    @Throws(ThemeColorSettingUpdateFailureException::class)
     override suspend fun saveThemeColorPreference(setting: ThemeColorSetting) {
         withContext(Dispatchers.IO) {
             try {
@@ -138,7 +137,6 @@ internal class SettingsRepositoryImpl(
         }
     }
 
-    @Throws(CalendarStartDayOfWeekSettingUpdateFailureException::class)
     override suspend fun saveCalendarStartDayOfWeekPreference(setting: CalendarStartDayOfWeekSetting) {
         withContext(Dispatchers.IO) {
             try {
@@ -150,7 +148,6 @@ internal class SettingsRepositoryImpl(
         }
     }
 
-    @Throws(ReminderNotificationSettingUpdateFailureException::class)
     override suspend fun saveReminderNotificationPreference(setting: ReminderNotificationSetting) {
         withContext(Dispatchers.IO) {
             try {
@@ -169,7 +166,6 @@ internal class SettingsRepositoryImpl(
         }
     }
 
-    @Throws(PassCodeSettingUpdateFailureException::class)
     override suspend fun savePasscodeLockPreference(setting: PasscodeLockSetting) {
         withContext(Dispatchers.IO) {
             try {
@@ -188,7 +184,6 @@ internal class SettingsRepositoryImpl(
         }
     }
 
-    @Throws(WeatherInfoFetchSettingUpdateFailureException::class)
     override suspend fun saveWeatherInfoFetchPreference(setting: WeatherInfoFetchSetting) {
         withContext(Dispatchers.IO) {
             try {
