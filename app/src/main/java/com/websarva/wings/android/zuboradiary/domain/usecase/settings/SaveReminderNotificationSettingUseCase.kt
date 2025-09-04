@@ -58,107 +58,73 @@ internal class SaveReminderNotificationSettingUseCase(
     ): DefaultUseCaseResult<Unit> {
         Log.i(logTag, "${logMsg}開始 (有効: $isChecked, 通知時刻: ${notificationTime ?: "未指定"})")
 
-        if (isChecked) {
-            requireNotNull(notificationTime) { "${logMsg}不正引数_リマインダー通知を有効にする場合、通知時刻は必須 (通知時刻: null)" }
-
-            try {
-                saveReminderNotificationValid(notificationTime)
-            } catch (e: ReminderNotificationSettingUpdateFailureException) {
-                Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
-                return UseCaseResult.Failure(e)
-            } catch (e: ReminderNotificationRegistrationFailureException) {
-                Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック成功", e)
-                return UseCaseResult.Failure(e)
-            } catch (e: ReminderNotificationSettingRollbackFailureException) {
-                Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック失敗", e)
-                return UseCaseResult.Failure(e)
+        val setting =
+            if (isChecked) {
+                requireNotNull(notificationTime) { "${logMsg}不正引数_リマインダー通知を有効にする場合、通知時刻は必須 (通知時刻: null)" }
+                ReminderNotificationSetting.Enabled(notificationTime)
+            } else {
+                ReminderNotificationSetting.Disabled
             }
 
-        } else {
-            try {
-                saveReminderNotificationInvalid()
-            } catch (e: UserSettingsLoadException) {
-                Log.e(logTag, "${logMsg}失敗_設定読込エラー", e)
-                return UseCaseResult.Failure(e)
-            } catch (e: ReminderNotificationSettingUpdateFailureException) {
-                Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
-                return UseCaseResult.Failure(e)
-            } catch (e: ReminderNotificationCancellationFailureException) {
-                Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック成功", e)
-                return UseCaseResult.Failure(e)
-            } catch (e: ReminderNotificationSettingRollbackFailureException) {
-                Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック失敗", e)
-                return UseCaseResult.Failure(e)
+        try {
+            saveReminderNotification(setting)
+        } catch (e: UserSettingsLoadException) {
+            Log.e(logTag, "${logMsg}失敗_設定読込エラー", e)
+            return UseCaseResult.Failure(e)
+        } catch (e: ReminderNotificationSettingUpdateFailureException) {
+            Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
+            return UseCaseResult.Failure(e)
+        } catch (e: ReminderNotificationRegistrationFailureException) {
+            Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック成功", e)
+            return UseCaseResult.Failure(e)
+        } catch (e: ReminderNotificationCancellationFailureException) {
+            Log.e(logTag, "${logMsg}失敗_通知キャンセルエラー、設定ロールバック成功", e)
+            return UseCaseResult.Failure(e)
+        } catch (e: ReminderNotificationSettingRollbackFailureException) {
+            when (setting) {
+                is ReminderNotificationSetting.Enabled -> {
+                    Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック失敗", e)
+                }
+                ReminderNotificationSetting.Disabled -> {
+                    Log.e(logTag, "${logMsg}失敗_通知キャンセルエラー、設定ロールバック失敗", e)
+                }
             }
+            return UseCaseResult.Failure(e)
         }
 
         Log.i(logTag, "${logMsg}完了")
         return UseCaseResult.Success(Unit)
     }
 
-    // TODO:saveReminderNotificationInvalid()と統一
     /**
-     * リマインダー通知設定を有効として保存し、通知を登録する。
+     * リマインダー通知設定を保存。
      *
-     * @param notificationTime 通知時刻。
-     * @throws ReminderNotificationSettingUpdateFailureException 設定の更新に失敗した場合。
-     * @throws ReminderNotificationRegistrationFailureException 通知の登録に失敗した場合。
-     */
-    private suspend fun saveReminderNotificationValid(notificationTime: LocalTime) {
-        val preferenceValue = ReminderNotificationSetting.Enabled(notificationTime)
-        try {
-            settingsRepository.saveReminderNotificationPreference(preferenceValue)
-            registerReminderNotification(notificationTime)
-        } catch (e: ReminderNotificationSettingUpdateFailureException) {
-            throw e
-        } catch (e: ReminderNotificationRegistrationFailureException) {
-            try {
-                rollbackReminderNotification(preferenceValue)
-            } catch (e: ReminderNotificationSettingRollbackFailureException) {
-                throw e
-            }
-            throw e
-        }
-    }
-
-    /**
-     * 指定された時刻でリマインダー通知を登録する。
+     * リマインダー通知設定を有効とした場合、通知を登録する。無効とした場合、通知をキャンセルする。
      *
-     * @param notificationTime 通知時刻。
-     * @throws ReminderNotificationRegistrationFailureException 通知の登録に失敗した場合。
-     */
-    private fun registerReminderNotification(notificationTime: LocalTime) {
-        when (val result = registerReminderNotificationUseCase(notificationTime)) {
-            is UseCaseResult.Success -> {
-                // 処理不要
-            }
-            is UseCaseResult.Failure -> {
-                throw result.exception
-            }
-        }
-    }
-
-    /**
-     * リマインダー通知設定を無効として保存し、通知をキャンセルする。
+     * 通知の登録、キャンセルに失敗した場合、元の設定値に戻すようにロールバック処理が行われる。
      *
-     * @throws ReminderNotificationSettingUpdateFailureException 設定の更新に失敗した場合。
-     * @throws ReminderNotificationCancellationFailureException 通知のキャンセルに失敗した場合。
      * @throws UserSettingsLoadException 現在の設定の読み込みに失敗した場合（ロールバック用）。
-     */
-    private suspend fun saveReminderNotificationInvalid() {
+     * @throws ReminderNotificationSettingUpdateFailureException 設定の更新に失敗した場合。
+     * @throws ReminderNotificationRegistrationFailureException 通知の登録に失敗した場合。(通知設定有効時のみ)
+     * @throws ReminderNotificationCancellationFailureException 通知のキャンセルに失敗した場合。(通知設定無効時のみ)
+     * @throws ReminderNotificationSettingRollbackFailureException 設定のロールバック処理に失敗した場合。
+     * */
+    private suspend fun saveReminderNotification(
+        settingValue: ReminderNotificationSetting,
+    ) {
         val backupSettingValue = fetchCurrentReminderNotificationSetting()
+        settingsRepository.saveReminderNotificationPreference(settingValue)
         try {
-            val preferenceValue = ReminderNotificationSetting.Disabled
-            settingsRepository.saveReminderNotificationPreference(preferenceValue)
-            cancelReminderNotification()
-        } catch (e: ReminderNotificationSettingUpdateFailureException) {
-            throw e
-        } catch (e: ReminderNotificationCancellationFailureException) {
-            try {
-                rollbackReminderNotification(backupSettingValue)
-            } catch (e: ReminderNotificationSettingRollbackFailureException) {
-                throw e
+            when (settingValue) {
+                is ReminderNotificationSetting.Enabled -> {
+                    registerReminderNotification(settingValue.notificationTime)
+                }
+                ReminderNotificationSetting.Disabled -> {
+                    cancelReminderNotification()
+                }
             }
+        } catch (e: DomainException) {
+            rollbackReminderNotification(backupSettingValue)
             throw e
         }
     }
@@ -182,6 +148,23 @@ internal class SaveReminderNotificationSettingUseCase(
                         }
                     }
                 }.first()
+        }
+    }
+
+    /**
+     * 指定された時刻でリマインダー通知を登録する。
+     *
+     * @param notificationTime 通知時刻。
+     * @throws ReminderNotificationRegistrationFailureException 通知の登録に失敗した場合。
+     */
+    private fun registerReminderNotification(notificationTime: LocalTime) {
+        when (val result = registerReminderNotificationUseCase(notificationTime)) {
+            is UseCaseResult.Success -> {
+                // 処理不要
+            }
+            is UseCaseResult.Failure -> {
+                throw result.exception
+            }
         }
     }
 
@@ -214,9 +197,7 @@ internal class SaveReminderNotificationSettingUseCase(
     ) {
         try {
             settingsRepository.saveReminderNotificationPreference(backupSettingValue)
-            Log.i(logTag, "${logMsg}設定ロールバック完了")
         } catch (e: ReminderNotificationSettingUpdateFailureException) {
-            Log.e(logTag, "${logMsg}設定ロールバック失敗", e)
             val backupNotificationTime =
                 when (backupSettingValue) {
                     is ReminderNotificationSetting.Enabled -> backupSettingValue.notificationTime
