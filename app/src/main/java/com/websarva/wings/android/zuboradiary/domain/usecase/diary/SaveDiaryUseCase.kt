@@ -104,22 +104,18 @@ internal class SaveDiaryUseCase(
         isNewDiary: Boolean
     ) {
         val saveDate = diary.date
-        try {
-            if (shouldDeleteOriginalDateDiary(saveDate, originalDate, isNewDiary)) {
-                Log.i(logTag, "${logMsg}元の日付の日記削除と新規保存実行 (元日付: $originalDate, 新日付: $saveDate)")
-                diaryRepository
-                    .deleteAndSaveDiary(
-                        originalDate,
-                        diary,
-                        diaryItemTitleSelectionHistoryItemList
-                    )
-            } else {
-                Log.i(logTag, "${logMsg}日記保存実行 (日付: $saveDate)")
-                diaryRepository
-                    .saveDiary(diary, diaryItemTitleSelectionHistoryItemList)
-            }
-        } catch (e: DiarySaveFailureException) {
-            throw e
+        if (shouldDeleteOriginalDateDiary(saveDate, originalDate, isNewDiary)) {
+            Log.i(logTag, "${logMsg}元の日付の日記削除と新規保存実行 (元日付: $originalDate, 新日付: $saveDate)")
+            diaryRepository
+                .deleteAndSaveDiary(
+                    originalDate,
+                    diary,
+                    diaryItemTitleSelectionHistoryItemList
+                )
+        } else {
+            Log.i(logTag, "${logMsg}日記保存実行 (日付: $saveDate)")
+            diaryRepository
+                .saveDiary(diary, diaryItemTitleSelectionHistoryItemList)
         }
     }
 

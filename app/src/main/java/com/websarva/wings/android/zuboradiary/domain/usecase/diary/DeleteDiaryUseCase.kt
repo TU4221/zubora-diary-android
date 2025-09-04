@@ -42,7 +42,7 @@ internal class DeleteDiaryUseCase(
         Log.i(logTag, "${logMsg}開始 (日付: $date, 画像URI: ${imageUriString?.let { "\"$it\"" } ?: "なし"})")
 
         try {
-            deleteDiary(date)
+            diaryRepository.deleteDiary(date)
         } catch (e: DiaryDeleteFailureException) {
             Log.e(logTag, "${logMsg}失敗_日記データ削除エラー", e)
             return UseCaseResult.Failure(e)
@@ -57,23 +57,6 @@ internal class DeleteDiaryUseCase(
 
         Log.i(logTag, "${logMsg}完了")
         return UseCaseResult.Success(Unit)
-    }
-
-
-    /**
-     * 指定された日付の日記データを削除する。
-     *
-     * @param date 削除する日記の日付。
-     * @throws DiaryDeleteFailureException 日記データの削除に失敗した場合。
-     */
-    private suspend fun deleteDiary(
-        date: LocalDate
-    ) {
-        try {
-            diaryRepository.deleteDiary(date)
-        } catch (e: DiaryDeleteFailureException) {
-            throw e
-        }
     }
 
     /**
