@@ -4,16 +4,15 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadException
+import com.websarva.wings.android.zuboradiary.domain.model.SavedDiaryDateRange
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionDiaryListUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewestDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadOldestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListStartYearMonthPickerDateRangeUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
@@ -48,8 +47,7 @@ internal class DiaryListViewModel @Inject constructor(
     private val loadAdditionDiaryListUseCase: LoadAdditionDiaryListUseCase,
     private val refreshDiaryListUseCase: RefreshDiaryListUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
-    private val loadNewestDiaryUseCase: LoadNewestDiaryUseCase,
-    private val loadOldestDiaryUseCase: LoadOldestDiaryUseCase
+    private val loadDiaryListStartYearMonthPickerDateRangeUseCase: LoadDiaryListStartYearMonthPickerDateRangeUseCase
 ) : BaseViewModel<DiaryListEvent, DiaryListAppMessage, DiaryListState>(
     DiaryListState.Idle
 ) {
@@ -153,8 +151,9 @@ internal class DiaryListViewModel @Inject constructor(
 
     fun onNavigationIconClick() {
         viewModelScope.launch {
-            val newestDiaryDate = loadNewestSavedDiaryDate() ?: LocalDate.now()
-            val oldestDiaryDate = loadOldestSavedDiaryDate() ?: LocalDate.now()
+            val dateRange = loadSavedDiaryDateRange()
+            val newestDiaryDate = dateRange.newestDiaryDate
+            val oldestDiaryDate = dateRange.oldestDiaryDate
             val newestYear = Year.of(newestDiaryDate.year)
             val oldestYear = Year.of(oldestDiaryDate.year)
             emitUiEvent(
@@ -397,38 +396,12 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private suspend fun loadNewestSavedDiaryDate(): LocalDate? {
-        when (val result = loadNewestDiaryUseCase()) {
-            is UseCaseResult.Success -> return result.value.date
+    private suspend fun loadSavedDiaryDateRange(): SavedDiaryDateRange {
+        when (val result = loadDiaryListStartYearMonthPickerDateRangeUseCase()) {
+            is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> {
-                when (result.exception) {
-                    is DiaryLoadException.AccessFailure -> {
-                        Log.e(logTag, "最新日記読込_失敗", result.exception)
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
-                    }
-                    is DiaryLoadException.DataNotFound -> {
-                        // 処理なし
-                    }
-                }
-                return null
-            }
-        }
-    }
-
-    private suspend fun loadOldestSavedDiaryDate(): LocalDate? {
-        when (val result = loadOldestDiaryUseCase()) {
-            is UseCaseResult.Success -> return result.value.date
-            is UseCaseResult.Failure -> {
-                when (result.exception) {
-                    is DiaryLoadException.AccessFailure -> {
-                        Log.e(logTag, "最古日記読込_失敗", result.exception)
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
-                    }
-                    is DiaryLoadException.DataNotFound -> {
-                        // 処理なし
-                    }
-                }
-                return null
+                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                return result.exception.fallbackDateRange
             }
         }
     }

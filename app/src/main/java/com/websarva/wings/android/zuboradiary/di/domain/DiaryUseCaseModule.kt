@@ -15,6 +15,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadOldestDia
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListStartYearMonthPickerDateRangeUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewWordSearchResultListUseCase
@@ -120,6 +121,17 @@ internal object DiaryUseCaseModule {
         diaryRepository: DiaryRepository
     ): LoadDiaryItemTitleSelectionHistoryListUseCase =
         LoadDiaryItemTitleSelectionHistoryListUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideLoadDiaryListStartYearMonthPickerDateRange(
+        loadNewestDiaryUseCase: LoadNewestDiaryUseCase,
+        loadOldestDiaryUseCase: LoadOldestDiaryUseCase
+    ): LoadDiaryListStartYearMonthPickerDateRangeUseCase =
+        LoadDiaryListStartYearMonthPickerDateRangeUseCase(
+            loadNewestDiaryUseCase,
+            loadOldestDiaryUseCase
+        )
 
     @Singleton
     @Provides
