@@ -323,7 +323,6 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param value 保存するテーマカラー設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveThemeColorPreference(value: ThemeColorPreference) {
         executeDataStoreEditOperation { preferences ->
             preferences[themeColorPreferenceKey] = value.themeColorNumber
@@ -336,7 +335,6 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param value 保存するカレンダー開始曜日設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
         executeDataStoreEditOperation { preferences ->
             preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
@@ -349,7 +347,6 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param value 保存するリマインダー通知設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveReminderNotificationPreference(value: ReminderNotificationPreference) {
         executeDataStoreEditOperation { preferences ->
             preferences[isEnabledReminderNotificationPreferenceKey] = value.isEnabled
@@ -363,7 +360,6 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param value 保存するパスコードロック設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun savePasscodeLockPreference(value: PasscodeLockPreference) {
         executeDataStoreEditOperation { preferences ->
             preferences[isEnabledPasscodeLockPreferenceKey] = value.isEnabled
@@ -377,7 +373,6 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param value 保存する天気情報取得設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
-    @Throws(UserPreferencesException.DataStoreAccessFailure::class)
     suspend fun saveWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
         executeDataStoreEditOperation { preferences ->
             preferences[isEnabledWeatherInfoFetchPreferenceKey] = value.isEnabled

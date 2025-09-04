@@ -96,7 +96,6 @@ internal class DeleteAllDataUseCase(
      *
      * @throws DeleteAllDataUseCaseException.AllSettingsInitializationFailure 設定の初期化に失敗した場合。
      */
-    @Throws(DeleteAllDataUseCaseException.AllSettingsInitializationFailure::class)
     private suspend fun initializeAllSettings() {
         when (val result = initializeAllSettingsUseCase()) {
             is UseCaseResult.Success -> {

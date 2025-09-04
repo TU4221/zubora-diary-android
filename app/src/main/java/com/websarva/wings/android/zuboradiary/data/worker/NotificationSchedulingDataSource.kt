@@ -31,7 +31,6 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
      * @param settingTime 通知を毎日表示する時刻。
      * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
      */
-    @Throws(WorkProfileAccessFailureException::class)
     fun registerReminderNotificationWorker(settingTime: LocalTime) {
         cancelReminderNotificationWorker()
 
@@ -79,7 +78,6 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
      *
      * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
      */
-    @Throws(WorkProfileAccessFailureException::class)
     fun cancelReminderNotificationWorker() {
         executeWorkOperation {
             workManager.apply {
@@ -99,7 +97,6 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
      * @param operation WorkManagerに対する操作を行う関数。
      * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
      */
-    @Throws(WorkProfileAccessFailureException::class)
     private fun executeWorkOperation(
         operation: () -> Unit
     ) {
