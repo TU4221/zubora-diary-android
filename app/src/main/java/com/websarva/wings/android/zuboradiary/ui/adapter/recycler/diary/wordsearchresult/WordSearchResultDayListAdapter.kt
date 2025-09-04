@@ -99,7 +99,7 @@ internal class WordSearchResultDayListAdapter(
                 textTitle.text = title
 
                 val strItemNumber =
-                    context.getString(R.string.fragment_word_search_result_item) + item.itemNumber
+                    context.getString(R.string.fragment_word_search_result_item) + item.itemNumber.value
                 textItemNumber.text = strItemNumber
                 textItemTitle.text = item.createItemTitleSpannableString(context, themeColor)
                 textItemComment.text = item.createItemCommentSpannableString(context, themeColor)
