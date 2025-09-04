@@ -9,23 +9,36 @@ import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
+/**
+ * テーマカラー設定を保存するユースケース。
+ *
+ * @property settingsRepository 設定関連の操作を行うリポジトリ。
+ */
 internal class SaveThemeColorSettingUseCase(
     private val settingsRepository: SettingsRepository
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "テーマカラー設定保存_"
 
+    /**
+     * ユースケースを実行し、指定されたテーマカラーを保存する。
+     *
+     * @param themeColor 保存するテーマカラー。
+     * @return 保存処理が成功した場合は [UseCaseResult.Success] を返す。
+     *   保存処理中に [ThemeColorSettingUpdateFailureException] が発生した場合は
+     *   [UseCaseResult.Failure] を返す。
+     */
     suspend operator fun invoke(
         themeColor: ThemeColor
     ): DefaultUseCaseResult<Unit> {
-        val logMsg = "テーマカラー設定保存_"
-        Log.i(logTag, "${logMsg}開始")
+        Log.i(logTag, "${logMsg}開始 (テーマカラー: $themeColor)")
 
         try {
             val preferenceValue = ThemeColorSetting(themeColor)
             settingsRepository.saveThemeColorPreference(preferenceValue)
         } catch (e: ThemeColorSettingUpdateFailureException) {
-            Log.e(logTag, "${logMsg}失敗")
+            Log.e(logTag, "${logMsg}失敗_設定保存処理エラー", e)
             return UseCaseResult.Failure(e)
         }
 

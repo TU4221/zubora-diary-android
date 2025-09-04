@@ -30,22 +30,35 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 //       - 既存データのマイグレーション方法（もしあれば）。
 //       - サムネイルのキャッシュ管理（不要になったサムネイルの削除ロジックなど）。
 //       - 元画像へのフルアクセスが必要な場合のフォールバック（例: 高解像度表示時）。
+
+/**
+ * 指定されたURI文字列に対して永続的なアクセス権限を取得するユースケース。
+ *
+ * @property uriRepository URI関連の操作を行うリポジトリ。
+ */
 internal class TakePersistableUriPermissionUseCase(
     private val uriRepository: UriRepository
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "URIの永続的権限取得_"
 
+    /**
+     * ユースケースを実行し、指定されたURIの永続的なアクセス権限を取得する。
+     *
+     * @param uriString 権限を取得する対象のURI文字列。
+     * @return 権限取得処理が成功した場合は [UseCaseResult.Success] を返す。
+     *   権限取得処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     */
     operator fun invoke(uriString: String): DefaultUseCaseResult<Unit> {
-        val logMsg = "URIの永続的権限取得_"
-        Log.i(logTag, "${logMsg}開始_$uriString")
+        Log.i(logTag, "${logMsg}開始 (URI: \"$uriString\")")
 
         return try {
             uriRepository.takePersistableUriPermission(uriString)
-            Log.i(logTag, "${logMsg}完了")
+            Log.i(logTag, "${logMsg}完了 (URI: \"$uriString\")")
             UseCaseResult.Success(Unit)
         } catch (e: PersistableUriPermissionTakeFailureException) {
-            Log.e(logTag, "${logMsg}失敗", e)
+            Log.e(logTag, "${logMsg}失敗_権限取得処理エラー (URI: \"$uriString\")", e)
             UseCaseResult.Failure(e)
         }
     }

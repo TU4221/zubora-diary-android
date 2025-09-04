@@ -9,23 +9,41 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearM
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
-import kotlin.jvm.Throws
 
+/**
+ * 既存の日記リストを再読み込みし、フッターを更新するユースケース。
+ *
+ * 日記の新規保存、編集、削除後にリストを最新の状態に更新するために使用される。
+ * 読み込むアイテム数は、現在のリストのアイテム数、または最低読み込み数のうち大きい方が採用される。
+ *
+ * @property loadDiaryListUseCase 日記リストを読み込むためのユースケース。
+ * @property updateDiaryListFooterUseCase 日記リストのフッターを更新するためのユースケース。
+ */
 internal class RefreshDiaryListUseCase(
     private val loadDiaryListUseCase: LoadDiaryListUseCase,
     private val updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "日記リスト再読込_"
 
+    /**
+     * ユースケースを実行し、日記リストを再読み込みし、フッターを更新した新しいリストを返す。
+     *
+     * @param currentList 現在表示されている日記のリスト。
+     * @param startDate 日記を読み込む期間の開始日。`null` の場合は全期間を対象とする。
+     * @return 再読み込みとフッター更新が成功した場合は、新しい日記リストを [UseCaseResult.Success] に格納して返す。
+     *   処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     */
     suspend operator fun invoke(
         currentList: DiaryYearMonthList<DiaryDayListItem.Standard>,
         startDate: LocalDate?
     ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>> {
-        val logMsg = "日記リスト再読込_"
-        Log.i(logTag, "${logMsg}開始")
+        Log.i(logTag, "${logMsg}開始 (現リスト件数: ${currentList.countDiaries()}," +
+                " 読込予定件数: ${currentList.countDiaries()}, 開始日: ${startDate ?: "全期間"})")
 
         var numLoadItems = currentList.countDiaries()
+
         // HACK:リストが空の状態、又は画面サイズより少ないアイテム数で日記を追加し、
         //      リスト画面に戻った際に以下の問題が発生する回避策。
         //      問題点:
@@ -37,23 +55,35 @@ internal class RefreshDiaryListUseCase(
         if (numLoadItems < NUM_LOAD_ITEMS) {
             numLoadItems = NUM_LOAD_ITEMS
         }
-        try {
-            val loadedDiaryList =
-                loadDiaryList(
-                    numLoadItems,
-                    startDate
-                )
-            val resultList = updateDiaryListFooter(loadedDiaryList, startDate)
 
-            Log.i(logTag, "${logMsg}完了")
-            return UseCaseResult.Success(resultList)
-        } catch (e: DomainException) {
-            Log.e(logTag, "${logMsg}失敗", e)
-            return UseCaseResult.Failure(e)
-        }
+        val loadedDiaryList =
+            try {
+                loadDiaryList(numLoadItems, startDate)
+            } catch (e: DomainException) {
+                Log.e(logTag, "${logMsg}失敗_再読込処理エラー", e)
+                return UseCaseResult.Failure(e)
+            }
+
+        val resultList =
+            try {
+                updateDiaryListFooter(loadedDiaryList, startDate)
+            } catch (e: DomainException) {
+                Log.e(logTag, "${logMsg}失敗_フッター更新処理エラー", e)
+                return UseCaseResult.Failure(e)
+            }
+
+        Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
+        return UseCaseResult.Success(resultList)
     }
 
-    @Throws(DomainException::class)
+    /**
+     * 指定されたアイテム数で日記リストを読み込む。オフセットは0で固定される。
+     *
+     * @param numLoadItems 読み込む日記のアイテム数。
+     * @param startDate 日記を読み込む期間の開始日。`null` の場合は全期間を対象とする。
+     * @return 読み込まれた日記のリスト。
+     * @throws DomainException 日記の読込に失敗した場合 ([LoadDiaryListUseCase] からスローされる例外)。
+     */
     private suspend fun loadDiaryList(
         numLoadItems: Int,
         startDate: LocalDate?
@@ -61,7 +91,7 @@ internal class RefreshDiaryListUseCase(
         val result =
             loadDiaryListUseCase(
                 numLoadItems,
-                0,
+                0, // 再読み込みのためオフセットは0
                 startDate
             )
         return when (result) {
@@ -74,7 +104,16 @@ internal class RefreshDiaryListUseCase(
         }
     }
 
-    @Throws(DomainException::class)
+    /**
+     * 指定された日記リストのフッター情報を更新する。
+     *
+     * @param list フッターを更新する対象の日記リスト。
+     * @param startDate 日記を読み込む期間の開始日（フッターの内容決定に使用される場合がある）。
+     *                  `null` の場合は全期間を対象とする。
+     * @return フッターが更新された日記リスト。
+     * @throws DomainException フッターの更新処理に失敗した場合
+     *   ([UpdateDiaryListFooterUseCase] からスローされる例外)。
+     */
     private suspend fun updateDiaryListFooter(
         list: DiaryYearMonthList<DiaryDayListItem.Standard>,
         startDate: LocalDate?

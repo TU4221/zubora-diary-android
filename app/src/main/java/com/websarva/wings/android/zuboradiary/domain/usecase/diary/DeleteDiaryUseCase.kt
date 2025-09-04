@@ -9,67 +9,91 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResul
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
+/**
+ * 特定の日付の日記を削除するユースケース。
+ *
+ * 日記データと共に、関連付けられた画像URIの永続的な権限も解放する。
+ *
+ * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
+ * @property releaseDiaryImageUriPermissionUseCase 画像URIの永続的権限を解放するためのユースケース。
+ */
 internal class DeleteDiaryUseCase(
     private val diaryRepository: DiaryRepository,
     private val releaseDiaryImageUriPermissionUseCase: ReleaseDiaryImageUriPermissionUseCase,
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "日記削除_"
 
-    // MEMO:日記表示、編集フラグメント以外からも削除できるように下記引数とする。
+    /**
+     * ユースケースを実行し、指定された日付の日記を削除し、関連する画像URIの権限を解放する。
+     *
+     * @param date 削除する日記の日付。
+     * @param imageUriString 削除する日記に関連付けられた画像のURI文字列。権限解放の対象となる。
+     *                       `null`の場合は権限解放処理をスキップする。
+     * @return 日記の削除処理が成功した場合は[UseCaseResult.Success] に `Unit` を格納して返す。
+     *         画像URI権限の解放に失敗しても日記削除が成功すれば成功とみなす。
+     *   日記の削除処理自体に失敗した場合は [UseCaseResult.Failure] を返す。
+     */
     suspend operator fun invoke(
         date: LocalDate,
         imageUriString: String?
     ): DefaultUseCaseResult<Unit> {
-        val logMsg = "日記削除_"
-        Log.i(logTag, "${logMsg}開始")
+        Log.i(logTag, "${logMsg}開始 (日付: $date, 画像URI: ${imageUriString?.let { "\"$it\"" } ?: "なし"})")
 
         try {
             deleteDiary(date)
         } catch (e: DiaryDeleteFailureException) {
-            Log.e(logTag, "${logMsg}失敗", e)
+            Log.e(logTag, "${logMsg}失敗_日記データ削除エラー", e)
             return UseCaseResult.Failure(e)
         }
 
         try {
             releaseImageUriPermission(imageUriString)
         } catch (e: DomainException) {
-            Log.e(logTag, "${logMsg}失敗", e)
-            // MEMO:Uri権限の取り消しに失敗しても日記保存がメインの為、成功とみなす。
+            // Uri権限の取り消しに失敗しても日記保存がメインの為、成功とみなす。
+            Log.w(logTag, "${logMsg}警告_画像URI権限解放エラー", e)
         }
 
         Log.i(logTag, "${logMsg}完了")
         return UseCaseResult.Success(Unit)
     }
 
-    @Throws(DiaryDeleteFailureException::class)
+
+    /**
+     * 指定された日付の日記データを削除する。
+     *
+     * @param date 削除する日記の日付。
+     * @throws DiaryDeleteFailureException 日記データの削除に失敗した場合。
+     */
     private suspend fun deleteDiary(
         date: LocalDate
     ) {
-        val logMsg = "日記データ削除_"
-        Log.i(logTag, "${logMsg}開始")
-
         try {
             diaryRepository.deleteDiary(date)
         } catch (e: DiaryDeleteFailureException) {
             throw e
         }
-
-        Log.i(logTag, "${logMsg}完了")
     }
 
-    @Throws(DomainException::class)
+    /**
+     * 指定された画像URI文字列に対する永続的な権限を解放する。
+     *
+     * URI文字列が `null` の場合は何も行わない。
+     *
+     * @param uriString 権限を解放する画像のURI文字列。
+     * @throws DomainException 権限解放処理に失敗した場合
+     *   （[ReleaseDiaryImageUriPermissionUseCase] からスローされる例外）。
+     */
     private suspend fun releaseImageUriPermission(
         uriString: String?
     ) {
-        val logMsg = "画像URIの永続的権限権限解放_"
 
         if (uriString == null) {
-            Log.i(logTag, "${logMsg}不要")
+            Log.i(logTag, "${logMsg}_URI解放不要 (画像URIなし)")
             return
         }
 
-        Log.i(logTag, "${logMsg}開始")
         when (val result = releaseDiaryImageUriPermissionUseCase(uriString)) {
             is UseCaseResult.Success -> {
                 // 処理なし
@@ -78,7 +102,5 @@ internal class DeleteDiaryUseCase(
                 throw result.exception
             }
         }
-
-        Log.i(logTag, "${logMsg}完了")
     }
 }

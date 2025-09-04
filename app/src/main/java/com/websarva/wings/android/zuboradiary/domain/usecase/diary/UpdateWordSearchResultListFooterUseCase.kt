@@ -8,18 +8,34 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearM
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
+/**
+ * ワード検索結果リストのフッターを更新するユースケース。
+ *
+ * 未読込の検索結果が存在するかどうかを確認し、存在しない場合はリストのフッターを
+ * プログレスインディケーターから「これ以上の検索結果はありません」というメッセージに置き換える。
+ *
+ * @property checkUnloadedWordSearchResultsExistUseCase 未読込のワード検索結果が存在するかどうかを確認するユースケース。
+ */
 internal class UpdateWordSearchResultListFooterUseCase(
     private val checkUnloadedWordSearchResultsExistUseCase: CheckUnloadedWordSearchResultsExistUseCase
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "ワード検索結果リストフッター更新_"
 
+    /**
+     * ユースケースを実行し、必要に応じてフッターが更新されたワード検索結果リストを返す。
+     *
+     * @param list フッターを更新する対象のワード検索結果リスト。
+     * @param searchWord 検索キーワード。未読込の検索結果存在確認に使用される。
+     * @return フッターが更新されたワード検索結果リスト、または元のリストを [UseCaseResult.Success] に格納して返す。
+     *   未読込の検索結果存在確認処理でエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     */
     suspend operator fun invoke(
         list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
         searchWord: String
     ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>> {
-        val logMsg = "ワード検索結果リストフッター更新_"
-        Log.i(logTag, "${logMsg}開始")
+        Log.i(logTag, "${logMsg}開始 (リスト件数: ${list.countDiaries()}, 検索ワード: \"$searchWord\")")
 
         try {
             val numLoadedDiaries = list.countDiaries()
@@ -27,18 +43,21 @@ internal class UpdateWordSearchResultListFooterUseCase(
                 when (val result = checkUnloadedWordSearchResultsExistUseCase(searchWord, numLoadedDiaries)) {
                     is UseCaseResult.Success -> {
                         if (result.value) {
+                            // 未読込の検索結果が存在する場合、リストは変更しない
+                            Log.i(logTag, "${logMsg}完了_未読込の検索結果あり (リスト変更なし)")
                             list
                         } else {
+                            // 未読込の検索結果が存在しない場合、フッターをメッセージに置き換える
+                            Log.i(logTag, "${logMsg}完了_未読込の検索結果なし (フッターをメッセージに置換)")
                             list.replaceFooterWithNoDiaryMessage()
                         }
                     }
                     is UseCaseResult.Failure -> throw result.exception
                 }
 
-            Log.i(logTag, "${logMsg}完了")
             return UseCaseResult.Success(resultList)
         } catch (e: DomainException) {
-            Log.e(logTag, "${logMsg}失敗", e)
+            Log.e(logTag, "${logMsg}失敗_未読込の検索結果存在確認エラー", e)
             return UseCaseResult.Failure(e)
         }
     }

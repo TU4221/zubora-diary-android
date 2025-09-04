@@ -8,21 +8,34 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResul
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
+/**
+ * 指定された日付の日記が既に存在するかどうかを確認するユースケース。
+ *
+ * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
+ */
 internal class DoesDiaryExistUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "日記既存確認_"
 
+    /**
+     * ユースケースを実行し、指定された日付の日記が存在するかどうかを返す。
+     *
+     * @param date 確認する日記の日付。
+     * @return 日記が存在する場合は [UseCaseResult.Success] に `true` を、
+     *         存在しない場合は `false` を格納して返す。
+     *   存在確認処理に失敗した場合は [UseCaseResult.Failure] を返す。
+     */
     suspend operator fun invoke(date: LocalDate): DefaultUseCaseResult<Boolean> {
-        val logMsg = "日記既存確認_"
-        Log.i(logTag, "${logMsg}開始")
+        Log.i(logTag, "${logMsg}開始 (日付: $date)")
         return try {
             val exists = diaryRepository.existsDiary(date)
-            Log.i(logTag, "${logMsg}完了")
+            Log.i(logTag, "${logMsg}完了 (結果: $exists)")
             UseCaseResult.Success(exists)
         } catch (e: DiaryExistenceCheckFailureException) {
-            Log.e(logTag, "${logMsg}失敗", e)
+            Log.e(logTag, "${logMsg}失敗_存在確認処理エラー", e)
             UseCaseResult.Failure(e)
         }
     }

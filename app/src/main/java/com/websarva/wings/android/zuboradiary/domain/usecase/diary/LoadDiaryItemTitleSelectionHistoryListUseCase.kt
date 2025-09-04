@@ -9,19 +9,28 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
+/**
+ * 日記項目のタイトル選択履歴リストを読み込むユースケース。
+ *
+ * ユーザーが過去に選択した日記のタイトル候補のリストを提供する。
+ *
+ * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
+ */
 internal class LoadDiaryItemTitleSelectionHistoryListUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "日記タイトル選択履歴読込_"
 
     /**
-     * @return [UseCaseResult.Success]
-     * この内部の [Flow] は、実行中に [DiaryItemTitleSelectionHistoryLoadFailureException] を
-     * スローする可能性があります。
+     * ユースケースを実行し、日記項目のタイトル選択履歴のFlowを返す。
+     *
+     * @return タイトル選択履歴リストを内包するFlowを [UseCaseResult.Success] に格納して返す。
+     *   この内部の [Flow] は、実行中に [DiaryItemTitleSelectionHistoryLoadFailureException] を
+     *   スローする可能性がある。[UseCaseResult.Failure] は返さない。
      */
     operator fun invoke(): UseCaseResult.Success<Flow<DiaryItemTitleSelectionHistoryList>> {
-        val logMsg = "日記タイトル選択履歴読込_"
         Log.i(logTag, "${logMsg}開始")
 
         val flow =
@@ -32,3 +41,4 @@ internal class LoadDiaryItemTitleSelectionHistoryListUseCase(
         return UseCaseResult.Success(flow)
     }
 }
+

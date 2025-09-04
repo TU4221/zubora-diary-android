@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.mapper.toDiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
@@ -13,26 +13,50 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearM
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
+/**
+ * 指定された検索ワードに一致する日記のリストを読み込み、表示用のデータに整形して返すユースケース。
+ *
+ * 取得した生の結果リストから、検索ワードにヒットした具体的な項目を抽出し、
+ * 年月ごとにグループ化された表示用のリスト形式に変換する。
+ *
+ * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
+ */
 internal class LoadWordSearchResultListUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "ワード検索結果リスト読込_"
 
     private val itemNumberKey = "ItemNumber"
     private val itemTitleKey = "ItemTitle"
     private val itemCommentKey = "ItemComment"
 
+    /**
+     * ユースケースを実行し、指定された検索ワードに一致する日記のリストを読み込み、整形して返す。
+     *
+     * @param numLoadItems 一度に読み込むアイテム数。1以上の値を指定する必要がある。
+     * @param loadOffset 読み込みを開始するオフセット。0以上の値を指定する必要がある。
+     * @param searchWord 検索ワード。空でない文字列を指定する必要がある。
+     * @return 整形されたワード検索結果の日記リストを [UseCaseResult.Success] に格納して返す。
+     *   日記リストの読み込みに失敗した場合は [UseCaseResult.Failure] を返す。
+     * @throws IllegalArgumentException `numLoadItems`が1未満、`loadOffset`が負数、
+     *   または`searchWord`が空の場合にスローされる。
+     */
     suspend operator fun invoke(
         numLoadItems: Int,
         loadOffset: Int,
         searchWord: String
     ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>> {
-        val logMsg = "ワード検索結果リスト読込_"
-        Log.i(logTag, "${logMsg}開始")
-        require(numLoadItems >= 1)
-        require(loadOffset >= 0)
-        require(searchWord.isNotEmpty())
+        Log.i(logTag, "${logMsg}開始 (読込件数: $numLoadItems, オフセット: $loadOffset, 検索ワード: \"$searchWord\")")
+
+        require(numLoadItems >= 1) {
+            "${logMsg}不正引数_読み込みアイテム数は1以上必須 (読込件数: $numLoadItems)"
+        }
+        require(loadOffset >= 0) {
+            "${logMsg}不正引数_読み込みオフセットは0以上必須 (オフセット: $loadOffset)"
+        }
+        require(searchWord.isNotEmpty()) { "${logMsg}不正引数_検索ワードは空であってはいけない" }
 
         try {
             val wordSearchResultList =
@@ -42,14 +66,21 @@ internal class LoadWordSearchResultListUseCase(
                     searchWord
                 )
             val convertedList = convertWordSearchResultList(wordSearchResultList, searchWord)
-            Log.i(logTag, "${logMsg}完了")
+            Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${convertedList.countDiaries()})")
             return UseCaseResult.Success(convertedList)
-        } catch (e: DiaryListLoadFailureException) {
-            Log.e(logTag, "${logMsg}失敗", e)
+        } catch (e: WordSearchResultListLoadFailureException) {
+            Log.e(logTag, "${logMsg}失敗_読込処理エラー", e)
             return UseCaseResult.Failure(e)
         }
     }
 
+    /**
+     * 生のワード検索結果リストを、表示用の年月でグループ化されたリストに変換する。
+     *
+     * @param diaryList 変換対象の生のワード検索結果リスト。
+     * @param searchWord 検索に使用されたキーワード。
+     * @return 年月でグループ化されたワード検索結果の日記リスト。入力リストが空の場合は空のリストを返す。
+     */
     private fun convertWordSearchResultList(
         diaryList: List<RawWordSearchResultListItem>,
         searchWord: String
@@ -63,6 +94,15 @@ internal class LoadWordSearchResultListUseCase(
         return diaryDayList.toDiaryYearMonthList()
     }
 
+    /**
+     * 生のワード検索結果アイテムを、表示用の [DiaryDayListItem.WordSearchResult] に変換する。
+     *
+     * 内部で [extractWordSearchResultTargetItem] を呼び出し、検索ワードにヒットした項目情報を取得する。
+     *
+     * @param item 変換対象の生のワード検索結果アイテム。
+     * @param searchWord 検索に使用されたキーワード。
+     * @return 表示用のワード検索結果アイテム。
+     */
     private fun convertWordSearchResultListItem(
         item: RawWordSearchResultListItem,
         searchWord: String
@@ -79,6 +119,19 @@ internal class LoadWordSearchResultListUseCase(
         )
     }
 
+    /**
+     * 生のワード検索結果アイテムから、検索ワードに実際にヒットした項目（タイトルまたはコメント）を抽出する。
+     *
+     * 複数の項目（項目1～項目5）の中から、指定された検索ワードがタイトルまたはコメントに含まれる
+     * 最初の項目を特定する。ヒットする項目がない(ヒット先が日記タイトル)場合は、項目1の情報を返す。
+     *
+     * @param item 検索対象の生のワード検索結果アイテム。
+     * @param searchWord 検索するキーワード。
+     * @return 抽出された項目の情報（項目番号、タイトル、コメント）を格納したマップ。
+     *   キーは [itemNumberKey], [itemTitleKey], [itemCommentKey]。
+     * @throws IllegalStateException 項目1～項目5に対して検索ワードのヒットがなく、
+     *                               返す予定の項目1のタイトルまたはコメントが `null` の場合。
+     */
     // MEMO:本来はDataSource側で処理するべき内容だが、対象日記項目のみを抽出するには複雑なロジックになる為、
     //      ドメイン側で処理する。
     private fun extractWordSearchResultTargetItem(
@@ -120,8 +173,16 @@ internal class LoadWordSearchResultListUseCase(
         // 検索ワードが項目タイトル、コメントに含まれていない場合、アイテムNo.1を抽出
         if (itemNumber == 0) {
             itemNumber = 1
-            itemTitle = itemTitles[0] ?: throw IllegalStateException()
-            itemComment = itemComments[0] ?: throw IllegalStateException()
+            itemTitle =
+                itemTitles[0]
+                    ?: throw IllegalStateException(
+                        "検索ワードにヒットせずitem1を返そうとしましたが、項目1のタイトルがnullです。"
+                    )
+            itemComment =
+                itemComments[0]
+                    ?: throw IllegalStateException(
+                        "検索ワードにヒットせずitem1を返そうとしましたが、項目1のコメントがnullです。"
+                    )
         }
 
         val result: MutableMap<String, Any> = HashMap()

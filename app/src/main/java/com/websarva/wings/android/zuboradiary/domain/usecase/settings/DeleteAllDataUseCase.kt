@@ -8,6 +8,18 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAll
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
+/**
+ * アプリケーションの全データを削除するユースケース。
+ *
+ * 具体的には以下の処理を実行する。
+ * 1. 全ての日記データ (項目タイトル選択履歴含む) を削除する。
+ * 2. 全ての永続的なURI権限を解放する。
+ * 3. 全ての設定を初期化する。
+ *
+ * @property diaryRepository 日記関連の操作を行うリポジトリ。
+ * @property releaseAllPersistableUriPermissionUseCase 全ての永続的なURI権限を解放するユースケース。
+ * @property initializeAllSettingsUseCase 全ての設定を初期化するユースケース。
+ */
 internal class DeleteAllDataUseCase(
     private val diaryRepository: DiaryRepository,
     private val releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase,
@@ -15,9 +27,16 @@ internal class DeleteAllDataUseCase(
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "アプリ全データ削除_"
 
+    /**
+     * ユースケースを実行し、アプリケーションの全データを削除する。
+     *
+     * @return 全ての削除処理が成功した場合は [UseCaseResult.Success] を返す。
+     *   いずれかの処理でエラーが発生した場合は、対応する [DeleteAllDataUseCaseException] を
+     *   [UseCaseResult.Failure] に格納して返す。
+     */
     suspend operator fun invoke(): UseCaseResult<Unit, DeleteAllDataUseCaseException> {
-        val logMsg = "アプリ全データ削除_"
         Log.i(logTag, "${logMsg}開始")
 
         try {
@@ -25,7 +44,16 @@ internal class DeleteAllDataUseCase(
             releaseAllImageUriPermission()
             initializeAllSettings()
         } catch (e: DeleteAllDataUseCaseException) {
-            Log.e(logTag, "${logMsg}失敗", e)
+            when (e) {
+                is DeleteAllDataUseCaseException.AllDataDeleteFailure ->
+                    Log.e(logTag, "${logMsg}失敗_日記データ削除処理エラー", e)
+
+                is DeleteAllDataUseCaseException.AllPersistableUriPermissionReleaseFailure ->
+                    Log.e(logTag, "${logMsg}失敗_権限解放処理エラー", e)
+
+                is DeleteAllDataUseCaseException.AllSettingsInitializationFailure ->
+                    Log.e(logTag, "${logMsg}失敗_設定初期化処理エラー", e)
+            }
             return UseCaseResult.Failure(e)
         }
 
@@ -33,25 +61,25 @@ internal class DeleteAllDataUseCase(
         return UseCaseResult.Success(Unit)
     }
 
-    @Throws(DeleteAllDataUseCaseException.AllDataDeleteFailure::class)
+    /**
+     * 全ての日記データを削除する。
+     *
+     * @throws DeleteAllDataUseCaseException.AllDataDeleteFailure 日記データの削除に失敗した場合。
+     */
     private suspend fun deleteAllData() {
-        val logMsg = "全データ削除_"
-        Log.i(logTag, "${logMsg}開始")
-
         try {
             diaryRepository.deleteAllData()
         } catch (e: AllDataDeleteFailureException) {
             throw DeleteAllDataUseCaseException.AllDataDeleteFailure(e)
         }
-
-        Log.i(logTag, "${logMsg}完了")
     }
 
-    @Throws(DeleteAllDataUseCaseException.AllPersistableUriPermissionReleaseFailure::class)
+    /**
+     * 全ての永続的なURI権限を解放する。
+     *
+     * @throws DeleteAllDataUseCaseException.AllPersistableUriPermissionReleaseFailure URI権限の解放に失敗した場合。
+     */
     private fun releaseAllImageUriPermission() {
-        val logMsg = "全永続的URI権限解放_"
-        Log.i(logTag, "${logMsg}開始")
-
         when (val result = releaseAllPersistableUriPermissionUseCase()) {
             is UseCaseResult.Success -> {
                 // 処理なし
@@ -61,15 +89,15 @@ internal class DeleteAllDataUseCase(
                     .AllPersistableUriPermissionReleaseFailure(result.exception)
             }
         }
-
-        Log.i(logTag, "${logMsg}完了")
     }
 
+    /**
+     * 全ての設定を初期化する。
+     *
+     * @throws DeleteAllDataUseCaseException.AllSettingsInitializationFailure 設定の初期化に失敗した場合。
+     */
     @Throws(DeleteAllDataUseCaseException.AllSettingsInitializationFailure::class)
     private suspend fun initializeAllSettings() {
-        val logMsg = "全設定初期化_"
-        Log.i(logTag, "${logMsg}開始")
-
         when (val result = initializeAllSettingsUseCase()) {
             is UseCaseResult.Success -> {
                 // 処理なし
@@ -79,7 +107,5 @@ internal class DeleteAllDataUseCase(
                     .AllSettingsInitializationFailure(result.exception)
             }
         }
-
-        Log.i(logTag, "${logMsg}完了")
     }
 }

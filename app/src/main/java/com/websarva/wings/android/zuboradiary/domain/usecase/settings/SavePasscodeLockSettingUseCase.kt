@@ -8,18 +8,32 @@ import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCode
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
+/**
+ * パスコードロック設定を保存するユースケース。
+ *
+ * @property settingsRepository 設定関連の操作を行うリポジトリ。
+ */
 internal class SavePasscodeLockSettingUseCase(
     private val settingsRepository: SettingsRepository
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "パスコードロック設定保存_"
 
+    /**
+     * ユースケースを実行し、パスコードロック設定を保存する。
+     *
+     * @param isChecked パスコードロックを有効にする場合は `true`、無効にする場合は `false`。
+     * @param passcode 設定するパスコード。`isChecked` が `true` の場合のみ使用される。
+     * @return 保存処理が成功した場合は [UseCaseResult.Success] を返す。
+     *   保存処理中に [PassCodeSettingUpdateFailureException] が発生した場合は
+     *   [UseCaseResult.Failure] を返す。
+     */
     suspend operator fun invoke(
         isChecked: Boolean,
         passcode: String = ""
     ): DefaultUseCaseResult<Unit> {
-        val logMsg = "パスコードロック設定保存_"
-        Log.i(logTag, "${logMsg}開始")
+        Log.i(logTag, "${logMsg}開始 (有効: $isChecked, パスコード: ${if (passcode.isNotEmpty()) "設定あり" else "設定なし"})")
 
         try {
             val preferenceValue =
@@ -30,7 +44,7 @@ internal class SavePasscodeLockSettingUseCase(
                 }
             settingsRepository.savePasscodeLockPreference(preferenceValue)
         } catch (e: PassCodeSettingUpdateFailureException) {
-            Log.e(logTag, "${logMsg}失敗")
+            Log.e(logTag, "${logMsg}失敗_設定保存処理エラー", e)
             return UseCaseResult.Failure(e)
         }
 

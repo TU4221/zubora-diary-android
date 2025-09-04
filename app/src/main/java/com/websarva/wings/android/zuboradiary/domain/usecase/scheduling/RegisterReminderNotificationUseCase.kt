@@ -8,20 +8,32 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResul
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalTime
 
+/**
+ * 指定された時刻にリマインダー通知を登録するユースケース。
+ *
+ * @property schedulingRepository スケジューリング関連の操作を行うリポジトリ。
+ */
 internal class RegisterReminderNotificationUseCase(
     private val schedulingRepository: SchedulingRepository
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "リマインダー通知の登録_"
 
+    /**
+     * ユースケースを実行し、指定された時刻にリマインダー通知を登録する。
+     *
+     * @param notificationTime 通知を登録する時刻。
+     * @return 登録処理が成功した場合は [UseCaseResult.Success] を返す。
+     *   登録処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     */
     operator fun invoke(notificationTime: LocalTime): DefaultUseCaseResult<Unit> {
-        val logMsg = "リマインダー通知の登録_"
-        Log.i(logTag, "${logMsg}開始")
+        Log.i(logTag, "${logMsg}開始 (通知時刻: $notificationTime)")
 
         try {
             schedulingRepository.registerReminderNotification(notificationTime)
         } catch (e: ReminderNotificationRegistrationFailureException) {
-            Log.e(logTag, "${logMsg}失敗", e)
+            Log.e(logTag, "${logMsg}失敗_登録処理エラー", e)
             return UseCaseResult.Failure(e)
         }
 

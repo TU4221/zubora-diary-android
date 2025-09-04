@@ -7,20 +7,32 @@ import com.websarva.wings.android.zuboradiary.domain.exception.uri.PersistableUr
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
+/**
+ * 指定されたURI文字列に対応する永続的なURI権限を解放するユースケース。
+ *
+ * @property uriRepository URI関連の操作を行うリポジトリ。
+ */
 internal class ReleasePersistableUriPermissionUseCase(
     private val uriRepository: UriRepository
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "URIの永続的権限解放_"
 
+    /**
+     * ユースケースを実行し、指定されたURIの永続的な権限を解放する。
+     *
+     * @param uriString 権限を解放する対象のURI文字列。
+     * @return 解放処理が成功した場合は [UseCaseResult.Success] を返す。
+     *   解放処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     */
     operator fun invoke(uriString: String): DefaultUseCaseResult<Unit> {
-        val logMsg = "URIの永続的権限解放_"
-        Log.i(logTag, "${logMsg}開始")
+        Log.i(logTag, "${logMsg}開始 (URI: \"$uriString\")")
 
         try {
             uriRepository.releasePersistableUriPermission(uriString)
         } catch (e: PersistableUriPermissionReleaseFailureException) {
-            Log.e(logTag, "${logMsg}失敗", e)
+            Log.e(logTag, "${logMsg}失敗_権限解放処理エラー", e)
             return UseCaseResult.Failure(e)
         }
 

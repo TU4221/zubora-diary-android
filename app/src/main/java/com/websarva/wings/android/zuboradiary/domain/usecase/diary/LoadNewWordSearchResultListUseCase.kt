@@ -8,41 +8,70 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayLi
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import kotlin.jvm.Throws
 
+/**
+ * 新規にワード検索結果リストを読み込み、フッターを更新するユースケース。
+ *
+ * 新しい検索キーワードで検索を実行した際に、最初の検索結果を取得するために使用される。
+ *
+ * @property loadWordSearchResultListUseCase ワード検索結果リストを読み込むためのユースケース。
+ * @property updateWordSearchResultListFooterUseCase ワード検索結果リストのフッターを更新するためのユースケース。
+ */
 internal class LoadNewWordSearchResultListUseCase(
     private val loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
     private val updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
 ) {
 
     private val logTag = createLogTag()
+    private val logMsg = "新規ワード検索結果リスト読込_"
 
+    /**
+     * ユースケースを実行し、新規にワード検索結果リストを読み込み、フッターを更新したリストを返す。
+     *
+     * @param searchWord 検索ワード。
+     * @return 新規読み込みとフッター更新が成功した場合は、新しい検索結果リストを [UseCaseResult.Success] に格納して返す。
+     *   処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     */
     suspend operator fun invoke(
         searchWord: String
     ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>> {
-        val logMsg = "新規ワード検索結果リスト読込_"
-        Log.i(logTag, "${logMsg}開始")
+        Log.i(logTag, "${logMsg}開始 (検索ワード: \"$searchWord\")")
 
-        try {
-            val loadedDiaryList = loadDiaryList(searchWord)
-            val resultList = updateDiaryListFooter(loadedDiaryList, searchWord)
+        val loadedDiaryList =
+            try {
+                loadDiaryList(searchWord)
+            } catch (e: DomainException) {
+                Log.e(logTag, "${logMsg}失敗_新規ワード検索結果読込処理エラー", e)
+                return UseCaseResult.Failure(e)
+            }
 
-            Log.i(logTag, "${logMsg}完了")
-            return UseCaseResult.Success(resultList)
-        } catch (e: DomainException) {
-            Log.e(logTag, "${logMsg}失敗", e)
-            return UseCaseResult.Failure(e)
-        }
+        val resultList =
+            try {
+                updateDiaryListFooter(loadedDiaryList, searchWord)
+            } catch (e: DomainException) {
+                Log.e(logTag, "${logMsg}失敗_フッター更新処理エラー", e)
+                return UseCaseResult.Failure(e)
+            }
+
+        Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
+        return UseCaseResult.Success(resultList)
     }
 
-    @Throws(DomainException::class)
+    /**
+     * 新規のワード検索結果リストを読み込む。
+     *
+     * @param searchWord 検索ワード。
+     * @return 読み込まれたワード検索結果のリスト。
+     * @throws DomainException ワード検索結果の読込に失敗した場合
+     *   ([LoadWordSearchResultListUseCase] からスローされる例外)。
+     */
     private suspend fun loadDiaryList(
         searchWord: String
     ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
         val result =
             loadWordSearchResultListUseCase(
                 NUM_LOAD_ITEMS,
-                0,
+                0, // 新規読み込みのためオフセットは0
                 searchWord
             )
         return when (result) {
@@ -55,7 +84,15 @@ internal class LoadNewWordSearchResultListUseCase(
         }
     }
 
-    @Throws(DomainException::class)
+    /**
+     * 指定されたワード検索結果リストのフッター情報を更新する。
+     *
+     * @param list フッターを更新する対象のワード検索結果リスト。
+     * @param searchWord 検索ワード。（フッターの内容決定に使用）
+     * @return フッターが更新されたワード検索結果リスト。
+     * @throws DomainException フッターの更新処理に失敗した場合
+     *   ([UpdateWordSearchResultListFooterUseCase] からスローされる例外)。
+     */
     private suspend fun updateDiaryListFooter(
         list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
         searchWord: String
@@ -70,3 +107,4 @@ internal class LoadNewWordSearchResultListUseCase(
         }
     }
 }
+
