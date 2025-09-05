@@ -36,9 +36,15 @@ internal object RepositoryModule {
 
     @Singleton
     @Provides
-    fun provideDiaryRepository(
+    fun provideDiaryRepositoryImpl(
         diaryDataSource: DiaryDataSource
-    ): DiaryRepository = DiaryRepositoryImpl(diaryDataSource)
+    ): DiaryRepositoryImpl = DiaryRepositoryImpl(diaryDataSource)
+
+    @Singleton
+    @Provides
+    fun provideDiaryRepository(
+        diaryRepositoryImpl: DiaryRepositoryImpl
+    ): DiaryRepository = diaryRepositoryImpl
 
     @Singleton
     @Provides

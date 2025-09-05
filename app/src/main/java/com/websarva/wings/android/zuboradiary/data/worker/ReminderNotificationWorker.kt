@@ -15,8 +15,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.websarva.wings.android.zuboradiary.ZuboraDiaryApplication
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
+import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepositoryImpl
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.assisted.Assisted
@@ -35,13 +34,13 @@ import java.time.LocalDate
  *
  * @param context アプリケーションコンテキスト。
  * @param workerParams ワーカーのパラメータ。
- * @property doesDiaryExistUseCase 当日の日記が存在するかどうかを確認するためのユースケース。
+ * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
 @HiltWorker
 internal class ReminderNotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val doesDiaryExistUseCase: DoesDiaryExistUseCase //TODO:UseCaseを引数で受け取るのではなく、日記確認処理のラムダ関数を受け取るように変更する。
+    private val diaryRepository: DiaryRepositoryImpl
 ) : CoroutineWorker(context, workerParams) {
 
     private val logTag = createLogTag()
@@ -101,9 +100,10 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
      * @return 当日の日記が存在する場合はtrue、存在しないまたは確認に失敗した場合はfalse。
      */
     private suspend fun existsSavedTodayDiary(): Boolean {
-        return when (val result = doesDiaryExistUseCase(LocalDate.now())) {
-            is UseCaseResult.Success -> result.value
-            is UseCaseResult.Failure -> false
+        return try {
+            diaryRepository.existsDiary(LocalDate.now())
+        } catch (e: Exception) {
+            false
         }
     }
 
