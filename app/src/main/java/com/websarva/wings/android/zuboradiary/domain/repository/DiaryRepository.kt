@@ -67,28 +67,27 @@ internal interface DiaryRepository {
      * @param date 読み込み対象の日付。
      * @return 指定された日付の日記データ。日記が存在しない場合は `null`。
      * @throws DiaryLoadException.AccessFailure 日記データの読み込みアクセスに失敗した場合。
-     *         ([DiaryLoadException.DataNotFound] は返り値 `null` で表現されるため、ここではスローされない想定)
+     * @throws DiaryLoadException.DataNotFound 該当の日記データが見つからなかった場合。
      */
-    //TODO 返り値 `null`をDiaryLoadException.DataNotFoundに置き換え
-    suspend fun loadDiary(date: LocalDate): Diary?
+    suspend fun loadDiary(date: LocalDate): Diary
 
     /**
      * 保存されている日記の中で、最も新しい日付の日記データを読み込む。
      *
      * @return 最新の日記データ。日記が一つも存在しない場合は `null`。
      * @throws DiaryLoadException.AccessFailure 日記データの読み込みアクセスに失敗した場合。
+     * @throws DiaryLoadException.DataNotFound 該当の日記データが見つからなかった場合。
      */
-    //TODO 返り値 `null`をDiaryLoadException.DataNotFoundに置き換え
-    suspend fun loadNewestDiary(): Diary?
+    suspend fun loadNewestDiary(): Diary
 
     /**
      * 保存されている日記の中で、最も古い日付の日記データを読み込む。
      *
      * @return 最古の日記データ。日記が一つも存在しない場合は `null`。
      * @throws DiaryLoadException.AccessFailure 日記データの読み込みアクセスに失敗した場合。
+     * @throws DiaryLoadException.DataNotFound 該当の日記データが見つからなかった場合。
      */
-    //TODO 返り値 `null`をDiaryLoadException.DataNotFoundに置き換え
-    suspend fun loadOldestDiary(): Diary?
+    suspend fun loadOldestDiary(): Diary
 
     /**
      * 日記リストを読み込む。

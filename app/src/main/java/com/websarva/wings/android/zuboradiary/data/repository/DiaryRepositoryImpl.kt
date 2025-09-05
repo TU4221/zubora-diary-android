@@ -74,30 +74,33 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    override suspend fun loadDiary(date: LocalDate): Diary? {
+    override suspend fun loadDiary(date: LocalDate): Diary {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectDiary(date)?.toDomainModel()
+                    ?: throw DiaryLoadException.DataNotFound()
             } catch (e: DataBaseAccessFailureException) {
                 throw DiaryLoadException.AccessFailure(date, e)
             }
         }
     }
 
-    override suspend fun loadNewestDiary(): Diary? {
+    override suspend fun loadNewestDiary(): Diary {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectNewestDiary()?.toDomainModel()
+                    ?: throw DiaryLoadException.DataNotFound()
             } catch (e: DataBaseAccessFailureException) {
                 throw DiaryLoadException.AccessFailure(cause = e)
             }
         }
     }
 
-    override suspend fun loadOldestDiary(): Diary? {
+    override suspend fun loadOldestDiary(): Diary {
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectOldestDiary()?.toDomainModel()
+                    ?: throw DiaryLoadException.DataNotFound()
             } catch (e: DataBaseAccessFailureException) {
                 throw DiaryLoadException.AccessFailure(cause = e)
             }

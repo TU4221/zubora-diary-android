@@ -38,17 +38,13 @@ internal class LoadDiaryUseCase(
         try {
             val diary = diaryRepository.loadDiary(date)
 
-            if (diary == null) {
-                Log.e(logTag, "${logMsg}失敗_該当日記が存在しない (日付: $date)")
-                return UseCaseResult.Failure(
-                    DiaryLoadException.DataNotFound(date)
-                )
-            }
-
             Log.i(logTag, "${logMsg}完了 (取得日記: $diary)")
             return UseCaseResult.Success(diary)
-        } catch (e: DiaryLoadException) {
+        } catch (e: DiaryLoadException.AccessFailure) {
             Log.e(logTag, "${logMsg}失敗_読込処理エラー (日付: $date)", e)
+            return UseCaseResult.Failure(e)
+        } catch (e: DiaryLoadException.DataNotFound) {
+            Log.e(logTag, "${logMsg}失敗_該当日記が存在しない (日付: $date)")
             return UseCaseResult.Failure(e)
         }
     }
