@@ -5,10 +5,10 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSe
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 /**
@@ -28,12 +28,13 @@ internal class LoadThemeColorSettingUseCase(
     /**
      * ユースケースを実行し、テーマカラー設定の読み込み結果を [Flow] として返す。
      *
-     * 読み込み処理はリポジトリ層で行われ、その結果を [UserSettingResult] に変換して [UseCaseResult] にラップする。
-     * - データソースからの読み込み成功時: [UserSettingResult.Success] を発行。
-     * - データソースからの読み込み失敗時 (アクセス失敗): [UserSettingResult.Failure] を発行し、
-     *   デフォルト値をフォールバックとして提供する。
-     * - データソースからの読み込み失敗時 (データ未発見): [UserSettingResult.Success] を発行し、
-     *   デフォルト値を設定値として提供する。
+     * リポジトリから設定値を読み込み、その結果を [UserSettingResult] に変換する。
+     * - リポジトリからの読み込み成功時: [UserSettingResult.Success] を発行。
+     * - リポジトリからの読み込み失敗時 ([UserSettingsLoadException] が発生した場合):
+     *     - [UserSettingsLoadException.AccessFailure]: [UserSettingResult.Failure] を発行し、
+     *       デフォルト値をフォールバックとして提供する。
+     *     - [UserSettingsLoadException.DataNotFound]: [UserSettingResult.Success] を発行し、
+     *       デフォルト値を設定値として提供する。
      *
      * @return テーマカラー設定の読み込み結果 ([UserSettingResult]) を
      *   [Flow] でラップし、[UseCaseResult.Success] に格納して返す。
@@ -42,49 +43,45 @@ internal class LoadThemeColorSettingUseCase(
     operator fun invoke(): UseCaseResult.Success<Flow<UserSettingResult<ThemeColorSetting>>> {
         Log.i(logTag, "${logMsg}開始")
 
-        val value =
+        val flow =
             settingsRepository
                 .loadThemeColorPreference()
-                .map { result: UserSettingDataSourceResult<ThemeColorSetting> ->
-                    when (result) {
-                        is UserSettingDataSourceResult.Success -> {
-                            Log.d(
-                                logTag,
-                                "${logMsg}読込成功 (設定値: ${result.setting})"
-                            )
-                            UserSettingResult.Success(result.setting)
-                        }
-                        is UserSettingDataSourceResult.Failure -> {
-                            val defaultSettingValue = ThemeColorSetting()
-                            when (result.exception) {
-                                is UserSettingsLoadException.AccessFailure -> {
-                                    Log.w(
-                                        logTag,
-                                        "${logMsg}失敗_アクセス失敗、" +
-                                                "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
-                                        result.exception
-                                    )
-                                    UserSettingResult.Failure(
-                                        result.exception,
-                                        defaultSettingValue
-                                    )
-                                }
-                                is UserSettingsLoadException.DataNotFound -> {
-                                    Log.i(
-                                        logTag,
-                                        "${logMsg}失敗_データ未発見、" +
-                                                "デフォルト値を設定値として使用 (デフォルト値: $defaultSettingValue)"
-                                    )
-                                    UserSettingResult.Success(
-                                        defaultSettingValue
-                                    )
-                                }
+                .map { setting: ThemeColorSetting ->
+                    Log.d(
+                        logTag,
+                        "${logMsg}読込成功 (設定値: ${setting})"
+                    )
+                    val result: UserSettingResult<ThemeColorSetting> =
+                        UserSettingResult.Success(setting)
+                    result
+                }.catch { cause: Throwable ->
+                    if (cause !is UserSettingsLoadException) throw cause
+
+                    val defaultSettingValue = ThemeColorSetting()
+                    val result =
+                        when (cause) {
+                            is UserSettingsLoadException.AccessFailure -> {
+                                Log.w(
+                                    logTag,
+                                    "${logMsg}失敗_アクセス失敗、" +
+                                            "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
+                                    cause
+                                )
+                                UserSettingResult.Failure(cause, defaultSettingValue)
+                            }
+                            is UserSettingsLoadException.DataNotFound -> {
+                                Log.i(
+                                    logTag,
+                                    "${logMsg}失敗_データ未発見、" +
+                                            "デフォルト値を設定値として使用 (デフォルト値: $defaultSettingValue)"
+                                )
+                                UserSettingResult.Success(defaultSettingValue)
                             }
                         }
-                    }
+                    emit(result)
                 }
 
         Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(value)
+        return UseCaseResult.Success(flow)
     }
 }

@@ -10,8 +10,8 @@ import com.websarva.wings.android.zuboradiary.domain.exception.settings.Calendar
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCodeSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -22,55 +22,45 @@ import kotlinx.coroutines.flow.Flow
  */
 internal interface SettingsRepository {
 
-    // TODO:例外のエラーハンドリングをDomain層で処理するように変更(現在データ層で処理)。例外も作成。
     /**
      * テーマカラー設定を読み込む。
      *
-     * @return テーマカラー設定 ([ThemeColorSetting]) を内包した結果 ([UserSettingDataSourceResult]) を放出する Flow。
-     * @throws ThemeColorSettingLoadFailureException 設定の読み込みに失敗した場合。
-    *   ([Flow] 内部で発生する可能性がある)
+     * @return テーマカラー設定 ([ThemeColorSetting]) を放出するFlow。
+     * @throws UserSettingsLoadException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadThemeColorPreference(): Flow<UserSettingDataSourceResult<ThemeColorSetting>>
+    fun loadThemeColorPreference(): Flow<ThemeColorSetting>
 
     /**
      * カレンダーの開始曜日設定を読み込む。
      *
-     * @return カレンダー開始曜日設定 ([CalendarStartDayOfWeekSetting]) を内包した結果 ([UserSettingDataSourceResult]) を放出する Flow。
-     * @throws CalendarStartDayOfWeekSettingLoadFailureException 設定の読み込みに失敗した場合。
-     *   ([Flow] 内部で発生する可能性がある)
+     * @return カレンダー開始曜日設定 ([CalendarStartDayOfWeekSetting]) を放出するFlow。
+     * @throws UserSettingsLoadException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadCalendarStartDayOfWeekPreference():
-            Flow<UserSettingDataSourceResult<CalendarStartDayOfWeekSetting>>
+    fun loadCalendarStartDayOfWeekPreference(): Flow<CalendarStartDayOfWeekSetting>
 
     /**
      * リマインダー通知設定を読み込む。
      *
-     * @return リマインダー通知設定 ([ReminderNotificationSetting]) を内包した結果 ([UserSettingDataSourceResult]) を放出する Flow。
-     * @throws ReminderNotificationSettingLoadFailureException 設定の読み込みに失敗した場合。
-     *   ([Flow] 内部で発生する可能性がある)
+     * @return リマインダー通知設定 ([ReminderNotificationSetting]) を放出するFlow。
+     * @throws UserSettingsLoadException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadReminderNotificationPreference():
-            Flow<UserSettingDataSourceResult<ReminderNotificationSetting>>
+    fun loadReminderNotificationPreference(): Flow<ReminderNotificationSetting>
 
     /**
      * パスコードロック設定を読み込む。
      *
-     * @return パスコードロック設定 ([PasscodeLockSetting]) を内包した結果 ([UserSettingDataSourceResult]) を放出する Flow。
-     * @throws PassCodeSettingLoadFailureException 設定の読み込みに失敗した場合。
-     *   ([Flow] 内部で発生する可能性がある)
+     * @return パスコードロック設定 ([PasscodeLockSetting]) を放出するFlow。
+     * @throws UserSettingsLoadException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadPasscodeLockPreference():
-            Flow<UserSettingDataSourceResult<PasscodeLockSetting>>
+    fun loadPasscodeLockPreference(): Flow<PasscodeLockSetting>
 
     /**
      * 天気情報取得設定を読み込む。
      *
-     * @return 天気情報取得設定 ([WeatherInfoFetchSetting]) を内包した結果 ([UserSettingDataSourceResult]) を放出する Flow。
-     * @throws WeatherInfoFetchSettingLoadFailureException 設定の読み込みに失敗した場合。
-     *   ([Flow] 内部で発生する可能性がある)
+     * @return 天気情報取得設定 ([WeatherInfoFetchSetting]) を放出するFlow。
+     * @throws UserSettingsLoadException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadWeatherInfoFetchPreference():
-            Flow<UserSettingDataSourceResult<WeatherInfoFetchSetting>>
+    fun loadWeatherInfoFetchPreference(): Flow<WeatherInfoFetchSetting>
 
     /**
      * テーマカラー設定を保存する。

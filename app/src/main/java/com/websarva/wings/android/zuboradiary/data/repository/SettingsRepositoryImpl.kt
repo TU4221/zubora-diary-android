@@ -6,7 +6,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStar
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferenceFlowResult
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
@@ -16,10 +15,10 @@ import com.websarva.wings.android.zuboradiary.domain.exception.settings.Reminder
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingDataSourceResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -27,102 +26,58 @@ internal class SettingsRepositoryImpl(
     private val userPreferencesDataSource: UserPreferencesDataSource
 ) : SettingsRepository {
 
-    override fun loadThemeColorPreference(): Flow<UserSettingDataSourceResult<ThemeColorSetting>> {
+    override fun loadThemeColorPreference(): Flow<ThemeColorSetting> {
         return userPreferencesDataSource.loadThemeColorPreference()
-            .map { result ->
-                when (result) {
-                    is UserPreferenceFlowResult.Success -> {
-                        UserSettingDataSourceResult.Success(
-                            result.preference.toDomainModel()
-                        )
-                    }
+            .map { preference ->
+                preference.toDomainModel()
+            }.catch { cause ->
+                if (cause !is UserPreferencesException) return@catch
 
-                    is UserPreferenceFlowResult.Failure -> {
-                        UserSettingDataSourceResult.Failure(
-                            mapPreferenceExceptionToSettingsException(result.exception)
-                        )
-                    }
-                }
+                throw mapPreferenceExceptionToSettingsException(cause)
             }
     }
 
-    override fun loadCalendarStartDayOfWeekPreference():
-            Flow<UserSettingDataSourceResult<CalendarStartDayOfWeekSetting>> {
+    override fun loadCalendarStartDayOfWeekPreference(): Flow<CalendarStartDayOfWeekSetting> {
         return userPreferencesDataSource.loadCalendarStartDayOfWeekPreference()
-            .map { result ->
-                when (result) {
-                    is UserPreferenceFlowResult.Success -> {
-                        UserSettingDataSourceResult.Success(
-                            result.preference.toDomainModel()
-                        )
-                    }
+            .map { preference ->
+                preference.toDomainModel()
+            }.catch { cause ->
+                if (cause !is UserPreferencesException) return@catch
 
-                    is UserPreferenceFlowResult.Failure -> {
-                        UserSettingDataSourceResult.Failure(
-                            mapPreferenceExceptionToSettingsException(result.exception)
-                        )
-                    }
-                }
+                throw mapPreferenceExceptionToSettingsException(cause)
             }
     }
 
-    override fun loadReminderNotificationPreference():
-            Flow<UserSettingDataSourceResult<ReminderNotificationSetting>> {
+    override fun loadReminderNotificationPreference(): Flow<ReminderNotificationSetting> {
         return userPreferencesDataSource.loadReminderNotificationPreference()
-            .map { result ->
-                when (result) {
-                    is UserPreferenceFlowResult.Success -> {
-                        UserSettingDataSourceResult.Success(
-                            result.preference.toDomainModel()
-                        )
-                    }
+            .map { preference ->
+                preference.toDomainModel()
+            }.catch { cause ->
+                if (cause !is UserPreferencesException) return@catch
 
-                    is UserPreferenceFlowResult.Failure -> {
-                        UserSettingDataSourceResult.Failure(
-                            mapPreferenceExceptionToSettingsException(result.exception)
-                        )
-                    }
-                }
+                throw mapPreferenceExceptionToSettingsException(cause)
             }
     }
 
-    override fun loadPasscodeLockPreference():
-            Flow<UserSettingDataSourceResult<PasscodeLockSetting>> {
+    override fun loadPasscodeLockPreference(): Flow<PasscodeLockSetting> {
         return userPreferencesDataSource.loadPasscodeLockPreference()
-            .map { result ->
-                when (result) {
-                    is UserPreferenceFlowResult.Success -> {
-                        UserSettingDataSourceResult.Success(
-                            result.preference.toDomainModel()
-                        )
-                    }
+            .map { preference ->
+                preference.toDomainModel()
+            }.catch { cause ->
+                if (cause !is UserPreferencesException) return@catch
 
-                    is UserPreferenceFlowResult.Failure -> {
-                        UserSettingDataSourceResult.Failure(
-                            mapPreferenceExceptionToSettingsException(result.exception)
-                        )
-                    }
-                }
+                throw mapPreferenceExceptionToSettingsException(cause)
             }
     }
 
-    override fun loadWeatherInfoFetchPreference():
-            Flow<UserSettingDataSourceResult<WeatherInfoFetchSetting>> {
+    override fun loadWeatherInfoFetchPreference(): Flow<WeatherInfoFetchSetting> {
         return userPreferencesDataSource.loadWeatherInfoFetchPreference()
-            .map { result ->
-                when (result) {
-                    is UserPreferenceFlowResult.Success -> {
-                        UserSettingDataSourceResult.Success(
-                            WeatherInfoFetchSetting(result.preference.isEnabled)
-                        )
-                    }
+            .map { preference ->
+                preference.toDomainModel()
+            }.catch { cause ->
+                if (cause !is UserPreferencesException) return@catch
 
-                    is UserPreferenceFlowResult.Failure -> {
-                        UserSettingDataSourceResult.Failure(
-                            mapPreferenceExceptionToSettingsException(result.exception)
-                        )
-                    }
-                }
+                throw mapPreferenceExceptionToSettingsException(cause)
             }
     }
 

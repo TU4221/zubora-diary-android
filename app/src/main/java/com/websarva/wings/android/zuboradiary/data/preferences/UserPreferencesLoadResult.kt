@@ -21,5 +21,5 @@ internal sealed class UserPreferencesLoadResult {
      *
      * @property exception 発生した例外。
      */
-    data class Failure(val exception: UserPreferencesException) : UserPreferencesLoadResult()
+    data class Failure(val exception: UserPreferencesException.DataStoreAccessFailure) : UserPreferencesLoadResult()
 }
