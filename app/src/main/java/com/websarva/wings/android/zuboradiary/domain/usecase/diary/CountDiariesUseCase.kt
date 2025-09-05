@@ -35,14 +35,7 @@ internal class CountDiariesUseCase(
         Log.i(logTag, "${logMsg}開始 (開始日: ${startDate ?: "全期間"})")
 
         return try {
-            val numDiaries =
-                if (startDate == null) {
-                    diaryRepository.countDiaries()
-                } else {
-                    diaryRepository.countDiaries(
-                        startDate
-                    )
-                }
+            val numDiaries = diaryRepository.countDiaries(startDate)
             Log.i(logTag, "${logMsg}完了 (結果: $numDiaries)")
             UseCaseResult.Success(numDiaries)
         } catch (e: DiaryCountFailureException) {

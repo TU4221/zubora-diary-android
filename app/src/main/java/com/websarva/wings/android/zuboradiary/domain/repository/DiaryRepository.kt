@@ -33,22 +33,13 @@ internal interface DiaryRepository {
 
     //region Diary
     /**
-     * 保存されているすべての日記の総数を取得する。
-     *
-     * @return 保存されている日記の総数。
-     * @throws DiaryCountFailureException 日記総数の取得に失敗した場合。
-     */
-    suspend fun countDiaries(): Int
-
-    // TODO:統一
-    /**
      * 指定された日付以降に保存されている日記の数を取得する。
      *
-     * @param date 日記数をカウントする期間の開始日。
-     * @return 指定された日付の日記の数 (通常は0または1)。
+     * @param date 日記数をカウントする期間の開始日。`null` の場合は全期間の日記を対象とする。
+     * @return 指定された期間の日記の総数。
      * @throws DiaryCountFailureException 指定された日付の日記数の取得に失敗した場合。
      */
-    suspend fun countDiaries(date: LocalDate): Int
+    suspend fun countDiaries(date: LocalDate? = null): Int
 
     /**
      * 指定された日付以降の日記データが存在するかどうかを確認する。

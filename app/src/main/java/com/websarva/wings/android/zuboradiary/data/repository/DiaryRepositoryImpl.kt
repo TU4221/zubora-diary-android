@@ -31,7 +31,6 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
-import kotlin.Throws
 
 
 internal class DiaryRepositoryImpl (
@@ -41,21 +40,14 @@ internal class DiaryRepositoryImpl (
     private val logTag = createLogTag()
 
     //region Diary
-    override suspend fun countDiaries(): Int {
+    override suspend fun countDiaries(date: LocalDate?): Int {
         return withContext(Dispatchers.IO) {
             try {
-                diaryDataSource.countDiaries()
-            } catch (e: DataBaseAccessFailureException) {
-                throw DiaryCountFailureException(e)
-            }
-        }
-
-    }
-
-    override suspend fun countDiaries(date: LocalDate): Int {
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.countDiaries(date)
+                if (date == null) {
+                    diaryDataSource.countDiaries()
+                } else {
+                    diaryDataSource.countDiaries(date)
+                }
             } catch (e: DataBaseAccessFailureException) {
                 throw DiaryCountFailureException(e)
             }
