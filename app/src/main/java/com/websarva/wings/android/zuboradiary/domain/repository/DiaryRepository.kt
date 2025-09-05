@@ -44,8 +44,8 @@ internal interface DiaryRepository {
     /**
      * 指定された日付以降の日記データが存在するかどうかを確認する。
      *
-     * @param date 確認対象期間の開始日。
-     * @return 指定された期間の日記が存在すれば `true`、存在しなければ `false`。
+     * @param date 確認する日記の日付。
+     * @return 指定された日付の日記が存在すれば `true`、存在しなければ `false`。
      * @throws DiaryExistenceCheckFailureException 日記の存在確認処理に失敗した場合。
      */
     suspend fun existsDiary(date: LocalDate): Boolean
