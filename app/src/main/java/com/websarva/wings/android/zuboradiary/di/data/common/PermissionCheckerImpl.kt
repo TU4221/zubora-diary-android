@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.di.data.common
 import android.content.Context
 import android.os.Build
 import com.websarva.wings.android.zuboradiary.data.common.PermissionChecker
+import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 
 internal class PermissionCheckerImpl(
@@ -17,4 +18,7 @@ internal class PermissionCheckerImpl(
                 true
             }
         }
+
+    override val isAccessLocationGranted:Boolean
+        get() = context.isAccessLocationGranted()
 }

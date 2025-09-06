@@ -1,6 +1,9 @@
 package com.websarva.wings.android.zuboradiary.di.data
 
 import android.content.Context
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.websarva.wings.android.zuboradiary.data.common.PermissionChecker
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import dagger.Module
 import dagger.Provides
@@ -25,7 +28,14 @@ internal object LocationModule {
 
     @Singleton
     @Provides
-    fun provideFusedLocationDataSource(
+    fun provideFusedLocationProviderClient(
         @ApplicationContext context: Context
-    ):  FusedLocationDataSource = FusedLocationDataSource(context)
+    ): FusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context)
+
+    @Singleton
+    @Provides
+    fun provideFusedLocationDataSource(
+        fusedLocationProviderClient: FusedLocationProviderClient,
+        permissionChecker: PermissionChecker
+    ):  FusedLocationDataSource = FusedLocationDataSource(fusedLocationProviderClient, permissionChecker)
 }

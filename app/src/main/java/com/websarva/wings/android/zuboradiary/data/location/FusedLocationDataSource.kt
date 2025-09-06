@@ -1,14 +1,13 @@
 package com.websarva.wings.android.zuboradiary.data.location
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.location.Location
 import android.util.Log
 import com.google.android.gms.location.CurrentLocationRequest
-import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
+import com.websarva.wings.android.zuboradiary.data.common.PermissionChecker
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withTimeoutOrNull
@@ -21,16 +20,15 @@ import java.util.concurrent.TimeoutException
  * 位置情報へのアクセス権限がない場合や、タイムアウトが発生した場合に発生する特定の例外を
  * [FusedLocationAccessFailureException] にラップする。
  *
- * @property context アプリケーションコンテキスト。
+ * @param fusedLocationProviderClient デバイスの位置情報を取得するために使用される。
+ * @param permissionChecker 位置情報アクセスパーミッションなど、必要な権限が付与されているかを確認する機能を提供。
  */
 internal class FusedLocationDataSource(
-    private val context: Context
+    private val fusedLocationProviderClient: FusedLocationProviderClient,
+    private val permissionChecker: PermissionChecker
 ) {
 
     val logTag = createLogTag()
-
-    private val fusedLocationProviderClient =
-        LocationServices.getFusedLocationProviderClient(context)
 
     // MEMO:fusedLocationProviderClient.lastLocation()を記述する時、Permission確認コードが必須となるが、
     //      Permission確認はプロパティで管理する為、@SuppressLintで警告抑制。
@@ -49,7 +47,7 @@ internal class FusedLocationDataSource(
         Log.i(logTag, "${logMsg}_開始")
         val cancellationTokenSource = CancellationTokenSource()
         try {
-            if (!context.isAccessLocationGranted()) {
+            if (!permissionChecker.isAccessLocationGranted) {
                 Log.i(logTag, "${logMsg}_権限未許可")
                 throw SecurityException()
             }

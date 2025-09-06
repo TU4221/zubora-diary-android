@@ -17,4 +17,11 @@ internal interface PermissionChecker {
      * @return 通知パーミッションが付与されていれば `true`、そうでなければ `false`。
      */
     val isPostNotificationsGranted: Boolean
+
+    /**
+     * 位置情報アクセスに必要な `ACCESS_FINE_LOCATION` 、又は `ACCESS_COARSE_LOCATION` パーミッションが現在付与されているかどうかを示す。
+     *
+     * @return 位置情報アクセスパーミッションが付与されていれば `true`、そうでなければ `false`。
+     */
+    val isAccessLocationGranted: Boolean
 }
