@@ -1,6 +1,10 @@
 package com.websarva.wings.android.zuboradiary.di.data
 
 import android.content.Context
+import androidx.datastore.core.DataStore
+import androidx.datastore.dataStoreFile
+import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
 import com.websarva.wings.android.zuboradiary.di.ApplicationScope
 import dagger.Module
@@ -27,8 +31,17 @@ internal object PreferencesModule {
 
     @Singleton
     @Provides
+    fun provideDataStorePreferences(
+        @ApplicationContext context: Context
+    ): DataStore<Preferences> =
+        PreferenceDataStoreFactory.create {
+            context.dataStoreFile("UserPreferences.preferences_pb")
+        }
+
+    @Singleton
+    @Provides
     fun provideUserPreferences(
-        @ApplicationContext context: Context,
+        preferencesDataStore: DataStore<Preferences>,
         @ApplicationScope appScope: CoroutineScope
-    ): UserPreferencesDataSource = UserPreferencesDataSource(context, appScope)
+    ): UserPreferencesDataSource = UserPreferencesDataSource(preferencesDataStore, appScope)
 }

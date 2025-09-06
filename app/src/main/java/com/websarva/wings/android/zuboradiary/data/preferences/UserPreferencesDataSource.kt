@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.IOException
 import androidx.datastore.preferences.core.MutablePreferences
@@ -9,7 +8,6 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import com.websarva.wings.android.zuboradiary.di.ApplicationScope
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -20,18 +18,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import javax.inject.Inject
-
-/**
- * [Context] の拡張プロパティとして、
- * アプリケーションのユーザー設定[Preferences]を格納する [DataStore] インスタンスを提供する。
- *
- * このDataStoreは "UserPreferences" という名前で識別される。
- */
-// MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
-//      その為、@Suppress("RedundantSuppression")で警告回避。
-@Suppress( "unused", "RedundantSuppression") //MEMO:警告対策。(初期化してない為、Unusedの警告が表示される)
-internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "UserPreferences")
-
 /**
  * ユーザー設定 (Preferences DataStore) へのアクセスを提供するデータソースクラス。
  *
@@ -41,11 +27,11 @@ internal val Context.dataStore: DataStore<Preferences> by preferencesDataStore(n
  * 設定の読み込みはFlowとして提供し、変更をリアクティブに監視できる。
  * 設定の書き込みはsuspend関数として提供。
  *
- * @property context アプリケーションコンテキスト。DataStoreインスタンスの取得に使用。
- * @property appScope アプリケーションスコープのコルーチンスコープ。Flowの共有などに使用。
+ * @param preferencesDataStore ユーザー設定を永続化するためのに使用される。
+ * @property appScope アプリケーションスコープのコルーチンスコープ。Flowの共有などに使用される。
  */
 internal class UserPreferencesDataSource @Inject constructor(
-    private val context: Context,
+    private val preferencesDataStore: DataStore<Preferences>,
     @ApplicationScope private val appScope: CoroutineScope
 ) {
 
@@ -82,7 +68,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @return 最新のユーザー設定の読み込み結果 ([UserPreferencesLoadResult]) を保持し放出する [StateFlow]。
      */
     private val userPreferencesResultFlow =
-        context.dataStore.data
+        preferencesDataStore.data
             .map { preferences ->
                 val result =
                     UserPreferencesLoadResult
@@ -350,7 +336,7 @@ internal class UserPreferencesDataSource @Inject constructor(
         operation: suspend (MutablePreferences) -> Unit
     ): Preferences {
         return try {
-            context.dataStore.edit { preferences ->
+            preferencesDataStore.edit { preferences ->
                 operation(preferences)
             }
         } catch (e: IOException) {
