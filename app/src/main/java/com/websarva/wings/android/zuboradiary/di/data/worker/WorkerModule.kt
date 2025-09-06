@@ -1,8 +1,9 @@
-package com.websarva.wings.android.zuboradiary.di.data
+package com.websarva.wings.android.zuboradiary.di.data.worker
 
 import android.content.Context
 import androidx.work.WorkManager
 import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
+import com.websarva.wings.android.zuboradiary.data.worker.ReminderNotificationMessageProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,4 +35,10 @@ internal object WorkerModule {
     fun provideNotificationSchedulingDataSource(
         workManager: WorkManager
     ): NotificationSchedulingDataSource = NotificationSchedulingDataSource(workManager)
+
+    @Singleton
+    @Provides
+    fun provideReminderNotificationMessageProvider(
+        @ApplicationContext context: Context
+    ): ReminderNotificationMessageProvider = ReminderNotificationMessageProviderImpl(context)
 }

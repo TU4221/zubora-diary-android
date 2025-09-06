@@ -2,8 +2,6 @@ package com.websarva.wings.android.zuboradiary.data.worker
 
 import android.annotation.SuppressLint
 import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.os.Build
 import android.util.Log
@@ -40,44 +38,20 @@ import java.time.LocalDate
 internal class ReminderNotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val diaryRepository: DiaryRepositoryImpl
+    private val diaryRepository: DiaryRepositoryImpl,
+    private val messageProvider: ReminderNotificationMessageProvider
 ) : CoroutineWorker(context, workerParams) {
+
+    companion object{
+        /**
+         * リマインダー通知用チャネルID
+         * */
+        const val CHANNEL_ID = "reminder_notification_worker"
+    }
 
     private val logTag = createLogTag()
 
-    private val channelId: String = context.getString(R.string.reminder_notification_worker_channel_id)
-    private val channelName: String = context.getString(R.string.reminder_notification_worker_channel_name)
-    private val channelDescription: String = context.getString(R.string.reminder_notification_worker_channel_description)
-    private val channelTitle: String = context.getString(R.string.reminder_notification_worker_content_title)
-    private val channelText: String = context.getString(R.string.reminder_notification_worker_content_text)
-    private val notifyId: Int = 100
-
-    init {
-        prepareNotificationManager()
-    }
-
-    /**
-     * 通知チャネルを準備する。
-     * Android O (API 26) 以降では、通知を表示する前に通知チャネルを作成する必要がある。
-     * このメソッドは、リマインダー通知用のチャネルを作成し、設定する。
-     */
-    private fun prepareNotificationManager() {
-        val notificationManager =
-            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        // MEMO:NotificationChannelはSdk26以降の機能
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel =
-                NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH)
-                    .apply{
-                        description = channelDescription
-                        lockscreenVisibility = Notification.VISIBILITY_PUBLIC
-                        enableVibration(true)
-                        setShowBadge(true)
-                    }
-            notificationManager.createNotificationChannel(channel)
-        }
-    }
+    private val notifyId = 100
 
     /**
      * ワーカーのメイン処理を実行する。
@@ -127,7 +101,7 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
         if (!isPermission) return Result.failure()
 
         val builder =
-            NotificationCompat.Builder(applicationContext, channelId)
+            NotificationCompat.Builder(applicationContext, CHANNEL_ID)
 
         val pendingIntent =
             NavDeepLinkBuilder(applicationContext)
@@ -137,8 +111,8 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
 
         val notification =
             builder.setSmallIcon(R.drawable.ic_notifications_24px)
-                .setContentTitle(channelTitle)
-                .setContentText(channelText)
+                .setContentTitle(messageProvider.title)
+                .setContentText(messageProvider.text)
                 .setPriority(NotificationCompat.PRIORITY_MAX)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setContentIntent(pendingIntent)

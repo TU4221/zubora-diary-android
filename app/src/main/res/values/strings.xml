@@ -354,7 +354,6 @@
     <string name="local_time_format_pattern_hour_minute">HH:mm</string>
 
     <!-- ReminderNotificationWorker -->
-    <string name="reminder_notification_worker_channel_id">reminder_notification_worker</string>
     <string name="reminder_notification_worker_channel_name">リマインダー通知</string>
     <string name="reminder_notification_worker_channel_description">設定した時間に日記を書く事をお知らせします。</string>
     <string name="reminder_notification_worker_content_title">お疲れ様です</string>
