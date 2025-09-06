@@ -1,21 +1,13 @@
 package com.websarva.wings.android.zuboradiary.data.worker
 
 import android.annotation.SuppressLint
-import android.app.Notification
 import android.content.Context
-import android.os.Build
-import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
 import androidx.hilt.work.HiltWorker
-import androidx.navigation.NavDeepLinkBuilder
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.websarva.wings.android.zuboradiary.ZuboraDiaryApplication
-import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.data.common.AppForegroundStateProvider
+import com.websarva.wings.android.zuboradiary.data.common.PermissionChecker
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepositoryImpl
-import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.time.LocalDate
@@ -26,32 +18,24 @@ import java.time.LocalDate
  * このワーカーは、ユーザーが設定した時刻に起動し、以下の条件を満たす場合に通知を表示する。
  * - アプリがフォアグラウンドで実行されていない。
  * - 当日の日記がまだ保存されていない。
- * - 通知のパーミッションが付与されている (Android 13以降)。
- *
- * 通知をタップすると、日記一覧画面 ([R.id.navigation_diary_list_fragment]) に遷移する。
+ * - 通知のパーミッションが付与されている
  *
  * @param context アプリケーションコンテキスト。
  * @param workerParams ワーカーのパラメータ。
+ * @property reminderNotifier リマインダー通知を実際に表示する機能を提供。
+ * @property appForegroundStateProvider アプリケーションがフォアグラウンドで実行されているかどうかの状態を提供。
+ * @property permissionChecker 通知パーミッションなど、必要な権限が付与されているかを確認する機能を提供。
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
 @HiltWorker
 internal class ReminderNotificationWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted workerParams: WorkerParameters,
-    private val diaryRepository: DiaryRepositoryImpl,
-    private val messageProvider: ReminderNotificationMessageProvider
+    private val reminderNotifier: ReminderNotifier,
+    private val appForegroundStateProvider: AppForegroundStateProvider,
+    private val permissionChecker: PermissionChecker,
+    private val diaryRepository: DiaryRepositoryImpl
 ) : CoroutineWorker(context, workerParams) {
-
-    companion object{
-        /**
-         * リマインダー通知用チャネルID
-         * */
-        const val CHANNEL_ID = "reminder_notification_worker"
-    }
-
-    private val logTag = createLogTag()
-
-    private val notifyId = 100
 
     /**
      * ワーカーのメイン処理を実行する。
@@ -61,8 +45,7 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
      * @return ワーカーの実行結果。
      */
     override suspend fun doWork(): Result {
-        val application = applicationContext as ZuboraDiaryApplication
-        if (application.isAppInForeground) return Result.success()
+        if (appForegroundStateProvider.isAppInForeground) return Result.success()
         if (existsSavedTodayDiary()) return Result.success()
 
         return showHeadsUpNotification()
@@ -84,43 +67,13 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
     /**
      * HeadsUp通知を表示する。
      *
-     * 通知をタップすると、日記一覧画面に遷移するPendingIntentが設定される。
-     *
      * @return 通知の表示に成功した場合は [Result.success]、パーミッションがない場合は [Result.failure]。
      */
     @SuppressLint("MissingPermission")
     private fun showHeadsUpNotification(): Result {
-        val isPermission =
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                applicationContext.isPostNotificationsGranted()
-            } else {
-                true
-            }
-        Log.d(logTag, "showHeadsUpNotification()_NotificationIsPermission = $isPermission")
+        if (!permissionChecker.isPostNotificationsGranted) return Result.failure()
 
-        if (!isPermission) return Result.failure()
-
-        val builder =
-            NotificationCompat.Builder(applicationContext, CHANNEL_ID)
-
-        val pendingIntent =
-            NavDeepLinkBuilder(applicationContext)
-                .setGraph(R.navigation.mobile_navigation)
-                .setDestination(R.id.navigation_diary_list_fragment)
-                .createPendingIntent()
-
-        val notification =
-            builder.setSmallIcon(R.drawable.ic_notifications_24px)
-                .setContentTitle(messageProvider.title)
-                .setContentText(messageProvider.text)
-                .setPriority(NotificationCompat.PRIORITY_MAX)
-                .setDefaults(Notification.DEFAULT_ALL)
-                .setContentIntent(pendingIntent)
-                .setAutoCancel(true)
-                .build()
-
-        val notificationManagerCompat = NotificationManagerCompat.from(applicationContext)
-        notificationManagerCompat.notify(notifyId, notification)
+        reminderNotifier.show()
         return Result.success()
     }
 }

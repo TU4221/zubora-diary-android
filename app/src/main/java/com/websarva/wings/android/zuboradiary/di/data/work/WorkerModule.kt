@@ -1,9 +1,11 @@
-package com.websarva.wings.android.zuboradiary.di.data.worker
+package com.websarva.wings.android.zuboradiary.di.data.work
 
 import android.content.Context
+import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
 import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
-import com.websarva.wings.android.zuboradiary.data.worker.ReminderNotificationMessageProvider
+import com.websarva.wings.android.zuboradiary.data.worker.ReminderNotifier
+import com.websarva.wings.android.zuboradiary.ui.notification.ReminderNotificationManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -38,7 +40,22 @@ internal object WorkerModule {
 
     @Singleton
     @Provides
-    fun provideReminderNotificationMessageProvider(
+    fun provideNotificationManagerCompatProvider(
         @ApplicationContext context: Context
-    ): ReminderNotificationMessageProvider = ReminderNotificationMessageProviderImpl(context)
+    ): NotificationManagerCompat = NotificationManagerCompat.from(context)
+
+    @Singleton
+    @Provides
+    fun provideReminderNotificationManager(
+        @ApplicationContext context: Context,
+        notificationManagerCompat: NotificationManagerCompat
+    ): ReminderNotificationManager = ReminderNotificationManager(context, notificationManagerCompat)
+
+    @Singleton
+    @Provides
+    fun provideReminderNotifier(
+        reminderNotificationManager: ReminderNotificationManager
+    ): ReminderNotifier {
+        return ReminderNotifierImpl(reminderNotificationManager)
+    }
 }

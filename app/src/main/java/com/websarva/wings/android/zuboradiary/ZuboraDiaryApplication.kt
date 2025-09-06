@@ -13,7 +13,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.Configuration
-import com.websarva.wings.android.zuboradiary.data.worker.ReminderNotificationWorker
+import com.websarva.wings.android.zuboradiary.ui.notification.ReminderNotificationManager
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
@@ -66,7 +66,7 @@ class ZuboraDiaryApplication : Application(), DefaultLifecycleObserver, Configur
             val channelDescription = getString(R.string.reminder_notification_worker_channel_description)
             val channel =
                 NotificationChannel(
-                    ReminderNotificationWorker.CHANNEL_ID,
+                    ReminderNotificationManager.CHANNEL_ID,
                     channelName,
                     NotificationManager.IMPORTANCE_HIGH
                 ).apply{
