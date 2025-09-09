@@ -1,24 +1,13 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesDeleteFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeleteFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryExistenceCheckFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriUsageCheckFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultCountFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeleteFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeleteFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryLoadFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -27,7 +16,7 @@ import java.time.LocalDate
  *
  * このインターフェースは、日記のCRUD操作、日記アイテムのタイトル選択履歴の管理、および日記データの検索機能を提供。
  *
- * 各メソッドは、操作に失敗した場合にドメイン固有の例外([DomainException] のサブクラス) をスローする。
+ * 各メソッドは、操作に失敗した場合にドメイン固有の例外([UseCaseException] のサブクラス) をスローする。
  */
 internal interface DiaryRepository {
 
@@ -37,7 +26,7 @@ internal interface DiaryRepository {
      *
      * @param date 日記数をカウントする期間の開始日。`null` の場合は全期間の日記を対象とする。
      * @return 指定された期間の日記の総数。
-     * @throws DiaryCountFailureException 指定された日付の日記数の取得に失敗した場合。
+     * @throws DataStorageException 指定された日付の日記数の取得に失敗した場合。
      */
     suspend fun countDiaries(date: LocalDate? = null): Int
 
@@ -46,7 +35,7 @@ internal interface DiaryRepository {
      *
      * @param date 確認する日記の日付。
      * @return 指定された日付の日記が存在すれば `true`、存在しなければ `false`。
-     * @throws DiaryExistenceCheckFailureException 日記の存在確認処理に失敗した場合。
+     * @throws DataStorageException 日記の存在確認処理に失敗した場合。
      */
     suspend fun existsDiary(date: LocalDate): Boolean
 
@@ -57,7 +46,7 @@ internal interface DiaryRepository {
      *
      * @param uriString 確認対象の画像のURI文字列。
      * @return 指定されたURIが使用されていれば `true`、使用されていなければ `false`。
-     * @throws DiaryImageUriUsageCheckFailureException 画像URIの使用状況確認処理に失敗した場合。
+     * @throws DataStorageException 画像URIの使用状況確認処理に失敗した場合。
      */
     suspend fun existsImageUri(uriString: String): Boolean
 
@@ -66,8 +55,8 @@ internal interface DiaryRepository {
      *
      * @param date 読み込み対象の日付。
      * @return 指定された日付の日記データ。日記が存在しない場合は `null`。
-     * @throws DiaryLoadException.AccessFailure 日記データの読み込みアクセスに失敗した場合。
-     * @throws DiaryLoadException.DataNotFound 該当の日記データが見つからなかった場合。
+     * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
+     * @throws NotFoundException 該当の日記データが見つからなかった場合。
      */
     suspend fun loadDiary(date: LocalDate): Diary
 
@@ -75,8 +64,8 @@ internal interface DiaryRepository {
      * 保存されている日記の中で、最も新しい日付の日記データを読み込む。
      *
      * @return 最新の日記データ。日記が一つも存在しない場合は `null`。
-     * @throws DiaryLoadException.AccessFailure 日記データの読み込みアクセスに失敗した場合。
-     * @throws DiaryLoadException.DataNotFound 該当の日記データが見つからなかった場合。
+     * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
+     * @throws NotFoundException 該当の日記データが見つからなかった場合。
      */
     suspend fun loadNewestDiary(): Diary
 
@@ -84,8 +73,8 @@ internal interface DiaryRepository {
      * 保存されている日記の中で、最も古い日付の日記データを読み込む。
      *
      * @return 最古の日記データ。日記が一つも存在しない場合は `null`。
-     * @throws DiaryLoadException.AccessFailure 日記データの読み込みアクセスに失敗した場合。
-     * @throws DiaryLoadException.DataNotFound 該当の日記データが見つからなかった場合。
+     * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
+     * @throws NotFoundException 該当の日記データが見つからなかった場合。
      */
     suspend fun loadOldestDiary(): Diary
 
@@ -100,7 +89,7 @@ internal interface DiaryRepository {
      * @param offset 読み込みを開始するオフセット。
      * @param date 日記を読み込む期間の開始日。`null` の場合は全期間を対象とする。
      * @return 読み込まれた日記リスト ([DiaryDayListItem.Standard])。条件に合う日記がない場合は空のリスト。
-     * @throws DiaryListLoadFailureException 日記リストの読み込みに失敗した場合。
+     * @throws DataStorageException 日記リストの読み込みに失敗した場合。
      */
     suspend fun loadDiaryList(
         num: Int,
@@ -115,7 +104,7 @@ internal interface DiaryRepository {
      *
      * @param diary 保存する日記データ。
      * @param historyItemList 保存または更新する日記アイテムのタイトル選択履歴リスト。
-     * @throws DiarySaveFailureException 日記データの保存に失敗した場合。
+     * @throws DataStorageException 日記データの保存に失敗した場合。
      */
     suspend fun saveDiary(
         diary: Diary,
@@ -131,7 +120,7 @@ internal interface DiaryRepository {
      * @param deleteDiaryDate 削除対象の既存の日記の日付。
      * @param newDiary 新しく保存する日記データ。
      * @param historyItemList 保存または更新する日記アイテムのタイトル選択履歴リスト。
-     * @throws DiarySaveFailureException 日記の削除または新しい日記の保存に失敗した場合。
+     * @throws DataStorageException 日記の削除または新しい日記の保存に失敗した場合。
      */
     suspend fun deleteAndSaveDiary(
         deleteDiaryDate: LocalDate,
@@ -143,14 +132,14 @@ internal interface DiaryRepository {
      * 指定された日付の日記データを削除する。
      *
      * @param date 削除対象の日記の日付。
-     * @throws DiaryDeleteFailureException 日記データの削除に失敗した場合。
+     * @throws DataStorageException 日記データの削除に失敗した場合。
      */
     suspend fun deleteDiary(date: LocalDate)
 
     /**
      * 保存されているすべての日記データを削除する。
      *
-     * @throws AllDiariesDeleteFailureException 全日記データの削除に失敗した場合。
+     * @throws DataStorageException 全日記データの削除に失敗した場合。
      */
     suspend fun deleteAllDiaries()
     //endregion
@@ -161,7 +150,7 @@ internal interface DiaryRepository {
      *
      * @param searchWord 検索する単語。
      * @return 検索ワードに一致した日記の数。
-     * @throws WordSearchResultCountFailureException 検索結果数の取得に失敗した場合。
+     * @throws DataStorageException 検索結果数の取得に失敗した場合。
      */
     suspend fun countWordSearchResults(searchWord: String): Int
 
@@ -172,7 +161,7 @@ internal interface DiaryRepository {
      * @param offset 取得開始位置のオフセット。
      * @param searchWord 検索する単語。
      * @return 読み込まれた検索結果のリスト。条件に合う日記がない場合は空のリスト。
-     * @throws WordSearchResultListLoadFailureException 検索結果リストの読み込みに失敗した場合。
+     * @throws DataStorageException 検索結果リストの読み込みに失敗した場合。
      */
     suspend fun loadWordSearchResultList(
         num: Int,
@@ -191,7 +180,7 @@ internal interface DiaryRepository {
      * @param offset 取得開始位置のオフセット。
      * @return 読み込まれた日記アイテムのタイトル選択履歴リスト ([DiaryItemTitleSelectionHistoryListItem]) を放出する Flow。
      *         条件に合う履歴がない場合は空のリストを放出する。
-     * @throws DiaryItemTitleSelectionHistoryLoadFailureException 履歴リストの読み込みに失敗した場合。
+     * @throws DataStorageException 履歴リストの読み込みに失敗した場合。
      *   ([Flow] 内部で発生する可能性がある)
      *
      */
@@ -203,7 +192,7 @@ internal interface DiaryRepository {
      * 指定されたタイトルの日記アイテム選択履歴を削除する。
      *
      * @param title 削除対象の履歴のタイトル。
-     * @throws DiaryItemTitleSelectionHistoryItemDeleteFailureException 履歴アイテムの削除に失敗した場合。
+     * @throws DataStorageException 履歴アイテムの削除に失敗した場合。
      */
     suspend fun deleteDiaryItemTitleSelectionHistory(title: String)
     //endregion
@@ -212,7 +201,7 @@ internal interface DiaryRepository {
     /**
      * アプリケーションの全データ（日記、履歴などすべて）を削除する。
      *
-     * @throws AllDataDeleteFailureException 全データの削除に失敗した場合。
+     * @throws DataStorageException 全データの削除に失敗した場合。
      */
     suspend fun deleteAllData()
     //endregion

@@ -3,10 +3,8 @@ package com.websarva.wings.android.zuboradiary.data.repository
 import android.net.Uri
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
 import com.websarva.wings.android.zuboradiary.data.uri.PersistableUriPermissionOperationFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.PersistableUriPermissionTakeFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.AllPersistableUriPermissionReleaseFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.PersistableUriPermissionReleaseFailureException
 import com.websarva.wings.android.zuboradiary.domain.repository.UriRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.PermissionException
 
 internal class UriRepositoryImpl (
     private val dataSource: UriPermissionDataSource
@@ -17,7 +15,7 @@ internal class UriRepositoryImpl (
         try {
             dataSource.takePersistableUriPermission(uri)
         } catch (e: PersistableUriPermissionOperationFailureException) {
-            throw PersistableUriPermissionTakeFailureException(uri, e)
+            throw PermissionException(cause = e)
         }
     }
 
@@ -26,7 +24,7 @@ internal class UriRepositoryImpl (
         try {
             dataSource.releasePersistableUriPermission(uri)
         } catch (e: PersistableUriPermissionOperationFailureException) {
-            throw PersistableUriPermissionReleaseFailureException(uri, e)
+            throw PermissionException(cause = e)
         }
     }
 
@@ -34,7 +32,7 @@ internal class UriRepositoryImpl (
         try {
             dataSource.releaseAllPersistableUriPermission()
         } catch (e: PersistableUriPermissionOperationFailureException) {
-            throw AllPersistableUriPermissionReleaseFailureException(e)
+            throw PermissionException(cause = e)
         }
     }
 }

@@ -5,9 +5,11 @@ import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSou
 import com.websarva.wings.android.zuboradiary.data.mapper.weather.toDomainModel
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiException
-import com.websarva.wings.android.zuboradiary.domain.exception.weather.WeatherInfoFetchException
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.InvalidParameterException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.LocationException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.NetworkConnectionException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
@@ -29,13 +31,13 @@ internal class WeatherInfoRepositoryImpl (
                     .fetchWeatherInfo(date, location.latitude, location.longitude)
                     .toDomainModel()
             } catch (e: FusedLocationAccessFailureException) {
-                throw WeatherInfoFetchException.AccessLocationFailure(e)
+                throw LocationException(cause = e)
             } catch (e: WeatherApiException) {
                 when (e) {
                     is WeatherApiException.ApiAccessFailure ->
-                        throw WeatherInfoFetchException.ApiAccessFailure(date, e)
+                        throw NetworkConnectionException(cause = e)
                     is WeatherApiException.DateOutOfRange ->
-                        throw WeatherInfoFetchException.DateOutOfRange(date, e)
+                        throw InvalidParameterException(cause = e)
                 }
             }
         }

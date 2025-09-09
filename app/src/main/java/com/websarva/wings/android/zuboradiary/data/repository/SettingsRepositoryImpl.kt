@@ -9,13 +9,10 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSe
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.CalendarStartDayOfWeekSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCodeSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -33,7 +30,7 @@ internal class SettingsRepositoryImpl(
             }.catch { cause ->
                 if (cause !is UserPreferencesException) return@catch
 
-                throw mapPreferenceExceptionToSettingsException(cause)
+                throw mapPreferenceExceptionToRepositoryException(cause)
             }
     }
 
@@ -44,7 +41,7 @@ internal class SettingsRepositoryImpl(
             }.catch { cause ->
                 if (cause !is UserPreferencesException) return@catch
 
-                throw mapPreferenceExceptionToSettingsException(cause)
+                throw mapPreferenceExceptionToRepositoryException(cause)
             }
     }
 
@@ -55,7 +52,7 @@ internal class SettingsRepositoryImpl(
             }.catch { cause ->
                 if (cause !is UserPreferencesException) return@catch
 
-                throw mapPreferenceExceptionToSettingsException(cause)
+                throw mapPreferenceExceptionToRepositoryException(cause)
             }
     }
 
@@ -66,7 +63,7 @@ internal class SettingsRepositoryImpl(
             }.catch { cause ->
                 if (cause !is UserPreferencesException) return@catch
 
-                throw mapPreferenceExceptionToSettingsException(cause)
+                throw mapPreferenceExceptionToRepositoryException(cause)
             }
     }
 
@@ -77,7 +74,7 @@ internal class SettingsRepositoryImpl(
             }.catch { cause ->
                 if (cause !is UserPreferencesException) return@catch
 
-                throw mapPreferenceExceptionToSettingsException(cause)
+                throw mapPreferenceExceptionToRepositoryException(cause)
             }
     }
 
@@ -87,7 +84,7 @@ internal class SettingsRepositoryImpl(
                 val preference = setting.toDataModel()
                 userPreferencesDataSource.saveThemeColorPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-                throw ThemeColorSettingUpdateFailureException(setting.themeColor, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -98,7 +95,7 @@ internal class SettingsRepositoryImpl(
                 val preference = setting.toDataModel()
                 userPreferencesDataSource.saveCalendarStartDayOfWeekPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-                throw CalendarStartDayOfWeekSettingUpdateFailureException(setting.dayOfWeek,e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -109,14 +106,7 @@ internal class SettingsRepositoryImpl(
                 val preference = setting.toDataModel()
                 userPreferencesDataSource.saveReminderNotificationPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-                throw ReminderNotificationSettingUpdateFailureException(
-                    setting.isEnabled,
-                    when (setting) {
-                        is ReminderNotificationSetting.Enabled -> setting.notificationTime
-                        ReminderNotificationSetting.Disabled -> null
-                    },
-                    e
-                )
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -127,14 +117,7 @@ internal class SettingsRepositoryImpl(
                 val preference = setting.toDataModel()
                 userPreferencesDataSource.savePasscodeLockPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-                throw PassCodeSettingUpdateFailureException(
-                    setting.isEnabled,
-                    when (setting) {
-                        is PasscodeLockSetting.Enabled -> setting.passcode
-                        PasscodeLockSetting.Disabled -> ""
-                    },
-                    e
-                )
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -145,20 +128,20 @@ internal class SettingsRepositoryImpl(
                 val preference = setting.toDataModel()
                 userPreferencesDataSource.saveWeatherInfoFetchPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-                throw WeatherInfoFetchSettingUpdateFailureException(setting.isEnabled, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
 
-    private fun mapPreferenceExceptionToSettingsException(
+    private fun mapPreferenceExceptionToRepositoryException(
         preferenceException: UserPreferencesException
-    ): UserSettingsLoadException {
+    ): RepositoryException {
         return when (preferenceException) {
             is UserPreferencesException.DataStoreAccessFailure -> {
-                UserSettingsLoadException.AccessFailure(preferenceException)
+                DataStorageException(cause = preferenceException)
             }
             is UserPreferencesException.DataNotFound -> {
-                UserSettingsLoadException.DataNotFound(preferenceException)
+                NotFoundException()
             }
         }
     }

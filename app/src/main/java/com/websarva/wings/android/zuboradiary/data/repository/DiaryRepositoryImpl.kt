@@ -8,22 +8,11 @@ import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesDeleteFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeleteFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryExistenceCheckFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriUsageCheckFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultCountFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeleteFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeleteFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryLoadFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -49,7 +38,7 @@ internal class DiaryRepositoryImpl (
                     diaryDataSource.countDiaries(date)
                 }
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryCountFailureException(e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -59,7 +48,7 @@ internal class DiaryRepositoryImpl (
             try {
                 diaryDataSource.existsDiary(date)
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryExistenceCheckFailureException(date, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -69,7 +58,7 @@ internal class DiaryRepositoryImpl (
             try {
                 diaryDataSource.existsImageUri(uriString)
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryImageUriUsageCheckFailureException(uriString, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -78,9 +67,9 @@ internal class DiaryRepositoryImpl (
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectDiary(date)?.toDomainModel()
-                    ?: throw DiaryLoadException.DataNotFound()
+                    ?: throw NotFoundException()
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryLoadException.AccessFailure(date, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -89,9 +78,9 @@ internal class DiaryRepositoryImpl (
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectNewestDiary()?.toDomainModel()
-                    ?: throw DiaryLoadException.DataNotFound()
+                    ?: throw NotFoundException()
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryLoadException.AccessFailure(cause = e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -100,9 +89,9 @@ internal class DiaryRepositoryImpl (
         return withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.selectOldestDiary()?.toDomainModel()
-                    ?: throw DiaryLoadException.DataNotFound()
+                    ?: throw NotFoundException()
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryLoadException.AccessFailure(cause = e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -122,7 +111,7 @@ internal class DiaryRepositoryImpl (
                     .selectDiaryListOrderByDateDesc(num, offset, date)
                     .map { it.toDomainModel() }
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryListLoadFailureException(e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -138,7 +127,7 @@ internal class DiaryRepositoryImpl (
                     historyItemList.map { it.toDataModel() }
                 )
             } catch (e: DataBaseAccessFailureException) {
-                throw DiarySaveFailureException(diary.date, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -156,7 +145,7 @@ internal class DiaryRepositoryImpl (
                     historyItemList.map { it.toDataModel() }
                 )
             } catch (e: DataBaseAccessFailureException) {
-                throw DiarySaveFailureException(newDiary.date, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -166,7 +155,7 @@ internal class DiaryRepositoryImpl (
             try {
                 diaryDataSource.deleteDiary(date)
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryDeleteFailureException(date, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -176,7 +165,7 @@ internal class DiaryRepositoryImpl (
             try {
                 diaryDataSource.deleteAllDiaries()
             } catch (e: DataBaseAccessFailureException) {
-                throw AllDiariesDeleteFailureException(e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -188,7 +177,7 @@ internal class DiaryRepositoryImpl (
             try {
                 diaryDataSource.countWordSearchResults(searchWord)
             } catch (e: DataBaseAccessFailureException) {
-                throw WordSearchResultCountFailureException(searchWord, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -207,16 +196,13 @@ internal class DiaryRepositoryImpl (
                     .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
                     .map { it.toDomainModel() }
             } catch (e: DataBaseAccessFailureException) {
-                throw WordSearchResultListLoadFailureException(searchWord, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
     //endregion
 
     //region DiaryItemTitleSelectionHistory
-    /**
-     * @throws DiaryItemTitleSelectionHistoryLoadFailureException
-     */
     override fun loadDiaryItemTitleSelectionHistoryList(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryListItem>> {
@@ -226,7 +212,7 @@ internal class DiaryRepositoryImpl (
         return diaryDataSource
             .selectHistoryListOrderByLogDesc(num, offset)
             .catch {
-                throw DiaryItemTitleSelectionHistoryLoadFailureException(it)
+                throw DataStorageException(cause = it)
             }
             .map { list ->
                 list.map { it.toDomainModel() }
@@ -238,7 +224,7 @@ internal class DiaryRepositoryImpl (
             try {
                 diaryDataSource.deleteHistoryItem(title)
             } catch (e: DataBaseAccessFailureException) {
-                throw DiaryItemTitleSelectionHistoryItemDeleteFailureException(title, e)
+                throw DataStorageException(cause = e)
             }
         }
     }
@@ -250,7 +236,7 @@ internal class DiaryRepositoryImpl (
             try {
                 diaryDataSource.deleteAllData()
             } catch (e: DataBaseAccessFailureException) {
-                throw AllDataDeleteFailureException(e)
+                throw DataStorageException(cause = e)
             }
         }
     }
