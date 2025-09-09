@@ -3,10 +3,11 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.NUM_LOAD_ITEMS
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchListFooterUpdateFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListAdditionLoadException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 /**
  * 既存のワード検索結果リストに追加の検索結果データを読み込み、結合してフッターを更新するユースケース。
@@ -35,7 +36,7 @@ internal class LoadAdditionWordSearchResultListUseCase(
     suspend operator fun invoke(
         currentList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
         searchWord: String
-    ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>> {
+    ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, WordSearchResultListAdditionLoadException> {
         Log.i(logTag, "${logMsg}開始 (現リスト件数: ${currentList.countDiaries()}, 検索ワード: \"$searchWord\")")
 
         val loadedDiaryList =
@@ -44,9 +45,11 @@ internal class LoadAdditionWordSearchResultListUseCase(
                     currentList.countDiaries(),
                     searchWord
                 )
-            } catch (e: DomainException) {
+            } catch (e: WordSearchResultListLoadException) {
                 Log.e(logTag, "${logMsg}失敗_追加ワード検索結果読込処理エラー", e)
-                return UseCaseResult.Failure(e)
+                return UseCaseResult.Failure(
+                    WordSearchResultListAdditionLoadException.LoadFailure(e)
+                )
             }
 
         val combinedList = currentList.combineDiaryLists(loadedDiaryList)
@@ -54,9 +57,11 @@ internal class LoadAdditionWordSearchResultListUseCase(
         val resultList =
             try {
                 updateDiaryListFooter(combinedList, searchWord)
-            } catch (e: DomainException) {
+            } catch (e: WordSearchListFooterUpdateFailureException) {
                 Log.e(logTag, "${logMsg}失敗_フッター更新処理エラー", e)
-                return UseCaseResult.Failure(e)
+                return UseCaseResult.Failure(
+                    WordSearchResultListAdditionLoadException.FooterUpdateFailure(e)
+                )
             }
 
         Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
@@ -69,8 +74,7 @@ internal class LoadAdditionWordSearchResultListUseCase(
      * @param loadOffset 読み込みを開始するオフセット（既に読み込まれている検索結果の数）。
      * @param searchWord 検索ワード。
      * @return 読み込まれたワード検索結果のリスト。
-     * @throws DomainException ワード検索結果の読込に失敗した場合
-     *   ([LoadWordSearchResultListUseCase] からスローされる例外)。
+     * @throws WordSearchResultListLoadException ワード検索結果の読込に失敗した場合。
      */
     private suspend fun loadDiaryList(
         loadOffset: Int,
@@ -98,8 +102,7 @@ internal class LoadAdditionWordSearchResultListUseCase(
      * @param list フッターを更新する対象のワード検索結果リスト。
      * @param searchWord 検索ワード。（フッターの内容決定に使用）
      * @return フッターが更新されたワード検索結果リスト。
-     * @throws DomainException フッターの更新処理に失敗した場合
-     *   ([UpdateWordSearchResultListFooterUseCase] からスローされる例外)。
+     * @throws WordSearchListFooterUpdateFailureException フッターの更新処理に失敗した場合。
      */
     private suspend fun updateDiaryListFooter(
         list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,

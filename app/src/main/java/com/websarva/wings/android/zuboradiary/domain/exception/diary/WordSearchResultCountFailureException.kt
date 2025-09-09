@@ -1,15 +1,30 @@
 package com.websarva.wings.android.zuboradiary.domain.exception.diary
 
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 
 /**
- * 指定された検索ワードに一致する日記の総数を取得する処理中に
- * 予期せぬエラーが発生した場合にスローされる例外。
+ * [CountWordSearchResultsUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
  *
- * @param searchWord 検索に使用されたキーワード。
+ * @param message 例外メッセージ。
  * @param cause 発生した根本的な原因となった[Throwable]。
  */
-internal class WordSearchResultCountFailureException(
-    searchWord: String,
+internal sealed class WordSearchResultCountFailureException(
+    message: String,
     cause: Throwable
-) : DomainException("検索ワード '$searchWord' に一致する日記の総数の取得に失敗しました。", cause)
+) : UseCaseException(message, cause) {
+
+    /**
+     * 検索ワードに一致する日記の総数を取得に失敗した場合にスローされる例外。
+     *
+     * @param searchWord 検索に使用されたキーワード。
+     * @param cause 発生した根本的な原因となった[Throwable]。
+     */
+    class CountFailure(
+        searchWord: String,
+        cause: Throwable
+    ) : WordSearchResultCountFailureException(
+        "検索ワード '$searchWord' に一致する日記の総数の取得に失敗しました。",
+        cause
+    )
+}

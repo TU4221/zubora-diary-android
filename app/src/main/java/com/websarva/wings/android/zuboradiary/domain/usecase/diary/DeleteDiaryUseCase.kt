@@ -3,9 +3,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeleteFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeleteException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriPermissionReleaseException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -38,19 +37,21 @@ internal class DeleteDiaryUseCase(
     suspend operator fun invoke(
         date: LocalDate,
         imageUriString: String?
-    ): DefaultUseCaseResult<Unit> {
+    ): UseCaseResult<Unit, DiaryDeleteException> {
         Log.i(logTag, "${logMsg}開始 (日付: $date, 画像URI: ${imageUriString?.let { "\"$it\"" } ?: "なし"})")
 
         try {
             diaryRepository.deleteDiary(date)
-        } catch (e: DiaryDeleteFailureException) {
+        } catch (e: DiaryDeleteException) {
             Log.e(logTag, "${logMsg}失敗_日記データ削除エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                DiaryDeleteException.DeleteFailure(date, e)
+            )
         }
 
         try {
             releaseImageUriPermission(imageUriString)
-        } catch (e: DomainException) {
+        } catch (e: DiaryImageUriPermissionReleaseException) {
             // Uri権限の取り消しに失敗しても日記保存がメインの為、成功とみなす。
             Log.w(logTag, "${logMsg}警告_画像URI権限解放エラー", e)
         }
@@ -65,8 +66,7 @@ internal class DeleteDiaryUseCase(
      * URI文字列が `null` の場合は何も行わない。
      *
      * @param uriString 権限を解放する画像のURI文字列。
-     * @throws DomainException 権限解放処理に失敗した場合
-     *   （[ReleaseDiaryImageUriPermissionUseCase] からスローされる例外）。
+     * @throws DiaryImageUriPermissionReleaseException 権限解放処理に失敗した場合。
      */
     private suspend fun releaseImageUriPermission(
         uriString: String?
@@ -76,7 +76,6 @@ internal class DeleteDiaryUseCase(
             Log.i(logTag, "${logMsg}_URI解放不要 (画像URIなし)")
             return
         }
-
         when (val result = releaseDiaryImageUriPermissionUseCase(uriString)) {
             is UseCaseResult.Success -> {
                 // 処理なし

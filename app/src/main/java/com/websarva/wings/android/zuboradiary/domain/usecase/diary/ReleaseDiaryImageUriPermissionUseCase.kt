@@ -1,10 +1,10 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriPermissionReleaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriUsageCheckFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -34,7 +34,9 @@ internal class ReleaseDiaryImageUriPermissionUseCase(
      * @return 権限解放処理が正常に完了した場合、またはURIがまだ使用中で解放処理がスキップされた場合は [UseCaseResult.Success] を返す。
      *   URIの使用状況確認に失敗した場合、または権限解放処理自体に失敗した場合は [UseCaseResult.Failure] を返す。
      */
-    suspend operator fun invoke(uriString: String): DefaultUseCaseResult<Unit> {
+    suspend operator fun invoke(
+        uriString: String
+    ): UseCaseResult<Unit, DiaryImageUriPermissionReleaseException> {
         Log.i(logTag, "${logMsg}開始 (URI: \"$uriString\")")
 
         try {
@@ -43,9 +45,12 @@ internal class ReleaseDiaryImageUriPermissionUseCase(
                 Log.i(logTag, "${logMsg}完了_URI使用中のためスキップ (URI: \"$uriString\")")
                 return UseCaseResult.Success(Unit)
             }
-        } catch (e: DiaryImageUriUsageCheckFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_URI使用状況確認エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                DiaryImageUriPermissionReleaseException
+                    .ImageUriUsageCheckFailure(uriString, e)
+            )
         }
 
         when (val result = releasePersistableUriPermissionUseCase(uriString)) {
@@ -55,7 +60,10 @@ internal class ReleaseDiaryImageUriPermissionUseCase(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}失敗_権限解放処理エラー", result.exception)
-                return UseCaseResult.Failure(result.exception)
+                return UseCaseResult.Failure(
+                    DiaryImageUriPermissionReleaseException
+                        .PermissionReleaseFailure(uriString, result.exception)
+                )
             }
         }
     }

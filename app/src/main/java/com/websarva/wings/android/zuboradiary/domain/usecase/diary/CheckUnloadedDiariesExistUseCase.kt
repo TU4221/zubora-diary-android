@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.UnloadedDiariesExistCheckException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -35,7 +35,7 @@ internal class CheckUnloadedDiariesExistUseCase(
     suspend operator fun invoke(
         numLoadedDiaries: Int,
         startDate: LocalDate?
-    ): DefaultUseCaseResult<Boolean> {
+    ): UseCaseResult<Boolean, UnloadedDiariesExistCheckException> {
         Log.i(logTag, "${logMsg}開始 (読込済件数: $numLoadedDiaries, 開始日: ${startDate ?: "全期間"})")
 
         return when (val result = countDiariesUseCase(startDate)) {
@@ -47,11 +47,14 @@ internal class CheckUnloadedDiariesExistUseCase(
                     } else {
                         numLoadedDiaries < numExistingDiaries
                     }
-                Log.i(logTag, "${logMsg}完了_(結果: $unloadedDiariesExist)")
+                Log.i(logTag, "${logMsg}完了 (結果: $unloadedDiariesExist)")
                 UseCaseResult.Success(unloadedDiariesExist)
             }
             is UseCaseResult.Failure -> {
-                UseCaseResult.Failure(result.exception)
+                Log.e(logTag, "${logMsg}失敗_カウント処理エラー")
+                UseCaseResult.Failure(
+                    UnloadedDiariesExistCheckException.CheckFailure(result.exception)
+                )
             }
         }
     }

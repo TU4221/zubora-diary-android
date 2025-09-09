@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.SavedDiaryDateRange
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionD
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListStartYearMonthPickerDateRangeUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshDiaryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DiaryListStartYearMonthPickerDateRangeLoadException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -102,7 +103,7 @@ internal class DiaryListViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 Log.i(logTag, "${logMsg}_キャンセル", e)
                 updateUiStateOnDiaryListLoadCompleted(currentList)
-            } catch (e: DomainException) {
+            } catch (e: UseCaseException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
                 updateUiStateOnDiaryListLoadCompleted(currentList)
                 emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
@@ -355,7 +356,7 @@ internal class DiaryListViewModel @Inject constructor(
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
             updateUiStateOnDiaryListLoadCompleted(currentList)
-        } catch (e: DomainException) {
+        } catch (e: UseCaseException) {
             Log.e(logTag, "${logMsg}_失敗", e)
             updateDiaryList(currentList)
             updateUiStateOnDiaryListLoadCompleted(currentList)
@@ -400,8 +401,12 @@ internal class DiaryListViewModel @Inject constructor(
         when (val result = loadDiaryListStartYearMonthPickerDateRangeUseCase()) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> {
-                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
-                return result.exception.fallbackDateRange
+                when (result.exception) {
+                    is DiaryListStartYearMonthPickerDateRangeLoadException.DiaryInfoLoadFailure -> {
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                        return result.exception.fallbackDateRange
+                    }
+                }
             }
         }
     }

@@ -2,10 +2,10 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListFooterUpdateException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.UnloadedDiariesExistCheckException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -35,7 +35,7 @@ internal class UpdateDiaryListFooterUseCase(
     suspend operator fun invoke(
         list: DiaryYearMonthList<DiaryDayListItem.Standard>,
         startDate: LocalDate?
-    ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>> {
+    ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, DiaryListFooterUpdateException> {
         Log.i(logTag, "${logMsg}開始 (リスト件数: ${list.countDiaries()}, 開始日: ${startDate ?: "全期間"})")
 
         try {
@@ -54,9 +54,11 @@ internal class UpdateDiaryListFooterUseCase(
                     is UseCaseResult.Failure -> throw result.exception
                 }
             return UseCaseResult.Success(resultList)
-        } catch (e: DomainException) {
+        } catch (e: UnloadedDiariesExistCheckException) {
             Log.e(logTag, "${logMsg}失敗_未読込の日記存在確認エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                DiaryListFooterUpdateException.UpdateFailure(e)
+            )
         }
     }
 }

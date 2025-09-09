@@ -1,25 +1,25 @@
 package com.websarva.wings.android.zuboradiary.domain.exception.diary
 
 import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListUseCase
 
 /**
- * [CountDiariesUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
+ * [LoadDiaryListUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
  *
  * @param message 例外メッセージ。
  * @param cause 発生した根本的な原因となった[Throwable]。
  */
-internal sealed class DiaryCountFailureException(
+internal sealed class DiaryListLoadException(
     message: String,
     cause: Throwable
 ) : UseCaseException(message, cause) {
 
     /**
-     * 日記の総数を取得するのに失敗した場合にスローされる例外。
+     * 日記リストの読み込みに失敗した場合にスローされる例外。
      *
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
-    class CountFailure(
+    class LoadFailure(
         cause: Throwable
-    ) : DiaryCountFailureException("日記の総数の取得に失敗しました。", cause)
+    ) : DiaryListLoadException("日記リストの読込に失敗しました。", cause)
 }

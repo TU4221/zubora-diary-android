@@ -5,7 +5,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -32,7 +33,7 @@ internal class LoadDiaryUseCase(
      */
     suspend operator fun invoke(
         date: LocalDate
-    ): DefaultUseCaseResult<Diary> {
+    ): UseCaseResult<Diary, DiaryLoadException> {
         Log.i(logTag, "${logMsg}開始 (日付: $date)")
 
         try {
@@ -40,12 +41,16 @@ internal class LoadDiaryUseCase(
 
             Log.i(logTag, "${logMsg}完了 (取得日記: $diary)")
             return UseCaseResult.Success(diary)
-        } catch (e: DiaryLoadException.AccessFailure) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_読込処理エラー (日付: $date)", e)
-            return UseCaseResult.Failure(e)
-        } catch (e: DiaryLoadException.DataNotFound) {
+            return UseCaseResult.Failure(
+                DiaryLoadException.LoadFailure(date, e)
+            )
+        } catch (e: NotFoundException) {
             Log.e(logTag, "${logMsg}失敗_該当日記が存在しない (日付: $date)")
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                DiaryLoadException.DataNotFound(date, e)
+            )
         }
     }
 }

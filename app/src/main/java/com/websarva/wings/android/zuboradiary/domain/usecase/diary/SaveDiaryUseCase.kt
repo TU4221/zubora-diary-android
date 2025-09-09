@@ -3,11 +3,12 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriPermissionReleaseException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiarySaveException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.PersistableUriPermissionTakeFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -53,7 +54,7 @@ internal class SaveDiaryUseCase(
         diaryItemTitleSelectionHistoryItemList: List<DiaryItemTitleSelectionHistory>,
         originalDiary: Diary,
         isNewDiary: Boolean
-    ): DefaultUseCaseResult<Unit> {
+    ): UseCaseResult<Unit, DiarySaveException> {
         Log.i(logTag, "${logMsg}開始 (新規: $isNewDiary, 日付: ${diary.date}, 元日付: ${originalDiary.date})")
 
         try {
@@ -63,23 +64,27 @@ internal class SaveDiaryUseCase(
                 originalDiary.date,
                 isNewDiary
             )
-        } catch (e: DiarySaveFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_日記データ保存エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                DiarySaveException.SaveFailure(diary.date, e)
+            )
         }
 
         try {
             releaseImageUriPermission(originalDiary.imageUriString)
-        } catch (e: DomainException) {
+        } catch (e: DiaryImageUriPermissionReleaseException) {
             // Uri権限の解放に失敗しても日記保存がメインの為、成功とみなす。
             Log.w(logTag, "${logMsg}元の画像URI権限解放失敗 (URI: \"${originalDiary.imageUriString}\")", e)
+            DiarySaveException.PermissionReleaseFailure(originalDiary.imageUriString ?: "null", e)
         }
 
         try {
             takeSavedImageUriPermission(diary.imageUriString)
-        } catch (e: DomainException) {
+        } catch (e: PersistableUriPermissionTakeFailureException) {
             // Uri権限の取得に失敗しても日記保存がメインの為、成功とみなす。
             Log.w(logTag, "${logMsg}保存画像のURI権限取得失敗 (URI: \"${diary.imageUriString}\")", e)
+            DiarySaveException.PermissionTakeFailure(diary.imageUriString ?: "null", e)
         }
 
         Log.i(logTag, "${logMsg}完了 (日付: ${diary.date})")
@@ -95,7 +100,7 @@ internal class SaveDiaryUseCase(
      * @param diaryItemTitleSelectionHistoryItemList 保存する日記項目のタイトル選択履歴リスト。
      * @param originalDate 更新前の日記の日付。新規作成の場合は、保存する日記の日付と同じ。
      * @param isNewDiary 新規の日記作成かどうかを示すフラグ。
-     * @throws DiarySaveFailureException 日記データの保存または削除に失敗した場合。
+     * @throws DataStorageException 日記データの保存または削除に失敗した場合。
      */
     private suspend fun saveDiary(
         diary: Diary,
@@ -145,8 +150,7 @@ internal class SaveDiaryUseCase(
      * URI文字列が `null` の場合は何も行わない。
      *
      * @param uriString 権限を解放する対象の画像URI文字列。`null` の場合は処理をスキップ。
-     * @throws DomainException 権限解放処理に失敗した場合
-     *   ([ReleaseDiaryImageUriPermissionUseCase] からスローされる例外)。
+     * @throws DiaryImageUriPermissionReleaseException 権限解放処理に失敗した場合。
      */
     private suspend fun releaseImageUriPermission(
         uriString: String?
@@ -172,8 +176,7 @@ internal class SaveDiaryUseCase(
      * URI文字列が `null` の場合は何も行わない。
      *
      * @param uriString 権限を取得する対象の画像URI文字列。`null` の場合は処理をスキップ。
-     * @throws DomainException 権限取得処理に失敗した場合
-     *   ([TakePersistableUriPermissionUseCase] からスローされる例外)。
+     * @throws PersistableUriPermissionTakeFailureException 権限取得処理に失敗した場合。
      */
     private fun takeSavedImageUriPermission(
         uriString: String?

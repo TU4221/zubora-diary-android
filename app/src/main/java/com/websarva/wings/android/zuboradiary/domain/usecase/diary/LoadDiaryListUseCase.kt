@@ -3,12 +3,12 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadException
 import com.websarva.wings.android.zuboradiary.domain.mapper.toDiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -41,7 +41,7 @@ internal class LoadDiaryListUseCase(
         numLoadItems: Int,
         loadOffset: Int,
         startDate: LocalDate?
-    ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>> {
+    ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, DiaryListLoadException> {
         Log.i(logTag, "${logMsg}開始 (読込件数: $numLoadItems, オフセット: $loadOffset, 開始日: ${startDate ?: "全期間"})")
 
         require(numLoadItems >= 1) {
@@ -61,9 +61,11 @@ internal class LoadDiaryListUseCase(
             val convertedList = convertDiaryYearMonthList(loadedDiaryList)
             Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${convertedList.countDiaries()})")
             return UseCaseResult.Success(convertedList)
-        } catch (e: DiaryListLoadFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_読込処理エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                DiaryListLoadException.LoadFailure(e)
+            )
         }
     }
 

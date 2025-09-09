@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryUpdateConfirmationCheckException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -37,7 +37,7 @@ internal class ShouldRequestDiaryUpdateConfirmationUseCase(
         inputDate: LocalDate,
         originalDate: LocalDate,
         isNewDiary: Boolean
-    ): DefaultUseCaseResult<Boolean> {
+    ): UseCaseResult<Boolean, DiaryUpdateConfirmationCheckException> {
         Log.i(logTag, "${logMsg}開始 (入力日: $inputDate, 元の日付: $originalDate, 新規: $isNewDiary)")
 
         // 1. 新規日記ではなく、かつ入力された日付が元の日付と同じ場合は、確認不要
@@ -57,7 +57,9 @@ internal class ShouldRequestDiaryUpdateConfirmationUseCase(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}失敗_日記存在確認エラー", result.exception)
-                UseCaseResult.Failure(result.exception)
+                UseCaseResult.Failure(
+                    DiaryUpdateConfirmationCheckException.CheckFailure(result.exception)
+                )
             }
         }
     }

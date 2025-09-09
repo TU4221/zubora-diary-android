@@ -3,10 +3,11 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.NUM_LOAD_ITEMS
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListFooterUpdateException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListRefreshException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -38,7 +39,7 @@ internal class RefreshDiaryListUseCase(
     suspend operator fun invoke(
         currentList: DiaryYearMonthList<DiaryDayListItem.Standard>,
         startDate: LocalDate?
-    ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>> {
+    ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, DiaryListRefreshException> {
         Log.i(logTag, "${logMsg}開始 (現リスト件数: ${currentList.countDiaries()}," +
                 " 読込予定件数: ${currentList.countDiaries()}, 開始日: ${startDate ?: "全期間"})")
 
@@ -59,17 +60,21 @@ internal class RefreshDiaryListUseCase(
         val loadedDiaryList =
             try {
                 loadDiaryList(numLoadItems, startDate)
-            } catch (e: DomainException) {
+            } catch (e: DiaryListLoadException) {
                 Log.e(logTag, "${logMsg}失敗_再読込処理エラー", e)
-                return UseCaseResult.Failure(e)
+                return UseCaseResult.Failure(
+                    DiaryListRefreshException.RefreshFailure(e)
+                )
             }
 
         val resultList =
             try {
                 updateDiaryListFooter(loadedDiaryList, startDate)
-            } catch (e: DomainException) {
+            } catch (e: DiaryListFooterUpdateException) {
                 Log.e(logTag, "${logMsg}失敗_フッター更新処理エラー", e)
-                return UseCaseResult.Failure(e)
+                return UseCaseResult.Failure(
+                    DiaryListRefreshException.FooterUpdateFailure(e)
+                )
             }
 
         Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
@@ -82,7 +87,7 @@ internal class RefreshDiaryListUseCase(
      * @param numLoadItems 読み込む日記のアイテム数。
      * @param startDate 日記を読み込む期間の開始日。`null` の場合は全期間を対象とする。
      * @return 読み込まれた日記のリスト。
-     * @throws DomainException 日記の読込に失敗した場合 ([LoadDiaryListUseCase] からスローされる例外)。
+     * @throws DiaryListLoadException 日記の読込に失敗した場合。
      */
     private suspend fun loadDiaryList(
         numLoadItems: Int,
@@ -111,8 +116,7 @@ internal class RefreshDiaryListUseCase(
      * @param startDate 日記を読み込む期間の開始日（フッターの内容決定に使用される場合がある）。
      *                  `null` の場合は全期間を対象とする。
      * @return フッターが更新された日記リスト。
-     * @throws DomainException フッターの更新処理に失敗した場合
-     *   ([UpdateDiaryListFooterUseCase] からスローされる例外)。
+     * @throws DiaryListFooterUpdateException フッターの更新処理に失敗した場合。
      */
     private suspend fun updateDiaryListFooter(
         list: DiaryYearMonthList<DiaryDayListItem.Standard>,

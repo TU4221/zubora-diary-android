@@ -2,8 +2,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultCountFailureException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -28,16 +28,18 @@ internal class CountWordSearchResultsUseCase(
      */
     suspend operator fun invoke(
         searchWord: String
-    ): DefaultUseCaseResult<Int> {
+    ): UseCaseResult<Int, WordSearchResultCountFailureException> {
         Log.i(logTag, "${logMsg}開始 (検索ワード: \"$searchWord\")")
 
         return try {
             val numDiaries =diaryRepository.countWordSearchResults(searchWord)
             Log.i(logTag, "${logMsg}完了 (結果: $numDiaries)")
             UseCaseResult.Success(numDiaries)
-        } catch (e: DiaryCountFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_カウント処理エラー", e)
-            UseCaseResult.Failure(e)
+            UseCaseResult.Failure(
+                WordSearchResultCountFailureException.CountFailure(searchWord, e)
+            )
         }
     }
 }

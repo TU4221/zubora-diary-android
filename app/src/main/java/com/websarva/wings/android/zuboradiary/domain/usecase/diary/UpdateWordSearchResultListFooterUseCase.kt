@@ -2,10 +2,10 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.UnloadedWordSearchResultsExistCheckException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchListFooterUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -34,7 +34,7 @@ internal class UpdateWordSearchResultListFooterUseCase(
     suspend operator fun invoke(
         list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
         searchWord: String
-    ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>> {
+    ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, WordSearchListFooterUpdateFailureException> {
         Log.i(logTag, "${logMsg}開始 (リスト件数: ${list.countDiaries()}, 検索ワード: \"$searchWord\")")
 
         try {
@@ -56,9 +56,11 @@ internal class UpdateWordSearchResultListFooterUseCase(
                 }
 
             return UseCaseResult.Success(resultList)
-        } catch (e: DomainException) {
+        } catch (e: UnloadedWordSearchResultsExistCheckException) {
             Log.e(logTag, "${logMsg}失敗_未読込の検索結果存在確認エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                WordSearchListFooterUpdateFailureException.UpdateFailure(e)
+            )
         }
     }
 }

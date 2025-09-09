@@ -1,40 +1,39 @@
 package com.websarva.wings.android.zuboradiary.domain.exception.diary
 
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
 import java.time.LocalDate
 
 /**
- * 特定の日記の読み込み処理中にエラーが発生した場合にスローされる例外基底クラス。
+ * [LoadDiaryUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
  *
- * @param message エラーメッセージ。
+ * @param message 例外メッセージ。
  * @param cause 発生した根本的な原因となった[Throwable]。nullの場合もある。
  */
 internal sealed class DiaryLoadException (
     message: String,
-    cause: Throwable? = null
-) : DomainException(message, cause) {
+    cause: Throwable
+) : UseCaseException(message, cause) {
 
     /**
-     * 日記データへのアクセスに失敗し、読み込みができなかった場合にスローされる例外。
+     * 日記の読み込みに失敗した場合にスローされる例外。
      *
-     * @param date アクセスに失敗した日記の日付。特定の日付が関連しない場合は `null` (デフォルト値)。
+     * @param date 読み込みに失敗した日記の日付。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
-    class AccessFailure(
-        date: LocalDate? = null,
+    class LoadFailure(
+        date: LocalDate,
         cause: Throwable
-    ) :DiaryLoadException(
-        (if (date == null) "" else "指定された日付 '$date' の") + "日記の読込に失敗しました。" ,
-        cause
-    )
+    ) :DiaryLoadException("指定された日付 '$date' の日記の読込に失敗しました。", cause)
 
     /**
-     * 読込対象日付の日記が見つからなかった場合にスローされる例外。
+     * 日記が見つからなかった場合にスローされる例外。
      *
-     * @param date 日記読込対象の日付。特定の日付が関連しない場合は `null` (デフォルト値)。
+     * @param date 日記読込対象の日付。
+     * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class DataNotFound(
-        date: LocalDate? = null
-    ) :DiaryLoadException(
-        (if (date == null) "" else "指定された日付 '$date' の") + "日記が見つかりませんでした。" )
+        date: LocalDate,
+        cause: Throwable
+    ) :DiaryLoadException("指定された日付 '$date' の日記が見つかりませんでした。", cause)
 }

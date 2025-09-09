@@ -3,8 +3,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeleteFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryItemTitleSelectionHistoryItemDeleteException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -28,16 +28,18 @@ internal class DeleteDiaryItemTitleSelectionHistoryItemUseCase(
      */
     suspend operator fun invoke(
         deleteTitle: String
-    ): DefaultUseCaseResult<Unit> {
+    ): UseCaseResult<Unit, DiaryItemTitleSelectionHistoryItemDeleteException> {
         Log.i(logTag, "${logMsg}開始 (削除タイトル: \"$deleteTitle\")")
 
         return try {
             diaryRepository.deleteDiaryItemTitleSelectionHistory(deleteTitle)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
-        } catch (e: DiaryItemTitleSelectionHistoryItemDeleteFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_削除処理エラー", e)
-            UseCaseResult.Failure(e)
+            UseCaseResult.Failure(
+                DiaryItemTitleSelectionHistoryItemDeleteException.DeleteFailure(deleteTitle, e)
+            )
         }
     }
 }

@@ -1,10 +1,12 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryLoadException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.NewestDiaryLoadException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.OldestDiaryLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.SavedDiaryDateRange
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.LoadDiaryListStartYearMonthPickerDateRangeUseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DiaryListStartYearMonthPickerDateRangeLoadException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -30,10 +32,10 @@ internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
      *
      * @return 日付範囲の取得に成功した場合は [UseCaseResult.Success] にその [SavedDiaryDateRange] オブジェクトを格納して返す。
      *   日記データが存在しない場合も、デフォルトの日付範囲 ([SavedDiaryDateRange] のデフォルトコンストラクタ値) を格納。
-     *   データの読み込みアクセスに失敗した場合は [UseCaseResult.Failure] に [LoadDiaryListStartYearMonthPickerDateRangeUseCaseException] を格納して返す。
+     *   データの読み込みアクセスに失敗した場合は [UseCaseResult.Failure] に [DiaryListStartYearMonthPickerDateRangeLoadException] を格納して返す。
      */
     suspend operator fun invoke(): UseCaseResult<
-            SavedDiaryDateRange, LoadDiaryListStartYearMonthPickerDateRangeUseCaseException> {
+            SavedDiaryDateRange, DiaryListStartYearMonthPickerDateRangeLoadException> {
         Log.i(logTag, "${logMsg}開始")
 
         val dateRange =
@@ -41,14 +43,26 @@ internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
                 val newestDiaryDate =loadNewestDiaryDate()
                 val oldestDiaryDate =loadOldestDiaryDate()
                 SavedDiaryDateRange(newestDiaryDate, oldestDiaryDate)
-            } catch (e: DiaryLoadException.AccessFailure) {
-                Log.e(logTag, "${logMsg}失敗_読込処理エラー", e)
-                return UseCaseResult.Failure(
-                    LoadDiaryListStartYearMonthPickerDateRangeUseCaseException(cause = e)
-                )
-            } catch (e: DiaryLoadException.DataNotFound) {
-                Log.i(logTag, "${logMsg}完了_保存された日記が存在しない")
-                SavedDiaryDateRange()
+            } catch (e: UseCaseException) {
+                // HACK:catchで対応するとコードが冗長になるのでwhenで対応。
+                when (e) {
+                    is NewestDiaryLoadException.LoadFailure,
+                    is OldestDiaryLoadException.LoadFailure -> {
+                        Log.e(logTag, "${logMsg}失敗_読込処理エラー", e)
+                        return UseCaseResult.Failure(
+                            DiaryListStartYearMonthPickerDateRangeLoadException
+                                .DiaryInfoLoadFailure(cause = e)
+                        )
+                    }
+
+                    is NewestDiaryLoadException.DataNotFound,
+                    is OldestDiaryLoadException.DataNotFound -> {
+                        Log.i(logTag, "${logMsg}完了_保存された日記が存在しない")
+                        SavedDiaryDateRange()
+                    }
+
+                    else -> throw IllegalStateException() // 通常、elseに分岐されることはない。
+                }
             }
 
         Log.i(logTag, "${logMsg}完了 (結果: $dateRange)")
@@ -59,7 +73,7 @@ internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
      * 最新の日記の日付を読み込む。
      *
      * @return 読み込まれた最新の日記の日付。
-     * @throws DiaryLoadException 最新の日記の読み込みに失敗した場合 ([LoadOldestDiaryUseCase] からスローされる例外)。
+     * @throws NewestDiaryLoadException 最新の日記の読み込みに失敗した場合。
      */
     private suspend fun loadNewestDiaryDate(): LocalDate {
         return when (val result = loadNewestDiaryUseCase()) {
@@ -76,7 +90,7 @@ internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
      * 最古の日記の日付を読み込む。
      *
      * @return 読み込まれた最古の日記の日付。
-     * @throws DiaryLoadException 最古の日記の読み込みに失敗した場合 ([LoadOldestDiaryUseCase] からスローされる例外)。
+     * @throws OldestDiaryLoadException 最古の日記の読み込みに失敗した場合。
      */
     private suspend fun loadOldestDiaryDate(): LocalDate {
         return when (val result = loadOldestDiaryUseCase()) {

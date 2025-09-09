@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.UnloadedWordSearchResultsExistCheckException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -33,7 +33,7 @@ internal class CheckUnloadedWordSearchResultsExistUseCase(
     suspend operator fun invoke(
         searchWord: String,
         numLoadedDiaries: Int
-    ): DefaultUseCaseResult<Boolean> {
+    ): UseCaseResult<Boolean, UnloadedWordSearchResultsExistCheckException> {
         Log.i(logTag, "${logMsg}開始 (検索ワード: \"$searchWord\", 読込済件数: $numLoadedDiaries)")
 
         return when (val result = countWordSearchResultsUseCase(searchWord)) {
@@ -50,7 +50,9 @@ internal class CheckUnloadedWordSearchResultsExistUseCase(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}失敗_検索結果カウントエラー", result.exception)
-                UseCaseResult.Failure(result.exception)
+                UseCaseResult.Failure(
+                    UnloadedWordSearchResultsExistCheckException.CheckFailure(result.exception)
+                )
             }
         }
     }

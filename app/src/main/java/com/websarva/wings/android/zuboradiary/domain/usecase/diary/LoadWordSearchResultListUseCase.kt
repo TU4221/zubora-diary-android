@@ -3,14 +3,14 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadException
 import com.websarva.wings.android.zuboradiary.domain.mapper.toDiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -47,7 +47,7 @@ internal class LoadWordSearchResultListUseCase(
         numLoadItems: Int,
         loadOffset: Int,
         searchWord: String
-    ): DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>> {
+    ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, WordSearchResultListLoadException> {
         Log.i(logTag, "${logMsg}開始 (読込件数: $numLoadItems, オフセット: $loadOffset, 検索ワード: \"$searchWord\")")
 
         require(numLoadItems >= 1) {
@@ -68,9 +68,11 @@ internal class LoadWordSearchResultListUseCase(
             val convertedList = convertWordSearchResultList(wordSearchResultList, searchWord)
             Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${convertedList.countDiaries()})")
             return UseCaseResult.Success(convertedList)
-        } catch (e: WordSearchResultListLoadFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_読込処理エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                WordSearchResultListLoadException.LoadFailure(searchWord, e)
+            )
         }
     }
 

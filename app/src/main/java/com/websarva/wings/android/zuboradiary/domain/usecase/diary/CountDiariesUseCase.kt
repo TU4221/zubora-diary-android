@@ -3,11 +3,12 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
+// TODO:単純処理の為、使用先をRepositoryに置き換え、削除
 /**
  * 保存されている日記の総数を取得するユースケース。
  *
@@ -31,16 +32,16 @@ internal class CountDiariesUseCase(
      */
     suspend operator fun invoke(
         startDate: LocalDate? = null
-    ): DefaultUseCaseResult<Int> {
+    ): UseCaseResult<Int, DiaryCountFailureException> {
         Log.i(logTag, "${logMsg}開始 (開始日: ${startDate ?: "全期間"})")
 
         return try {
             val numDiaries = diaryRepository.countDiaries(startDate)
             Log.i(logTag, "${logMsg}完了 (結果: $numDiaries)")
             UseCaseResult.Success(numDiaries)
-        } catch (e: DiaryCountFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_カウント処理エラー", e)
-            UseCaseResult.Failure(e)
+            UseCaseResult.Failure(DiaryCountFailureException.CountFailure(e))
         }
     }
 }
