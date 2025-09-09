@@ -3,9 +3,9 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.NUM_LOAD_ITEMS
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListAdditionLoadException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListFooterUpdateException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryListLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListAdditionLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListFooterUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.utils.createLogTag

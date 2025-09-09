@@ -3,8 +3,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryDeleteException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryImageUriPermissionReleaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageUriPermissionReleaseException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 

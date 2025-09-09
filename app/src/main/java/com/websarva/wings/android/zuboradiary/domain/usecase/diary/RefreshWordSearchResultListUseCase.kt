@@ -3,9 +3,9 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.NUM_LOAD_ITEMS
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchListFooterUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListLoadException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultListRefreshException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchListFooterUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListRefreshException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -73,7 +73,7 @@ internal class RefreshWordSearchResultListUseCase(
         val resultList =
             try {
                 updateDiaryListFooter(loadedDiaryList, searchWord)
-            } catch (e: WordSearchListFooterUpdateFailureException) {
+            } catch (e: WordSearchListFooterUpdateException) {
                 Log.e(logTag, "${logMsg}失敗_フッター更新処理エラー", e)
                 return UseCaseResult.Failure(
                     WordSearchResultListRefreshException.FooterUpdateFailure(e)
@@ -118,7 +118,7 @@ internal class RefreshWordSearchResultListUseCase(
      * @param list フッターを更新する対象のワード検索結果リスト。
      * @param searchWord 検索ワード（フッターの内容決定に使用）。
      * @return フッターが更新されたワード検索結果リスト。
-     * @throws WordSearchListFooterUpdateFailureException フッターの更新処理に失敗した場合。
+     * @throws WordSearchListFooterUpdateException フッターの更新処理に失敗した場合。
      */
     private suspend fun updateDiaryListFooter(
         list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,

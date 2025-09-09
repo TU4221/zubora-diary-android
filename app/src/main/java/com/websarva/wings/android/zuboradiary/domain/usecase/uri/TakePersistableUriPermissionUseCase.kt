@@ -3,10 +3,11 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.PersistableUriPermissionTakeFailureException
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.exception.PersistableUriPermissionTakeFailureException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
+// TODO:URI関係はレポジトリ層までとする為、このクラスは削除
 // TODO: [画像表示の永続化改善] 現在は画像URIを直接参照しているが、以下の課題があるため、
 //       画像選択時にサムネイル（または適切なプレビューサイズのBitmap）を生成し、
 //       アプリの内部ストレージにファイルとして保存する方式への変更を検討する。

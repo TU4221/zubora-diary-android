@@ -1,12 +1,11 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 
 /**
  * ユーザー設定の取得処理における最終的な結果を表す基底クラス。
  *
- * データソース（例: データベースやファイル）から取得したユーザー設定情報 ([UserSettingDataSourceResult]) に、
- * アプリケーションのルール（ビジネスルール）を適用した後の状態を示す。
+ * データソースから取得したユーザー設定情報に、ビジネスルールを適用した後の状態を示す。
  *
  * このクラスは以下のいずれかの状態を表す。
  * - 設定値が正常に利用できる状態（成功）
@@ -40,7 +39,7 @@ internal sealed class UserSettingResult<out T : UserSetting> {
      * @property fallbackSetting エラー発生時に代わりに利用するユーザー設定の値。
      */
     data class Failure<out T : UserSetting>(
-        val exception: /*UserSettingsLoadException*/ Exception, // TODO:20250909仮修正
+        val exception: UseCaseException,
         val fallbackSetting: T
     ) : UserSettingResult<T>()
 }

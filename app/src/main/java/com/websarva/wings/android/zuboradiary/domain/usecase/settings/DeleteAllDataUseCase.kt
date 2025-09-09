@@ -3,9 +3,9 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.AllPersistableUriPermissionReleaseFailureException
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.exception.AllPersistableUriPermissionReleaseFailureException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.AllDataDeleteException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllDataDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 

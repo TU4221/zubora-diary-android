@@ -2,13 +2,13 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.CalendarStartDayOfWeekSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCodeSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.AllSettingsInitializationException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PassCodeSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
@@ -26,19 +26,19 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
  * - パスコードロック
  * - 天気情報取得
  *
- * @property saveThemeColorSettingUseCase テーマカラー設定を更新するユースケース。
- * @property saveCalendarStartDayOfWeekSettingUseCase カレンダーの週の開始曜日設定を更新するユースケース。
- * @property saveReminderNotificationSettingUseCase リマインダー通知設定を更新するユースケース。
- * @property savePasscodeLockSettingUseCase パスコードロック設定を更新するユースケース。
- * @property saveWeatherInfoFetchSettingUseCase 天気情報取得設定を更新するユースケース。
+ * @property updateThemeColorSettingUseCase テーマカラー設定を更新するユースケース。
+ * @property updateCalendarStartDayOfWeekSettingUseCase カレンダーの週の開始曜日設定を更新するユースケース。
+ * @property updateReminderNotificationSettingUseCase リマインダー通知設定を更新するユースケース。
+ * @property updatePasscodeLockSettingUseCase パスコードロック設定を更新するユースケース。
+ * @property updateWeatherInfoFetchSettingUseCase 天気情報取得設定を更新するユースケース。
  *
  */
 internal class InitializeAllSettingsUseCase(
-    private val saveThemeColorSettingUseCase: SaveThemeColorSettingUseCase,
-    private val saveCalendarStartDayOfWeekSettingUseCase: SaveCalendarStartDayOfWeekUseCase,
-    private val saveReminderNotificationSettingUseCase: SaveReminderNotificationSettingUseCase,
-    private val savePasscodeLockSettingUseCase: SavePasscodeLockSettingUseCase,
-    private val saveWeatherInfoFetchSettingUseCase: SaveWeatherInfoFetchSettingUseCase
+    private val updateThemeColorSettingUseCase: UpdateThemeColorSettingUseCase,
+    private val updateCalendarStartDayOfWeekSettingUseCase: UpdateCalendarStartDayOfWeekSettingUseCase,
+    private val updateReminderNotificationSettingUseCase: UpdateReminderNotificationSettingUseCase,
+    private val updatePasscodeLockSettingUseCase: UpdatePasscodeLockSettingUseCase,
+    private val updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -54,11 +54,11 @@ internal class InitializeAllSettingsUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            saveThemeColorSettingUseCase(ThemeColorSetting().themeColor)
-            saveCalendarStartDayOfWeekSettingUseCase(CalendarStartDayOfWeekSetting().dayOfWeek)
-            saveReminderNotificationSettingUseCase(ReminderNotificationSetting.Disabled.isEnabled)
-            savePasscodeLockSettingUseCase(PasscodeLockSetting.Disabled.isEnabled)
-            saveWeatherInfoFetchSettingUseCase(WeatherInfoFetchSetting().isEnabled)
+            updateThemeColorSettingUseCase(ThemeColorSetting().themeColor)
+            updateCalendarStartDayOfWeekSettingUseCase(CalendarStartDayOfWeekSetting().dayOfWeek)
+            updateReminderNotificationSettingUseCase(ReminderNotificationSetting.Disabled.isEnabled)
+            updatePasscodeLockSettingUseCase(PasscodeLockSetting.Disabled.isEnabled)
+            updateWeatherInfoFetchSettingUseCase(WeatherInfoFetchSetting().isEnabled)
         } catch (e: ThemeColorSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_テーマカラー設定保存エラー", e)
             return UseCaseResult.Failure(

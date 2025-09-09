@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.DiaryCountFailureException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryCountException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -32,7 +32,7 @@ internal class CountDiariesUseCase(
      */
     suspend operator fun invoke(
         startDate: LocalDate? = null
-    ): UseCaseResult<Int, DiaryCountFailureException> {
+    ): UseCaseResult<Int, DiaryCountException> {
         Log.i(logTag, "${logMsg}開始 (開始日: ${startDate ?: "全期間"})")
 
         return try {
@@ -41,7 +41,7 @@ internal class CountDiariesUseCase(
             UseCaseResult.Success(numDiaries)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_カウント処理エラー", e)
-            UseCaseResult.Failure(DiaryCountFailureException.CountFailure(e))
+            UseCaseResult.Failure(DiaryCountException.CountFailure(e))
         }
     }
 }

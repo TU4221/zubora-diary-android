@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.scheduling
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegisterException
+import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.exception.ReminderNotificationRegisterException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.SchedulingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalTime

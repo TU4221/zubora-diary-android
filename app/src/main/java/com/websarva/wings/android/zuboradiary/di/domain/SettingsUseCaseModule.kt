@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.SettingsReposito
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.RegisterReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDiariesUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteAllDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadPasscodeLockSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadReminderNotificationSettingUseCase
@@ -13,11 +13,11 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeC
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveCalendarStartDayOfWeekUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SavePasscodeLockSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveReminderNotificationSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveThemeColorSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveWeatherInfoFetchSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateCalendarStartDayOfWeekSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdatePasscodeLockSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateReminderNotificationSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateThemeColorSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import dagger.Module
 import dagger.Provides
@@ -64,18 +64,18 @@ internal object SettingsUseCaseModule {
     @Singleton
     @Provides
     fun provideInitializeAllSettingsUseCase(
-        saveThemeColorSettingUseCase: SaveThemeColorSettingUseCase,
-        saveCalendarStartDayOfWeekSettingUseCase: SaveCalendarStartDayOfWeekUseCase,
-        saveReminderNotificationSettingUseCase: SaveReminderNotificationSettingUseCase,
-        savePasscodeLockSettingUseCase: SavePasscodeLockSettingUseCase,
-        saveWeatherInfoFetchSettingUseCase: SaveWeatherInfoFetchSettingUseCase
+        updateThemeColorSettingUseCase: UpdateThemeColorSettingUseCase,
+        updateCalendarStartDayOfWeekSettingUseCase: UpdateCalendarStartDayOfWeekSettingUseCase,
+        updateReminderNotificationSettingUseCase: UpdateReminderNotificationSettingUseCase,
+        updatePasscodeLockSettingUseCase: UpdatePasscodeLockSettingUseCase,
+        updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase
     ): InitializeAllSettingsUseCase =
         InitializeAllSettingsUseCase(
-            saveThemeColorSettingUseCase,
-            saveCalendarStartDayOfWeekSettingUseCase,
-            saveReminderNotificationSettingUseCase,
-            savePasscodeLockSettingUseCase,
-            saveWeatherInfoFetchSettingUseCase
+            updateThemeColorSettingUseCase,
+            updateCalendarStartDayOfWeekSettingUseCase,
+            updateReminderNotificationSettingUseCase,
+            updatePasscodeLockSettingUseCase,
+            updateWeatherInfoFetchSettingUseCase
         )
 
     @Singleton
@@ -122,27 +122,27 @@ internal object SettingsUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideSaveCalendarStartDayOfWeekUseCase(
+    fun provideUpdateCalendarStartDayOfWeekSettingUseCase(
         settingsRepository: SettingsRepository
-    ): SaveCalendarStartDayOfWeekUseCase =
-        SaveCalendarStartDayOfWeekUseCase(settingsRepository)
+    ): UpdateCalendarStartDayOfWeekSettingUseCase =
+        UpdateCalendarStartDayOfWeekSettingUseCase(settingsRepository)
 
     @Singleton
     @Provides
-    fun provideSavePasscodeLockSettingUseCase(
+    fun provideUpdatePasscodeLockSettingUseCase(
         settingsRepository: SettingsRepository
-    ): SavePasscodeLockSettingUseCase =
-        SavePasscodeLockSettingUseCase(settingsRepository)
+    ): UpdatePasscodeLockSettingUseCase =
+        UpdatePasscodeLockSettingUseCase(settingsRepository)
 
     @Singleton
     @Provides
-    fun provideSaveReminderNotificationSettingUseCase(
+    fun provideUpdateReminderNotificationSettingUseCase(
         settingsRepository: SettingsRepository,
         loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase,
         registerReminderNotificationUseCase: RegisterReminderNotificationUseCase,
         cancelReminderNotificationUseCase: CancelReminderNotificationUseCase
-    ): SaveReminderNotificationSettingUseCase =
-        SaveReminderNotificationSettingUseCase(
+    ): UpdateReminderNotificationSettingUseCase =
+        UpdateReminderNotificationSettingUseCase(
             settingsRepository,
             loadReminderNotificationSettingUseCase,
             registerReminderNotificationUseCase,
@@ -151,15 +151,15 @@ internal object SettingsUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideSaveThemeColorSettingUseCase(
+    fun provideUpdateThemeColorSettingUseCase(
         settingsRepository: SettingsRepository
-    ): SaveThemeColorSettingUseCase =
-        SaveThemeColorSettingUseCase(settingsRepository)
+    ): UpdateThemeColorSettingUseCase =
+        UpdateThemeColorSettingUseCase(settingsRepository)
 
     @Singleton
     @Provides
-    fun provideSaveWeatherInfoFetchSettingUseCase(
+    fun provideUpdateWeatherInfoFetchSettingUseCase(
         settingsRepository: SettingsRepository
-    ): SaveWeatherInfoFetchSettingUseCase =
-        SaveWeatherInfoFetchSettingUseCase(settingsRepository)
+    ): UpdateWeatherInfoFetchSettingUseCase =
+        UpdateWeatherInfoFetchSettingUseCase(settingsRepository)
 }

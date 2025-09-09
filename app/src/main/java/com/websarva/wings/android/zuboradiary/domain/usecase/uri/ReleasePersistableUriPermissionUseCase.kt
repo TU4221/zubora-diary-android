@@ -3,10 +3,11 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.uri
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.UriRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.uri.PersistableUriPermissionReleaseFailureException
+import com.websarva.wings.android.zuboradiary.domain.usecase.uri.exception.PersistableUriPermissionReleaseFailureException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.PermissionException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
+// TODO:URI関係はレポジトリ層までとする為、このクラスは削除
 /**
  * 指定されたURI文字列に対応する永続的なURI権限を解放するユースケース。
  *

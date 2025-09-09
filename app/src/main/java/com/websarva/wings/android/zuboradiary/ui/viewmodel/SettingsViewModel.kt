@@ -9,22 +9,22 @@ import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.AllDataDeleteException
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.AllDiariesDeleteException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllDataDeleteException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.AllDiariesDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDiariesUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteAllDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadPasscodeLockSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadReminderNotificationSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadWeatherInfoFetchSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveCalendarStartDayOfWeekUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SavePasscodeLockSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveReminderNotificationSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveThemeColorSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.SaveWeatherInfoFetchSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateCalendarStartDayOfWeekSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdatePasscodeLockSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateReminderNotificationSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateThemeColorSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
@@ -58,11 +58,11 @@ internal class SettingsViewModel @Inject constructor(
     private val loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase,
     private val loadPasscodeLockSettingUseCase: LoadPasscodeLockSettingUseCase,
     private val loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase,
-    private val saveThemeColorSettingUseCase: SaveThemeColorSettingUseCase,
-    private val saveCalendarStartDayOfWeekUseCase: SaveCalendarStartDayOfWeekUseCase,
-    private val saveReminderNotificationSettingUseCase: SaveReminderNotificationSettingUseCase,
-    private val savePasscodeLockSettingUseCase: SavePasscodeLockSettingUseCase,
-    private val saveWeatherInfoFetchSettingUseCase: SaveWeatherInfoFetchSettingUseCase,
+    private val updateThemeColorSettingUseCase: UpdateThemeColorSettingUseCase,
+    private val updateCalendarStartDayOfWeekSettingUseCase: UpdateCalendarStartDayOfWeekSettingUseCase,
+    private val updateReminderNotificationSettingUseCase: UpdateReminderNotificationSettingUseCase,
+    private val updatePasscodeLockSettingUseCase: UpdatePasscodeLockSettingUseCase,
+    private val updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase,
     private val deleteAllDiariesUseCase: DeleteAllDiariesUseCase,
     private val deleteAllDataUseCase: DeleteAllDataUseCase,
 ) : BaseViewModel<SettingsEvent, SettingsAppMessage, SettingsState>(
@@ -720,25 +720,25 @@ internal class SettingsViewModel @Inject constructor(
 
     private suspend fun saveThemeColor(value: ThemeColorUi) {
         executeSettingUpdate(
-            { saveThemeColorSettingUseCase(value.toDomainModel()) }
+            { updateThemeColorSettingUseCase(value.toDomainModel()) }
         )
     }
 
     private suspend fun saveCalendarStartDayOfWeek(value: DayOfWeek) {
         executeSettingUpdate(
-            { saveCalendarStartDayOfWeekUseCase(value) }
+            { updateCalendarStartDayOfWeekSettingUseCase(value) }
         )
     }
 
     private suspend fun saveReminderNotificationValid(value: LocalTime) {
         executeSettingUpdate (
-            { saveReminderNotificationSettingUseCase(true, value) }
+            { updateReminderNotificationSettingUseCase(true, value) }
         )
     }
 
     private suspend fun saveReminderNotificationInvalid() {
         executeSettingUpdate(
-            { saveReminderNotificationSettingUseCase(false) },
+            { updateReminderNotificationSettingUseCase(false) },
             { emitUiEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch) }
         )
     }
@@ -751,20 +751,20 @@ internal class SettingsViewModel @Inject constructor(
         }
 
         executeSettingUpdate (
-            { savePasscodeLockSettingUseCase(value, passcode) },
+            { updatePasscodeLockSettingUseCase(value, passcode) },
             { emitUiEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch) }
         )
     }
 
     private suspend fun saveWeatherInfoFetch(value: Boolean) {
         executeSettingUpdate(
-            { saveWeatherInfoFetchSettingUseCase(value) },
+            { updateWeatherInfoFetchSettingUseCase(value) },
             { emitUiEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch) }
         )
     }
 
     private suspend fun executeSettingUpdate(
-        process: suspend () -> DefaultUseCaseResult<Unit>,
+        process: suspend () -> UseCaseResult<Unit, UseCaseException>,
         onFailure: (suspend () -> Unit)? = null
     ) {
         when (val result = process()) {

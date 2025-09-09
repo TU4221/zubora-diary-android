@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
-import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.SchedulingException
 import java.time.LocalTime
 

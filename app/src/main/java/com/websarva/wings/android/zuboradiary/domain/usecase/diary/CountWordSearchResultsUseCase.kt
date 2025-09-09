@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.WordSearchResultCountFailureException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -28,7 +28,7 @@ internal class CountWordSearchResultsUseCase(
      */
     suspend operator fun invoke(
         searchWord: String
-    ): UseCaseResult<Int, WordSearchResultCountFailureException> {
+    ): UseCaseResult<Int, WordSearchResultCountException> {
         Log.i(logTag, "${logMsg}開始 (検索ワード: \"$searchWord\")")
 
         return try {
@@ -38,7 +38,7 @@ internal class CountWordSearchResultsUseCase(
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_カウント処理エラー", e)
             UseCaseResult.Failure(
-                WordSearchResultCountFailureException.CountFailure(searchWord, e)
+                WordSearchResultCountException.CountFailure(searchWord, e)
             )
         }
     }

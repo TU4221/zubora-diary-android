@@ -3,18 +3,17 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.SavedDiaryDateRange
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListStartYearMonthPickerDateRangeUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshDiaryListUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DiaryListStartYearMonthPickerDateRangeLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -324,7 +323,7 @@ internal class DiaryListViewModel @Inject constructor(
         state: DiaryListState,
         currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
         processLoad: suspend (DiaryYearMonthListUi<DiaryDayListItemUi.Standard>)
-        -> DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>>
+        -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, UseCaseException>
     ) {
         require(
             when (state) {

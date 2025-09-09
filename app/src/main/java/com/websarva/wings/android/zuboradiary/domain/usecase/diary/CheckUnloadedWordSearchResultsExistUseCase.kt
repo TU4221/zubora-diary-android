@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.UnloadedWordSearchResultsExistCheckException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.UnloadedWordSearchResultsExistCheckException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 

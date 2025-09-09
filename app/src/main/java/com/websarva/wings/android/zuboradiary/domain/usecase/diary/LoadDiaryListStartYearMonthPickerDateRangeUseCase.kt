@@ -1,12 +1,12 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.NewestDiaryLoadException
-import com.websarva.wings.android.zuboradiary.domain.exception.diary.OldestDiaryLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.NewestDiaryLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.OldestDiaryLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.SavedDiaryDateRange
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DiaryListStartYearMonthPickerDateRangeLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 

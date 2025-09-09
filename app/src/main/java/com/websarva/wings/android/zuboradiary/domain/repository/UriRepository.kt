@@ -1,10 +1,10 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
-import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.PermissionException
 
-// TODO:Domain層が認識するべきではない(DiaryRepositoryの更新、削除メソッドに含める？)
+// TODO:UseCase層が認識するべきではないアンドロイド固有の機能のためDiaryRepository層の日記処理メソッドに含める。
 /**
  * URIの永続的なパーミッション管理を抽象化するリポジトリインターフェース。
  *

@@ -2,10 +2,10 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
@@ -301,7 +301,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         processLoad: suspend (
             currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
             searchWord: String
-        ) -> DefaultUseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>>
+        ) -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, UseCaseException>
     ) {
         require(
             when (state) {
@@ -334,7 +334,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
             updateUiStateOnWorSearchResultListLoadCompleted(currentResultList)
-        } catch (e: DomainException) {
+        } catch (e: UseCaseException) {
             Log.e(logTag, "${logMsg}_失敗", e)
             updateWordSearchResultList(currentResultList)
             updateUiStateOnWorSearchResultListLoadCompleted(currentResultList)
@@ -364,7 +364,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
     }
 
-    @Throws(DomainException::class)
+    @Throws(WordSearchResultCountException::class)
     private suspend fun countWordSearchResults(searchWord: String): Int {
         when (val result = countWordSearchResultsUseCase(searchWord)) {
             is UseCaseResult.Success -> return result.value
