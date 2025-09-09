@@ -1,18 +1,15 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.exception
 
+import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDiariesUseCase
 
 /**
- * [DeleteAllDiariesUseCase] の実行中に発生しうる、より具体的な失敗原因を示す例外の基底クラス。
- *
- * このクラスの各サブクラスは、全日記削除処理における異なる失敗シナリオを表します。
- * これにより、ユースケースの呼び出し元は、発生した例外の種類に応じて、
- * より詳細なエラーハンドリングやユーザーへのフィードバックを行うことが可能になります。
+ * [DeleteAllDiariesUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
  *
  * @param message 例外メッセージ。
  * @param cause この例外を引き起こした根本的な原因となった [Throwable]。
  */
-internal sealed class DeleteAllDiariesUseCaseException(
+internal sealed class AllDiariesDeleteException(
     message: String,
     cause: Throwable
 ) : UseCaseException(message, cause) {
@@ -22,9 +19,9 @@ internal sealed class DeleteAllDiariesUseCaseException(
      *
      * @param cause 発生した根本的な原因となった [Throwable]。
      */
-    class AllDiariesDeleteFailure(
+    class DeleteFailure(
         cause: Throwable
-    ) : DeleteAllDiariesUseCaseException(
+    ) : AllDiariesDeleteException(
         "全日記の削除に失敗しました。",
         cause
     )
@@ -34,9 +31,9 @@ internal sealed class DeleteAllDiariesUseCaseException(
      *
      * @param cause 発生した根本的な原因となった [Throwable]。
      */
-    class AllPersistableUriPermissionReleaseFailure(
+    class PersistableUriPermissionReleaseFailure(
         cause: Throwable
-    ) : DeleteAllDiariesUseCaseException(
+    ) : AllDiariesDeleteException(
         "全ての永続的URI権限の解放に失敗しました。",
         cause
     )

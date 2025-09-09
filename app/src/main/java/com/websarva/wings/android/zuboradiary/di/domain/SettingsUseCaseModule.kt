@@ -64,9 +64,19 @@ internal object SettingsUseCaseModule {
     @Singleton
     @Provides
     fun provideInitializeAllSettingsUseCase(
-        settingsRepository: SettingsRepository
+        saveThemeColorSettingUseCase: SaveThemeColorSettingUseCase,
+        saveCalendarStartDayOfWeekSettingUseCase: SaveCalendarStartDayOfWeekUseCase,
+        saveReminderNotificationSettingUseCase: SaveReminderNotificationSettingUseCase,
+        savePasscodeLockSettingUseCase: SavePasscodeLockSettingUseCase,
+        saveWeatherInfoFetchSettingUseCase: SaveWeatherInfoFetchSettingUseCase
     ): InitializeAllSettingsUseCase =
-        InitializeAllSettingsUseCase(settingsRepository)
+        InitializeAllSettingsUseCase(
+            saveThemeColorSettingUseCase,
+            saveCalendarStartDayOfWeekSettingUseCase,
+            saveReminderNotificationSettingUseCase,
+            savePasscodeLockSettingUseCase,
+            saveWeatherInfoFetchSettingUseCase
+        )
 
     @Singleton
     @Provides

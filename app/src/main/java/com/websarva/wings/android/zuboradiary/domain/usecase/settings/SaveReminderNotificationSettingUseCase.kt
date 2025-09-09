@@ -4,14 +4,13 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-/*import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException //TODO:20250909仮修正
-import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException*/
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingRollbackFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
+import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
+import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancelException
+import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegisterException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingLoadException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.RegisterReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -50,12 +49,12 @@ internal class SaveReminderNotificationSettingUseCase(
      * @param isChecked リマインダー通知を有効にする場合は `true`、無効にする場合は `false`。
      * @param notificationTime 通知時刻。`isChecked` が `true` の場合に必須。
      * @return 保存処理および通知の登録/キャンセル処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   処理中に [DomainException] が発生した場合は [UseCaseResult.Failure] を返す。
+     *   処理中に [UseCaseException] が発生した場合は [UseCaseResult.Failure] を返す。
      */
     suspend operator fun invoke(
         isChecked: Boolean,
         notificationTime: LocalTime? = null
-    ): DefaultUseCaseResult<Unit> {
+    ): UseCaseResult<Unit, ReminderNotificationSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (有効: $isChecked, 通知時刻: ${notificationTime ?: "未指定"})")
 
         val setting =
@@ -68,25 +67,29 @@ internal class SaveReminderNotificationSettingUseCase(
 
         try {
             saveReminderNotification(setting)
-        } catch (e: UserSettingsLoadException) {
-            Log.e(logTag, "${logMsg}失敗_設定読込エラー", e)
-            return UseCaseResult.Failure(e)
-        } catch (e: ReminderNotificationSettingUpdateFailureException) {
-            Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
-            return UseCaseResult.Failure(e)
-        }/* catch (e: ReminderNotificationRegistrationFailureException) { //TODO:20250909仮修正
-            Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック成功", e)
-            return UseCaseResult.Failure(e)
-        } catch (e: ReminderNotificationCancellationFailureException) {
-            Log.e(logTag, "${logMsg}失敗_通知キャンセルエラー、設定ロールバック成功", e)
-            return UseCaseResult.Failure(e)
-        }*/ catch (e: ReminderNotificationSettingRollbackFailureException) {
-            when (setting) {
-                is ReminderNotificationSetting.Enabled -> {
-                    Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック失敗", e)
+        } catch (e: ReminderNotificationSettingUpdateException) {
+            when (e) {
+                is ReminderNotificationSettingUpdateException.BackupFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_設定読込エラー", e)
                 }
-                ReminderNotificationSetting.Disabled -> {
-                    Log.e(logTag, "${logMsg}失敗_通知キャンセルエラー、設定ロールバック失敗", e)
+                is ReminderNotificationSettingUpdateException.UpdateFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
+                }
+                is ReminderNotificationSettingUpdateException.SchedulingRegisterFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック成功", e)
+                }
+                is ReminderNotificationSettingUpdateException.SchedulingCancelFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_通知キャンセルエラー、設定ロールバック成功", e)
+                }
+                is ReminderNotificationSettingUpdateException.RollbackFailure -> {
+                    when (setting) {
+                        is ReminderNotificationSetting.Enabled -> {
+                            Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック失敗", e)
+                        }
+                        ReminderNotificationSetting.Disabled -> {
+                            Log.e(logTag, "${logMsg}失敗_通知キャンセルエラー、設定ロールバック失敗", e)
+                        }
+                    }
                 }
             }
             return UseCaseResult.Failure(e)
@@ -96,6 +99,7 @@ internal class SaveReminderNotificationSettingUseCase(
         return UseCaseResult.Success(Unit)
     }
 
+    // TODO:細分化。可読性が悪い。
     /**
      * リマインダー通知設定を保存。
      *
@@ -103,17 +107,33 @@ internal class SaveReminderNotificationSettingUseCase(
      *
      * 通知の登録、キャンセルに失敗した場合、元の設定値に戻すようにロールバック処理が行われる。
      *
-     * @throws UserSettingsLoadException 現在の設定の読み込みに失敗した場合（ロールバック用）。
-     * @throws ReminderNotificationSettingUpdateFailureException 設定の更新に失敗した場合。
-     * @throws ReminderNotificationRegistrationFailureException 通知の登録に失敗した場合。(通知設定有効時のみ)
-     * @throws ReminderNotificationCancellationFailureException 通知のキャンセルに失敗した場合。(通知設定無効時のみ)
-     * @throws ReminderNotificationSettingRollbackFailureException 設定のロールバック処理に失敗した場合。
+     * @throws ReminderNotificationSettingUpdateException 設定の保存に失敗した場合。
      * */
     private suspend fun saveReminderNotification(
         settingValue: ReminderNotificationSetting,
     ) {
-        val backupSettingValue = fetchCurrentReminderNotificationSetting()
-        settingsRepository.saveReminderNotificationPreference(settingValue)
+        val backupSettingValue =
+            try {
+                fetchCurrentReminderNotificationSetting()
+            } catch (e: ReminderNotificationSettingLoadException) {
+                throw ReminderNotificationSettingUpdateException.BackupFailure(e)
+            }
+
+        try {
+            settingsRepository.saveReminderNotificationPreference(settingValue)
+        } catch (e: DataStorageException) {
+            val settingNotificationTime =
+                when (settingValue) {
+                    is ReminderNotificationSetting.Enabled -> settingValue.notificationTime
+                    ReminderNotificationSetting.Disabled -> null
+                }
+            throw ReminderNotificationSettingUpdateException.UpdateFailure(
+                settingValue.isEnabled,
+                settingNotificationTime,
+                e
+            )
+        }
+
         try {
             when (settingValue) {
                 is ReminderNotificationSetting.Enabled -> {
@@ -123,9 +143,18 @@ internal class SaveReminderNotificationSettingUseCase(
                     cancelReminderNotification()
                 }
             }
-        } catch (e: DomainException) {
+        } catch (e: UseCaseException) {
             rollbackReminderNotification(backupSettingValue)
-            throw e
+
+            throw when (e) {
+                is ReminderNotificationRegisterException -> {
+                    ReminderNotificationSettingUpdateException.SchedulingRegisterFailure(e)
+                }
+                is ReminderNotificationCancelException -> {
+                    ReminderNotificationSettingUpdateException.SchedulingCancelFailure(e)
+                }
+                else -> IllegalStateException()
+            }
         }
     }
 
@@ -133,7 +162,7 @@ internal class SaveReminderNotificationSettingUseCase(
      * 現在のリマインダー通知設定を読み込む。
      *
      * @return 現在のリマインダー通知設定。
-     * @throws UserSettingsLoadException 設定の読み込みに失敗した場合。
+     * @throws ReminderNotificationSettingLoadException 設定の読み込みに失敗した場合。
      */
     private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationSetting {
         return withContext(Dispatchers.IO) {
@@ -155,7 +184,7 @@ internal class SaveReminderNotificationSettingUseCase(
      * 指定された時刻でリマインダー通知を登録する。
      *
      * @param notificationTime 通知時刻。
-     * @throws ReminderNotificationRegistrationFailureException 通知の登録に失敗した場合。
+     * @throws ReminderNotificationRegisterException 通知の登録に失敗した場合。
      */
     private fun registerReminderNotification(notificationTime: LocalTime) {
         when (val result = registerReminderNotificationUseCase(notificationTime)) {
@@ -163,7 +192,7 @@ internal class SaveReminderNotificationSettingUseCase(
                 // 処理不要
             }
             is UseCaseResult.Failure -> {
-                throw result.exception
+                throw ReminderNotificationSettingUpdateException.SchedulingRegisterFailure(result.exception)
             }
         }
     }
@@ -171,7 +200,7 @@ internal class SaveReminderNotificationSettingUseCase(
     /**
      * リマインダー通知をキャンセルする。
      *
-     * @throws ReminderNotificationCancellationFailureException 通知のキャンセルに失敗した場合。
+     * @throws ReminderNotificationCancelException 通知のキャンセルに失敗した場合。
      */
     private fun cancelReminderNotification() {
         when (val result = cancelReminderNotificationUseCase()) {
@@ -179,7 +208,7 @@ internal class SaveReminderNotificationSettingUseCase(
                 // 処理不要
             }
             is UseCaseResult.Failure -> {
-                throw result.exception
+                throw ReminderNotificationSettingUpdateException.SchedulingCancelFailure(result.exception)
             }
         }
     }
@@ -190,20 +219,20 @@ internal class SaveReminderNotificationSettingUseCase(
      * 通知の登録やキャンセル処理に失敗した際に、設定を以前の状態に戻すために使用される。
      *
      * @param backupSettingValue ロールバック先のリマインダー通知設定値。
-     * @throws ReminderNotificationSettingRollbackFailureException ロールバック処理に失敗した場合。
+     * @throws ReminderNotificationSettingUpdateException.RollbackFailure ロールバック処理に失敗した場合。
      */
     private suspend fun rollbackReminderNotification(
         backupSettingValue: ReminderNotificationSetting
     ) {
         try {
             settingsRepository.saveReminderNotificationPreference(backupSettingValue)
-        } catch (e: ReminderNotificationSettingUpdateFailureException) {
+        } catch (e: DataStorageException) {
             val backupNotificationTime =
                 when (backupSettingValue) {
                     is ReminderNotificationSetting.Enabled -> backupSettingValue.notificationTime
                     ReminderNotificationSetting.Disabled -> null
                 }
-            throw ReminderNotificationSettingRollbackFailureException(
+            throw ReminderNotificationSettingUpdateException.RollbackFailure(
                 backupSettingValue.isEnabled,
                 backupNotificationTime,
                 e

@@ -3,8 +3,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-//import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDiariesDeleteFailureException // TODO:20250909仮修正
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDiariesUseCaseException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.AllDiariesDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -30,20 +30,20 @@ internal class DeleteAllDiariesUseCase(
      * ユースケースを実行し、全ての日記データ (項目タイトル選択履歴除く) と関連URI権限を削除する。
      *
      * @return 全ての削除処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   いずれかの処理でエラーが発生した場合は、対応する [DeleteAllDiariesUseCaseException] を
+     *   いずれかの処理でエラーが発生した場合は、対応する [AllDiariesDeleteException] を
      *   [UseCaseResult.Failure] に格納して返す。
      */
-    suspend operator fun invoke(): UseCaseResult<Unit, DeleteAllDiariesUseCaseException> {
+    suspend operator fun invoke(): UseCaseResult<Unit, AllDiariesDeleteException> {
         Log.i(logTag, "${logMsg}開始")
 
         try {
             deleteAllDiaries()
             releaseAllImageUriPermission()
-        } catch (e: DeleteAllDiariesUseCaseException) {
+        } catch (e: AllDiariesDeleteException) {
             when (e) {
-                is DeleteAllDiariesUseCaseException.AllDiariesDeleteFailure ->
+                is AllDiariesDeleteException.DeleteFailure ->
                     Log.e(logTag, "${logMsg}失敗_日記データ削除処理エラー", e)
-                is DeleteAllDiariesUseCaseException.AllPersistableUriPermissionReleaseFailure ->
+                is AllDiariesDeleteException.PersistableUriPermissionReleaseFailure ->
                     Log.e(logTag, "${logMsg}失敗_権限解放処理エラー", e)
             }
             return UseCaseResult.Failure(e)
@@ -56,20 +56,20 @@ internal class DeleteAllDiariesUseCase(
     /**
      * 全ての日記データを削除する。
      *
-     * @throws DeleteAllDiariesUseCaseException.AllDiariesDeleteFailure 日記データの削除に失敗した場合。
+     * @throws AllDiariesDeleteException.DeleteFailure 日記データの削除に失敗した場合。
      */
     private suspend fun deleteAllDiaries() {
         try {
             diaryRepository.deleteAllDiaries()
-        } catch (e: /*AllDiariesDeleteFailureException*/Exception) { // TODO:20250909仮修正
-            throw DeleteAllDiariesUseCaseException.AllDiariesDeleteFailure(e)
+        } catch (e: DataStorageException) {
+            throw AllDiariesDeleteException.DeleteFailure(e)
         }
     }
 
     /**
      * 全ての永続的なURI権限を解放する。
      *
-     * @throws DeleteAllDiariesUseCaseException.AllPersistableUriPermissionReleaseFailure URI権限の解放に失敗した場合。
+     * @throws AllDiariesDeleteException.PersistableUriPermissionReleaseFailure URI権限の解放に失敗した場合。
      */
     private fun releaseAllImageUriPermission() {
         when (val result = releaseAllPersistableUriPermissionUseCase()) {
@@ -77,8 +77,8 @@ internal class DeleteAllDiariesUseCase(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                throw DeleteAllDiariesUseCaseException
-                    .AllPersistableUriPermissionReleaseFailure(result.exception)
+                throw AllDiariesDeleteException
+                    .PersistableUriPermissionReleaseFailure(result.exception)
             }
         }
     }

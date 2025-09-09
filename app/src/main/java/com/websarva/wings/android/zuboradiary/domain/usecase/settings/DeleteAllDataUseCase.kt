@@ -3,8 +3,9 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-//import com.websarva.wings.android.zuboradiary.domain.exception.diary.AllDataDeleteFailureException // TODO:20250909仮修正
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDataUseCaseException
+import com.websarva.wings.android.zuboradiary.domain.exception.uri.AllPersistableUriPermissionReleaseFailureException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.AllDataDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -33,28 +34,36 @@ internal class DeleteAllDataUseCase(
      * ユースケースを実行し、アプリケーションの全データを削除する。
      *
      * @return 全ての削除処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   いずれかの処理でエラーが発生した場合は、対応する [DeleteAllDataUseCaseException] を
+     *   いずれかの処理でエラーが発生した場合は、対応する [AllDataDeleteException] を
      *   [UseCaseResult.Failure] に格納して返す。
      */
-    suspend operator fun invoke(): UseCaseResult<Unit, DeleteAllDataUseCaseException> {
+    suspend operator fun invoke(): UseCaseResult<Unit, AllDataDeleteException> {
         Log.i(logTag, "${logMsg}開始")
 
         try {
             deleteAllData()
             releaseAllImageUriPermission()
             initializeAllSettings()
-        } catch (e: DeleteAllDataUseCaseException) {
+        } catch (e: AllDataDeleteException) {
             when (e) {
-                is DeleteAllDataUseCaseException.AllDataDeleteFailure ->
+                is AllDataDeleteException.DiariesDeleteFailure ->
                     Log.e(logTag, "${logMsg}失敗_日記データ削除処理エラー", e)
 
-                is DeleteAllDataUseCaseException.AllPersistableUriPermissionReleaseFailure ->
+                is AllDataDeleteException.UriPermissionReleaseFailure ->
                     Log.e(logTag, "${logMsg}失敗_権限解放処理エラー", e)
 
-                is DeleteAllDataUseCaseException.AllSettingsInitializationFailure ->
+                is AllDataDeleteException.SettingsInitializationFailure ->
                     Log.e(logTag, "${logMsg}失敗_設定初期化処理エラー", e)
             }
             return UseCaseResult.Failure(e)
+        } catch (e: DataStorageException) {
+            return UseCaseResult.Failure(
+                AllDataDeleteException.DiariesDeleteFailure(e)
+            )
+        } catch (e: AllPersistableUriPermissionReleaseFailureException) {
+            return UseCaseResult.Failure(
+                AllDataDeleteException.UriPermissionReleaseFailure(e)
+            )
         }
 
         Log.i(logTag, "${logMsg}完了")
@@ -64,20 +73,16 @@ internal class DeleteAllDataUseCase(
     /**
      * 全ての日記データを削除する。
      *
-     * @throws DeleteAllDataUseCaseException.AllDataDeleteFailure 日記データの削除に失敗した場合。
+     * @throws DataStorageException 日記データの削除に失敗した場合。
      */
     private suspend fun deleteAllData() {
-        try {
-            diaryRepository.deleteAllData()
-        } catch (e: /*AllDataDeleteFailureException*/Exception) { // TODO:20250909仮修正
-            throw DeleteAllDataUseCaseException.AllDataDeleteFailure(e)
-        }
+        diaryRepository.deleteAllData()
     }
 
     /**
      * 全ての永続的なURI権限を解放する。
      *
-     * @throws DeleteAllDataUseCaseException.AllPersistableUriPermissionReleaseFailure URI権限の解放に失敗した場合。
+     * @throws AllPersistableUriPermissionReleaseFailureException URI権限の解放に失敗した場合。
      */
     private fun releaseAllImageUriPermission() {
         when (val result = releaseAllPersistableUriPermissionUseCase()) {
@@ -85,8 +90,7 @@ internal class DeleteAllDataUseCase(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                throw DeleteAllDataUseCaseException
-                    .AllPersistableUriPermissionReleaseFailure(result.exception)
+                throw result.exception
             }
         }
     }
@@ -94,7 +98,7 @@ internal class DeleteAllDataUseCase(
     /**
      * 全ての設定を初期化する。
      *
-     * @throws DeleteAllDataUseCaseException.AllSettingsInitializationFailure 設定の初期化に失敗した場合。
+     * @throws AllDataDeleteException.SettingsInitializationFailure 設定の初期化に失敗した場合。
      */
     private suspend fun initializeAllSettings() {
         when (val result = initializeAllSettingsUseCase()) {
@@ -102,8 +106,8 @@ internal class DeleteAllDataUseCase(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                throw DeleteAllDataUseCaseException
-                    .AllSettingsInitializationFailure(result.exception)
+                throw AllDataDeleteException
+                    .SettingsInitializationFailure(result.exception)
             }
         }
     }

@@ -2,19 +2,18 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.CalendarStartDayOfWeekSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCodeSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.CalendarStartDayOfWeekSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCodeSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.AllSettingsInitializationException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -27,10 +26,19 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
  * - パスコードロック
  * - 天気情報取得
  *
- * @property settingsRepository 設定関連の操作を行うリポジトリ。
+ * @property saveThemeColorSettingUseCase テーマカラー設定を更新するユースケース。
+ * @property saveCalendarStartDayOfWeekSettingUseCase カレンダーの週の開始曜日設定を更新するユースケース。
+ * @property saveReminderNotificationSettingUseCase リマインダー通知設定を更新するユースケース。
+ * @property savePasscodeLockSettingUseCase パスコードロック設定を更新するユースケース。
+ * @property saveWeatherInfoFetchSettingUseCase 天気情報取得設定を更新するユースケース。
+ *
  */
 internal class InitializeAllSettingsUseCase(
-    private val settingsRepository: SettingsRepository
+    private val saveThemeColorSettingUseCase: SaveThemeColorSettingUseCase,
+    private val saveCalendarStartDayOfWeekSettingUseCase: SaveCalendarStartDayOfWeekUseCase,
+    private val saveReminderNotificationSettingUseCase: SaveReminderNotificationSettingUseCase,
+    private val savePasscodeLockSettingUseCase: SavePasscodeLockSettingUseCase,
+    private val saveWeatherInfoFetchSettingUseCase: SaveWeatherInfoFetchSettingUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -40,40 +48,42 @@ internal class InitializeAllSettingsUseCase(
      * ユースケースを実行し、全ての設定を初期値にリセットする。
      *
      * @return 初期化処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   処理中に [DomainException] が発生した場合は [UseCaseResult.Failure] を返す。
+     *   処理中に [UseCaseException] が発生した場合は [UseCaseResult.Failure] を返す。
      */
-    suspend operator fun invoke(): DefaultUseCaseResult<Unit> {
+    suspend operator fun invoke(): UseCaseResult<Unit, AllSettingsInitializationException> {
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            settingsRepository.saveThemeColorPreference(ThemeColorSetting())
-            settingsRepository.saveCalendarStartDayOfWeekPreference(
-                CalendarStartDayOfWeekSetting()
-            )
-            settingsRepository.saveReminderNotificationPreference(
-                ReminderNotificationSetting.Disabled
-            )
-            settingsRepository.savePasscodeLockPreference(
-                PasscodeLockSetting.Disabled
-            )
-            settingsRepository.saveWeatherInfoFetchPreference(
-                WeatherInfoFetchSetting()
-            )
-        } catch (e: ThemeColorSettingUpdateFailureException) {
+            saveThemeColorSettingUseCase(ThemeColorSetting().themeColor)
+            saveCalendarStartDayOfWeekSettingUseCase(CalendarStartDayOfWeekSetting().dayOfWeek)
+            saveReminderNotificationSettingUseCase(ReminderNotificationSetting.Disabled.isEnabled)
+            savePasscodeLockSettingUseCase(PasscodeLockSetting.Disabled.isEnabled)
+            saveWeatherInfoFetchSettingUseCase(WeatherInfoFetchSetting().isEnabled)
+        } catch (e: ThemeColorSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_テーマカラー設定保存エラー", e)
-            return UseCaseResult.Failure(e)
-        } catch (e: CalendarStartDayOfWeekSettingUpdateFailureException) {
+            return UseCaseResult.Failure(
+                AllSettingsInitializationException.ThemeColorInitializationFailure(e)
+            )
+        } catch (e: CalendarStartDayOfWeekSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_カレンダー開始曜日設定保存エラー", e)
-            return UseCaseResult.Failure(e)
-        } catch (e: ReminderNotificationSettingUpdateFailureException) {
+            return UseCaseResult.Failure(
+                AllSettingsInitializationException.CalendarStartDayOfWeeksInitializationFailure(e)
+            )
+        } catch (e: ReminderNotificationSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_リマインダー通知設定保存エラー", e)
-            return UseCaseResult.Failure(e)
-        } catch (e: PassCodeSettingUpdateFailureException) {
+            return UseCaseResult.Failure(
+                AllSettingsInitializationException.ReminderNotificationInitializationFailure(e)
+            )
+        } catch (e: PassCodeSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_パスコードロック設定保存エラー", e)
-            return UseCaseResult.Failure(e)
-        } catch (e: WeatherInfoFetchSettingUpdateFailureException) {
+            return UseCaseResult.Failure(
+                AllSettingsInitializationException.PasscodeInitializationFailure(e)
+            )
+        } catch (e: WeatherInfoFetchSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_天気情報取得設定保存エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                AllSettingsInitializationException.WeatherInfoFetchInitializationFailure(e)
+            )
         }
 
         Log.i(logTag, "${logMsg}完了")

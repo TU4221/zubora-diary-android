@@ -4,9 +4,9 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateFailureException
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.ThemeColorSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -26,20 +26,21 @@ internal class SaveThemeColorSettingUseCase(
      *
      * @param themeColor 保存するテーマカラー。
      * @return 保存処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   保存処理中に [ThemeColorSettingUpdateFailureException] が発生した場合は
-     *   [UseCaseResult.Failure] を返す。
+     *   保存処理中に [DataStorageException] が発生した場合は [UseCaseResult.Failure] を返す。
      */
     suspend operator fun invoke(
         themeColor: ThemeColor
-    ): DefaultUseCaseResult<Unit> {
+    ): UseCaseResult<Unit, ThemeColorSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (テーマカラー: $themeColor)")
 
         try {
             val preferenceValue = ThemeColorSetting(themeColor)
             settingsRepository.saveThemeColorPreference(preferenceValue)
-        } catch (e: ThemeColorSettingUpdateFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定保存処理エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                ThemeColorSettingUpdateException.UpdateFailure(themeColor, e)
+            )
         }
 
         Log.i(logTag, "${logMsg}完了")

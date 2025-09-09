@@ -4,8 +4,8 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCodeSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.PassCodeSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -26,13 +26,12 @@ internal class SavePasscodeLockSettingUseCase(
      * @param isChecked パスコードロックを有効にする場合は `true`、無効にする場合は `false`。
      * @param passcode 設定するパスコード。`isChecked` が `true` の場合のみ使用される。
      * @return 保存処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   保存処理中に [PassCodeSettingUpdateFailureException] が発生した場合は
-     *   [UseCaseResult.Failure] を返す。
+     *   保存処理中に [DataStorageException] が発生した場合は [UseCaseResult.Failure] を返す。
      */
     suspend operator fun invoke(
         isChecked: Boolean,
         passcode: String = ""
-    ): DefaultUseCaseResult<Unit> {
+    ): UseCaseResult<Unit, PassCodeSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (有効: $isChecked, パスコード: ${if (passcode.isNotEmpty()) "設定あり" else "設定なし"})")
 
         try {
@@ -43,9 +42,11 @@ internal class SavePasscodeLockSettingUseCase(
                     PasscodeLockSetting.Disabled
                 }
             settingsRepository.savePasscodeLockPreference(preferenceValue)
-        } catch (e: PassCodeSettingUpdateFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定保存処理エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                PassCodeSettingUpdateException.UpdateFailure(isChecked, e)
+            )
         }
 
         Log.i(logTag, "${logMsg}完了")

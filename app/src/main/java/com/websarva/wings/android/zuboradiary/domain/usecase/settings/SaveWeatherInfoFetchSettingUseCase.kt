@@ -4,8 +4,8 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.WeatherInfoFetchSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -25,20 +25,21 @@ internal class SaveWeatherInfoFetchSettingUseCase(
      *
      * @param isChecked 天気情報取得を有効にする場合は `true`、無効にする場合は `false`。
      * @return 保存処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   保存処理中に [WeatherInfoFetchSettingUpdateFailureException] が発生した場合は
-     *   [UseCaseResult.Failure] を返す。
+     *   保存処理中に [DataStorageException] が発生した場合は [UseCaseResult.Failure] を返す。
      */
     suspend operator fun invoke(
         isChecked: Boolean
-    ): DefaultUseCaseResult<Unit> {
+    ): UseCaseResult<Unit, WeatherInfoFetchSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (有効: $isChecked)")
 
         try {
             val preferenceValue = WeatherInfoFetchSetting(isChecked)
             settingsRepository.saveWeatherInfoFetchPreference(preferenceValue)
-        } catch (e: WeatherInfoFetchSettingUpdateFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定保存処理エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                WeatherInfoFetchSettingUpdateException.UpdateFailure(isChecked, e)
+            )
         }
 
         Log.i(logTag, "${logMsg}完了")

@@ -11,8 +11,8 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNoti
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDataUseCaseException
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.DeleteAllDiariesUseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.AllDataDeleteException
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.AllDiariesDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
@@ -238,7 +238,9 @@ internal class SettingsViewModel @Inject constructor(
                 .map {
                     when (it) {
                         is UserSettingResult.Success -> it.setting.dayOfWeek
-                        is UserSettingResult.Failure -> it.fallbackSetting.dayOfWeek
+                        is UserSettingResult.Failure -> {
+                            it.fallbackSetting.dayOfWeek
+                        }
                     }
                 }.onEach { value: DayOfWeek ->
                     handle[SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY] = value
@@ -252,7 +254,9 @@ internal class SettingsViewModel @Inject constructor(
                 .map {
                     when (it) {
                         is UserSettingResult.Success -> it.setting.isEnabled
-                        is UserSettingResult.Failure -> it.fallbackSetting.isEnabled
+                        is UserSettingResult.Failure -> {
+                            it.fallbackSetting.isEnabled
+                        }
                     }
                 }.stateInEagerly(null )
 
@@ -286,7 +290,9 @@ internal class SettingsViewModel @Inject constructor(
                         is UserSettingResult.Success -> {
                             it.setting.isEnabled
                         }
-                        is UserSettingResult.Failure -> it.fallbackSetting.isEnabled
+                        is UserSettingResult.Failure -> {
+                            it.fallbackSetting.isEnabled
+                        }
                     }
                 }.stateInEagerly(null )
 
@@ -318,7 +324,9 @@ internal class SettingsViewModel @Inject constructor(
                 .map {
                     when (it) {
                         is UserSettingResult.Success -> it.setting.isEnabled
-                        is UserSettingResult.Failure -> it.fallbackSetting.isEnabled
+                        is UserSettingResult.Failure -> {
+                            it.fallbackSetting.isEnabled
+                        }
                     }
                 }.stateInEagerly(null)
     }
@@ -781,10 +789,10 @@ internal class SettingsViewModel @Inject constructor(
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
                 Log.e(logTag, "全日記削除_失敗", result.exception)
                 when (result.exception) {
-                    is DeleteAllDiariesUseCaseException.AllDiariesDeleteFailure -> {
+                    is AllDiariesDeleteException.DeleteFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
                     }
-                    is DeleteAllDiariesUseCaseException.AllPersistableUriPermissionReleaseFailure -> {
+                    is AllDiariesDeleteException.PersistableUriPermissionReleaseFailure -> {
                         // 処理なし
                     }
                 }
@@ -814,13 +822,13 @@ internal class SettingsViewModel @Inject constructor(
                 Log.e(logTag, "アプリ全データ削除_失敗", result.exception)
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
                 when (result.exception) {
-                    is DeleteAllDataUseCaseException.AllDataDeleteFailure -> {
+                    is AllDataDeleteException.DiariesDeleteFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
                     }
-                    is DeleteAllDataUseCaseException.AllPersistableUriPermissionReleaseFailure -> {
+                    is AllDataDeleteException.UriPermissionReleaseFailure -> {
                         // 処理なし
                     }
-                    is DeleteAllDataUseCaseException.AllSettingsInitializationFailure -> {
+                    is AllDataDeleteException.SettingsInitializationFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)
                     }
                 }

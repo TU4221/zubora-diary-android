@@ -4,11 +4,12 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.CalendarStartDayOfWeekSettingUpdateFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.CalendarStartDayOfWeekSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.DayOfWeek
 
+// TODO:クラス名修正。SaveCalendarStartDayOf`setting`WeekUseCase(diメソッドも)
 /**
  * カレンダーの週の開始曜日設定を保存するユースケース。
  *
@@ -26,20 +27,21 @@ internal class SaveCalendarStartDayOfWeekUseCase(
      *
      * @param dayOfWeek 保存する週の開始曜日。
      * @return 保存処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   保存処理中に [CalendarStartDayOfWeekSettingUpdateFailureException] が発生した場合は
-     *   [UseCaseResult.Failure] を返す。
+     *   保存処理中に [DataStorageException] が発生した場合は [UseCaseResult.Failure] を返す。
      */
     suspend operator fun invoke(
         dayOfWeek: DayOfWeek
-    ): DefaultUseCaseResult<Unit> {
+    ): UseCaseResult<Unit, CalendarStartDayOfWeekSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (曜日: $dayOfWeek)")
 
         try {
             val preferenceValue = CalendarStartDayOfWeekSetting(dayOfWeek)
             settingsRepository.saveCalendarStartDayOfWeekPreference(preferenceValue)
-        } catch (e: CalendarStartDayOfWeekSettingUpdateFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定保存処理エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                CalendarStartDayOfWeekSettingUpdateException.UpdateFailure(dayOfWeek, e)
+            )
         }
 
         Log.i(logTag, "${logMsg}完了")
