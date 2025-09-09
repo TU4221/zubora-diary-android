@@ -3,8 +3,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.scheduling
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegisterException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.SchedulingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalTime
 
@@ -27,14 +27,16 @@ internal class RegisterReminderNotificationUseCase(
      * @return 登録処理が成功した場合は [UseCaseResult.Success] を返す。
      *   登録処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
      */
-    operator fun invoke(notificationTime: LocalTime): DefaultUseCaseResult<Unit> {
+    operator fun invoke(notificationTime: LocalTime): UseCaseResult<Unit, ReminderNotificationRegisterException> {
         Log.i(logTag, "${logMsg}開始 (通知時刻: $notificationTime)")
 
         try {
             schedulingRepository.registerReminderNotification(notificationTime)
-        } catch (e: ReminderNotificationRegistrationFailureException) {
+        } catch (e: SchedulingException) {
             Log.e(logTag, "${logMsg}失敗_登録処理エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                ReminderNotificationRegisterException.RegisterFailure(e)
+            )
         }
 
         Log.i(logTag, "${logMsg}完了")

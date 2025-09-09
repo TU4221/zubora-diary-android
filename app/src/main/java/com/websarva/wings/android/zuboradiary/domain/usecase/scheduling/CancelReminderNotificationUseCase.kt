@@ -3,8 +3,8 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.scheduling
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancelException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.SchedulingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -25,14 +25,16 @@ internal class CancelReminderNotificationUseCase(
      * @return 解除処理が成功した場合は [UseCaseResult.Success] を返す。
      *   解除処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
      */
-    operator fun invoke(): DefaultUseCaseResult<Unit> {
+    operator fun invoke(): UseCaseResult<Unit, ReminderNotificationCancelException> {
         Log.i(logTag, "${logMsg}開始")
 
         try {
             schedulingRepository.cancelReminderNotification()
-        } catch (e: ReminderNotificationCancellationFailureException) {
+        } catch (e: SchedulingException) {
             Log.e(logTag, "${logMsg}失敗_解除処理エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                ReminderNotificationCancelException.CancelFailure(e)
+            )
         }
 
         Log.i(logTag, "${logMsg}完了")

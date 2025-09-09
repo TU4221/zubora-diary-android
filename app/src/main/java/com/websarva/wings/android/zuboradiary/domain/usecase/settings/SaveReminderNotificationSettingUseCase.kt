@@ -5,8 +5,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException
-import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException
+/*import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationCancellationFailureException //TODO:20250909仮修正
+import com.websarva.wings.android.zuboradiary.domain.exception.reminder.ReminderNotificationRegistrationFailureException*/
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingRollbackFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.ReminderNotificationSettingUpdateFailureException
 import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
@@ -74,13 +74,13 @@ internal class SaveReminderNotificationSettingUseCase(
         } catch (e: ReminderNotificationSettingUpdateFailureException) {
             Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
             return UseCaseResult.Failure(e)
-        } catch (e: ReminderNotificationRegistrationFailureException) {
+        }/* catch (e: ReminderNotificationRegistrationFailureException) { //TODO:20250909仮修正
             Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック成功", e)
             return UseCaseResult.Failure(e)
         } catch (e: ReminderNotificationCancellationFailureException) {
             Log.e(logTag, "${logMsg}失敗_通知キャンセルエラー、設定ロールバック成功", e)
             return UseCaseResult.Failure(e)
-        } catch (e: ReminderNotificationSettingRollbackFailureException) {
+        }*/ catch (e: ReminderNotificationSettingRollbackFailureException) {
             when (setting) {
                 is ReminderNotificationSetting.Enabled -> {
                     Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック失敗", e)
