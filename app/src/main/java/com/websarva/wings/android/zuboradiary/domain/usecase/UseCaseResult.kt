@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
  * @param T 成功時の結果の型。
  * @param E 失敗時のドメイン例外の型。 [DomainException] またはそのサブクラスである必要がある。
  */
-internal sealed class UseCaseResult<out T, out E : DomainException> {
+internal sealed class UseCaseResult<out T, out E : /*DomainException*/Exception> { // TODO:20250909仮修正
     /**
      * ユースケースの実行が成功したことを表す。
      *
@@ -27,7 +27,7 @@ internal sealed class UseCaseResult<out T, out E : DomainException> {
      * @param exception 発生したドメイン例外。
      * @param E 失敗時のドメイン例外の型。
      */
-    data class Failure<out E : DomainException>(val exception: E) : UseCaseResult<Nothing, E>()
+    data class Failure<out E : /*DomainException*/Exception>(val exception: E) : UseCaseResult<Nothing, E>() // TODO:20250909仮修正
 }
 
 /**
@@ -36,4 +36,4 @@ internal sealed class UseCaseResult<out T, out E : DomainException> {
  *
  * @param T 成功時の結果の型。
  */
-internal typealias DefaultUseCaseResult<T> = UseCaseResult<T, DomainException>
+internal typealias DefaultUseCaseResult<T> = UseCaseResult<T, /*DomainException*/Exception> // TODO:20250909仮修正

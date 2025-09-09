@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.uri.AllPersistableUriPermissionReleaseFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.PermissionException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -25,14 +25,16 @@ internal class ReleaseAllPersistableUriPermissionUseCase(
      * @return 解放処理が成功した場合は [UseCaseResult.Success] を返す。
      *   解放処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
      */
-    operator fun invoke(): DefaultUseCaseResult<Unit> {
+    operator fun invoke(): UseCaseResult<Unit, AllPersistableUriPermissionReleaseFailureException> {
         Log.i(logTag, "${logMsg}開始")
 
         try {
             uriRepository.releaseAllPersistableUriPermission()
-        } catch (e: AllPersistableUriPermissionReleaseFailureException) {
+        } catch (e: PermissionException) {
             Log.e(logTag, "${logMsg}失敗_権限解放処理エラー", e)
-            return UseCaseResult.Failure(e)
+            return UseCaseResult.Failure(
+                AllPersistableUriPermissionReleaseFailureException(e)
+            )
         }
 
         Log.i(logTag, "${logMsg}完了")

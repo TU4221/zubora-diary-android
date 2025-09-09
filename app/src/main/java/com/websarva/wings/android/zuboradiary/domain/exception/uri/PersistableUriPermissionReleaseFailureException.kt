@@ -1,16 +1,16 @@
 package com.websarva.wings.android.zuboradiary.domain.exception.uri
 
-import android.net.Uri
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
 
+// TODO:削除
 /**
  * 指定されたURIに対する永続的なアクセス権限の付与処理中に
  * 予期せぬエラーが発生した場合にスローされる例外。
  *
- * @param uri 権限付与対象のURI。
+ * @param uriString 権限付与対象のURI文字列。
  * @param cause 発生した根本的な原因となった[Throwable]。
  */
 internal class PersistableUriPermissionReleaseFailureException(
-    uri: Uri,
+    uriString: String,
     cause: Throwable
-) : DomainException("URI '$uri' の永続的URI権限の解放に失敗しました。", cause)
+) : UseCaseException("URI '$uriString' の永続的URI権限の解放に失敗しました。", cause)

@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.UriRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.uri.PersistableUriPermissionTakeFailureException
-import com.websarva.wings.android.zuboradiary.domain.usecase.DefaultUseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 // TODO: [画像表示の永続化改善] 現在は画像URIを直接参照しているが、以下の課題があるため、
@@ -50,16 +50,18 @@ internal class TakePersistableUriPermissionUseCase(
      * @return 権限取得処理が成功した場合は [UseCaseResult.Success] を返す。
      *   権限取得処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
      */
-    operator fun invoke(uriString: String): DefaultUseCaseResult<Unit> {
+    operator fun invoke(uriString: String): UseCaseResult<Unit, PersistableUriPermissionTakeFailureException> {
         Log.i(logTag, "${logMsg}開始 (URI: \"$uriString\")")
 
         return try {
             uriRepository.takePersistableUriPermission(uriString)
             Log.i(logTag, "${logMsg}完了 (URI: \"$uriString\")")
             UseCaseResult.Success(Unit)
-        } catch (e: PersistableUriPermissionTakeFailureException) {
+        } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_権限取得処理エラー (URI: \"$uriString\")", e)
-            UseCaseResult.Failure(e)
+            UseCaseResult.Failure(
+                PersistableUriPermissionTakeFailureException(uriString, e)
+            )
         }
     }
 }

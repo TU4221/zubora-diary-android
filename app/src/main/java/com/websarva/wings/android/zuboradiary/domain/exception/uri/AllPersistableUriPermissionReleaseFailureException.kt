@@ -1,7 +1,8 @@
 package com.websarva.wings.android.zuboradiary.domain.exception.uri
 
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UseCaseException
 
+// TODO:削除
 /**
  * アプリが保持している全ての永続的なURI権限の解放処理中に
  * 予期せぬエラーが発生した場合にスローされる例外。
@@ -10,4 +11,4 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
  */
 internal class AllPersistableUriPermissionReleaseFailureException(
     cause: Throwable
-) : DomainException("全ての永続的URI権限の解放に失敗しました。", cause)
+) : UseCaseException("全ての永続的URI権限の解放に失敗しました。", cause)
