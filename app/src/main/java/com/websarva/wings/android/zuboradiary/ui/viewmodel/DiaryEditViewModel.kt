@@ -4,7 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.usecase.exception.FetchWeatherInfoUseCaseException
+import com.websarva.wings.android.zuboradiary.domain.usecase.exception.WeatherInfoFetchException
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
@@ -945,16 +945,16 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 updateUiState(DiaryEditState.Editing)
                 when (result.exception) {
-                    is FetchWeatherInfoUseCaseException.LocationPermissionNotGranted -> {
+                    is WeatherInfoFetchException.LocationPermissionNotGranted -> {
                         emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
                     }
-                    is FetchWeatherInfoUseCaseException.LocationAccessFailure -> {
+                    is WeatherInfoFetchException.LocationAccessFailure -> {
                         emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoFetchFailure)
                     }
-                    is FetchWeatherInfoUseCaseException.WeatherInfoDateOutOfRange -> {
+                    is WeatherInfoFetchException.DateOutOfRange -> {
                         emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoDateOutOfRange)
                     }
-                    is FetchWeatherInfoUseCaseException.WeatherInfoFetchFailure -> {
+                    is WeatherInfoFetchException.FetchFailure -> {
                         emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoFetchFailure)
                     }
                 }
