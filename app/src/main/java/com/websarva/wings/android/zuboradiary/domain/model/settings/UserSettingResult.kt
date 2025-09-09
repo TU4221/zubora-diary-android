@@ -40,7 +40,7 @@ internal sealed class UserSettingResult<out T : UserSetting> {
      * @property fallbackSetting エラー発生時に代わりに利用するユーザー設定の値。
      */
     data class Failure<out T : UserSetting>(
-        val exception: UserSettingsLoadException,
+        val exception: /*UserSettingsLoadException*/ Exception, // TODO:20250909仮修正
         val fallbackSetting: T
     ) : UserSettingResult<T>()
 }

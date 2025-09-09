@@ -1,11 +1,13 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.domain.exception.settings.CalendarStartDayOfWeekSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.settings.UserSettingsLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -30,15 +32,12 @@ internal class LoadCalendarStartDayOfWeekSettingUseCase(
      *
      * リポジトリから設定値を読み込み、その結果を [UserSettingResult] に変換する。
      * - リポジトリからの読み込み成功時: [UserSettingResult.Success] を発行。
-     * - リポジトリからの読み込み失敗時 ([UserSettingsLoadException] が発生した場合):
-     *     - [UserSettingsLoadException.AccessFailure]: [UserSettingResult.Failure] を発行し、
-     *       デフォルト値をフォールバックとして提供する。
-     *     - [UserSettingsLoadException.DataNotFound]: [UserSettingResult.Success] を発行し、
-     *       デフォルト値を設定値として提供する。
+     * - リポジトリからの読み込み失敗時 ([DataStorageException]、 [NotFoundException] が発生した場合):
+     *     - [DataStorageException]: [UserSettingResult.Failure] を発行し、デフォルト値をフォールバックとして提供する。
+     *     - [NotFoundException]: [UserSettingResult.Success] を発行し、デフォルト値を設定値として提供する。
      *
-     * @return カレンダーの週の開始曜日設定の読み込み結果 ([UserSettingResult]) を
-     *   [Flow] でラップし、[UseCaseResult.Success] に格納して返す。
-     *   このユースケースは、常に [UseCaseResult.Success] を返す。
+     * @return カレンダーの週の開始曜日設定の読み込み結果を [UserSettingResult] へ [Flow] でラップし、
+     *   [UseCaseResult.Success] に格納して返す。このユースケースは、常に [UseCaseResult.Success] を返す。
      */
     operator fun invoke(): UseCaseResult.Success<Flow<UserSettingResult<CalendarStartDayOfWeekSetting>>> {
         Log.i(logTag, "${logMsg}開始")
@@ -55,21 +54,22 @@ internal class LoadCalendarStartDayOfWeekSettingUseCase(
                         UserSettingResult.Success(setting)
                     result
                 }.catch { cause: Throwable ->
-                    if (cause !is UserSettingsLoadException) throw cause
-
                     val defaultSettingValue = CalendarStartDayOfWeekSetting()
-                    val result =
+                    val userSettingResult =
                         when (cause) {
-                            is UserSettingsLoadException.AccessFailure -> {
+                            is DataStorageException -> {
                                 Log.w(
                                     logTag,
                                     "${logMsg}失敗_アクセス失敗、" +
                                             "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
                                     cause
                                 )
-                                UserSettingResult.Failure(cause, defaultSettingValue)
+                                UserSettingResult.Failure(
+                                    CalendarStartDayOfWeekSettingLoadException.LoadFailure(cause),
+                                    defaultSettingValue
+                                )
                             }
-                            is UserSettingsLoadException.DataNotFound -> {
+                            is NotFoundException -> {
                                 Log.i(
                                     logTag,
                                     "${logMsg}失敗_データ未発見、" +
@@ -77,8 +77,9 @@ internal class LoadCalendarStartDayOfWeekSettingUseCase(
                                 )
                                 UserSettingResult.Success(defaultSettingValue)
                             }
+                            else -> throw cause
                         }
-                    emit(result)
+                    emit(userSettingResult)
                 }
 
         Log.i(logTag, "${logMsg}完了")
