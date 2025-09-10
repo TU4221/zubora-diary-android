@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PassCodeSettingLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PasscodeLockSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
@@ -32,10 +32,10 @@ internal class LoadPasscodeLockSettingUseCase(
      * @return カレンダーの週の開始曜日設定の読み込み結果を [UseCaseResult] へ [Flow] でラップして返す。
      *   読み込みが成功した場合は[UseCaseResult.Success] に [PasscodeLockSetting] を格納して返す。
      *   読み込みに失敗した場合は、[UseCaseResult.Failure] にフォールバック値を格納した
-     *   [PassCodeSettingLoadException] を格納して返す。
+     *   [PasscodeLockSettingLoadException] を格納して返す。
      */
     operator fun invoke(): Flow<
-            UseCaseResult<PasscodeLockSetting, PassCodeSettingLoadException>
+            UseCaseResult<PasscodeLockSetting, PasscodeLockSettingLoadException>
     > {
         Log.i(logTag, "${logMsg}開始")
 
@@ -46,7 +46,7 @@ internal class LoadPasscodeLockSettingUseCase(
                     logTag,
                     "${logMsg}読込成功 (設定値: ${setting})"
                 )
-                val result: UseCaseResult<PasscodeLockSetting, PassCodeSettingLoadException> =
+                val result: UseCaseResult<PasscodeLockSetting, PasscodeLockSettingLoadException> =
                     UseCaseResult.Success(setting)
                 result
             }.catch { cause: Throwable ->
@@ -61,7 +61,7 @@ internal class LoadPasscodeLockSettingUseCase(
                                 cause
                             )
                             UseCaseResult.Failure(
-                                PassCodeSettingLoadException
+                                PasscodeLockSettingLoadException
                                     .LoadFailure(defaultSettingValue, cause),
                             )
                         }

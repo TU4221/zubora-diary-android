@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadPassco
  * @param message 例外メッセージ。
  * @param cause 発生した根本的な原因となった[Throwable]。
  */
-internal sealed class PassCodeSettingLoadException (
+internal sealed class PasscodeLockSettingLoadException (
     val fallbackSetting: PasscodeLockSetting,
     message: String,
     cause: Throwable
@@ -28,5 +28,5 @@ internal sealed class PassCodeSettingLoadException (
     class LoadFailure(
         fallbackSetting: PasscodeLockSetting,
         cause: Throwable
-    ) : PassCodeSettingLoadException(fallbackSetting, "パスコード設定の読込に失敗しました。", cause)
+    ) : PasscodeLockSettingLoadException(fallbackSetting, "パスコード設定の読込に失敗しました。", cause)
 }
