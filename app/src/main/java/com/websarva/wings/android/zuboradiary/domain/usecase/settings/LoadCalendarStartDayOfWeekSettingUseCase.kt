@@ -29,7 +29,7 @@ internal class LoadCalendarStartDayOfWeekSettingUseCase(
     /**
      * ユースケースを実行し、カレンダーの週の開始曜日設定の読み込み結果を [Flow] として返す。
      *
-     * @return カレンダーの週の開始曜日設定の読み込み結果を [UseCaseResult] へ [Flow] でラップして返す。
+     * @return 読み込み結果を [UseCaseResult] へ [Flow] でラップして返す。
      *   読み込みが成功した場合は[UseCaseResult.Success] に [CalendarStartDayOfWeekSetting] を格納して返す。
      *   読み込みに失敗した場合は、[UseCaseResult.Failure] にフォールバック値を格納した
      *   [CalendarStartDayOfWeekSettingLoadException] を格納して返す。

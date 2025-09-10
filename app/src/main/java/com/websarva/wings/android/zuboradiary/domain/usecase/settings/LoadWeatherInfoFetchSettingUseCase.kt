@@ -29,7 +29,7 @@ internal class LoadWeatherInfoFetchSettingUseCase(
     /**
      * ユースケースを実行し、天気情報取得設定の読み込み結果を [Flow] として返す。
      *
-     * @return カレンダーの週の開始曜日設定の読み込み結果を [UseCaseResult] へ [Flow] でラップして返す。
+     * @return 読み込み結果を [UseCaseResult] へ [Flow] でラップして返す。
      *   読み込みが成功した場合は[UseCaseResult.Success] に [WeatherInfoFetchSetting] を格納して返す。
      *   読み込みに失敗した場合は、[UseCaseResult.Failure] にフォールバック値を格納した
      *   [WeatherInfoFetchSettingLoadException] を格納して返す。
