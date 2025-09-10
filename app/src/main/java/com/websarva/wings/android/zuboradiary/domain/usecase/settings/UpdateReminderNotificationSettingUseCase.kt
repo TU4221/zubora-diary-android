@@ -9,7 +9,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.exceptio
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.exception.ReminderNotificationRegisterException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.RegisterReminderNotificationUseCase
@@ -150,14 +149,14 @@ internal class UpdateReminderNotificationSettingUseCase(
      */
     private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationSetting {
         return withContext(Dispatchers.IO) {
-            loadReminderNotificationSettingUseCase().value
-                .map { result: UserSettingResult<ReminderNotificationSetting> ->
-                    when (result) {
-                        is UserSettingResult.Success -> {
-                            result.setting
+            loadReminderNotificationSettingUseCase()
+                .map {
+                    when (it) {
+                        is UseCaseResult.Success -> {
+                            it.value
                         }
-                        is UserSettingResult.Failure -> {
-                            throw result.exception
+                        is UseCaseResult.Failure -> {
+                            throw it.exception
                         }
                     }
                 }.first()

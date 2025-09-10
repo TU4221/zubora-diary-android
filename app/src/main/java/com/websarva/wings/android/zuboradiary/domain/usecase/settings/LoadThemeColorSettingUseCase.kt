@@ -5,7 +5,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -30,59 +29,51 @@ internal class LoadThemeColorSettingUseCase(
     /**
      * ユースケースを実行し、テーマカラー設定の読み込み結果を [Flow] として返す。
      *
-     * リポジトリから設定値を読み込み、その結果を [UserSettingResult] に変換する。
-     * - リポジトリからの読み込み成功時: [UserSettingResult.Success] を発行。
-     * - リポジトリからの読み込み失敗時 ([DataStorageException]、 [NotFoundException] が発生した場合):
-     *     - [DataStorageException]: [UserSettingResult.Failure] を発行し、デフォルト値をフォールバックとして提供する。
-     *     - [NotFoundException]: [UserSettingResult.Success] を発行し、デフォルト値を設定値として提供する。
-     *
-     * @return テーマカラー設定の読み込み結果を [UserSettingResult] へ [Flow] でラップし、
-     *   [UseCaseResult.Success] に格納して返す。このユースケースは、常に [UseCaseResult.Success] を返す。
+     * @return カレンダーの週の開始曜日設定の読み込み結果を [UseCaseResult] へ [Flow] でラップして返す。
+     *   読み込みが成功した場合は[UseCaseResult.Success] に [ThemeColorSetting] を格納して返す。
+     *   読み込みに失敗した場合は、[UseCaseResult.Failure] にフォールバック値を格納した
+     *   [ThemeColorSettingLoadException] を格納して返す。
      */
-    operator fun invoke(): UseCaseResult.Success<Flow<UserSettingResult<ThemeColorSetting>>> {
+    operator fun invoke(): Flow<UseCaseResult<ThemeColorSetting, ThemeColorSettingLoadException>> {
         Log.i(logTag, "${logMsg}開始")
 
-        val flow =
-            settingsRepository
-                .loadThemeColorSetting()
-                .map { setting: ThemeColorSetting ->
-                    Log.d(
-                        logTag,
-                        "${logMsg}読込成功 (設定値: ${setting})"
-                    )
-                    val result: UserSettingResult<ThemeColorSetting> =
-                        UserSettingResult.Success(setting)
-                    result
-                }.catch { cause: Throwable ->
-                    val defaultSettingValue = ThemeColorSetting()
-                    val userSettingResult =
-                        when (cause) {
-                            is DataStorageException -> {
-                                Log.w(
-                                    logTag,
-                                    "${logMsg}失敗_アクセス失敗、" +
-                                            "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
-                                    cause
-                                )
-                                UserSettingResult.Failure(
-                                    ThemeColorSettingLoadException.LoadFailure(cause),
-                                    defaultSettingValue
-                                )
-                            }
-                            is NotFoundException -> {
-                                Log.i(
-                                    logTag,
-                                    "${logMsg}失敗_データ未発見、" +
-                                            "デフォルト値を設定値として使用 (デフォルト値: $defaultSettingValue)"
-                                )
-                                UserSettingResult.Success(defaultSettingValue)
-                            }
-                            else -> throw cause
+        return settingsRepository
+            .loadThemeColorSetting()
+            .map { setting: ThemeColorSetting ->
+                Log.d(
+                    logTag,
+                    "${logMsg}読込成功 (設定値: ${setting})"
+                )
+                val result: UseCaseResult<ThemeColorSetting, ThemeColorSettingLoadException> =
+                    UseCaseResult.Success(setting)
+                result
+            }.catch { cause: Throwable ->
+                val defaultSettingValue = ThemeColorSetting()
+                val result =
+                    when (cause) {
+                        is DataStorageException -> {
+                            Log.w(
+                                logTag,
+                                "${logMsg}失敗_アクセス失敗、" +
+                                        "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
+                                cause
+                            )
+                            UseCaseResult.Failure(
+                                ThemeColorSettingLoadException
+                                    .LoadFailure(defaultSettingValue, cause),
+                            )
                         }
-                    emit(userSettingResult)
-                }
-
-        Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(flow)
+                        is NotFoundException -> {
+                            Log.i(
+                                logTag,
+                                "${logMsg}_データ未発見_" +
+                                        "デフォルト値を設定値として使用 (デフォルト値: $defaultSettingValue)"
+                            )
+                            UseCaseResult.Success(defaultSettingValue)
+                        }
+                        else -> throw cause
+                    }
+                emit(result)
+            }
     }
 }

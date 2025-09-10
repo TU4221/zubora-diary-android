@@ -10,7 +10,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
@@ -216,16 +215,15 @@ internal class SettingsViewModel @Inject constructor(
         val initialValue = handle.get<ThemeColorUi>(SAVED_THEME_COLOR_STATE_KEY)
         themeColor =
             loadThemeColorSettingUseCase()
-                .value
                 .map {
                     when (it) {
-                        is UserSettingResult.Success -> {
+                        is UseCaseResult.Success -> {
                             onUserSettingsFetchSuccess()
-                            it.setting.themeColor.toUiModel()
+                            it.value.themeColor.toUiModel()
                         }
-                        is UserSettingResult.Failure -> {
+                        is UseCaseResult.Failure -> {
                             onUserSettingsFetchFailure()
-                            it.fallbackSetting.themeColor.toUiModel()
+                            it.exception.fallbackSetting.themeColor.toUiModel()
                         }
                     }
                 }.onEach { value: ThemeColorUi ->
@@ -237,12 +235,11 @@ internal class SettingsViewModel @Inject constructor(
         val initialValue = handle.get<DayOfWeek>(SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY)
         calendarStartDayOfWeek =
             loadCalendarStartDayOfWeekSettingUseCase()
-                .value
                 .map {
                     when (it) {
-                        is UserSettingResult.Success -> it.setting.dayOfWeek
-                        is UserSettingResult.Failure -> {
-                            it.fallbackSetting.dayOfWeek
+                        is UseCaseResult.Success -> it.value.dayOfWeek
+                        is UseCaseResult.Failure -> {
+                            it.exception.fallbackSetting.dayOfWeek
                         }
                     }
                 }.onEach { value: DayOfWeek ->
@@ -253,30 +250,30 @@ internal class SettingsViewModel @Inject constructor(
     private fun setUpReminderNotificationSettingValue() {
         isCheckedReminderNotification =
             loadReminderNotificationSettingUseCase()
-                .value
                 .map {
                     when (it) {
-                        is UserSettingResult.Success -> it.setting.isEnabled
-                        is UserSettingResult.Failure -> {
-                            it.fallbackSetting.isEnabled
+                        is UseCaseResult.Success -> it.value.isEnabled
+                        is UseCaseResult.Failure -> {
+                            it.exception.fallbackSetting.isEnabled
                         }
                     }
                 }.stateInEagerly(null )
 
         reminderNotificationTime =
             loadReminderNotificationSettingUseCase()
-                .value
                 .map {
                     when (it) {
-                        is UserSettingResult.Success -> {
-                            when (it.setting) {
-                                is ReminderNotificationSetting.Enabled -> it.setting.notificationTime
+                        is UseCaseResult.Success -> {
+                            when (it.value) {
+                                is ReminderNotificationSetting.Enabled -> it.value.notificationTime
                                 ReminderNotificationSetting.Disabled -> null
                             }
                         }
-                        is UserSettingResult.Failure -> {
-                            when (it.fallbackSetting) {
-                                is ReminderNotificationSetting.Enabled -> it.fallbackSetting.notificationTime
+                        is UseCaseResult.Failure -> {
+                            when (it.exception.fallbackSetting) {
+                                is ReminderNotificationSetting.Enabled -> {
+                                    it.exception.fallbackSetting.notificationTime
+                                }
                                 ReminderNotificationSetting.Disabled -> null
                             }
                         }
@@ -287,32 +284,30 @@ internal class SettingsViewModel @Inject constructor(
     private fun setUpPasscodeLockSettingValue() {
         isCheckedPasscodeLock =
             loadPasscodeLockSettingUseCase()
-                .value
                 .map {
                     when (it) {
-                        is UserSettingResult.Success -> {
-                            it.setting.isEnabled
+                        is UseCaseResult.Success -> {
+                            it.value.isEnabled
                         }
-                        is UserSettingResult.Failure -> {
-                            it.fallbackSetting.isEnabled
+                        is UseCaseResult.Failure -> {
+                            it.exception.fallbackSetting.isEnabled
                         }
                     }
                 }.stateInEagerly(null )
 
         passcode =
             loadPasscodeLockSettingUseCase()
-                .value
                 .map {
                     when (it) {
-                        is UserSettingResult.Success -> {
-                            when (it.setting) {
-                                is PasscodeLockSetting.Enabled -> it.setting.passcode
+                        is UseCaseResult.Success -> {
+                            when (it.value) {
+                                is PasscodeLockSetting.Enabled -> it.value.passcode
                                 PasscodeLockSetting.Disabled -> null
                             }
                         }
-                        is UserSettingResult.Failure -> {
-                            when (it.fallbackSetting) {
-                                is PasscodeLockSetting.Enabled -> it.fallbackSetting.passcode
+                        is UseCaseResult.Failure -> {
+                            when (it.exception.fallbackSetting) {
+                                is PasscodeLockSetting.Enabled -> it.exception.fallbackSetting.passcode
                                 PasscodeLockSetting.Disabled -> null
                             }
                         }
@@ -323,12 +318,11 @@ internal class SettingsViewModel @Inject constructor(
     private fun setUpWeatherInfoFetchSettingValue() {
         isCheckedWeatherInfoFetch =
             loadWeatherInfoFetchSettingUseCase()
-                .value
                 .map {
                     when (it) {
-                        is UserSettingResult.Success -> it.setting.isEnabled
-                        is UserSettingResult.Failure -> {
-                            it.fallbackSetting.isEnabled
+                        is UseCaseResult.Success -> it.value.isEnabled
+                        is UseCaseResult.Failure -> {
+                            it.exception.fallbackSetting.isEnabled
                         }
                     }
                 }.stateInEagerly(null)

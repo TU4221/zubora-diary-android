@@ -2,8 +2,6 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
-import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -36,19 +34,19 @@ internal class IsWeatherInfoFetchEnabledUseCase(
 
         val value =
             withContext(Dispatchers.IO) {
-                loadWeatherInfoFetchSettingUseCase().value
-                    .map { value: UserSettingResult<WeatherInfoFetchSetting> ->
-                        when (value) {
-                            is UserSettingResult.Success -> {
-                                value.setting.isEnabled
+                loadWeatherInfoFetchSettingUseCase()
+                    .map { result ->
+                        when (result) {
+                            is UseCaseResult.Success -> {
+                                result.value.isEnabled
                             }
-                            is UserSettingResult.Failure -> {
+                            is UseCaseResult.Failure -> {
                                 Log.w(
                                     logTag, "${logMsg}設定読み込み失敗、" +
-                                        "フォールバック値を使用 (有効: ${value.fallbackSetting.isEnabled})",
-                                    value.exception
+                                        "フォールバック値を使用 (有効: ${result.exception.fallbackSetting.isEnabled})",
+                                    result.exception
                                 )
-                                value.fallbackSetting.isEnabled
+                                result.exception.fallbackSetting.isEnabled
                             }
                         }
                     }.first()
