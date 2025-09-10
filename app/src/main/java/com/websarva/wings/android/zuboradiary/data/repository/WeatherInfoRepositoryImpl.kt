@@ -1,37 +1,31 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
-import com.websarva.wings.android.zuboradiary.data.location.FusedLocationAccessFailureException
-import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.mapper.weather.toDomainModel
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiException
+import com.websarva.wings.android.zuboradiary.domain.model.SimpleLocation
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.InvalidParameterException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.LocationException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.NetworkConnectionException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 internal class WeatherInfoRepositoryImpl (
-    private val weatherApiDataSource: WeatherApiDataSource,
-    private val fusedLocationDataSource: FusedLocationDataSource
+    private val weatherApiDataSource: WeatherApiDataSource
 ) : WeatherInfoRepository {
 
     override fun canFetchWeatherInfo(date: LocalDate): Boolean {
         return weatherApiDataSource.canFetchWeatherInfo(date)
     }
 
-    override suspend fun fetchWeatherInfo(date: LocalDate): Weather {
+    override suspend fun fetchWeatherInfo(date: LocalDate, location: SimpleLocation): Weather {
         return withContext(Dispatchers.IO) {
             try {
-                val location = fusedLocationDataSource.fetchCurrentLocation()
                 weatherApiDataSource
                     .fetchWeatherInfo(date, location.latitude, location.longitude)
                     .toDomainModel()
-            } catch (e: FusedLocationAccessFailureException) {
-                throw LocationException(cause = e)
             } catch (e: WeatherApiException) {
                 when (e) {
                     is WeatherApiException.ApiAccessFailure ->

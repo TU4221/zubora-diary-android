@@ -1,9 +1,9 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
+import com.websarva.wings.android.zuboradiary.domain.model.SimpleLocation
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.InvalidParameterException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.LocationException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.NetworkConnectionException
 import java.time.LocalDate
 
@@ -25,13 +25,13 @@ internal interface WeatherInfoRepository {
     fun canFetchWeatherInfo(date: LocalDate): Boolean
 
     /**
-     * 指定された日付の天気情報を取得する。
+     * 指定された日付と位置の天気情報を取得する。
      *
      * @param date 天気情報を取得する対象の日付。
+     * @param location 天気情報を取得する対象の位置情報。
      * @return 取得された天気情報。
-     * @throws LocationException 天気情報の取得に必要な位置情報の取得に失敗した場合。
      * @throws NetworkConnectionException 天気情報の取得に失敗した場合。
      * @throws InvalidParameterException 指定された日付が天気情報の取得可能範囲を超えてた場合。
      */
-    suspend fun fetchWeatherInfo(date: LocalDate): Weather
+    suspend fun fetchWeatherInfo(date: LocalDate, location: SimpleLocation): Weather
 }

@@ -6,8 +6,9 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.InvalidParameterException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.LocationException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.NetworkConnectionException
+import com.websarva.wings.android.zuboradiary.domain.usecase.location.FetchCurrentLocationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.location.exception.CurrentLocationFetchException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -21,7 +22,8 @@ import java.time.LocalDate
  */
 internal class FetchWeatherInfoUseCase(
     private val weatherInfoRepository: WeatherInfoRepository,
-    private val canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase
+    private val canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase,
+    private val fetchCurrentLocationUseCase: FetchCurrentLocationUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -48,21 +50,30 @@ internal class FetchWeatherInfoUseCase(
             return UseCaseResult.Failure(exception)
         }
 
-        if (!isGranted) {
-            val exception = WeatherInfoFetchException.LocationPermissionNotGranted()
-            Log.w(logTag, "${logMsg}失敗_位置情報権限未取得", exception)
-            return UseCaseResult.Failure(exception)
-        }
-
         return try {
-            val weather = weatherInfoRepository.fetchWeatherInfo(date)
+            val location =
+                when (val result = fetchCurrentLocationUseCase(isGranted)) {
+                    is UseCaseResult.Success -> result.value
+                    is UseCaseResult.Failure -> throw result.exception
+                }
+            val weather = weatherInfoRepository.fetchWeatherInfo(date, location)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(weather)
-        } catch (e: LocationException) {
-            Log.e(logTag, "${logMsg}失敗_位置情報アクセスエラー", e)
-            UseCaseResult.Failure(
-                WeatherInfoFetchException.LocationAccessFailure(e)
-            )
+        } catch (e: CurrentLocationFetchException) {
+            when (e) {
+                is CurrentLocationFetchException.LocationPermissionNotGranted -> {
+                    Log.w(logTag, "${logMsg}失敗_位置情報権限未取得", e)
+                    UseCaseResult.Failure(
+                        WeatherInfoFetchException.LocationPermissionNotGranted(e)
+                    )
+                }
+                is CurrentLocationFetchException.LocationAccessFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_位置情報アクセスエラー", e)
+                    UseCaseResult.Failure(
+                        WeatherInfoFetchException.LocationAccessFailure(e)
+                    )
+                }
+            }
         } catch (e: NetworkConnectionException) {
             Log.e(logTag, "${logMsg}失敗_APIアクセスエラー", e)
             UseCaseResult.Failure(

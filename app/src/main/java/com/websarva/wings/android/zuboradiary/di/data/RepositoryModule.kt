@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepos
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepositoryImpl
+import com.websarva.wings.android.zuboradiary.data.repository.LocationRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.repository.SchedulingRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepositoryImpl
 import com.websarva.wings.android.zuboradiary.domain.repository.UriRepository
@@ -16,6 +17,7 @@ import com.websarva.wings.android.zuboradiary.data.repository.UriRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
 import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
+import com.websarva.wings.android.zuboradiary.domain.repository.LocationRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -48,6 +50,12 @@ internal object RepositoryModule {
 
     @Singleton
     @Provides
+    fun provideLocationRepository(
+        fusedLocationDataSource: FusedLocationDataSource
+    ): LocationRepository = LocationRepositoryImpl(fusedLocationDataSource)
+
+    @Singleton
+    @Provides
     fun provideSchedulingRepository(
         workManager: NotificationSchedulingDataSource
     ): SchedulingRepository = SchedulingRepositoryImpl(workManager)
@@ -67,11 +75,6 @@ internal object RepositoryModule {
     @Singleton
     @Provides
     fun provideWeatherApiRepository(
-        weatherApiDataSource: WeatherApiDataSource,
-        fusedLocationDataSource: FusedLocationDataSource
-    ): WeatherInfoRepository =
-        WeatherInfoRepositoryImpl(
-            weatherApiDataSource,
-            fusedLocationDataSource
-        )
+        weatherApiDataSource: WeatherApiDataSource
+    ): WeatherInfoRepository = WeatherInfoRepositoryImpl(weatherApiDataSource)
 }

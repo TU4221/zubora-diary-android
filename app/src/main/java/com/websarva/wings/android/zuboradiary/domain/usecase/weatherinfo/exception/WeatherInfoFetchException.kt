@@ -17,8 +17,12 @@ internal sealed class WeatherInfoFetchException(
 
     /**
      * 位置情報の取得権限が付与されていない場合の例外。
+     *
+     * @param cause 発生した根本的な原因となった [Throwable]。
      */
-    class LocationPermissionNotGranted : WeatherInfoFetchException("位置情報取得権限が未取得です。")
+    class LocationPermissionNotGranted(
+        cause: Throwable
+    ) : WeatherInfoFetchException("位置情報取得権限が未取得です。", cause)
 
     /**
      * 位置情報の取得に失敗した場合の例外。
