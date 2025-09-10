@@ -8,7 +8,6 @@ import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataSt
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
-// TODO:単純処理の為、使用先をRepositoryに置き換え、削除
 /**
  * 指定された日付の日記が既に存在するかどうかを確認するユースケース。
  *

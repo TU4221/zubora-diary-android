@@ -8,7 +8,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
-// TODO:単純処理の為、使用先をRepositoryに置き換え、削除
 /**
  * 保存されている日記の総数を取得するユースケース。
  *
