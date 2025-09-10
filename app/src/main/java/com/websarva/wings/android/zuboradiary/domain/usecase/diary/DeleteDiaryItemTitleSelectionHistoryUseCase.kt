@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryItemDeleteException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryDeleteException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class DeleteDiaryItemTitleSelectionHistoryItemUseCase(
+internal class DeleteDiaryItemTitleSelectionHistoryUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
@@ -28,7 +28,7 @@ internal class DeleteDiaryItemTitleSelectionHistoryItemUseCase(
      */
     suspend operator fun invoke(
         deleteTitle: String
-    ): UseCaseResult<Unit, DiaryItemTitleSelectionHistoryItemDeleteException> {
+    ): UseCaseResult<Unit, DiaryItemTitleSelectionHistoryDeleteException> {
         Log.i(logTag, "${logMsg}開始 (削除タイトル: \"$deleteTitle\")")
 
         return try {
@@ -38,7 +38,7 @@ internal class DeleteDiaryItemTitleSelectionHistoryItemUseCase(
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_削除処理エラー", e)
             UseCaseResult.Failure(
-                DiaryItemTitleSelectionHistoryItemDeleteException.DeleteFailure(deleteTitle, e)
+                DiaryItemTitleSelectionHistoryDeleteException.DeleteFailure(deleteTitle, e)
             )
         }
     }

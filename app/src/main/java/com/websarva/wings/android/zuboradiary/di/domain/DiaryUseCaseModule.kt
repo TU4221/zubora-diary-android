@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloaded
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultsExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
@@ -77,10 +77,10 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideDeleteDiaryItemTitleSelectionHistoryItemUseCase(
+    fun provideDeleteDiaryItemTitleSelectionHistoryUseCase(
         diaryRepository: DiaryRepository
-    ): DeleteDiaryItemTitleSelectionHistoryItemUseCase =
-        DeleteDiaryItemTitleSelectionHistoryItemUseCase(diaryRepository)
+    ): DeleteDiaryItemTitleSelectionHistoryUseCase =
+        DeleteDiaryItemTitleSelectionHistoryUseCase(diaryRepository)
 
     @Singleton
     @Provides

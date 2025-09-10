@@ -1,15 +1,15 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryItemUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 
 /**
- * [DeleteDiaryItemTitleSelectionHistoryItemUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
+ * [DeleteDiaryItemTitleSelectionHistoryUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
  *
  * @param message 例外メッセージ。
  * @param cause 発生した根本的な原因となった[Throwable]。
  */
-internal sealed class DiaryItemTitleSelectionHistoryItemDeleteException (
+internal sealed class DiaryItemTitleSelectionHistoryDeleteException (
     message: String,
     cause: Throwable
 ) : UseCaseException(message, cause) {
@@ -23,7 +23,7 @@ internal sealed class DiaryItemTitleSelectionHistoryItemDeleteException (
     class DeleteFailure (
         title: String,
         cause: Throwable
-    ) : DiaryItemTitleSelectionHistoryItemDeleteException(
+    ) : DiaryItemTitleSelectionHistoryDeleteException(
         "日記項目タイトル選択履歴の '$title' の削除に失敗しました。",
         cause
     )
