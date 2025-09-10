@@ -120,7 +120,7 @@ internal class UpdateReminderNotificationSettingUseCase(
             }
 
         try {
-            settingsRepository.saveReminderNotificationPreference(settingValue)
+            settingsRepository.updateReminderNotificationPreference(settingValue)
         } catch (e: DataStorageException) {
             val settingNotificationTime =
                 when (settingValue) {
@@ -225,7 +225,7 @@ internal class UpdateReminderNotificationSettingUseCase(
         backupSettingValue: ReminderNotificationSetting
     ) {
         try {
-            settingsRepository.saveReminderNotificationPreference(backupSettingValue)
+            settingsRepository.updateReminderNotificationPreference(backupSettingValue)
         } catch (e: DataStorageException) {
             val backupNotificationTime =
                 when (backupSettingValue) {

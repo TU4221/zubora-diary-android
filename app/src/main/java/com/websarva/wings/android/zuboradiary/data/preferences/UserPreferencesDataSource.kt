@@ -260,36 +260,36 @@ internal class UserPreferencesDataSource @Inject constructor(
     }
 
     /**
-     * テーマカラー設定 ([ThemeColorPreference]) をDataStoreに保存する。
+     * テーマカラー設定 ([ThemeColorPreference]) を更新する。
      *
-     * @param value 保存するテーマカラー設定。
+     * @param value 更新するテーマカラー設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
-    suspend fun saveThemeColorPreference(value: ThemeColorPreference) {
+    suspend fun updateThemeColorPreference(value: ThemeColorPreference) {
         executeDataStoreEditOperation { preferences ->
             preferences[themeColorPreferenceKey] = value.themeColorNumber
         }
     }
 
     /**
-     * カレンダーの開始曜日設定 ([CalendarStartDayOfWeekPreference]) をDataStoreに保存する。
+     * カレンダーの開始曜日設定 ([CalendarStartDayOfWeekPreference]) を更新する。
      *
-     * @param value 保存するカレンダー開始曜日設定。
+     * @param value 更新するカレンダー開始曜日設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
-    suspend fun saveCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
+    suspend fun updateCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
         executeDataStoreEditOperation { preferences ->
             preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
         }
     }
 
     /**
-     * リマインダー通知設定 ([ReminderNotificationPreference]) をDataStoreに保存する。
+     * リマインダー通知設定 ([ReminderNotificationPreference]) を更新する。
      *
-     * @param value 保存するリマインダー通知設定。
+     * @param value 更新するリマインダー通知設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
-    suspend fun saveReminderNotificationPreference(value: ReminderNotificationPreference) {
+    suspend fun updateReminderNotificationPreference(value: ReminderNotificationPreference) {
         executeDataStoreEditOperation { preferences ->
             preferences[isEnabledReminderNotificationPreferenceKey] = value.isEnabled
             preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
@@ -297,12 +297,12 @@ internal class UserPreferencesDataSource @Inject constructor(
     }
 
     /**
-     * パスコードロック設定 ([PasscodeLockPreference]) をDataStoreに保存する。
+     * パスコードロック設定 ([PasscodeLockPreference]) を更新する。
      *
-     * @param value 保存するパスコードロック設定。
+     * @param value 更新するパスコードロック設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
-    suspend fun savePasscodeLockPreference(value: PasscodeLockPreference) {
+    suspend fun updatePasscodeLockPreference(value: PasscodeLockPreference) {
         executeDataStoreEditOperation { preferences ->
             preferences[isEnabledPasscodeLockPreferenceKey] = value.isEnabled
             preferences[passcodePreferenceKey] = value.passcode
@@ -310,12 +310,12 @@ internal class UserPreferencesDataSource @Inject constructor(
     }
 
     /**
-     * 天気情報取得設定 ([WeatherInfoFetchPreference]) をDataStoreに保存する。
+     * 天気情報取得設定 ([WeatherInfoFetchPreference]) を更新する。
      *
-     * @param value 保存する天気情報取得設定。
+     * @param value 更新する天気情報取得設定。
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
-    suspend fun saveWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
+    suspend fun updateWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
         executeDataStoreEditOperation { preferences ->
             preferences[isEnabledWeatherInfoFetchPreferenceKey] = value.isEnabled
         }

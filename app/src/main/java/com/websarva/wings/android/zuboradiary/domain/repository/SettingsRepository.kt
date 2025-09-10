@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 /**
  * アプリケーション設定値へのアクセスと永続化を抽象化するリポジトリインターフェース。
  *
- * このインターフェースは、各種アプリケーション設定の読み込みと保存機能を提供します。
+ * このインターフェースは、各種アプリケーション設定の読み込みと更新機能を提供します。
  * 各メソッドは、操作に失敗した場合にドメイン固有の例外 ([UseCaseException] のサブクラス) をスローします。
  */
 internal interface SettingsRepository {
@@ -64,42 +64,42 @@ internal interface SettingsRepository {
     fun loadWeatherInfoFetchPreference(): Flow<WeatherInfoFetchSetting>
 
     /**
-     * テーマカラー設定を保存する。
+     * テーマカラー設定を更新する。
      *
-     * @param setting 保存するテーマカラー設定。
-     * @throws DataStorageException テーマカラー設定の保存に失敗した場合。
+     * @param setting 更新するテーマカラー設定。
+     * @throws DataStorageException テーマカラー設定の更新に失敗した場合。
      */
-    suspend fun saveThemeColorPreference(setting: ThemeColorSetting)
+    suspend fun updateThemeColorPreference(setting: ThemeColorSetting)
 
     /**
-     * カレンダーの開始曜日設定を保存する。
+     * カレンダーの開始曜日設定を更新する。
      *
-     * @param setting 保存するカレンダー開始曜日設定。
-     * @throws DataStorageException カレンダー開始曜日設定の保存に失敗した場合。
+     * @param setting 更新するカレンダー開始曜日設定。
+     * @throws DataStorageException カレンダー開始曜日設定の更新に失敗した場合。
      */
-    suspend fun saveCalendarStartDayOfWeekPreference(setting: CalendarStartDayOfWeekSetting)
+    suspend fun updateCalendarStartDayOfWeekPreference(setting: CalendarStartDayOfWeekSetting)
 
     /**
-     * リマインダー通知設定を保存する。
+     * リマインダー通知設定を更新する。
      *
-     * @param setting 保存するリマインダー通知設定。
-     * @throws DataStorageException リマインダー通知設定の保存に失敗した場合。
+     * @param setting 更新するリマインダー通知設定。
+     * @throws DataStorageException リマインダー通知設定の更新に失敗した場合。
      */
-    suspend fun saveReminderNotificationPreference(setting: ReminderNotificationSetting)
+    suspend fun updateReminderNotificationPreference(setting: ReminderNotificationSetting)
 
     /**
-     * パスコードロック設定を保存する。
+     * パスコードロック設定を更新する。
      *
-     * @param setting 保存するパスコードロック設定。
-     * @throws DataStorageException パスコードロック設定の保存に失敗した場合。
+     * @param setting 更新するパスコードロック設定。
+     * @throws DataStorageException パスコードロック設定の更新に失敗した場合。
      */
-    suspend fun savePasscodeLockPreference(setting: PasscodeLockSetting)
+    suspend fun updatePasscodeLockPreference(setting: PasscodeLockSetting)
 
     /**
-     * 天気情報取得設定を保存する。
+     * 天気情報取得設定を更新する。
      *
-     * @param setting 保存する天気情報取得設定。
-     * @throws DataStorageException 天気情報取得設定の保存に失敗した場合。
+     * @param setting 更新する天気情報取得設定。
+     * @throws DataStorageException 天気情報取得設定の更新に失敗した場合。
      */
-    suspend fun saveWeatherInfoFetchPreference(setting: WeatherInfoFetchSetting)
+    suspend fun updateWeatherInfoFetchPreference(setting: WeatherInfoFetchSetting)
 }

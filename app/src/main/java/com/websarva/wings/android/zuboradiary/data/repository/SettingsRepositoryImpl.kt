@@ -78,55 +78,55 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    override suspend fun saveThemeColorPreference(setting: ThemeColorSetting) {
+    override suspend fun updateThemeColorPreference(setting: ThemeColorSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
-                userPreferencesDataSource.saveThemeColorPreference(preference)
+                userPreferencesDataSource.updateThemeColorPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw DataStorageException(cause = e)
             }
         }
     }
 
-    override suspend fun saveCalendarStartDayOfWeekPreference(setting: CalendarStartDayOfWeekSetting) {
+    override suspend fun updateCalendarStartDayOfWeekPreference(setting: CalendarStartDayOfWeekSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
-                userPreferencesDataSource.saveCalendarStartDayOfWeekPreference(preference)
+                userPreferencesDataSource.updateCalendarStartDayOfWeekPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw DataStorageException(cause = e)
             }
         }
     }
 
-    override suspend fun saveReminderNotificationPreference(setting: ReminderNotificationSetting) {
+    override suspend fun updateReminderNotificationPreference(setting: ReminderNotificationSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
-                userPreferencesDataSource.saveReminderNotificationPreference(preference)
+                userPreferencesDataSource.updateReminderNotificationPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw DataStorageException(cause = e)
             }
         }
     }
 
-    override suspend fun savePasscodeLockPreference(setting: PasscodeLockSetting) {
+    override suspend fun updatePasscodeLockPreference(setting: PasscodeLockSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
-                userPreferencesDataSource.savePasscodeLockPreference(preference)
+                userPreferencesDataSource.updatePasscodeLockPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw DataStorageException(cause = e)
             }
         }
     }
 
-    override suspend fun saveWeatherInfoFetchPreference(setting: WeatherInfoFetchSetting) {
+    override suspend fun updateWeatherInfoFetchPreference(setting: WeatherInfoFetchSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
-                userPreferencesDataSource.saveWeatherInfoFetchPreference(preference)
+                userPreferencesDataSource.updateWeatherInfoFetchPreference(preference)
             } catch (e: UserPreferencesException.DataStoreAccessFailure) {
                 throw DataStorageException(cause = e)
             }

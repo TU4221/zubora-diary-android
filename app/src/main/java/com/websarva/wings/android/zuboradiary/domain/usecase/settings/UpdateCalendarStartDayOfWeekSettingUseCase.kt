@@ -35,7 +35,7 @@ internal class UpdateCalendarStartDayOfWeekSettingUseCase(
 
         try {
             val preferenceValue = CalendarStartDayOfWeekSetting(dayOfWeek)
-            settingsRepository.saveCalendarStartDayOfWeekPreference(preferenceValue)
+            settingsRepository.updateCalendarStartDayOfWeekPreference(preferenceValue)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(

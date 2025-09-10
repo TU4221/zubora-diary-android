@@ -34,7 +34,7 @@ internal class UpdateWeatherInfoFetchSettingUseCase(
 
         try {
             val preferenceValue = WeatherInfoFetchSetting(isChecked)
-            settingsRepository.saveWeatherInfoFetchPreference(preferenceValue)
+            settingsRepository.updateWeatherInfoFetchPreference(preferenceValue)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(

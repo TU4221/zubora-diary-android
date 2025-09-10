@@ -41,7 +41,7 @@ internal class UpdatePasscodeLockSettingUseCase(
                 } else {
                     PasscodeLockSetting.Disabled
                 }
-            settingsRepository.savePasscodeLockPreference(preferenceValue)
+            settingsRepository.updatePasscodeLockPreference(preferenceValue)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(

@@ -35,7 +35,7 @@ internal class UpdateThemeColorSettingUseCase(
 
         try {
             val preferenceValue = ThemeColorSetting(themeColor)
-            settingsRepository.saveThemeColorPreference(preferenceValue)
+            settingsRepository.updateThemeColorPreference(preferenceValue)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(
