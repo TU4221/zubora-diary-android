@@ -33,7 +33,7 @@ internal class UpdateThemeColorSettingUseCase(
         Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
 
         try {
-            settingsRepository.updateThemeColorPreference(setting)
+            settingsRepository.updateThemeColorSetting(setting)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(

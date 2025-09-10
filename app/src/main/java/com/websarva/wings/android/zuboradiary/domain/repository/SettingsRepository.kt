@@ -25,7 +25,7 @@ internal interface SettingsRepository {
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      * @throws NotFoundException 保存された設定値が見つからなかった場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadThemeColorPreference(): Flow<ThemeColorSetting>
+    fun loadThemeColorSetting(): Flow<ThemeColorSetting>
 
     /**
      * カレンダーの開始曜日設定を読み込む。
@@ -34,7 +34,7 @@ internal interface SettingsRepository {
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      * @throws NotFoundException 保存された設定値が見つからなかった場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadCalendarStartDayOfWeekPreference(): Flow<CalendarStartDayOfWeekSetting>
+    fun loadCalendarStartDayOfWeekSetting(): Flow<CalendarStartDayOfWeekSetting>
 
     /**
      * リマインダー通知設定を読み込む。
@@ -43,7 +43,7 @@ internal interface SettingsRepository {
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      * @throws NotFoundException 保存された設定値が見つからなかった場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadReminderNotificationPreference(): Flow<ReminderNotificationSetting>
+    fun loadReminderNotificationSetting(): Flow<ReminderNotificationSetting>
 
     /**
      * パスコードロック設定を読み込む。
@@ -52,7 +52,7 @@ internal interface SettingsRepository {
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      * @throws NotFoundException 保存された設定値が見つからなかった場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadPasscodeLockPreference(): Flow<PasscodeLockSetting>
+    fun loadPasscodeLockSetting(): Flow<PasscodeLockSetting>
 
     /**
      * 天気情報取得設定を読み込む。
@@ -61,7 +61,7 @@ internal interface SettingsRepository {
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      * @throws NotFoundException 保存された設定値が見つからなかった場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadWeatherInfoFetchPreference(): Flow<WeatherInfoFetchSetting>
+    fun loadWeatherInfoFetchSetting(): Flow<WeatherInfoFetchSetting>
 
     /**
      * テーマカラー設定を更新する。
@@ -69,7 +69,7 @@ internal interface SettingsRepository {
      * @param setting 更新するテーマカラー設定。
      * @throws DataStorageException テーマカラー設定の更新に失敗した場合。
      */
-    suspend fun updateThemeColorPreference(setting: ThemeColorSetting)
+    suspend fun updateThemeColorSetting(setting: ThemeColorSetting)
 
     /**
      * カレンダーの開始曜日設定を更新する。
@@ -77,7 +77,7 @@ internal interface SettingsRepository {
      * @param setting 更新するカレンダー開始曜日設定。
      * @throws DataStorageException カレンダー開始曜日設定の更新に失敗した場合。
      */
-    suspend fun updateCalendarStartDayOfWeekPreference(setting: CalendarStartDayOfWeekSetting)
+    suspend fun updateCalendarStartDayOfWeekSetting(setting: CalendarStartDayOfWeekSetting)
 
     /**
      * リマインダー通知設定を更新する。
@@ -85,7 +85,7 @@ internal interface SettingsRepository {
      * @param setting 更新するリマインダー通知設定。
      * @throws DataStorageException リマインダー通知設定の更新に失敗した場合。
      */
-    suspend fun updateReminderNotificationPreference(setting: ReminderNotificationSetting)
+    suspend fun updateReminderNotificationSetting(setting: ReminderNotificationSetting)
 
     /**
      * パスコードロック設定を更新する。
@@ -93,7 +93,7 @@ internal interface SettingsRepository {
      * @param setting 更新するパスコードロック設定。
      * @throws DataStorageException パスコードロック設定の更新に失敗した場合。
      */
-    suspend fun updatePasscodeLockPreference(setting: PasscodeLockSetting)
+    suspend fun updatePasscodeLockSetting(setting: PasscodeLockSetting)
 
     /**
      * 天気情報取得設定を更新する。
@@ -101,5 +101,5 @@ internal interface SettingsRepository {
      * @param setting 更新する天気情報取得設定。
      * @throws DataStorageException 天気情報取得設定の更新に失敗した場合。
      */
-    suspend fun updateWeatherInfoFetchPreference(setting: WeatherInfoFetchSetting)
+    suspend fun updateWeatherInfoFetchSetting(setting: WeatherInfoFetchSetting)
 }

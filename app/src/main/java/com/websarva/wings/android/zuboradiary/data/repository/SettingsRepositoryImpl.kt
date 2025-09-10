@@ -23,7 +23,7 @@ internal class SettingsRepositoryImpl(
     private val userPreferencesDataSource: UserPreferencesDataSource
 ) : SettingsRepository {
 
-    override fun loadThemeColorPreference(): Flow<ThemeColorSetting> {
+    override fun loadThemeColorSetting(): Flow<ThemeColorSetting> {
         return userPreferencesDataSource.loadThemeColorPreference()
             .map { preference ->
                 preference.toDomainModel()
@@ -34,7 +34,7 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    override fun loadCalendarStartDayOfWeekPreference(): Flow<CalendarStartDayOfWeekSetting> {
+    override fun loadCalendarStartDayOfWeekSetting(): Flow<CalendarStartDayOfWeekSetting> {
         return userPreferencesDataSource.loadCalendarStartDayOfWeekPreference()
             .map { preference ->
                 preference.toDomainModel()
@@ -45,7 +45,7 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    override fun loadReminderNotificationPreference(): Flow<ReminderNotificationSetting> {
+    override fun loadReminderNotificationSetting(): Flow<ReminderNotificationSetting> {
         return userPreferencesDataSource.loadReminderNotificationPreference()
             .map { preference ->
                 preference.toDomainModel()
@@ -56,7 +56,7 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    override fun loadPasscodeLockPreference(): Flow<PasscodeLockSetting> {
+    override fun loadPasscodeLockSetting(): Flow<PasscodeLockSetting> {
         return userPreferencesDataSource.loadPasscodeLockPreference()
             .map { preference ->
                 preference.toDomainModel()
@@ -67,7 +67,7 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    override fun loadWeatherInfoFetchPreference(): Flow<WeatherInfoFetchSetting> {
+    override fun loadWeatherInfoFetchSetting(): Flow<WeatherInfoFetchSetting> {
         return userPreferencesDataSource.loadWeatherInfoFetchPreference()
             .map { preference ->
                 preference.toDomainModel()
@@ -78,7 +78,7 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    override suspend fun updateThemeColorPreference(setting: ThemeColorSetting) {
+    override suspend fun updateThemeColorSetting(setting: ThemeColorSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
@@ -89,7 +89,7 @@ internal class SettingsRepositoryImpl(
         }
     }
 
-    override suspend fun updateCalendarStartDayOfWeekPreference(setting: CalendarStartDayOfWeekSetting) {
+    override suspend fun updateCalendarStartDayOfWeekSetting(setting: CalendarStartDayOfWeekSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
@@ -100,7 +100,7 @@ internal class SettingsRepositoryImpl(
         }
     }
 
-    override suspend fun updateReminderNotificationPreference(setting: ReminderNotificationSetting) {
+    override suspend fun updateReminderNotificationSetting(setting: ReminderNotificationSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
@@ -111,7 +111,7 @@ internal class SettingsRepositoryImpl(
         }
     }
 
-    override suspend fun updatePasscodeLockPreference(setting: PasscodeLockSetting) {
+    override suspend fun updatePasscodeLockSetting(setting: PasscodeLockSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()
@@ -122,7 +122,7 @@ internal class SettingsRepositoryImpl(
         }
     }
 
-    override suspend fun updateWeatherInfoFetchPreference(setting: WeatherInfoFetchSetting) {
+    override suspend fun updateWeatherInfoFetchSetting(setting: WeatherInfoFetchSetting) {
         withContext(Dispatchers.IO) {
             try {
                 val preference = setting.toDataModel()

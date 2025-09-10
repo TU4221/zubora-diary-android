@@ -44,7 +44,7 @@ internal class LoadPasscodeLockSettingUseCase(
 
         val flow =
             settingsRepository
-                .loadPasscodeLockPreference()
+                .loadPasscodeLockSetting()
                 .map { setting: PasscodeLockSetting ->
                     Log.d(
                         logTag,

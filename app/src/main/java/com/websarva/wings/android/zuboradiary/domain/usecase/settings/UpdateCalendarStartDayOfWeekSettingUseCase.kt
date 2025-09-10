@@ -33,7 +33,7 @@ internal class UpdateCalendarStartDayOfWeekSettingUseCase(
         Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
 
         try {
-            settingsRepository.updateCalendarStartDayOfWeekPreference(setting)
+            settingsRepository.updateCalendarStartDayOfWeekSetting(setting)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(

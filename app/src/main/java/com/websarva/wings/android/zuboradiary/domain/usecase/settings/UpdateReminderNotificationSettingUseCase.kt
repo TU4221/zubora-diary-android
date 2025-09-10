@@ -110,7 +110,7 @@ internal class UpdateReminderNotificationSettingUseCase(
             }
 
         try {
-            settingsRepository.updateReminderNotificationPreference(settingValue)
+            settingsRepository.updateReminderNotificationSetting(settingValue)
         } catch (e: DataStorageException) {
             throw ReminderNotificationSettingUpdateException.UpdateFailure(
                 settingValue,
@@ -209,7 +209,7 @@ internal class UpdateReminderNotificationSettingUseCase(
         backupSettingValue: ReminderNotificationSetting
     ) {
         try {
-            settingsRepository.updateReminderNotificationPreference(backupSettingValue)
+            settingsRepository.updateReminderNotificationSetting(backupSettingValue)
         } catch (e: DataStorageException) {
             throw ReminderNotificationSettingUpdateException.RollbackFailure(
                 backupSettingValue,

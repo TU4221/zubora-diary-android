@@ -44,7 +44,7 @@ internal class LoadCalendarStartDayOfWeekSettingUseCase(
 
         val flow =
             settingsRepository
-                .loadCalendarStartDayOfWeekPreference()
+                .loadCalendarStartDayOfWeekSetting()
                 .map { setting: CalendarStartDayOfWeekSetting ->
                     Log.d(
                         logTag,

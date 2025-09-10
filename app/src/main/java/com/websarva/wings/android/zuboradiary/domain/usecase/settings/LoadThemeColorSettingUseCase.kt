@@ -44,7 +44,7 @@ internal class LoadThemeColorSettingUseCase(
 
         val flow =
             settingsRepository
-                .loadThemeColorPreference()
+                .loadThemeColorSetting()
                 .map { setting: ThemeColorSetting ->
                     Log.d(
                         logTag,

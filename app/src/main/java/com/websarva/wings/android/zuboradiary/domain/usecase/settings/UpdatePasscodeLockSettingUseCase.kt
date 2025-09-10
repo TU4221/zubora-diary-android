@@ -33,7 +33,7 @@ internal class UpdatePasscodeLockSettingUseCase(
         Log.i(logTag, "${logMsg}開始 (有効: ${setting.isEnabled}")
 
         try {
-            settingsRepository.updatePasscodeLockPreference(setting)
+            settingsRepository.updatePasscodeLockSetting(setting)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(

@@ -44,7 +44,7 @@ internal class LoadReminderNotificationSettingUseCase(
 
         val flow =
             settingsRepository
-                .loadReminderNotificationPreference()
+                .loadReminderNotificationSetting()
                 .map { setting: ReminderNotificationSetting ->
                     Log.d(
                         logTag,

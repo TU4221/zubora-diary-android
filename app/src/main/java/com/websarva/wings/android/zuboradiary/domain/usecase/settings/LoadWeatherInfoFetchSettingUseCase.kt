@@ -44,7 +44,7 @@ internal class LoadWeatherInfoFetchSettingUseCase(
 
         val flow =
             settingsRepository
-                .loadWeatherInfoFetchPreference()
+                .loadWeatherInfoFetchSetting()
                 .map { setting: WeatherInfoFetchSetting ->
                     Log.d(
                         logTag,
