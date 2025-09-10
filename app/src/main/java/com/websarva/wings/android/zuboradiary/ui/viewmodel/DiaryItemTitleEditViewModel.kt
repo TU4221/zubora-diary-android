@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
@@ -27,7 +26,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -206,23 +204,24 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
         updateUiState(DiaryItemTitleEditState.LoadingSelectionHistory)
         itemTitleSelectionHistoryList =
-            loadDiaryItemTitleSelectionHistoryListUseCase().value
-                .catch {
+            loadDiaryItemTitleSelectionHistoryListUseCase()
+                .map {
                     when (it) {
-                        is DiaryItemTitleSelectionHistoryLoadException -> {
+                        is UseCaseResult.Success -> {
+                            if (it.value.isEmpty) {
+                                updateUiState(DiaryItemTitleEditState.NoSelectionHistory)
+                            } else {
+                                updateUiState(DiaryItemTitleEditState.ShowingSelectionHistory)
+                            }
+                            it.value.toUiModel()
+                        }
+                        is UseCaseResult.Failure -> {
                             emitAppMessageEvent(
                                 DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadFailure
                             )
+                            initialItemTitleSelectionHistoryList
                         }
-                        else -> throw it
                     }
-                }.map { list ->
-                    if (list.isEmpty) {
-                        updateUiState(DiaryItemTitleEditState.NoSelectionHistory)
-                    } else {
-                        updateUiState(DiaryItemTitleEditState.ShowingSelectionHistory)
-                    }
-                    list.toUiModel()
                 }.stateInWhileSubscribed(
                     initialItemTitleSelectionHistoryList
                 )

@@ -28,26 +28,35 @@ internal class LoadDiaryItemTitleSelectionHistoryListUseCase(
     /**
      * ユースケースを実行し、日記項目のタイトル選択履歴のFlowを返す。
      *
-     * @return タイトル選択履歴リストを内包するFlowを [UseCaseResult.Success] に格納して返す。
-     *   この内部の [Flow] は、実行中に [DiaryItemTitleSelectionHistoryLoadException] を
-     *   スローする可能性がある。[UseCaseResult.Failure] は返さない。
+     * @return タイトル選択履歴リストの読み込み結果を [UseCaseResult] へ [Flow] でラップして返す。
+     *   読み込みが成功した場合は[UseCaseResult.Success] に [DiaryItemTitleSelectionHistoryList] を格納して返す。
+     *   読み込みに失敗した場合は、[UseCaseResult.Failure] に [DiaryItemTitleSelectionHistoryLoadException] を格納して返す。
      */
-    operator fun invoke(): UseCaseResult.Success<Flow<DiaryItemTitleSelectionHistoryList>> {
+    operator fun invoke(): Flow<
+            UseCaseResult<DiaryItemTitleSelectionHistoryList, DiaryItemTitleSelectionHistoryLoadException>
+    > {
         Log.i(logTag, "${logMsg}開始")
 
-        val flow =
-            diaryRepository
-                .loadDiaryItemTitleSelectionHistoryList(50, 0)
-                .map { DiaryItemTitleSelectionHistoryList(it) }
-                .catch {
-                    throw if (it is DataStorageException) {
+        return diaryRepository
+            .loadDiaryItemTitleSelectionHistoryList(50, 0)
+            .map {
+                Log.d(
+                    logTag,
+                    "${logMsg}読込成功 (読込件数: ${it.count()})"
+                )
+                UseCaseResult.Success(
+                    DiaryItemTitleSelectionHistoryList(it)
+                )
+            }
+            .catch {
+                if (it is DataStorageException) {
+                    UseCaseResult.Failure(
                         DiaryItemTitleSelectionHistoryLoadException.LoadFailure(it)
-                    } else {
-                        it
-                    }
+                    )
+                } else {
+                    throw it
                 }
-        Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(flow)
+            }
     }
 }
 
