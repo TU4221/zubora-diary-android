@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception
 
+import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateReminderNotificationSettingUseCase
-import java.time.LocalTime
 
 /**
  * [UpdateReminderNotificationSettingUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
@@ -29,18 +29,16 @@ internal sealed class ReminderNotificationSettingUpdateException(
     /**
      * リマインダー通知設定の更新に失敗した場合にスローされる例外。
      *
-     * @param isEnabled 更新しようとしたリマインダー通知設定値。
-     * @param time リマインダー通知時間。無効の場合は `null` 。
+     * @param setting 更新しようとした設定 [ReminderNotificationSetting] オブジェクト]。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class UpdateFailure(
-        isEnabled: Boolean,
-        time: LocalTime? = null,
+        setting: ReminderNotificationSetting,
         cause: Throwable
     ) : ReminderNotificationSettingUpdateException(
         "リマインダー通知設定 '${
-            if (isEnabled) {
-                "有効 '${time ?: ""}'"
+            if (setting is ReminderNotificationSetting.Enabled) {
+                "有効 '${setting.notificationTime}'"
             } else {
                 "無効"
             }
@@ -69,18 +67,16 @@ internal sealed class ReminderNotificationSettingUpdateException(
     /**
      * リマインダー通知設定のスケジュール操作に失敗した後のロールバックに失敗した場合にスローされる例外。
      *
-     * @param isEnabled ロールバックしようとしたリマインダー通知設定値。
-     * @param time リマインダー通知時間。無効の場合は `null` 。
+     * @param setting ロールバックしようとした設定 [ReminderNotificationSetting] オブジェクト]。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class RollbackFailure(
-        isEnabled: Boolean,
-        time: LocalTime? = null,
+        setting: ReminderNotificationSetting,
         cause: Throwable
     ) : ReminderNotificationSettingUpdateException(
         "リマインダー通知設定 '${
-            if (isEnabled) {
-                "有効 '${time ?: ""}'"
+            if (setting is ReminderNotificationSetting.Enabled) {
+                "有効 '${setting.notificationTime}'"
             } else {
                 "無効"
             }

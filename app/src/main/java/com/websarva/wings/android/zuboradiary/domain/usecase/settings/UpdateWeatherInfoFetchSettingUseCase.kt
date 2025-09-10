@@ -23,22 +23,21 @@ internal class UpdateWeatherInfoFetchSettingUseCase(
     /**
      * ユースケースを実行し、天気情報取得設定を更新する。
      *
-     * @param isChecked 天気情報取得を有効にする場合は `true`、無効にする場合は `false`。
+     * @param setting 更新する設定 [WeatherInfoFetchSetting] オブジェクト。
      * @return 更新処理が成功した場合は [UseCaseResult.Success] を返す。
      *   更新処理中に [DataStorageException] が発生した場合は [UseCaseResult.Failure] を返す。
      */
     suspend operator fun invoke(
-        isChecked: Boolean
+        setting: WeatherInfoFetchSetting
     ): UseCaseResult<Unit, WeatherInfoFetchSettingUpdateException> {
-        Log.i(logTag, "${logMsg}開始 (有効: $isChecked)")
+        Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
 
         try {
-            val preferenceValue = WeatherInfoFetchSetting(isChecked)
-            settingsRepository.updateWeatherInfoFetchPreference(preferenceValue)
+            settingsRepository.updateWeatherInfoFetchPreference(setting)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(
-                WeatherInfoFetchSettingUpdateException.UpdateFailure(isChecked, e)
+                WeatherInfoFetchSettingUpdateException.UpdateFailure(setting, e)
             )
         }
 

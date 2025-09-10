@@ -54,11 +54,11 @@ internal class InitializeAllSettingsUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            updateThemeColorSettingUseCase(ThemeColorSetting().themeColor)
-            updateCalendarStartDayOfWeekSettingUseCase(CalendarStartDayOfWeekSetting().dayOfWeek)
-            updateReminderNotificationSettingUseCase(ReminderNotificationSetting.Disabled.isEnabled)
-            updatePasscodeLockSettingUseCase(PasscodeLockSetting.Disabled.isEnabled)
-            updateWeatherInfoFetchSettingUseCase(WeatherInfoFetchSetting().isEnabled)
+            updateThemeColorSettingUseCase(ThemeColorSetting())
+            updateCalendarStartDayOfWeekSettingUseCase(CalendarStartDayOfWeekSetting())
+            updateReminderNotificationSettingUseCase(ReminderNotificationSetting.Disabled)
+            updatePasscodeLockSettingUseCase(PasscodeLockSetting.Disabled)
+            updateWeatherInfoFetchSettingUseCase(WeatherInfoFetchSetting())
         } catch (e: ThemeColorSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_テーマカラー設定保存エラー", e)
             return UseCaseResult.Failure(

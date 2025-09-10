@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception
 
+import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdatePasscodeLockSettingUseCase
 
@@ -17,15 +18,15 @@ internal sealed class PassCodeSettingUpdateException(
     /**
      * パスコード設定の更新に失敗した場合にスローされる例外。
      *
-     * @param isEnabled 更新しようとしたパスコード設定値。
+     * @param setting 更新しようとした設定 [PasscodeLockSetting] オブジェクト]。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class UpdateFailure(
-        isEnabled: Boolean,
+        setting: PasscodeLockSetting,
         cause: Throwable
     ) : PassCodeSettingUpdateException(
         "パスコード設定 '${
-            if (isEnabled) {
+            if (setting.isEnabled) {
                 "有効"
             } else {
                 "無効"

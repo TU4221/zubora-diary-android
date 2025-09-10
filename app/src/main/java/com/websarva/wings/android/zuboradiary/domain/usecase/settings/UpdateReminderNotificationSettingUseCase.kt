@@ -46,24 +46,14 @@ internal class UpdateReminderNotificationSettingUseCase(
      * 設定が有効な場合は、指定された時刻で通知を登録する。
      * 設定が無効な場合は、既存の通知をキャンセルする。
      *
-     * @param isChecked リマインダー通知を有効にする場合は `true`、無効にする場合は `false`。
-     * @param notificationTime 通知時刻。`isChecked` が `true` の場合に必須。
+     * @param setting 更新する設定 [ReminderNotificationSetting] オブジェクト。
      * @return 更新処理および通知の登録/キャンセル処理が成功した場合は [UseCaseResult.Success] を返す。
      *   処理中に [UseCaseException] が発生した場合は [UseCaseResult.Failure] を返す。
      */
     suspend operator fun invoke(
-        isChecked: Boolean,
-        notificationTime: LocalTime? = null
+        setting: ReminderNotificationSetting
     ): UseCaseResult<Unit, ReminderNotificationSettingUpdateException> {
-        Log.i(logTag, "${logMsg}開始 (有効: $isChecked, 通知時刻: ${notificationTime ?: "未指定"})")
-
-        val setting =
-            if (isChecked) {
-                requireNotNull(notificationTime) { "${logMsg}不正引数_リマインダー通知を有効にする場合、通知時刻は必須 (通知時刻: null)" }
-                ReminderNotificationSetting.Enabled(notificationTime)
-            } else {
-                ReminderNotificationSetting.Disabled
-            }
+        Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
 
         try {
             saveReminderNotification(setting)
@@ -122,14 +112,8 @@ internal class UpdateReminderNotificationSettingUseCase(
         try {
             settingsRepository.updateReminderNotificationPreference(settingValue)
         } catch (e: DataStorageException) {
-            val settingNotificationTime =
-                when (settingValue) {
-                    is ReminderNotificationSetting.Enabled -> settingValue.notificationTime
-                    ReminderNotificationSetting.Disabled -> null
-                }
             throw ReminderNotificationSettingUpdateException.UpdateFailure(
-                settingValue.isEnabled,
-                settingNotificationTime,
+                settingValue,
                 e
             )
         }
@@ -227,14 +211,8 @@ internal class UpdateReminderNotificationSettingUseCase(
         try {
             settingsRepository.updateReminderNotificationPreference(backupSettingValue)
         } catch (e: DataStorageException) {
-            val backupNotificationTime =
-                when (backupSettingValue) {
-                    is ReminderNotificationSetting.Enabled -> backupSettingValue.notificationTime
-                    ReminderNotificationSetting.Disabled -> null
-                }
             throw ReminderNotificationSettingUpdateException.RollbackFailure(
-                backupSettingValue.isEnabled,
-                backupNotificationTime,
+                backupSettingValue,
                 e
             )
         }

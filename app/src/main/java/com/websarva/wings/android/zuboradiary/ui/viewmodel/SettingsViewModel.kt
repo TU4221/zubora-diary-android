@@ -5,10 +5,13 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
+import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.UserSettingResult
+import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllDataDeleteException
@@ -720,25 +723,41 @@ internal class SettingsViewModel @Inject constructor(
 
     private suspend fun saveThemeColor(value: ThemeColorUi) {
         executeSettingUpdate(
-            { updateThemeColorSettingUseCase(value.toDomainModel()) }
+            {
+                updateThemeColorSettingUseCase(
+                    ThemeColorSetting(value.toDomainModel())
+                )
+            }
         )
     }
 
     private suspend fun saveCalendarStartDayOfWeek(value: DayOfWeek) {
         executeSettingUpdate(
-            { updateCalendarStartDayOfWeekSettingUseCase(value) }
+            {
+                updateCalendarStartDayOfWeekSettingUseCase(
+                    CalendarStartDayOfWeekSetting(value)
+                )
+            }
         )
     }
 
     private suspend fun saveReminderNotificationValid(value: LocalTime) {
         executeSettingUpdate (
-            { updateReminderNotificationSettingUseCase(true, value) }
+            {
+                updateReminderNotificationSettingUseCase(
+                    ReminderNotificationSetting.Enabled(value)
+                )
+            }
         )
     }
 
     private suspend fun saveReminderNotificationInvalid() {
         executeSettingUpdate(
-            { updateReminderNotificationSettingUseCase(false) },
+            {
+                updateReminderNotificationSettingUseCase(
+                ReminderNotificationSetting.Disabled
+                )
+            },
             { emitUiEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch) }
         )
     }
@@ -751,14 +770,26 @@ internal class SettingsViewModel @Inject constructor(
         }
 
         executeSettingUpdate (
-            { updatePasscodeLockSettingUseCase(value, passcode) },
+            {
+                val setting =
+                    if (value) {
+                        PasscodeLockSetting.Enabled(passcode)
+                    } else {
+                        PasscodeLockSetting.Disabled
+                    }
+                updatePasscodeLockSettingUseCase(setting)
+            },
             { emitUiEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch) }
         )
     }
 
     private suspend fun saveWeatherInfoFetch(value: Boolean) {
         executeSettingUpdate(
-            { updateWeatherInfoFetchSettingUseCase(value) },
+            {
+                updateWeatherInfoFetchSettingUseCase(
+                    WeatherInfoFetchSetting(value)
+                )
+            },
             { emitUiEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch) }
         )
     }

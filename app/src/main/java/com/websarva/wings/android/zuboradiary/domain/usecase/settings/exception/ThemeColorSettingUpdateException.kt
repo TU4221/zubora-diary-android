@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception
 
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
+import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateThemeColorSettingUseCase
 
 /**
@@ -18,11 +18,11 @@ internal sealed class ThemeColorSettingUpdateException(
     /**
      * テーマカラー設定の更新に失敗した場合にスローされる例外。
      *
-     * @param themeColor 更新しようとしたテーマカラー。
+     * @param setting 更新しようとした設定 [ThemeColorSetting] オブジェクト。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class UpdateFailure(
-        themeColor: ThemeColor,
+        setting: ThemeColorSetting,
         cause: Throwable
-    ) : ThemeColorSettingUpdateException("テーマカラー設定 '$themeColor' の更新に失敗しました。", cause)
+    ) : ThemeColorSettingUpdateException("テーマカラー設定 '${setting.themeColor}' の更新に失敗しました。", cause)
 }

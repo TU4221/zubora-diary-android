@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception
 
+import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateWeatherInfoFetchSettingUseCase
 
@@ -17,15 +18,15 @@ internal sealed class WeatherInfoFetchSettingUpdateException(
     /**
      * 天気情報取得設定の更新に失敗した場合にスローされる例外。
      *
-     * @param isEnabled 更新しようとした天気情報取得設定値。
+     * @param setting 更新しようとした設定 [WeatherInfoFetchSetting] オブジェクト。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class UpdateFailure(
-        isEnabled: Boolean,
+        setting: WeatherInfoFetchSetting,
         cause: Throwable
     ) : WeatherInfoFetchSettingUpdateException(
         "天気情報取得設定 '${
-            if (isEnabled) {
+            if (setting.isEnabled) {
                 "有効"
             } else {
                 "無効"

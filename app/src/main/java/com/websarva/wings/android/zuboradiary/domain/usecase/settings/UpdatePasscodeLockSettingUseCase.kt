@@ -23,29 +23,21 @@ internal class UpdatePasscodeLockSettingUseCase(
     /**
      * ユースケースを実行し、パスコードロック設定を更新する。
      *
-     * @param isChecked パスコードロックを有効にする場合は `true`、無効にする場合は `false`。
-     * @param passcode 設定するパスコード。`isChecked` が `true` の場合のみ使用される。
+     * @param setting 更新する設定 [PasscodeLockSetting] オブジェクト。
      * @return 更新処理が成功した場合は [UseCaseResult.Success] を返す。
      *   更新処理中に [DataStorageException] が発生した場合は [UseCaseResult.Failure] を返す。
      */
     suspend operator fun invoke(
-        isChecked: Boolean,
-        passcode: String = ""
+        setting: PasscodeLockSetting
     ): UseCaseResult<Unit, PassCodeSettingUpdateException> {
-        Log.i(logTag, "${logMsg}開始 (有効: $isChecked, パスコード: ${if (passcode.isNotEmpty()) "設定あり" else "設定なし"})")
+        Log.i(logTag, "${logMsg}開始 (有効: ${setting.isEnabled}")
 
         try {
-            val preferenceValue =
-                if (isChecked) {
-                    PasscodeLockSetting.Enabled(passcode)
-                } else {
-                    PasscodeLockSetting.Disabled
-                }
-            settingsRepository.updatePasscodeLockPreference(preferenceValue)
+            settingsRepository.updatePasscodeLockPreference(setting)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(
-                PassCodeSettingUpdateException.UpdateFailure(isChecked, e)
+                PassCodeSettingUpdateException.UpdateFailure(setting, e)
             )
         }
 

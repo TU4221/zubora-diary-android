@@ -7,7 +7,6 @@ import com.websarva.wings.android.zuboradiary.domain.repository.SettingsReposito
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import java.time.DayOfWeek
 
 /**
  * カレンダーの週の開始曜日設定を更新するユースケース。
@@ -24,22 +23,21 @@ internal class UpdateCalendarStartDayOfWeekSettingUseCase(
     /**
      * ユースケースを実行し、指定された曜日をカレンダーの週の開始曜日として更新する。
      *
-     * @param dayOfWeek 更新する週の開始曜日。
+     * @param setting 更新する設定 [CalendarStartDayOfWeekSetting] オブジェクト。
      * @return 更新処理が成功した場合は [UseCaseResult.Success] を返す。
      *   更新処理中に [DataStorageException] が発生した場合は [UseCaseResult.Failure] を返す。
      */
     suspend operator fun invoke(
-        dayOfWeek: DayOfWeek
+        setting: CalendarStartDayOfWeekSetting
     ): UseCaseResult<Unit, CalendarStartDayOfWeekSettingUpdateException> {
-        Log.i(logTag, "${logMsg}開始 (曜日: $dayOfWeek)")
+        Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
 
         try {
-            val preferenceValue = CalendarStartDayOfWeekSetting(dayOfWeek)
-            settingsRepository.updateCalendarStartDayOfWeekPreference(preferenceValue)
+            settingsRepository.updateCalendarStartDayOfWeekPreference(setting)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(
-                CalendarStartDayOfWeekSettingUpdateException.UpdateFailure(dayOfWeek, e)
+                CalendarStartDayOfWeekSettingUpdateException.UpdateFailure(setting, e)
             )
         }
 
