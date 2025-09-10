@@ -56,7 +56,7 @@ internal class UpdateReminderNotificationSettingUseCase(
         Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
 
         try {
-            saveReminderNotification(setting)
+            updateReminderNotification(setting)
         } catch (e: ReminderNotificationSettingUpdateException) {
             when (e) {
                 is ReminderNotificationSettingUpdateException.BackupFailure -> {
@@ -99,7 +99,7 @@ internal class UpdateReminderNotificationSettingUseCase(
      *
      * @throws ReminderNotificationSettingUpdateException 設定の更新に失敗した場合。
      * */
-    private suspend fun saveReminderNotification(
+    private suspend fun updateReminderNotification(
         settingValue: ReminderNotificationSetting,
     ) {
         val backupSettingValue =
