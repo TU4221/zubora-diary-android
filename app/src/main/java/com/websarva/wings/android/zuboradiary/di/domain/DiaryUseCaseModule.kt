@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesU
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.IsImageUriUsedInDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewestDiaryUseCase
@@ -95,6 +96,12 @@ internal object DiaryUseCaseModule {
     fun provideDoesDiaryExistUseCase(
         diaryRepository: DiaryRepository
     ): DoesDiaryExistUseCase = DoesDiaryExistUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideIsImageUriUsedInDiariesUseCase(
+        diaryRepository: DiaryRepository
+    ): IsImageUriUsedInDiariesUseCase = IsImageUriUsedInDiariesUseCase(diaryRepository)
 
     @Singleton
     @Provides
@@ -204,11 +211,11 @@ internal object DiaryUseCaseModule {
     @Singleton
     @Provides
     fun provideReleaseDiaryImageUriPermissionUseCase(
-        diaryRepository: DiaryRepository,
+        isImageUriUsedInDiariesUseCase: IsImageUriUsedInDiariesUseCase,
         releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase
     ): ReleaseDiaryImageUriPermissionUseCase =
         ReleaseDiaryImageUriPermissionUseCase(
-            diaryRepository,
+            isImageUriUsedInDiariesUseCase,
             releasePersistableUriPermissionUseCase
         )
 

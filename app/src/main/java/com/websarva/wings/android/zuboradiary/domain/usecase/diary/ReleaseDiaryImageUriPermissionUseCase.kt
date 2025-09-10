@@ -3,8 +3,6 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageUriPermissionReleaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -13,11 +11,11 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
  *
  * 指定されたURIが他の日記で使用されていない場合に限り、そのURIに対する永続的なアクセス権限を解放する。
  *
- * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
+ * @property isImageUriUsedInDiariesUseCase 画像Uriがのいずれかの日記データで使用されているか確認するためのユースケース。。
  * @property releasePersistableUriPermissionUseCase 永続的なURI権限を解放するためのユースケース。
  */
 internal class ReleaseDiaryImageUriPermissionUseCase(
-    private val diaryRepository: DiaryRepository,
+    private val isImageUriUsedInDiariesUseCase: IsImageUriUsedInDiariesUseCase,
     private val releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase
 ) {
 
@@ -39,30 +37,34 @@ internal class ReleaseDiaryImageUriPermissionUseCase(
     ): UseCaseResult<Unit, DiaryImageUriPermissionReleaseException> {
         Log.i(logTag, "${logMsg}開始 (URI: \"$uriString\")")
 
-        try {
-            val existsImageUri = diaryRepository.existsImageUri(uriString)
-            if (existsImageUri) {
-                Log.i(logTag, "${logMsg}完了_URI使用中のためスキップ (URI: \"$uriString\")")
-                return UseCaseResult.Success(Unit)
-            }
-        } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_URI使用状況確認エラー", e)
-            return UseCaseResult.Failure(
-                DiaryImageUriPermissionReleaseException
-                    .ImageUriUsageCheckFailure(uriString, e)
-            )
-        }
-
-        when (val result = releasePersistableUriPermissionUseCase(uriString)) {
+        when (val usedResult = isImageUriUsedInDiariesUseCase(uriString)) {
             is UseCaseResult.Success -> {
-                Log.i(logTag, "${logMsg}完了 (URI: \"$uriString\")")
-                return UseCaseResult.Success(Unit)
+                val existsImageUri = usedResult.value
+                if (existsImageUri) {
+                    Log.i(logTag, "${logMsg}完了_URI使用中のためスキップ (URI: \"$uriString\")")
+                    return UseCaseResult.Success(Unit)
+                }
             }
+
             is UseCaseResult.Failure -> {
-                Log.e(logTag, "${logMsg}失敗_権限解放処理エラー", result.exception)
+                Log.e(logTag, "${logMsg}失敗_URI使用状況確認エラー", usedResult.exception)
                 return UseCaseResult.Failure(
                     DiaryImageUriPermissionReleaseException
-                        .PermissionReleaseFailure(uriString, result.exception)
+                        .ImageUriUsageCheckFailure(uriString, usedResult.exception)
+                )
+            }
+        }
+
+        return when (val releaseResult = releasePersistableUriPermissionUseCase(uriString)) {
+            is UseCaseResult.Success -> {
+                Log.i(logTag, "${logMsg}完了 (URI: \"$uriString\")")
+                UseCaseResult.Success(Unit)
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "${logMsg}失敗_権限解放処理エラー", releaseResult.exception)
+                UseCaseResult.Failure(
+                    DiaryImageUriPermissionReleaseException
+                        .PermissionReleaseFailure(uriString, releaseResult.exception)
                 )
             }
         }
