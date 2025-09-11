@@ -30,7 +30,6 @@ import java.time.LocalDateTime
  * @property item5Title 5番目の日記項目のタイトル。null許容。
  * @property item5Comment 5番目の日記項目のコメント。null許容。
  * @property imageUriString 関連付けられた画像のURI文字列。null許容。
- * @constructor 新しい [Diary] インスタンスを作成する。
  * @throws IllegalArgumentException 日記項目のタイトルとコメントのnull整合性、または日記項目の順序整合性に違反する場合。
  */
 @Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
