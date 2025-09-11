@@ -26,6 +26,7 @@ internal class DeleteAllDiariesUseCase(
     private val logTag = createLogTag()
     private val logMsg = "全日記データ削除_"
 
+    // TODO:権限解放時のエラーハンドリングが不適切。(日記データ削除したあとでも失敗になる)
     /**
      * ユースケースを実行し、全ての日記データ (項目タイトル選択履歴除く) と関連URI権限を削除する。
      *
