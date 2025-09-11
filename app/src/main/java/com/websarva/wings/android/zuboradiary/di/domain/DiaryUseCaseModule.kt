@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloaded
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultsExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CreateDiaryImageFileUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.IsImageUriUsedInDiariesUseCase
@@ -31,6 +32,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequest
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.UpdateDiaryListFooterUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.UpdateWordSearchResultListFooterUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.file.SaveImageFileUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
 import dagger.Module
@@ -75,6 +77,12 @@ internal object DiaryUseCaseModule {
     fun provideCountWordSearchResultsUseCase(
         diaryRepository: DiaryRepository
     ): CountWordSearchResultsUseCase = CountWordSearchResultsUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideCreateDiaryImageFileUseCase(
+        saveImageFileUseCase: SaveImageFileUseCase
+    ): CreateDiaryImageFileUseCase = CreateDiaryImageFileUseCase(saveImageFileUseCase)
 
     @Singleton
     @Provides
