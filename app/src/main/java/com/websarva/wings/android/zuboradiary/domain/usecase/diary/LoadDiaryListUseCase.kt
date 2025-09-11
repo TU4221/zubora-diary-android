@@ -33,8 +33,8 @@ internal class LoadDiaryListUseCase(
      * @param numLoadItems 一度に読み込む日記のアイテム数。1以上の値を指定する必要がある。
      * @param loadOffset 読み込みを開始するオフセット。0以上の値を指定する必要がある。
      * @param startDate 日記を読み込む期間の開始日。`null` の場合は全期間を対象とする。
-     * @return 読み込まれ、変換された日記リストを [UseCaseResult.Success] に格納して返す。
-     *   日記リストの読み込みに失敗した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に日記リスト( [DiaryYearMonthList] )を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [DiaryListLoadException] を格納して返す。
      * @throws IllegalArgumentException `numLoadItems`が1未満、`loadOffset`が負数の場合にスローされる。
      */
     suspend operator fun invoke(

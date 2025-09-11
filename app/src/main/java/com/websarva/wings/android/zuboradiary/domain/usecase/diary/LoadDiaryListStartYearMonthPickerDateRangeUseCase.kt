@@ -30,9 +30,9 @@ internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
     /**
      * ユースケースを実行し、日記リストの先頭年月ピッカー用の日付範囲情報を返す。
      *
-     * @return 日付範囲の取得に成功した場合は [UseCaseResult.Success] にその [SavedDiaryDateRange] オブジェクトを格納して返す。
-     *   日記データが存在しない場合も、デフォルトの日付範囲 ([SavedDiaryDateRange] のデフォルトコンストラクタ値) を格納。
-     *   データの読み込みアクセスに失敗した場合は [UseCaseResult.Failure] に [DiaryListStartYearMonthPickerDateRangeLoadException] を格納して返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に日付範囲( [SavedDiaryDateRange] )を格納して返す。
+     *   日記データが存在しない場合も、デフォルトの日付範囲 ( [SavedDiaryDateRange] のデフォルトコンストラクタ値) を格納。
+     *   失敗した場合は [UseCaseResult.Failure] に [DiaryListStartYearMonthPickerDateRangeLoadException] を格納して返す。
      */
     suspend operator fun invoke(): UseCaseResult<
             SavedDiaryDateRange, DiaryListStartYearMonthPickerDateRangeLoadException> {

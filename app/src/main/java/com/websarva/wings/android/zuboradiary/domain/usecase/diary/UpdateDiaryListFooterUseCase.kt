@@ -29,8 +29,9 @@ internal class UpdateDiaryListFooterUseCase(
      *
      * @param list フッターを更新する対象の日記リスト。
      * @param startDate 日記の読み込み開始日。未読込の日記存在確認に使用される。`null` の場合は全期間が対象。
-     * @return フッターが更新された日記リスト、または元のリストを [UseCaseResult.Success] に格納して返す。
-     *   未読込の日記存在確認処理でエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に
+     *   更新された日記リスト、または元のリスト( [DiaryYearMonthList] )を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [DiaryListFooterUpdateException] を格納して返す。
      */
     suspend operator fun invoke(
         list: DiaryYearMonthList<DiaryDayListItem.Standard>,

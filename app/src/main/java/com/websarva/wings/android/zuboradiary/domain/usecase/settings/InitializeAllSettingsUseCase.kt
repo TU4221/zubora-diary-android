@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PassCodeSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
@@ -47,8 +46,8 @@ internal class InitializeAllSettingsUseCase(
     /**
      * ユースケースを実行し、全ての設定を初期値にリセットする。
      *
-     * @return 初期化処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   処理中に [UseCaseException] が発生した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [AllSettingsInitializationException] を格納して返す。
      */
     suspend operator fun invoke(): UseCaseResult<Unit, AllSettingsInitializationException> {
         Log.i(logTag, "${logMsg}開始")

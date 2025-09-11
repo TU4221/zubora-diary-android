@@ -26,8 +26,8 @@ internal class CountDiariesUseCase(
      * ユースケースを実行し、日記の総数を返す。
      *
      * @param startDate 日記数をカウントする期間の開始日。`null` の場合は全期間の日記を対象とする。
-     * @return 日記の総数を [UseCaseResult.Success] に格納して返す。
-     *   日記数のカウントに失敗した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に日記の総数( [Int] )を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [DiaryCountException] を格納して返す。
      */
     suspend operator fun invoke(
         startDate: LocalDate? = null

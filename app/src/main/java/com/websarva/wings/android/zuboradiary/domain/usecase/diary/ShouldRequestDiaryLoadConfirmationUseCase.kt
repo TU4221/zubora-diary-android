@@ -33,7 +33,7 @@ internal class ShouldRequestDiaryLoadConfirmationUseCase(
      * @param originalDate 編集中の日記の元の日付。
      * @param isNewDiary 新規の日記作成かどうかを示すフラグ。`true`の場合は新規作成、`false`の場合は既存日記の更新。
      * @return 日記の読み込み確認が必要な場合は `true`、そうでない場合は `false` を [UseCaseResult.Success] に格納して返す。
-     *   日記存在確認処理でエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     *   確認に失敗した場合は [UseCaseResult.Failure] に [DiaryLoadConfirmationCheckException] を格納して返す。
      */
     suspend operator fun invoke(
         inputDate: LocalDate,

@@ -28,8 +28,9 @@ internal class UpdateWordSearchResultListFooterUseCase(
      *
      * @param list フッターを更新する対象のワード検索結果リスト。
      * @param searchWord 検索キーワード。未読込の検索結果存在確認に使用される。
-     * @return フッターが更新されたワード検索結果リスト、または元のリストを [UseCaseResult.Success] に格納して返す。
-     *   未読込の検索結果存在確認処理でエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に更新されたワード検索結果リスト、
+     *   または元のリスト( [DiaryYearMonthList] )を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [WordSearchListFooterUpdateException] を格納して返す。
      */
     suspend operator fun invoke(
         list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,

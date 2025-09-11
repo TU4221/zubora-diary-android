@@ -45,9 +45,9 @@ internal class UpdateReminderNotificationSettingUseCase(
      * 設定が有効な場合は、指定された時刻で通知を登録する。
      * 設定が無効な場合は、既存の通知をキャンセルする。
      *
-     * @param setting 更新する設定 [ReminderNotificationSetting] オブジェクト。
-     * @return 更新処理および通知の登録/キャンセル処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   処理中に [UseCaseException] が発生した場合は [UseCaseResult.Failure] を返す。
+     * @param setting 更新する設定 [ReminderNotificationSetting] 。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [ReminderNotificationSettingUpdateException] を格納して返す。
      */
     suspend operator fun invoke(
         setting: ReminderNotificationSetting

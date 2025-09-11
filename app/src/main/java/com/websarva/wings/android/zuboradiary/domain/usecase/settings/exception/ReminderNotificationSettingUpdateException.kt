@@ -29,7 +29,7 @@ internal sealed class ReminderNotificationSettingUpdateException(
     /**
      * リマインダー通知設定の更新に失敗した場合にスローされる例外。
      *
-     * @param setting 更新しようとした設定 [ReminderNotificationSetting] オブジェクト]。
+     * @param setting 更新しようとした設定 [ReminderNotificationSetting] 。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class UpdateFailure(
@@ -67,7 +67,7 @@ internal sealed class ReminderNotificationSettingUpdateException(
     /**
      * リマインダー通知設定のスケジュール操作に失敗した後のロールバックに失敗した場合にスローされる例外。
      *
-     * @param setting ロールバックしようとした設定 [ReminderNotificationSetting] オブジェクト]。
+     * @param setting ロールバックしようとした設定 [ReminderNotificationSetting] 。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class RollbackFailure(

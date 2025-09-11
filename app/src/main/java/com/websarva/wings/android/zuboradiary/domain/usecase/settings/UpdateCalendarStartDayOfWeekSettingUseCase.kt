@@ -23,9 +23,9 @@ internal class UpdateCalendarStartDayOfWeekSettingUseCase(
     /**
      * ユースケースを実行し、指定された曜日をカレンダーの週の開始曜日として更新する。
      *
-     * @param setting 更新する設定 [CalendarStartDayOfWeekSetting] オブジェクト。
-     * @return 更新処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   更新処理中に [DataStorageException] が発生した場合は [UseCaseResult.Failure] を返す。
+     * @param setting 更新する設定 [CalendarStartDayOfWeekSetting] 。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [CalendarStartDayOfWeekSettingUpdateException] を格納して返す。
      */
     suspend operator fun invoke(
         setting: CalendarStartDayOfWeekSetting

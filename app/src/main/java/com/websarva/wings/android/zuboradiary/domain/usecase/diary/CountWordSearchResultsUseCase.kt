@@ -23,8 +23,8 @@ internal class CountWordSearchResultsUseCase(
      * ユースケースを実行し、指定された検索ワードに一致する日記の総数を返す。
      *
      * @param searchWord 検索するキーワード。
-     * @return 検索ワードに一致した日記の総数を [UseCaseResult.Success] に格納して返す。
-     *   日記数のカウントに失敗した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に検索ワードに一致した日記の総数( [Int] )を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [WordSearchResultCountException] を格納して返す。
      */
     suspend operator fun invoke(
         searchWord: String

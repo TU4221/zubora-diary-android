@@ -33,9 +33,8 @@ internal class DeleteAllDataUseCase(
     /**
      * ユースケースを実行し、アプリケーションの全データを削除する。
      *
-     * @return 全ての削除処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   いずれかの処理でエラーが発生した場合は、対応する [AllDataDeleteException] を
-     *   [UseCaseResult.Failure] に格納して返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [AllDataDeleteException] を格納して返す。
      */
     suspend operator fun invoke(): UseCaseResult<Unit, AllDataDeleteException> {
         Log.i(logTag, "${logMsg}開始")

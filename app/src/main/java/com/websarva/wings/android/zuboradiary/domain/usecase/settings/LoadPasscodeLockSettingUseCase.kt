@@ -29,9 +29,10 @@ internal class LoadPasscodeLockSettingUseCase(
     /**
      * ユースケースを実行し、パスコードロック設定の読み込み結果を [Flow] として返す。
      *
-     * @return 読み込み結果を [UseCaseResult] へ [Flow] でラップして返す。
-     *   読み込みが成功した場合は[UseCaseResult.Success] に [PasscodeLockSetting] を格納して返す。
-     *   読み込みに失敗した場合は、[UseCaseResult.Failure] にフォールバック値を格納した
+     * @return 読み込み結果を [UseCaseResult] へ [Flow] 内部でラップして返す。
+     *   読み込みに成功した場合は[UseCaseResult.Success] に
+     *   パスコードロック設定( [PasscodeLockSetting] )を格納して返す。
+     *   失敗した場合は、[UseCaseResult.Failure] にフォールバック値を格納した
      *   [PasscodeLockSettingLoadException] を格納して返す。
      */
     operator fun invoke(): Flow<

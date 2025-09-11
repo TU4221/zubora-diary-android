@@ -34,9 +34,8 @@ internal class FetchWeatherInfoUseCase(
      *
      * @param isGranted 位置情報権限が付与されているかどうか。
      * @param date 天気情報を取得する日付。
-     * @return 取得した天気情報 ([Weather]) を [UseCaseResult.Success] に格納して返す。
-     *   処理中にエラーが発生した場合は、対応する [WeatherInfoFetchException] を
-     *   [UseCaseResult.Failure] に格納して返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に [Weather] を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [WeatherInfoFetchException] を格納して返す。
      */
     suspend operator fun invoke(
         isGranted: Boolean,

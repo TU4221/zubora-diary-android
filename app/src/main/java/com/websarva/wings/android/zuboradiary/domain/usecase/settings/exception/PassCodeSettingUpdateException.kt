@@ -18,7 +18,7 @@ internal sealed class PassCodeSettingUpdateException(
     /**
      * パスコード設定の更新に失敗した場合にスローされる例外。
      *
-     * @param setting 更新しようとした設定 [PasscodeLockSetting] オブジェクト]。
+     * @param setting 更新しようとした設定 [PasscodeLockSetting] 。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class UpdateFailure(

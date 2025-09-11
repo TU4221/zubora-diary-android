@@ -28,9 +28,9 @@ internal class LoadDiaryItemTitleSelectionHistoryListUseCase(
     /**
      * ユースケースを実行し、日記項目のタイトル選択履歴のFlowを返す。
      *
-     * @return タイトル選択履歴リストの読み込み結果を [UseCaseResult] へ [Flow] でラップして返す。
-     *   読み込みが成功した場合は[UseCaseResult.Success] に [DiaryItemTitleSelectionHistoryList] を格納して返す。
-     *   読み込みに失敗した場合は、[UseCaseResult.Failure] に [DiaryItemTitleSelectionHistoryLoadException] を格納して返す。
+     * @return タイトル選択履歴リストの読み込み結果を [UseCaseResult] へ [Flow] 内部でラップして返す。
+     *   読み込みに成功した場合は[UseCaseResult.Success] に [DiaryItemTitleSelectionHistoryList] を格納して返す。
+     *   失敗した場合は、[UseCaseResult.Failure] に [DiaryItemTitleSelectionHistoryLoadException] を格納して返す。
      */
     operator fun invoke(): Flow<
             UseCaseResult<DiaryItemTitleSelectionHistoryList, DiaryItemTitleSelectionHistoryLoadException>

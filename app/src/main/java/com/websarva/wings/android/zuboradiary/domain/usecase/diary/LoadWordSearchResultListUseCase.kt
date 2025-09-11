@@ -38,8 +38,9 @@ internal class LoadWordSearchResultListUseCase(
      * @param numLoadItems 一度に読み込むアイテム数。1以上の値を指定する必要がある。
      * @param loadOffset 読み込みを開始するオフセット。0以上の値を指定する必要がある。
      * @param searchWord 検索ワード。空でない文字列を指定する必要がある。
-     * @return 整形されたワード検索結果の日記リストを [UseCaseResult.Success] に格納して返す。
-     *   日記リストの読み込みに失敗した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に
+     *   整形されたワード検索結果の日記リスト( [DiaryYearMonthList] )を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [WordSearchResultListLoadException] を格納して返す。
      * @throws IllegalArgumentException `numLoadItems`が1未満、`loadOffset`が負数、
      *   または`searchWord`が空の場合にスローされる。
      */

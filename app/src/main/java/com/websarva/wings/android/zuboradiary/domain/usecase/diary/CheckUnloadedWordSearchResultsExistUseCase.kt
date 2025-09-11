@@ -28,7 +28,8 @@ internal class CheckUnloadedWordSearchResultsExistUseCase(
      * @param numLoadedDiaries 現在UIなどに読み込まれている、この検索ワードに一致する日記の数。
      * @return 未読込の検索結果の日記が存在する場合は [UseCaseResult.Success] に `true` を、
      *         存在しない場合や検索結果が0件の場合は `false` を格納して返す。
-     *   検索結果の日記数のカウントに失敗した場合は [UseCaseResult.Failure] を返す。
+     *   検索結果の日記数のカウントに失敗した場合は [UseCaseResult.Failure] に
+     *   [UnloadedWordSearchResultsExistCheckException] を格納して返す。
      */
     suspend operator fun invoke(
         searchWord: String,

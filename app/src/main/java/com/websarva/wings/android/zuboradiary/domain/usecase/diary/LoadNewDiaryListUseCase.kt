@@ -31,8 +31,8 @@ internal class LoadNewDiaryListUseCase(
      * ユースケースを実行し、新規に日記リストを読み込み、フッターを更新したリストを返す。
      *
      * @param startDate 日記を読み込む期間の開始日。`null` の場合は全期間を対象とする。
-     * @return 新規読み込みとフッター更新が成功した場合は、新しい日記リストを [UseCaseResult.Success] に格納して返す。
-     *   処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に新しい日記リスト( [DiaryYearMonthList] )を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [DiaryListNewLoadException] を格納して返す。
      */
     suspend operator fun invoke(
         startDate: LocalDate?

@@ -28,9 +28,9 @@ internal class CheckUnloadedDiariesExistUseCase(
      * @param numLoadedDiaries 現在UIに読み込まれている日記の数。
      * @param startDate 日記の存在を確認する期間の開始日。`null` の場合は全期間の日記を対象とする。
      * @return 未読込の日記が存在する場合は [UseCaseResult.Success] に `true` を、
-     *         存在しない場合や確認対象の日記が0件の場合は `false` を格納して返す。
-     *   日記数のカウントに失敗した場合は [UseCaseResult.Failure] を返す。
-     *
+     *   存在しない場合や確認対象の日記が0件の場合は `false` を格納して返す。
+     *   日記数のカウントに失敗した場合は [UseCaseResult.Failure] に
+     *   [UnloadedDiariesExistCheckException] を格納して返す。
      */
     suspend operator fun invoke(
         numLoadedDiaries: Int,

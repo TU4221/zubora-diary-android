@@ -30,8 +30,8 @@ internal class LoadAdditionWordSearchResultListUseCase(
      *
      * @param currentList 現在表示されているワード検索結果のリスト。
      * @param searchWord 検索ワード。
-     * @return 追加読み込みとフッター更新が成功した場合は、新しい検索結果リストを [UseCaseResult.Success] に格納して返す。
-     *   処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に新しい検索結果リスト( [DiaryYearMonthList] )を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [WordSearchResultListAdditionLoadException] を格納して返す。
      */
     suspend operator fun invoke(
         currentList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,

@@ -46,8 +46,8 @@ internal class SaveDiaryUseCase(
      * @param diaryItemTitleSelectionHistoryItemList 保存する日記項目のタイトル選択履歴リスト。
      * @param originalDiary 更新前の元の日記データ。新規作成の場合は、ダミー日記データ。
      * @param isNewDiary 新規の日記作成かどうかを示すフラグ。`true`の場合は新規作成、`false`の場合は既存日記の更新。
-     * @return 日記の保存処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   日記の保存処理に失敗した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [DiarySaveException] を格納して返す。
      */
     suspend operator fun invoke(
         diary: Diary,

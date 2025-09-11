@@ -24,9 +24,8 @@ internal class FetchCurrentLocationUseCase(
      * ユースケースを実行し、現在位置情報を取得する。
      *
      * @param isGranted 位置情報権限が付与されているかどうか。
-     * @return 取得した位置情報 ([SimpleLocation]) を [UseCaseResult.Success] に格納して返す。
-     *   処理中にエラーが発生した場合は、対応する [CurrentLocationFetchException] を
-     *   [UseCaseResult.Failure] に格納して返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に現在位置情報( [SimpleLocation] )を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [CurrentLocationFetchException] を格納して返す。
      */
     suspend operator fun invoke(
         isGranted: Boolean

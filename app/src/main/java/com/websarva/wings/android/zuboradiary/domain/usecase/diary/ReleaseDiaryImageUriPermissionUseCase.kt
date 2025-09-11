@@ -29,8 +29,10 @@ internal class ReleaseDiaryImageUriPermissionUseCase(
      * 使用されていない場合のみ、権限を解放する。
      *
      * @param uriString 権限を解放する対象の画像URI文字列。
-     * @return 権限解放処理が正常に完了した場合、またはURIがまだ使用中で解放処理がスキップされた場合は [UseCaseResult.Success] を返す。
-     *   URIの使用状況確認に失敗した場合、または権限解放処理自体に失敗した場合は [UseCaseResult.Failure] を返す。
+     * @return 権限解放処理が正常に完了した場合、またはURIがまだ使用中で解放処理がスキップされた場合は
+     *   [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   URIの使用状況確認に失敗した場合、または権限解放処理自体に失敗した場合は
+     *   [UseCaseResult.Failure] に [DiaryImageUriPermissionReleaseException] を格納して返す。
      */
     suspend operator fun invoke(
         uriString: String

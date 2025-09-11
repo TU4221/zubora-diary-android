@@ -24,8 +24,8 @@ internal class RegisterReminderNotificationUseCase(
      * ユースケースを実行し、指定された時刻にリマインダー通知を登録する。
      *
      * @param notificationTime 通知を登録する時刻。
-     * @return 登録処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   登録処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [ReminderNotificationRegisterException] を格納して返す。
      */
     operator fun invoke(notificationTime: LocalTime): UseCaseResult<Unit, ReminderNotificationRegisterException> {
         Log.i(logTag, "${logMsg}開始 (通知時刻: $notificationTime)")

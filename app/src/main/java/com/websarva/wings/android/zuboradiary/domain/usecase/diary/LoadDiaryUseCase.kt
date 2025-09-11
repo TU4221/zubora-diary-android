@@ -28,8 +28,8 @@ internal class LoadDiaryUseCase(
      * ユースケースを実行し、指定された日付の日記データを返す。
      *
      * @param date 読み込む日記の日付。
-     * @return 読み込まれた日記データを [UseCaseResult.Success] に格納して返す。
-     *   日記の読み込みに失敗した場合、または該当する日記が存在しない場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に日記データ( [Diary] )を格納して返す。
+     *   失敗した場合、または該当する日記が存在しない場合は [UseCaseResult.Failure] に [DiaryLoadException] を格納して返す。
      */
     suspend operator fun invoke(
         date: LocalDate

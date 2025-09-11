@@ -26,8 +26,9 @@ internal class LoadNewestDiaryUseCase(
     /**
      * ユースケースを実行し、最新の日記データを返す。
      *
-     * @return 最新の日記データが存在する場合は [UseCaseResult.Success] にその [Diary] オブジェクトを格納して返す。
-     *   日記が存在しない場合、読み込みに失敗した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に最新日記データ( [Diary] )を格納して返す。
+     *   失敗した場合、または日記が存在しない場合は [UseCaseResult.Failure] に
+     *   [NewestDiaryLoadException] を格納して返す。
      */
     suspend operator fun invoke(): UseCaseResult<Diary, NewestDiaryLoadException> {
         Log.i(logTag, "${logMsg}開始")

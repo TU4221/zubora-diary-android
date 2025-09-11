@@ -29,9 +29,10 @@ internal class LoadReminderNotificationSettingUseCase(
     /**
      * ユースケースを実行し、リマインダー通知設定の読み込み結果を [Flow] として返す。
      *
-     * @return 読み込み結果を [UseCaseResult] へ [Flow] でラップして返す。
-     *   読み込みが成功した場合は[UseCaseResult.Success] に [ReminderNotificationSetting] を格納して返す。
-     *   読み込みに失敗した場合は、[UseCaseResult.Failure] にフォールバック値を格納した
+     * @return 読み込み結果を [UseCaseResult] へ [Flow] 内部でラップして返す。
+     *   読み込みに成功した場合は[UseCaseResult.Success] に
+     *   リマインダー通知設定( [ReminderNotificationSetting] )を格納して返す。
+     *   失敗した場合は、[UseCaseResult.Failure] にフォールバック値を格納した
      *   [ReminderNotificationSettingLoadException] を格納して返す。
      */
     operator fun invoke(): Flow<UseCaseResult<ReminderNotificationSetting, ReminderNotificationSettingLoadException>> {

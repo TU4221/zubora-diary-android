@@ -29,9 +29,8 @@ internal class DeleteAllDiariesUseCase(
     /**
      * ユースケースを実行し、全ての日記データ (項目タイトル選択履歴除く) と関連URI権限を削除する。
      *
-     * @return 全ての削除処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   いずれかの処理でエラーが発生した場合は、対応する [AllDiariesDeleteException] を
-     *   [UseCaseResult.Failure] に格納して返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [AllDiariesDeleteException] を格納して返す。
      */
     suspend operator fun invoke(): UseCaseResult<Unit, AllDiariesDeleteException> {
         Log.i(logTag, "${logMsg}開始")

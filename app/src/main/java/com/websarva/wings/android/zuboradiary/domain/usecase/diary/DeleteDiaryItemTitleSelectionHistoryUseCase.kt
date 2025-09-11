@@ -23,8 +23,8 @@ internal class DeleteDiaryItemTitleSelectionHistoryUseCase(
      * ユースケースを実行し、指定されたタイトルを選択履歴から削除する。
      *
      * @param deleteTitle 削除するタイトル文字列。
-     * @return 削除処理の成功を [UseCaseResult.Success] に `Unit` を格納して返す。
-     *   削除処理に失敗した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [DiaryItemTitleSelectionHistoryDeleteException] を格納して返す。
      */
     suspend operator fun invoke(
         deleteTitle: String

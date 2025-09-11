@@ -18,7 +18,7 @@ internal sealed class WeatherInfoFetchSettingUpdateException(
     /**
      * 天気情報取得設定の更新に失敗した場合にスローされる例外。
      *
-     * @param setting 更新しようとした設定 [WeatherInfoFetchSetting] オブジェクト。
+     * @param setting 更新しようとした設定 [WeatherInfoFetchSetting] 。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class UpdateFailure(

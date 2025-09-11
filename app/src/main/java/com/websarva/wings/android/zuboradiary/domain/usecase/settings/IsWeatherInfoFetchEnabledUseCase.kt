@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
 /**
- * 天気情報取得機能が有効かどうかを確認するユースケース。
+ * 天気情報取得設定が有効かどうかを確認するユースケース。
  *
  * @property loadWeatherInfoFetchSettingUseCase 天気情報取得設定を読み込むユースケース。
  */
@@ -21,13 +21,13 @@ internal class IsWeatherInfoFetchEnabledUseCase(
     private val logMsg = "天気情報取得設定確認_"
 
     /**
-     * ユースケースを実行し、天気情報取得機能が有効かどうかを返す。
+     * ユースケースを実行し、天気情報取得設定が有効かどうかを返す。
      *
      * 設定の読み込みに成功した場合はその設定値を、失敗した場合はフォールバック設定値を参照する。
      *
-     * @return 天気情報取得機能が有効な場合は `true`、無効な場合は `false` を
+     * @return 天気情報取得設定が有効な場合は `true`、無効な場合は `false` を
      *   [UseCaseResult.Success] に格納して返す。
-     *   このユースケースは常に成功を返す設計のため、[UseCaseResult.Failure] を返すことはない。
+     *   このユースケースは常に成功するため、[UseCaseResult.Failure] を返すことはない。
      */
     suspend operator fun invoke(): UseCaseResult.Success<Boolean> {
         Log.i(logTag, "${logMsg}開始")

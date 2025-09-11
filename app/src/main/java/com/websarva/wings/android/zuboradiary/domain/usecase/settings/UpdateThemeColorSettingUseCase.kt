@@ -23,9 +23,9 @@ internal class UpdateThemeColorSettingUseCase(
     /**
      * ユースケースを実行し、指定されたテーマカラーを更新する。
      *
-     * @param setting 更新する設定 [ThemeColorSetting] オブジェクト。
-     * @return 更新処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   更新処理中に [DataStorageException] が発生した場合は [UseCaseResult.Failure] を返す。
+     * @param setting 更新する設定 [ThemeColorSetting] 。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [ThemeColorSettingUpdateException] を格納して返す。
      */
     suspend operator fun invoke(
         setting: ThemeColorSetting

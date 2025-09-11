@@ -24,8 +24,8 @@ internal class IsImageUriUsedInDiariesUseCase(
      *
      * @param uriString 確認対象の画像URI文字列。
      * @return 画像Uriが使用されている場合は [UseCaseResult.Success] に `true` を、
-     *         使用されていない場合は `false` を格納して返す。
-     *   使用確認処理に失敗した場合は [UseCaseResult.Failure] を返す。
+     *   使用されていない場合は `false` を格納して返す。
+     *   確認に失敗した場合は [UseCaseResult.Failure] に [ImageUriUsageCheckException] を格納して返す。
      */
     suspend operator fun invoke(
         uriString: String

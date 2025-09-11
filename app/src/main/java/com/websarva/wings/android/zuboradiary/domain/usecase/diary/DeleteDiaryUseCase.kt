@@ -30,9 +30,9 @@ internal class DeleteDiaryUseCase(
      * @param date 削除する日記の日付。
      * @param imageUriString 削除する日記に関連付けられた画像のURI文字列。権限解放の対象となる。
      *                       `null`の場合は権限解放処理をスキップする。
-     * @return 日記の削除処理が成功した場合は[UseCaseResult.Success] に `Unit` を格納して返す。
-     *         画像URI権限の解放に失敗しても日記削除が成功すれば成功とみなす。
-     *   日記の削除処理自体に失敗した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   画像URI権限の解放に失敗しても日記削除が成功すれば成功とみなす。
+     *   日記の削除処理自体に失敗した場合は [UseCaseResult.Failure] に [DiaryDeleteException] を格納して返す。
      */
     suspend operator fun invoke(
         date: LocalDate,

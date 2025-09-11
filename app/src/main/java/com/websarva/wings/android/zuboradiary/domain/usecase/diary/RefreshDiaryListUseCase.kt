@@ -33,8 +33,8 @@ internal class RefreshDiaryListUseCase(
      *
      * @param currentList 現在表示されている日記のリスト。
      * @param startDate 日記を読み込む期間の開始日。`null` の場合は全期間を対象とする。
-     * @return 再読み込みとフッター更新が成功した場合は、新しい日記リストを [UseCaseResult.Success] に格納して返す。
-     *   処理中にエラーが発生した場合は [UseCaseResult.Failure] を返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に新しい日記リスト( [DiaryYearMonthList] )を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [DiaryListRefreshException] を格納して返す。
      */
     suspend operator fun invoke(
         currentList: DiaryYearMonthList<DiaryDayListItem.Standard>,

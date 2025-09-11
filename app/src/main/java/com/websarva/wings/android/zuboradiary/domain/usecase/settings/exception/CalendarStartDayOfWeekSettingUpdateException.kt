@@ -18,7 +18,7 @@ internal sealed class CalendarStartDayOfWeekSettingUpdateException(
     /**
      * カレンダーの開始曜日設定の更新に失敗した場合にスローされる例外。
      *
-     * @param setting 更新しようとした設定 [CalendarStartDayOfWeekSetting] オブジェクト]。
+     * @param setting 更新しようとした設定 [CalendarStartDayOfWeekSetting] 。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class UpdateFailure(

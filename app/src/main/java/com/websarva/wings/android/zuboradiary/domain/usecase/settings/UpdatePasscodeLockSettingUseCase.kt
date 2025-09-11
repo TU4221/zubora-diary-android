@@ -23,9 +23,9 @@ internal class UpdatePasscodeLockSettingUseCase(
     /**
      * ユースケースを実行し、パスコードロック設定を更新する。
      *
-     * @param setting 更新する設定 [PasscodeLockSetting] オブジェクト。
-     * @return 更新処理が成功した場合は [UseCaseResult.Success] を返す。
-     *   更新処理中に [DataStorageException] が発生した場合は [UseCaseResult.Failure] を返す。
+     * @param setting 更新する設定 [PasscodeLockSetting] 。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [PassCodeSettingUpdateException] を格納して返す。
      */
     suspend operator fun invoke(
         setting: PasscodeLockSetting

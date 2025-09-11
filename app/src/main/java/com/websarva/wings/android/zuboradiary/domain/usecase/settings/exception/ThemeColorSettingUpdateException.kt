@@ -18,7 +18,7 @@ internal sealed class ThemeColorSettingUpdateException(
     /**
      * テーマカラー設定の更新に失敗した場合にスローされる例外。
      *
-     * @param setting 更新しようとした設定 [ThemeColorSetting] オブジェクト。
+     * @param setting 更新しようとした設定 [ThemeColorSetting] 。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class UpdateFailure(
