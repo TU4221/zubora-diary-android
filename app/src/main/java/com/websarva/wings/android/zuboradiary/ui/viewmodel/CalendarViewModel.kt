@@ -192,7 +192,6 @@ internal class CalendarViewModel @Inject constructor(
         )
     }
 
-    // MEMO:呼び出し元で通信エラーが判断できるように戻り値をNullableとする。
     private suspend fun existsSavedDiary(date: LocalDate): Boolean {
         when (val result = doesDiaryExistUseCase(date)) {
             is UseCaseResult.Success -> return result.value
