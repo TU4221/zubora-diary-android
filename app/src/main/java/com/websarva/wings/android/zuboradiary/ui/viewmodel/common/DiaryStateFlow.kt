@@ -17,7 +17,7 @@ internal open class DiaryStateFlow {
         const val MAX_ITEMS: Int = ItemNumber.MAX_NUMBER
     }
 
-    private val initialDiary = Diary()
+    protected val initialDiary = Diary()
 
     protected val initialId = initialDiary.id
     open val id = MutableStateFlow(initialId)

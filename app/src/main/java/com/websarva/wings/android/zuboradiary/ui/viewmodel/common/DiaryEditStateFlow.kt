@@ -31,8 +31,6 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         private const val SAVED_LOG_STATE_KEY = "log"
     }
 
-    private val initialDiary = Diary()
-
     override val id = MutableStateFlow(handle[SAVED_ID_STATE_KEY] ?: initialId)
 
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
