@@ -112,19 +112,17 @@ internal interface DiaryRepository {
     )
 
     /**
-     * 指定された日付の既存の日記を削除し、新しい日記データを保存する。
+     * 保存する日記データと同じ日付の日記データを削除し、保存する日記データを保存する。
      *
      * この操作はトランザクションで処理されることを期待。
      * 同時に、日記アイテムのタイトル選択履歴も更新する。
      *
-     * @param deleteDiaryDate 削除対象の既存の日記の日付。
-     * @param newDiary 新しく保存する日記データ。
+     * @param diary 保存する日記データ。
      * @param historyItemList 保存または更新する日記アイテムのタイトル選択履歴リスト。
      * @throws DataStorageException 日記の削除または新しい日記の保存に失敗した場合。
      */
     suspend fun deleteAndSaveDiary(
-        deleteDiaryDate: LocalDate,
-        newDiary: Diary,
+        diary: Diary,
         historyItemList: List<DiaryItemTitleSelectionHistory>
     )
 

@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.data.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
-import java.time.LocalDate
 
 // MEMO:テーブル構成変更手順
 //      https://qiita.com/kazuma_f/items/8c15e7087623e8f6706b
@@ -59,22 +58,20 @@ internal abstract class DiaryDatabase : RoomDatabase() {
     }
 
     /**
-     * 指定された日付の日記を削除し、新しい日記データと日記項目タイトル選択履歴データをトランザクション内で保存する。
+     * 保存する日記データと同じ日付の日記データを削除し、保存する日記データと日記項目タイトル選択履歴データをトランザクション内で保存する。
      *
-     * まず指定された日付の日記を削除し、その後新しい日記を挿入する。
+     * まず保存する日記データと同じ日付の日記を削除し、その後保存する日記を挿入する。
      * 選択履歴も更新し、古い選択履歴を削除する。
      *
-     * @param deleteDiaryDate 削除する日記の日付。
      * @param createDiaryEntity 新しく保存する日記データ。
      * @param updateTitleList 更新する日記項目タイトル選択履歴データのリスト。
      */
     @Transaction
     suspend fun deleteAndSaveDiary(
-        deleteDiaryDate: LocalDate,
         createDiaryEntity: DiaryEntity,
         updateTitleList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
-        createDiaryDao().deleteDiary(deleteDiaryDate.toString())
+        createDiaryDao().deleteDiary(createDiaryEntity.date)
         createDiaryDao().insertDiary(createDiaryEntity)
         createDiaryItemTitleSelectionHistoryDao().insertHistory(updateTitleList)
         createDiaryItemTitleSelectionHistoryDao().deleteOldHistory()

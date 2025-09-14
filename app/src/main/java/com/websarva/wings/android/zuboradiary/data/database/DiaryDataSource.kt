@@ -169,24 +169,22 @@ internal class DiaryDataSource(
     }
 
     /**
-     * 指定された日付の日記を削除し、新しい日記データと日記項目タイトル選択履歴をデータベースに保存する。
+     * 新しい日記データと同じ日付の日記データを削除し、新しい日記データを保存する。
+     * 同時に日記項目タイトル選択履歴をデータベースに保存する。
      *
      * この操作はトランザクションとして実行される。
      *
-     * @param deleteDiaryDate 削除する日記の日付。
-     * @param newDiary 新しく保存する日記データ。
+     * @param diary 新しく保存する日記データ。
      * @param historyItemList 保存する日記項目タイトル選択履歴データのリスト。
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun deleteAndSaveDiary(
-        deleteDiaryDate: LocalDate,
-        newDiary: DiaryEntity,
+        diary: DiaryEntity,
         historyItemList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
         executeSuspendDbOperation {
             diaryDatabase.deleteAndSaveDiary(
-                deleteDiaryDate,
-                newDiary,
+                diary,
                 historyItemList
             )
         }

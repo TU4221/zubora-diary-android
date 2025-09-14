@@ -133,15 +133,13 @@ internal class DiaryRepositoryImpl (
     }
 
     override suspend fun deleteAndSaveDiary(
-        deleteDiaryDate: LocalDate,
-        newDiary: Diary,
+        diary: Diary,
         historyItemList: List<DiaryItemTitleSelectionHistory>
     ) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteAndSaveDiary(
-                    deleteDiaryDate,
-                    newDiary.toDataModel(),
+                    diary.toDataModel(),
                     historyItemList.map { it.toDataModel() }
                 )
             } catch (e: DataBaseAccessFailureException) {

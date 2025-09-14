@@ -231,11 +231,13 @@ internal object DiaryUseCaseModule {
     @Provides
     fun provideSaveDiaryUseCase(
         diaryRepository: DiaryRepository,
+        doesDiaryExistUseCase: DoesDiaryExistUseCase,
         takePersistableUriPermissionUseCase: TakePersistableUriPermissionUseCase,
         releaseDiaryImageUriPermissionUseCase: ReleaseDiaryImageUriPermissionUseCase
     ): SaveDiaryUseCase =
         SaveDiaryUseCase(
             diaryRepository,
+            doesDiaryExistUseCase,
             takePersistableUriPermissionUseCase,
             releaseDiaryImageUriPermissionUseCase
         )

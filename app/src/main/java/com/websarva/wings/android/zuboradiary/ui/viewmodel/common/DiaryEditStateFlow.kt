@@ -20,6 +20,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
     companion object {
         const val MAX_ITEMS: Int = ItemNumber.MAX_NUMBER
 
+        private const val SAVED_ID_STATE_KEY = "id"
         private const val SAVED_DATE_STATE_KEY = "date"
         private const val SAVED_WEATHER_1_STATE_KEY = "weather1"
         private const val SAVED_WEATHER_2_STATE_KEY = "weather2"
@@ -31,6 +32,8 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
     }
 
     private val initialDiary = Diary()
+
+    override val id = MutableStateFlow(handle[SAVED_ID_STATE_KEY] ?: initialId)
 
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
     //      StateFlow変数を用意しても意味がないので作成しない。
@@ -71,6 +74,9 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         )
 
     init {
+        id.onEach {
+            handle[SAVED_ID_STATE_KEY] = it
+        }.launchIn(scope)
         date.onEach {
             handle[SAVED_DATE_STATE_KEY] = it
         }.launchIn(scope)
@@ -99,6 +105,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
     fun createDiary(): Diary {
         return Diary(
+            id.value,
             date.value ?:throw IllegalStateException("日付なし(null)"),
             LocalDateTime.now(),
             weather1.value.toDomainModel(),

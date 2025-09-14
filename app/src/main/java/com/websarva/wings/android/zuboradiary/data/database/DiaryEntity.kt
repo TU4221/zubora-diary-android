@@ -11,7 +11,8 @@ import androidx.room.PrimaryKey
  * このクラスは、データベースの "diaries" テーブルの各行に対応する。
  * 日記内容を保持する。
  *
- * @property date 日記の日付。このエンティティの主キー。
+ * @property id 日記の識別番号。このエンティティの主キー。
+ * @property date 日記の日付。
  * @property log 日記の更新日付。
  * @property weather1 1つ目の天気情報を示す整数値。具体的な値はアプリの定義による。
  * @property weather2 2つ目の天気情報を示す整数値。オプションであり、1つ目と異なる場合や補足的な情報として使用。
@@ -32,6 +33,8 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "diaries")
 internal data class DiaryEntity(
     @PrimaryKey
+    val id: String,
+
     val date: String,
 
     val log: String,

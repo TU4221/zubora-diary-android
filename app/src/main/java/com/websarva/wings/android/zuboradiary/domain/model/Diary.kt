@@ -4,6 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.LocalDateTime
+import java.util.UUID
 
 /**
  * 日記を表すデータクラス。
@@ -13,6 +14,7 @@ import java.time.LocalDateTime
  * アイテムは最大5つまで設定でき、itemXTitle と itemXComment はペアでnullまたは非nullである必要がある。
  * また、item(N)が設定されている場合、item(N-1)も設定されている必要がある。
  *
+ * @property id 日記の識別番号。デフォルトはUUIDランダム生成値。
  * @property date 日記の日付。デフォルトは現在の日付。
  * @property log 最終更新日時。デフォルトは現在のローカル日時。
  * @property weather1 その日の天気（1つ目）。デフォルトは [Weather.UNKNOWN]。
@@ -34,6 +36,7 @@ import java.time.LocalDateTime
  */
 @Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
 internal data class Diary(
+    val id: UUIDString = UUIDString(UUID.randomUUID().toString()),
     val date: LocalDate = LocalDate.now(),
     val log: LocalDateTime = LocalDateTime.now(),
     val weather1: Weather = Weather.UNKNOWN,

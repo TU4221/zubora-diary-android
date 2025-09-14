@@ -4,6 +4,7 @@ import android.net.Uri
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,9 @@ internal open class DiaryStateFlow {
     }
 
     private val initialDiary = Diary()
+
+    protected val initialId = initialDiary.id
+    open val id = MutableStateFlow(initialId)
 
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
     //      StateFlow変数を用意しても意味がないので作成しない。
@@ -75,6 +79,7 @@ internal open class DiaryStateFlow {
 
     fun update(diary: Diary) {
         diary.run {
+            updateId(id)
             updateDate(date)
             updateWeather1(weather1.toUiModel())
             updateWeather2(weather2.toUiModel())
@@ -101,6 +106,10 @@ internal open class DiaryStateFlow {
             updateImageUri(imageUriString?.let { Uri.parse(it) })
             updateLog(log)
         }
+    }
+
+    private fun updateId(id: UUIDString) {
+        this.id.value = id
     }
 
     private fun updateDate(date: LocalDate?) {

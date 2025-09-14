@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.uri.exception.Persi
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
 import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -26,6 +27,7 @@ import java.time.LocalDate
  */
 internal class SaveDiaryUseCase(
     private val diaryRepository: DiaryRepository,
+    private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val takePersistableUriPermissionUseCase: TakePersistableUriPermissionUseCase,
     private val releaseDiaryImageUriPermissionUseCase: ReleaseDiaryImageUriPermissionUseCase,
 ) {
@@ -64,6 +66,11 @@ internal class SaveDiaryUseCase(
                 originalDiary.date,
                 isNewDiary
             )
+        } catch (e: DiaryExistenceCheckException) {
+            Log.e(logTag, "${logMsg}失敗_同じ日付の日記データの既存確認エラー", e)
+            return UseCaseResult.Failure(
+                DiarySaveException.SaveFailure(diary.date, e)
+            )
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_日記データ保存エラー", e)
             return UseCaseResult.Failure(
@@ -94,13 +101,16 @@ internal class SaveDiaryUseCase(
     /**
      * 日記データとタイトル選択履歴を保存する。
      *
-     * 日付が変更された既存日記の場合、元の日付の日記を削除してから新しい日付で保存する。
+     * 同じ日付の(識別番号が)異なる日記データがデータベースに存在する場合、データベースの日記を削除してから保存する。
+     * これにより、同じ日付の日記データが複数存在することを防ぐ。
      *
      * @param diary 保存する日記データ。
      * @param diaryItemTitleSelectionHistoryItemList 保存する日記項目のタイトル選択履歴リスト。
-     * @param originalDate 更新前の日記の日付。新規作成の場合は、保存する日記の日付と同じ。
+     * @param originalDate 編集前の日記の日付。新規作成の場合は、保存する日記の日付と同じ。
      * @param isNewDiary 新規の日記作成かどうかを示すフラグ。
      * @throws DataStorageException 日記データの保存または削除に失敗した場合。
+     * @throws DiaryExistenceCheckException 保存する日記データと同じ日付の日記データを
+     * 削除する必要があるかどうかを確認するのに失敗した場合。
      */
     private suspend fun saveDiary(
         diary: Diary,
@@ -109,11 +119,10 @@ internal class SaveDiaryUseCase(
         isNewDiary: Boolean
     ) {
         val saveDate = diary.date
-        if (shouldDeleteOriginalDateDiary(saveDate, originalDate, isNewDiary)) {
-            Log.i(logTag, "${logMsg}元の日付の日記削除と新規保存実行 (元日付: $originalDate, 新日付: $saveDate)")
+        if (shouldDeleteSameDateDiary(saveDate, originalDate, isNewDiary)) {
+            Log.i(logTag, "${logMsg}同じ日付の日記削除と保存実行 (日付: $saveDate)")
             diaryRepository
                 .deleteAndSaveDiary(
-                    originalDate,
                     diary,
                     diaryItemTitleSelectionHistoryItemList
                 )
@@ -125,23 +134,58 @@ internal class SaveDiaryUseCase(
     }
 
     /**
-     * 元の日付の日記を削除する必要があるかどうかを判断する。
+     * 保存する日記データと同じ日付の既存日記データを削除する必要があるかどうかを判断する。
      *
-     * 新規日記の場合は削除不要。既存日記で、かつ入力された日付が元の日付と異なる場合に削除が必要と判断する。
+     * 新規日記、かつ同じ日付の日記データがデータベースに存在する場合は削除を必要とする。
+     * 編集日記、かつ編集前後の日付が異なる、かつ編集後と同じ日付の日記データがデータベースに存在する場合は削除を必要とする。
      *
-     * @param inputDate 入力された日記の日付。
-     * @param originalDate 元の日記の日付。
-     * @param isNewDiary 新規の日記作成かどうかを示すフラグ。
-     * @return 元の日付の日記を削除する必要があれば `true`、そうでなければ `false`。
+     * @param inputDate 保存する(編集後の)日記の日付。
+     * @param originalDate 編集前の日記の日付。
+     * @param isNewDiary 新規作成の日記かどうかを示すフラグ。
+     * @return 保存する日記データと同じ日付の既存日記データを削除する必要があれば `true`、そうでなければ `false`。
+     * @throws DiaryExistenceCheckException 確認に失敗した場合。
      */
-    private fun shouldDeleteOriginalDateDiary(
+    private suspend fun shouldDeleteSameDateDiary(
         inputDate: LocalDate,
         originalDate: LocalDate,
         isNewDiary: Boolean
     ): Boolean {
-        if (isNewDiary) return false
+        /*
+        * 新規保存 -> 同日付既存日記なし -> 新規日記保存
+        *         -> 同日付既存日記あり -> 同日付既存日記削除、新規日記保存 (既存日記は異なるIdとなる為削除必須)
+        *
+        * 既存編集保存 -> 日付変更なし -> (同日付既存日記なし) -> (既存日記保存) (日付変更なしパターンで同日付既存日記なしはありえない)
+        *                         -> (同日付既存日記あり) -> 編集日記保存
+        *            -> 日付変更あり -> 同日付既存日記なし -> 編集日記保存
+        *                         -> 同日付既存日記あり -> 同日付既存日記削除、新規日記保存
+        * */
+        return if (isNewDiary) {
+            doesDiaryExist(inputDate)
+        } else {
+            if (inputDate == originalDate) {
+                false
+            } else {
+                doesDiaryExist(inputDate)
+            }
+        }
+    }
 
-        return inputDate != originalDate
+    /**
+     * 指定された日付の日記データがデータベースに存在するかどうかを確認。
+     *
+     * @param date 確認対象の日付。
+     * @return 指定された日付の日記が存在する場合は `true`、存在しない場合は `false`を返す。
+     * @throws DiaryExistenceCheckException 確認に失敗した場合。
+     */
+    private suspend fun doesDiaryExist(date: LocalDate): Boolean {
+        return when (val result = doesDiaryExistUseCase(date)) {
+            is UseCaseResult.Success -> {
+                result.value
+            }
+            is UseCaseResult.Failure -> {
+                throw result.exception
+            }
+        }
     }
 
     /**
