@@ -46,7 +46,6 @@ internal class DiaryDataSource(
      * @return 指定された日付より前の日記の総数。
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
-    @Throws(DataBaseAccessFailureException::class)
     suspend fun countDiaries(date: LocalDate): Int {
         return executeSuspendDbOperation {
             diaryDao.countDiaries(date.toString())
@@ -60,7 +59,6 @@ internal class DiaryDataSource(
      * @return 日記が存在すればtrue、しなければfalse。
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
-    @Throws(DataBaseAccessFailureException::class)
     suspend fun existsDiary(date: LocalDate): Boolean {
         return executeSuspendDbOperation {
             diaryDao.existsDiary(date.toString())
