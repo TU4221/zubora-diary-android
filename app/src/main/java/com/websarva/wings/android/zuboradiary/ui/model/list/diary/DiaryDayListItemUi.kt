@@ -1,7 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.model.list.diary
 
-import android.net.Uri
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import java.time.LocalDate
 
 internal sealed class DiaryDayListItemUi(
@@ -11,8 +12,19 @@ internal sealed class DiaryDayListItemUi(
     data class Standard(
         override val date: LocalDate,
         val title: String,
-        val imageUri: Uri?
-    ) : DiaryDayListItemUi(date)
+        val imageFileName: ImageFileName?,
+        val imageFilePath: ImageFilePathUi
+    ) : DiaryDayListItemUi(date) {
+        init {
+            require(
+                when (imageFilePath) {
+                    is ImageFilePathUi.Valid,
+                    is ImageFilePathUi.NoImage -> imageFileName != null
+                    is ImageFilePathUi.Invalid -> imageFileName == null
+                }
+            )
+        }
+    }
 
     data class WordSearchResult(
         override val date: LocalDate,

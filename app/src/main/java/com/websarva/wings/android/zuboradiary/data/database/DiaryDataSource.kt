@@ -66,19 +66,6 @@ internal class DiaryDataSource(
     }
 
     /**
-     * 指定された画像URIを持つ日記が存在するかどうかを確認する。
-     *
-     * @param uriString 確認する画像のURI文字列。
-     * @return 画像URIを持つ日記が存在すればtrue、しなければfalse。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
-     */
-    suspend fun existsImageUri(uriString: String): Boolean {
-        return executeSuspendDbOperation {
-            diaryDao.existsImageUri(uriString)
-        }
-    }
-
-    /**
      * 指定された日付の日記データを取得する。
      *
      * @param date 取得する日記の日付。
@@ -151,40 +138,46 @@ internal class DiaryDataSource(
      * この操作はトランザクションとして実行される。
      *
      * @param diary 保存する日記データ。
-     * @param historyItemList 保存する日記項目タイトル選択履歴データのリスト。
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
-    suspend fun saveDiary(
-        diary: DiaryEntity,
-        historyItemList: List<DiaryItemTitleSelectionHistoryEntity>
-    ) {
+    suspend fun saveDiary(diary: DiaryEntity) {
         executeSuspendDbOperation {
-            diaryDatabase.saveDiary(
-                diary,
-                historyItemList
-            )
+            diaryDao.insertDiary(diary)
         }
     }
 
     /**
      * 保存する日記データと同じ日付の日記データを削除し、保存する日記データを保存する。
-     * 同時に日記項目タイトル選択履歴をデータベースに保存する。
      *
      * この操作はトランザクションとして実行される。
      *
      * @param diary 新しく保存する日記データ。
-     * @param historyItemList 保存する日記項目タイトル選択履歴データのリスト。
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
-    suspend fun deleteAndSaveDiary(
-        diary: DiaryEntity,
+    suspend fun deleteAndSaveDiary(diary: DiaryEntity) {
+        executeSuspendDbOperation {
+            diaryDatabase.deleteAndSaveDiary(diary)
+        }
+    }
+
+    /**
+     * 日記項目タイトル選択履歴データをデータベースに保存する。
+     *
+     * 日記項目タイトル選択履歴データを保存後、最新の50件を除く最終使用日時が古い順の履歴を削除する。
+     *
+     * この操作はトランザクションとして実行される。
+     *
+     * @param historyItemList 更新する日記項目タイトル選択履歴データのリスト。
+     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     */
+    suspend fun updateDiaryItemTitleSelectionHistory(
         historyItemList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
         executeSuspendDbOperation {
-            diaryDatabase.deleteAndSaveDiary(
-                diary,
-                historyItemList
-            )
+            diaryDatabase
+                .updateDiaryItemTitleSelectionHistory(
+                    historyItemList
+                )
         }
     }
 

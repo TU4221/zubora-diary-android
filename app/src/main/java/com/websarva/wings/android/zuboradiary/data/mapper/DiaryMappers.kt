@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.data.mapper
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import java.time.LocalDate
@@ -27,7 +28,7 @@ internal fun DiaryEntity.toDomainModel(): Diary {
         item4Comment,
         item5Title,
         item5Comment,
-        imageUriString
+        imageFileName?.let { ImageFileName(it) }
     )
 }
 
@@ -50,6 +51,6 @@ internal fun Diary.toDataModel(): DiaryEntity {
         item4Comment,
         item5Title,
         item5Comment,
-        imageUriString
+        imageFileName?.fullName
     )
 }

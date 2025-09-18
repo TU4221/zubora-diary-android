@@ -62,4 +62,12 @@ internal sealed class DiaryEditAppMessage(
         // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = AccessLocationPermissionRequest
     }
+
+    data object ImageLoadFailure :  DiaryEditAppMessage(
+        R.string.dialog_app_message_title_access_error,
+        R.string.dialog_diary_edit_app_message_image_load_failure
+    ) {
+        // デシリアライズ時のシングルトン性を維持
+        private fun readResolve(): Any = ImageLoadFailure
+    }
 }

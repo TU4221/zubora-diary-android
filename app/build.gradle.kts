@@ -190,6 +190,9 @@ dependencies {
     // The compose calendar library
     implementation(libs.kizitonwose.calendar.compose)
 
+    // Coil 3 (For Android Views) (画像表示)
+    //implementation(libs.coil)
+
     // AboutLibraries
     // https://github.com/mikepenz/AboutLibraries
     implementation(libs.aboutlibraries.core)

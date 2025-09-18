@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import java.time.LocalDate
@@ -16,25 +17,37 @@ internal sealed class DiaryDeleteException (
 ) : UseCaseException(message, cause) {
 
     /**
-     * 特定の日付の日記の削除に失敗した場合にスローされる例外。
+     * 特定の日付の日記データの削除に失敗した場合にスローされる例外。
      *
      * @param date 削除しようとした日記の日付。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
-    class DeleteFailure (
+    class DiaryDataDeleteFailure (
         date: LocalDate,
         cause: Throwable
-    ) : DiaryDeleteException("日付 '$date' の日記の削除に失敗しました。", cause)
+    ) : DiaryDeleteException("日付 '$date' の日記データの削除に失敗しました。", cause)
 
-    // TODO:Uri権限の取り消しに失敗しても日記保存がメインの為、成功とみなす。その為、削除かViewmodelで無視するようにするか件検討
     /**
-     * 指定された画像URI権限解放に失敗した場合にスローされる例外。
+     * 削除対象の日記データみつからなかった場合にスローされる例外。
      *
-     * @param uriString 権限解放対象の画像URIの文字列。
+     * @param date 削除しようとした日記の日付。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
-    class PermissionReleaseFailure(
-        uriString: String,
+    class DiaryDataNotFound (
+        date: LocalDate,
         cause: Throwable
-    ) : DiaryDeleteException("画像URI '$uriString' の権限解放に失敗しました。", cause)
+    ) : DiaryDeleteException("削除対象である日付 '$date' の日記データがみつかりませんでした。", cause)
+
+    /**
+     * 日記に添付された画像ファイルの削除に失敗した場合にスローされる例外。
+     *
+     * @param date 削除しようとした日記の日付。
+     * @param fileName 削除しようとした画像ファイル名。
+     * @param cause 発生した根本的な原因となった[Throwable]。
+     */
+    class DiaryImageFileDeleteFailure(
+        date: LocalDate,
+        fileName: ImageFileName,
+        cause: Throwable
+    ) : DiaryDeleteException("削除対象である日付 '$date' の日記の画像ファイル '$fileName' の削除に失敗しました。", cause)
 }

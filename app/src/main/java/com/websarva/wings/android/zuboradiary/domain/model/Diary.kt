@@ -9,7 +9,7 @@ import java.util.UUID
 /**
  * 日記を表すデータクラス。
  *
- * このクラスは、特定の日付の日記の内容（天気、体調、タイトル、項目、画像URIなど）を保持する。
+ * このクラスは、特定の日付の日記の内容（天気、体調、タイトル、項目、画像ファイル名など）を保持する。
  *
  * アイテムは最大5つまで設定でき、itemXTitle と itemXComment はペアでnullまたは非nullである必要がある。
  * また、item(N)が設定されている場合、item(N-1)も設定されている必要がある。
@@ -23,15 +23,15 @@ import java.util.UUID
  * @property title 日記のタイトル。デフォルトは空文字列。
  * @property item1Title 1番目の日記項目のタイトル。デフォルトは空文字列。
  * @property item1Comment 1番目の日記項目のコメント。デフォルトは空文字列。
- * @property item2Title 2番目の日記項目のタイトル。null許容。
- * @property item2Comment 2番目の日記項目のコメント。null許容。
- * @property item3Title 3番目の日記項目のタイトル。null許容。
- * @property item3Comment 3番目の日記項目のコメント。null許容。
- * @property item4Title 4番目の日記項目のタイトル。null許容。
- * @property item4Comment 4番目の日記項目のコメント。null許容。
- * @property item5Title 5番目の日記項目のタイトル。null許容。
- * @property item5Comment 5番目の日記項目のコメント。null許容。
- * @property imageUriString 関連付けられた画像のURI文字列。null許容。
+ * @property item2Title 2つ目の項目のタイトル。未入力の場合 `null`。
+ * @property item2Comment 2つ目の項目のコメント。未入力の場合 `null`。
+ * @property item3Title 3つ目の項目のタイトル。未入力の場合 `null`。
+ * @property item3Comment 3つ目の項目のコメント。未入力の場合 `null`。
+ * @property item4Title 4つ目の項目のタイトル。未入力の場合 `null`。
+ * @property item4Comment 4つ目の項目のコメント。未入力の場合 `null`。
+ * @property item5Title 5つ目の項目のタイトル。未入力の場合 `null`。
+ * @property item5Comment 5つ目の項目のコメント。未入力の場合 `null`。
+ * @property imageFileName 日記に添付した画像ファイル名。未添付の場合 `null`。
  * @throws IllegalArgumentException 日記項目のタイトルとコメントのnull整合性、または日記項目の順序整合性に違反する場合。
  */
 @Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
@@ -53,7 +53,7 @@ internal data class Diary(
     val item4Comment: String? = null,
     val item5Title: String? = null,
     val item5Comment: String? = null,
-    val imageUriString: String? = null
+    val imageFileName: ImageFileName? = null
 ) : Parcelable {
 
     init {
@@ -119,6 +119,6 @@ internal data class Diary(
                 this.item4Comment == other.item4Comment &&
                 this.item5Title == other.item5Title &&
                 this.item5Comment == other.item5Comment &&
-                this.imageUriString == other.imageUriString
+                this.imageFileName == other.imageFileName
     }
 }

@@ -1,12 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
-import android.net.Uri
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -51,8 +52,11 @@ internal open class DiaryStateFlow {
     protected open val items: Array<out DiaryItemStateFlow> =
         Array(MAX_ITEMS) { i -> DiaryItemStateFlow(i + 1) }
 
-    protected val initialImageUri = initialDiary.imageUriString?.let { Uri.parse(it) }
-    open val imageUri = MutableStateFlow(initialImageUri)
+    protected val initialImageFileName = initialDiary.imageFileName
+    open val imageFileName = MutableStateFlow(initialImageFileName)
+
+    private val initialImageFilePath = ImageFilePathUi.NoImage
+    val imageFilePath = MutableStateFlow<ImageFilePathUi>(initialImageFilePath)
 
     protected val initialLog = null // MEMO:Logは保存記録の意味合となるため日記新規作成時を考慮してnullとする。
     open val log =
@@ -68,7 +72,7 @@ internal open class DiaryStateFlow {
         for (item in items) {
             item.initialize()
         }
-        updateImageUri(initialImageUri)
+        updateImageFileName(initialImageFileName)
         updateLog(initialLog)
     }
 
@@ -103,7 +107,7 @@ internal open class DiaryStateFlow {
             }
             updateNumVisibleItems(numVisibleItems)
 
-            updateImageUri(imageUriString?.let { Uri.parse(it) })
+            updateImageFileName(imageFileName)
             updateLog(log)
         }
     }
@@ -156,8 +160,8 @@ internal open class DiaryStateFlow {
         this.numVisibleItems.value = count
     }
 
-    private fun updateImageUri(imageUri: Uri?) {
-        this.imageUri.value = imageUri
+    private fun updateImageFileName(imageFileName: ImageFileName?) {
+        this.imageFileName.value = imageFileName
     }
 
     private fun updateLog(log: LocalDateTime?) {

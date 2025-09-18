@@ -53,16 +53,6 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    override suspend fun existsImageUri(uriString: String): Boolean {
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.existsImageUri(uriString)
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
-        }
-    }
-
     override suspend fun loadDiary(date: LocalDate): Diary {
         return withContext(Dispatchers.IO) {
             try {
@@ -117,14 +107,12 @@ internal class DiaryRepositoryImpl (
     }
 
     override suspend fun saveDiary(
-        diary: Diary,
-        historyItemList: List<DiaryItemTitleSelectionHistory>
+        diary: Diary
     ) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.saveDiary(
-                    diary.toDataModel(),
-                    historyItemList.map { it.toDataModel() }
+                    diary.toDataModel()
                 )
             } catch (e: DataBaseAccessFailureException) {
                 throw DataStorageException(cause = e)
@@ -133,14 +121,12 @@ internal class DiaryRepositoryImpl (
     }
 
     override suspend fun deleteAndSaveDiary(
-        diary: Diary,
-        historyItemList: List<DiaryItemTitleSelectionHistory>
+        diary: Diary
     ) {
         withContext(Dispatchers.IO) {
             try {
                 diaryDataSource.deleteAndSaveDiary(
-                    diary.toDataModel(),
-                    historyItemList.map { it.toDataModel() }
+                    diary.toDataModel()
                 )
             } catch (e: DataBaseAccessFailureException) {
                 throw DataStorageException(cause = e)
@@ -215,6 +201,14 @@ internal class DiaryRepositoryImpl (
             .map { list ->
                 list.map { it.toDomainModel() }
             }
+    }
+
+    override suspend fun updateDiaryItemTitleSelectionHistory(
+        historyItemList: List<DiaryItemTitleSelectionHistory>
+    ) {
+        diaryDataSource.updateDiaryItemTitleSelectionHistory(
+            historyItemList.map { it.toDataModel() }
+        )
     }
 
     override suspend fun deleteDiaryItemTitleSelectionHistory(title: String) {

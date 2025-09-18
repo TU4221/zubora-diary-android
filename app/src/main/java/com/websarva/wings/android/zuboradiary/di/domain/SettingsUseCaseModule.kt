@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.di.domain
 
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.RegisterReminderNotificationUseCase
@@ -18,7 +19,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdatePass
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateReminderNotificationSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateWeatherInfoFetchSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleaseAllPersistableUriPermissionUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,12 +41,12 @@ internal object SettingsUseCaseModule {
     @Provides
     fun provideDeleteAllDataUseCase(
         diaryRepository: DiaryRepository,
-        releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase,
+        fileRepository: FileRepository,
         initializeAllSettingsUseCase: InitializeAllSettingsUseCase
     ): DeleteAllDataUseCase =
         DeleteAllDataUseCase(
             diaryRepository,
-            releaseAllPersistableUriPermissionUseCase,
+            fileRepository,
             initializeAllSettingsUseCase
         )
 
@@ -54,11 +54,11 @@ internal object SettingsUseCaseModule {
     @Provides
     fun provideDeleteAllDiariesUseCase(
         diaryRepository: DiaryRepository,
-        releaseAllPersistableUriPermissionUseCase: ReleaseAllPersistableUriPermissionUseCase
+        fileRepository: FileRepository
     ): DeleteAllDiariesUseCase =
         DeleteAllDiariesUseCase(
             diaryRepository,
-            releaseAllPersistableUriPermissionUseCase
+            fileRepository
         )
 
     @Singleton

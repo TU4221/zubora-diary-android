@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.list.diary
 
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import java.time.LocalDate
 
@@ -22,12 +23,12 @@ internal sealed class DiaryDayListItem(
      *
      * @property date 日記の日付。
      * @property title 日記のタイトル。
-     * @property imageUriString 日記に関連付けられた画像のURI文字列。画像がない場合はnull。
+     * @property imageFileName 日記に関連付けられた画像ファイル名。画像がない場合はnull。
      */
     data class Standard(
         override val date: LocalDate,
         val title: String,
-        val imageUriString: String?
+        val imageFileName: ImageFileName?
     ) : DiaryDayListItem(date)
 
     /**

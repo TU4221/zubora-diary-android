@@ -10,6 +10,8 @@ import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
@@ -21,6 +23,9 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWe
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestExitWithoutDiarySaveConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.file.ClearCacheFileUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.file.BuildImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.file.CacheDiaryImageUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -35,6 +40,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFet
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -67,6 +73,9 @@ internal class DiaryEditViewModel @Inject constructor(
     private val fetchWeatherInfoUseCase: FetchWeatherInfoUseCase,
     private val shouldFetchWeatherInfoUseCase: ShouldFetchWeatherInfoUseCase,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
+    private val cacheDiaryImageUseCase: CacheDiaryImageUseCase,
+    private val buildImageFilePathUseCase: BuildImageFilePathUseCase,
+    private val clearCacheFileUseCase: ClearCacheFileUseCase
 ) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditState>(
     handle[SAVED_VIEW_MODEL_STATE_KEY] ?: DiaryEditState.Idle
 ) {
@@ -263,14 +272,17 @@ internal class DiaryEditViewModel @Inject constructor(
             false
         )
 
-    val imageUri
-        get() = diaryStateFlow.imageUri.asStateFlow()
+    val imageFileName
+        get() = diaryStateFlow.imageFileName.asStateFlow()
+
+    val imageFilePath
+        get() = diaryStateFlow.imageFilePath.asStateFlow()
 
     val isImageDeleteButtonClickable =
-        combine(uiState, imageUri) { state, imageUri ->
+        combine(uiState, imageFileName) { state, imageFileName ->
             return@combine when (state) {
                 DiaryEditState.Editing -> {
-                    imageUri != null
+                    imageFileName != null
                 }
 
                 DiaryEditState.Idle,
@@ -376,9 +388,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
         val originalDiary = _originalDiary.requireValue()
         val originalDate = originalDiary.date
-        val originalImageUri = originalDiary.imageUriString?.let { Uri.parse(it) }
+        val originalImageFileName = originalDiary.imageFileName
 
-        val parameters = DiaryDeleteParameters(originalDate, originalImageUri)
+        val parameters = DiaryDeleteParameters(originalDate, originalImageFileName)
 
         viewModelScope.launch {
             emitUiEvent(
@@ -542,9 +554,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters) {
         val date = parameters.date
-        val imageUri = parameters.imageUri
+        val imageFileName = parameters.imageFileName
         viewModelScope.launch {
-            deleteDiary(date, imageUri)
+            deleteDiary(date, imageFileName)
         }
     }
 
@@ -634,7 +646,9 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun handleDiaryImageDeleteDialogPositiveResult() {
-        deleteImageUri()
+        viewModelScope.launch {
+            deleteImageUri()
+        }
     }
 
     fun onExitWithoutDiarySaveDialogResultReceived(
@@ -670,13 +684,22 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // MEMO:未選択時null
     fun onOpenDocumentResultImageUriReceived(uri: Uri?) {
-        updateImageUri(uri)
-        updateUiState(DiaryEditState.Editing)
+        val diaryId = diaryStateFlow.id.value
+        viewModelScope.launch {
+            cacheDiaryImage(uri, diaryId)
+        }
     }
 
     // StateFlow値変更時処理
     fun onOriginalDiaryDateChanged(dateString: String?) {
         updateEditingDiaryDateString(dateString)
+    }
+
+    fun onDiaryImageFileNameChanged(fileName: ImageFileName?) {
+
+        viewModelScope.launch {
+            buildImageFilePath(fileName)
+        }
     }
 
     // MotionLayout変更時処理
@@ -796,16 +819,16 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun deleteDiary(
         date: LocalDate,
-        imageUri: Uri?
+        imageFileName: ImageFileName?
     ) {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
         updateUiState(DiaryEditState.Deleting)
-        val imageUriString = imageUri?.toString()
-        when (deleteDiaryUseCase(date, imageUriString)) {
+        when (deleteDiaryUseCase(date, imageFileName)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
+                clearCacheFileUseCase()
                 updateUiState(DiaryEditState.Editing)
                 emitUiEvent(
                     DiaryEditEvent
@@ -1019,8 +1042,40 @@ internal class DiaryEditViewModel @Inject constructor(
         emitUiEvent(DiaryEditEvent.SelectImage)
     }
 
-    private fun deleteImageUri() {
-        updateImageUri(null)
+    private suspend fun deleteImageUri() {
+        updateImageFileName(null)
+        clearCacheFileUseCase()
+    }
+
+    private suspend fun cacheDiaryImage(uri: Uri?, diaryId: UUIDString) {
+        if (uri != null) {
+            when (val result = cacheDiaryImageUseCase(uri.toString(), diaryId.value)) {
+                is UseCaseResult.Success -> {
+                    updateImageFileName(result.value)
+                }
+                is UseCaseResult.Failure -> {
+                    emitAppMessageEvent(DiaryEditAppMessage.ImageLoadFailure)
+                }
+            }
+        }
+        updateUiState(DiaryEditState.Editing)
+    }
+
+    private suspend fun buildImageFilePath(fileName: ImageFileName?) {
+        val imageFilePathUi =
+            if (fileName == null) {
+                ImageFilePathUi.NoImage
+            } else {
+                when (val result = buildImageFilePathUseCase(fileName)) {
+                    is UseCaseResult.Success -> {
+                        ImageFilePathUi.Valid(result.value)
+                    }
+                    is UseCaseResult.Failure -> {
+                        ImageFilePathUi.Invalid
+                    }
+                }
+            }
+        updateImageFilePath(imageFilePathUi)
     }
 
     private suspend fun handleBackNavigation(
@@ -1036,6 +1091,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     .NavigateExitWithoutDiarySaveConfirmationDialog(parameters)
             )
         } else {
+            clearCacheFileUseCase()
             navigatePreviousFragment(originalDiary)
         }
     }
@@ -1116,8 +1172,12 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.getItemStateFlow(itemNumber).comment.value = comment
     }
 
-    private fun updateImageUri(imageUri: Uri?) {
-        diaryStateFlow.imageUri.value = imageUri
+    private fun updateImageFileName(imageFileName: ImageFileName?) {
+        diaryStateFlow.imageFileName.value = imageFileName
+    }
+
+    private fun updateImageFilePath(imageFilePath: ImageFilePathUi) {
+        diaryStateFlow.imageFilePath.value = imageFilePath
     }
 
     private fun updateIsNewDiary(isNew: Boolean) {

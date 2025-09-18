@@ -154,7 +154,7 @@
             android:text="@string/layout_diary_show_attached_image"
             android:textAppearance="@style/AppTextViewTextAppearance"
             android:textSize="@dimen/layout_diary_show_small_text_size"
-            android:visibility="@{viewModel.imageUri == null ? View.GONE : View.VISIBLE}" />
+            android:visibility="@{viewModel.imageFileName == null ? View.GONE : View.VISIBLE}" />
 
         <!-- MEMO:本レイアウトはincludeタグ使用先でスクロール機能を用意してもらう前提のため、警告"partially hidden in layout"
                   を"tools:ignore="VisualLintBounds""で無視する。 -->
@@ -168,7 +168,7 @@
             android:scaleType="fitCenter"
             android:adjustViewBounds="true"
             android:contentDescription="@string/layout_diary_show_attached_image_description"
-            android:visibility="@{viewModel.imageUri == null ? View.GONE : View.VISIBLE}"
+            android:visibility="@{viewModel.imageFileName == null ? View.GONE : View.VISIBLE}"
             tools:ignore="VisualLintBounds" />
 
         <TextView

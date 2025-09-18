@@ -1,8 +1,12 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
-import com.websarva.wings.android.zuboradiary.domain.model.ImageSize
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.InvalidParameterException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.PermissionException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.ResourceAlreadyExistsException
 
 /**
  * ファイル関連へのアクセスと永続化を抽象化するリポジトリインターフェース。
@@ -14,29 +18,145 @@ import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataSt
 internal interface FileRepository {
 
     /**
-     * 指定されたUriを画像ファイルに変換してキャッシュディレクトリへ保存する。
+     * 指定された画像ファイル名からキャッシュ相対パスを構築する。
      *
-     * @param uriString 保存したいUri。
-     * @param fileBaseName 保存されるファイルのベース名。
-     * @return キャッシュディレクトリへ保存されたファイルパス。
+     * @param fileName 相対パスを構築する対象のファイル名。
+     * @return 構築されたファイルパス。
+     */
+    suspend fun buildImageFileAbsolutePathFromCache(fileName: ImageFileName): String
+
+    /**
+     * 指定された画像ファイル名から永続ストレージ相対パスを構築する。
+     *
+     * @param fileName 相対パスを構築する対象のファイル名。
+     * @return 構築されたファイルパス。
+     */
+    suspend fun buildImageFileAbsolutePathFromPermanent(fileName: ImageFileName): String
+
+    /**
+     * 指定された画像ファイルがキャッシュに存在するか確認する。
+     *
+     * @param fileName 確認したいファイル名。
+     * @return 指定された画像ファイルが存在すれば `true`、存在しなければ `false`。
+     * @throws PermissionException ファイルへのアクセス権限がない場合。
+     * @throws DataStorageException 存在の確認に失敗した場合。
+     */
+    suspend fun existsImageFileInCache(fileName: ImageFileName): Boolean
+
+    /**
+     * 指定された画像ファイルが永続ストレージに存在するか確認する。
+     *
+     * @param fileName 確認したいファイル名。
+     * @return 指定された画像ファイルが存在すれば `true`、存在しなければ `false`。
+     * @throws PermissionException ファイルへのアクセス権限がない場合。
+     * @throws DataStorageException 存在の確認に失敗した場合。
+     */
+    suspend fun existsImageFileInPermanent(fileName: ImageFileName): Boolean
+
+    /**
+     * 指定された画像ファイルがバックアップストレージに存在するか確認する。
+     *
+     * @param fileName 確認したいファイル名。
+     * @return 指定された画像ファイルが存在すれば `true`、存在しなければ `false`。
+     * @throws PermissionException ファイルへのアクセス権限がない場合。
+     * @throws DataStorageException 存在の確認に失敗した場合。
+     */
+    suspend fun existsImageFileInBackup(fileName: ImageFileName): Boolean
+
+    /**
+     * 指定されたUriの画像ファイルをキャッシュストレージへキャッシュする。
+     *
+     * @param uriString キャッシュしたい画像ファイルのUri。
+     * @param fileBaseName キャッシュされるファイルのベース名。
+     * @return キャッシュストレージへ保存されたファイル名。
+     * @throws NotFoundException 指定されたURI/ファイルパスの画像が見つからない場合。
+     * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws DataStorageException ファイルの保存に失敗した場合。
      */
-    suspend fun saveImageFileToCache(uriString: String, fileBaseName: String, size: ImageSize): String
+    suspend fun cacheImageFile(uriString: String, fileBaseName: String): ImageFileName
 
     /**
-     * 指定されたファイルを永続ディレクトリへ移動する。
+     * 指定された画像ファイルをキャッシュストレージから永続ストレージへ移動する。
      *
-     * @param filePath 移動したいファイルパス。
-     * @return 永続ディレクトリへ保存されたファイルパス。
+     * @param fileName 移動したいファイル名。
      * @throws DataStorageException ファイルの移動に失敗した場合。
+     * @throws InvalidParameterException 指定されたファイル名が無効の場合。
+     * @throws NotFoundException 移動元ファイルが見つからない場合。
+     * @throws PermissionException ファイルへのアクセス権限がない場合。
+     * @throws ResourceAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
      */
-    suspend fun moveFileToPermanent(filePath: String): String
+    suspend fun moveImageFileToPermanent(fileName: ImageFileName)
 
     /**
-     * 指定されたファイルを削除する。
+     * 指定された画像ファイルを永続ストレージからバックアップストレージへ移動する。
      *
-     * @param filePath 削除したいファイルパス。
+     * @param fileName 移動したいファイル名。
+     * @throws DataStorageException ファイルの移動に失敗した場合。
+     * @throws InvalidParameterException 指定されたファイル名が無効の場合。
+     * @throws NotFoundException 移動元ファイルが見つからない場合。
+     * @throws PermissionException ファイルへのアクセス権限がない場合。
+     * @throws ResourceAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
+     */
+    suspend fun moveImageFileToBackup(fileName: ImageFileName)
+
+    /**
+     * 指定された画像ファイルを永続ストレージからキャッシュストレージに復元する。
+     *
+     * @param fileName 復元したいファイル名。
+     * @throws DataStorageException ファイルの復元に失敗した場合。
+     * @throws InvalidParameterException 指定されたファイル名が無効の場合。
+     * @throws NotFoundException 復元元ファイルが見つからない場合。
+     * @throws PermissionException ファイルへのアクセス権限がない場合。
+     * @throws ResourceAlreadyExistsException 復元先に同名のファイルが既に存在する場合。
+     */
+    suspend fun restoreImageFileFromPermanent(fileName: ImageFileName)
+
+    /**
+     * 指定された画像ファイルをバックアップストレージから永続ストレージに復元する。
+     *
+     * @param fileName 復元したいファイル名。
+     * @throws DataStorageException ファイルの復元に失敗した場合。
+     * @throws InvalidParameterException 指定されたファイル名が無効の場合。
+     * @throws NotFoundException 復元元ファイルが見つからない場合。
+     * @throws PermissionException ファイルへのアクセス権限がない場合。
+     * @throws ResourceAlreadyExistsException 復元先に同名のファイルが既に存在する場合。
+     */
+    suspend fun restoreImageFileFromBackup(fileName: ImageFileName)
+
+    /**
+     * 指定された画像ファイルを永続ストレージから削除する。
+     *
+     * @param fileName 削除したいファイル名。
+     * @throws DataStorageException ファイルの削除に失敗した場合。
+     * @throws InvalidParameterException 指定されたファイル名が無効の場合。
+     * @throws NotFoundException 指定されたファイルが見つからなかった場合。
+     * @throws PermissionException 指定されたファイルへのアクセス権限がない場合。
+     */
+    suspend fun deleteImageFileInPermanent(fileName: ImageFileName)
+
+    /**
+     * バックアップストレージから画像ファイルを削除する。
+     *
+     * @throws DataStorageException ファイルの削除に失敗した場合。
+     * @throws NotFoundException 削除対象が見つからなかった場合。
+     * @throws PermissionException バックアップストレージへのアクセス権限がない場合。
+     */
+    suspend fun clearAllImageFilesInCache()
+
+    /**
+     * バックアップストレージから画像ファイルを削除する。
+     *
+     * @throws DataStorageException ファイルの削除に失敗した場合。
+     * @throws NotFoundException 削除対象が見つからなかった場合。
+     * @throws PermissionException バックアップストレージへのアクセス権限がない場合。
+     */
+    suspend fun clearAllImageFilesInBackup()
+
+
+    /**
+     * 全ての画像ファイルを削除する。
+     *
      * @throws DataStorageException ファイルの削除に失敗した場合。
      */
-    suspend fun deleteFile(filePath: String)
+    suspend fun clearAllImageFiles()
 }

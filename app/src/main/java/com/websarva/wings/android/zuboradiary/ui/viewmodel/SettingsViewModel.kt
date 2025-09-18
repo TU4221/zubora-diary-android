@@ -817,8 +817,8 @@ internal class SettingsViewModel @Inject constructor(
                     is AllDiariesDeleteException.DeleteFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
                     }
-                    is AllDiariesDeleteException.PersistableUriPermissionReleaseFailure -> {
-                        // 処理なし
+                    is AllDiariesDeleteException.ImageFileDeleteFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllDiaryImagesDeleteFailure)
                     }
                 }
             }
@@ -850,8 +850,8 @@ internal class SettingsViewModel @Inject constructor(
                     is AllDataDeleteException.DiariesDeleteFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
                     }
-                    is AllDataDeleteException.UriPermissionReleaseFailure -> {
-                        // 処理なし
+                    is AllDataDeleteException.ImageFileDeleteFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllDiaryImagesDeleteFailure)
                     }
                     is AllDataDeleteException.SettingsInitializationFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)

@@ -116,7 +116,7 @@ internal class DiaryDayListAdapter
             DiaryImageConfigurator()
                 .setUpImageOnDiaryList(
                     binding.imageAttachedImage,
-                    item.imageUri,
+                    null, // TODO:ライブラリのVerをあげてからコイルを実装し、その後対応。
                     themeColor
                 )
 
@@ -137,7 +137,7 @@ internal class DiaryDayListAdapter
             oldItem: DiaryDayListItemUi.Standard,
             newItem: DiaryDayListItemUi.Standard
         ): Boolean {
-            val result = oldItem.title == newItem.title && oldItem.imageUri == newItem.imageUri
+            val result = oldItem.title == newItem.title && oldItem.imageFilePath == newItem.imageFilePath
 
             Log.d(
                 logTag,

@@ -20,15 +20,15 @@ import androidx.room.PrimaryKey
  * @property title 日記のタイトル。
  * @property item1Title 1つ目の項目のタイトル。
  * @property item1Comment 1つ目の項目のコメント。
- * @property item2Title 2つ目の項目のタイトル (オプショナル)。
- * @property item2Comment 2つ目の項目のコメント (オプショナル)。
- * @property item3Title 3つ目の項目のタイトル (オプショナル)。
- * @property item3Comment 3つ目の項目のコメント (オプショナル)。
- * @property item4Title 4つ目の項目のタイトル (オプショナル)。
- * @property item4Comment 4つ目の項目のコメント (オプショナル)。
- * @property item5Title 5つ目の項目のタイトル (オプショナル)。
- * @property item5Comment 5つ目の項目のコメント (オプショナル)。
- * @property imageUriString 日記に添付した画像のURI文字列 (オプショナル)。
+ * @property item2Title 2つ目の項目のタイトル。未入力の場合 `null`。
+ * @property item2Comment 2つ目の項目のコメント。未入力の場合 `null`。
+ * @property item3Title 3つ目の項目のタイトル。未入力の場合 `null`。
+ * @property item3Comment 3つ目の項目のコメント。未入力の場合 `null`。
+ * @property item4Title 4つ目の項目のタイトル。未入力の場合 `null`。
+ * @property item4Comment 4つ目の項目のコメント。未入力の場合 `null`。
+ * @property item5Title 5つ目の項目のタイトル。未入力の場合 `null`。
+ * @property item5Comment 5つ目の項目のコメント。未入力の場合 `null`。
+ * @property imageFileName 日記に添付した画像ファイル名。未添付の場合 `null`。
  */
 @Entity(tableName = "diaries")
 internal data class DiaryEntity(
@@ -79,6 +79,6 @@ internal data class DiaryEntity(
     @ColumnInfo(name = "item_5_comment")
     val item5Comment: String?,
 
-    @ColumnInfo(name = "image_uri")
-    val imageUriString: String?
+    @ColumnInfo(name = "image_file_name")
+    val imageFileName: String?
 )

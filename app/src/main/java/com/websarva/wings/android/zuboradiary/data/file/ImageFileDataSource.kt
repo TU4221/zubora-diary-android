@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.data.file
 
-import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -8,6 +7,8 @@ import android.net.Uri
 import android.system.ErrnoException
 import android.system.OsConstants
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.data.file.exception.DirectoryDeletionFailedException
+import com.websarva.wings.android.zuboradiary.data.file.exception.FileAlreadyExistsException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileDeleteException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileOperationException
 import com.websarva.wings.android.zuboradiary.data.file.exception.InsufficientStorageException
@@ -21,9 +22,6 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
-import java.nio.file.Path
-import java.nio.file.Paths
-
 
 /**
  * 画像ファイルの永続化およびキャッシュ処理を担当するデータソース。
@@ -33,13 +31,13 @@ import java.nio.file.Paths
  * ファイル操作に関するエラーは、定義されたカスタム例外 ([FileOperationException] のサブクラスなど) をスローする。
  *
  * @property contentResolver コンテンツURIへのアクセスに必要。
- * @property cacheDirPath アプリケーションのキャッシュファイル用ディレクトリパス。
- * @property permanentDirPath アプリケーションの永続ファイル用ディレクトリパス。
+ * @property cacheDir アプリケーションのキャッシュファイル用ディレクトリ。
+ * @property permanentDir アプリケーションの永続ファイル用ディレクトリ。
  */
 internal class ImageFileDataSource(
     private val contentResolver: ContentResolver,
-    private val cacheDirPath: String,
-    private val permanentDirPath: String
+    private val cacheDir: File,
+    private val permanentDir: File
 ) {
 
     private val logTag = createLogTag()
@@ -52,41 +50,78 @@ internal class ImageFileDataSource(
     private val imageDirName = "images"
 
     private val imageCacheDir: File by lazy {
-        File(cacheDirPath, imageDirName)
+        File(cacheDir, imageDirName)
             .also { it.mkdir() } // 指定ディレクトリ作成
     }
 
     private val imagePermanentDir: File by lazy {
-        File(permanentDirPath, imageDirName)
-            .also { it.mkdir() } // 指定ディレクトリ作成
+        File(permanentDir, imageDirName)
+            .also { it.mkdir() }
+    }
+
+    private val imageBackupDir: File by lazy {
+        File(imagePermanentDir, "backup")
+            .also { it.mkdir() }
     }
 
     /**
-     * 指定されたファイルパス文字列からファイル名を抽出する。
+     * 指定された画像ファイルから、キャッシュ画像ディレクトリ絶対パスを構築する。
      *
-     * APIレベル26以上が必要な `java.nio.file.Paths` を使用するが、
-     * API desugaring により下位互換性を確保している。
-     *
-     * @param filePath ファイルパス文字列。
-     * @return 抽出されたファイル名。
+     * @param fileName 構築対象の画像ファイルの名前。
+     * @return 構築された絶対パス。
      */
-    @SuppressLint("NewApi")
-    fun extractFileName(filePath: String): String {
-        return Paths.get(filePath).fileName.toString()
+    fun buildImageFileAbsolutePathFromCache(fileName: String): String {
+        return File(imageCacheDir, fileName).absolutePath
     }
 
     /**
-     * 画像ファイル名から、画像ディレクトリ基準の相対パスを構築する。
+     * 指定された画像ファイルから、永続画像ディレクトリ絶対パスを構築する。
      *
-     * @param fileName 画像ファイル名。
-     * @return "images/fileName" 形式の相対パス。
+     * @param fileName 構築対象の画像ファイルの名前。
+     * @return 構築された絶対パス。
      */
-    fun buildImageRelativePath(fileName: String): String {
-        return "$imageDirName${File.separator}$fileName"
+    fun buildImageFileAbsolutePathFromPermanent(fileName: String): String {
+        return File(imagePermanentDir, fileName).absolutePath
     }
 
     /**
-     * 指定されたURIの画像をリサイズ・圧縮し、キャッシュディレクトリにJPEG形式で保存する。
+     * 指定された画像ファイルがキャッシュディレクトリに存在するか確認する。
+     *
+     * @param fileName 確認したいファイルの名前。
+     * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
+     * @throws FileReadException ファイルの存在確認に失敗した場合。
+     * @return 構築された絶対パス。
+     */
+    fun existsImageFileInCache(fileName: String): Boolean {
+        return File(imageCacheDir, fileName).exists()
+    }
+
+    /**
+     * 指定された画像ファイルが永続ディレクトリに存在するか確認する。
+     *
+     * @param fileName 確認したいファイルの名前。
+     * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
+     * @throws FileReadException ファイルの存在確認に失敗した場合。
+     * @return 構築された絶対パス。
+     */
+    fun existsImageFileInPermanent(fileName: String): Boolean {
+        return File(imagePermanentDir, fileName).exists()
+    }
+
+    /**
+     * 指定された画像ファイルがバックアップディレクトリに存在するか確認する。
+     *
+     * @param fileName 確認したいファイルの名前。
+     * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
+     * @throws FileReadException ファイルの存在確認に失敗した場合。
+     * @return 構築された絶対パス。
+     */
+    fun existsImageFileInBackup(fileName: String): Boolean {
+        return File(imageBackupDir, fileName).exists()
+    }
+
+    /**
+     * 指定されたURIの画像ファイルをリサイズ・圧縮し、キャッシュディレクトリにJPEG形式でキャッシュする。
      *
      * @param uriString 画像のURI文字列。
      * @param fileBaseName 保存するファイル名のベース部分 (拡張子なし)。
@@ -95,12 +130,12 @@ internal class ImageFileDataSource(
      * @param quality JPEG圧縮品質 (0-100)。
      * @return 保存されたファイル名 (拡張子付き)。
      * @throws FileNotFoundException 指定されたURI/ファイルパスの画像が見つからない場合。
-     * @throws FilePermissionDeniedException ファイルアクセス権限がない場合。
+     * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
      * @throws FileReadException 画像の読み込みまたはデコードに失敗した場合。
      * @throws FileWriteException 画像の書き込みに失敗した場合。
      * @throws InsufficientStorageException ストレージの空き容量が不足した場合。
      */
-    fun saveImageFileToCache(
+    fun cacheImageFile(
         uriString: String,
         fileBaseName: String,
         width: Int = 0,
@@ -112,6 +147,7 @@ internal class ImageFileDataSource(
         val outputFile = File(imageCacheDir, outputFileName)
         var bitmap: Bitmap? = null
 
+        // URI指定画像ファイル読み出し
         try {
             contentResolver.openInputStream(uri)?.use { inputStream ->
                 bitmap = decodeSampledBitmapFromStream(inputStream, width, height)
@@ -126,6 +162,7 @@ internal class ImageFileDataSource(
 
         val bitmapNotNull = bitmap ?: throw FileOperationException("bitmap変数がNullのままです。")
 
+        // キャッシュディレクトリへ書き込み(保存)
         try {
             FileOutputStream(outputFile).use { outputStream ->
                 val isSuccess = bitmapNotNull.compress(imageFileExtension, quality, outputStream)
@@ -221,30 +258,91 @@ internal class ImageFileDataSource(
     /**
      * 指定されたファイル名の画像をキャッシュディレクトリから永続ディレクトリへ移動する。
      *
-     * 移動先ファイルが既に存在する場合は上書きする。
+     * このメソッドは内部でキャッシュディレクトリと永続ディレクトリを指定して [moveImageFile] を呼び出している。
+     * 処理内容、例外の詳細は [moveImageFile]を参照。
+     *
+     * @param fileName 移動する画像ファイル名 (拡張子付き)。
+     */
+    fun moveImageFileToPermanent(fileName: String) {
+        moveImageFile(fileName, imageCacheDir, imagePermanentDir)
+    }
+
+    /**
+     * 指定されたファイル名の画像を永続ディレクトリからキャッシュディレクトリへ戻す。
+     *
+     * このメソッドは内部で永続ディレクトリとキャッシュディレクトリを指定して [moveImageFile] を呼び出している。
+     * 処理内容、例外の詳細は [moveImageFile]を参照。
+     *
+     * @param fileName 移動する画像ファイル名 (拡張子付き)。
+     */
+    fun restoreImageFileFromPermanent(fileName: String) {
+        moveImageFile(fileName, imagePermanentDir, imageCacheDir)
+    }
+
+    /**
+     * 指定されたファイル名の画像を永続ディレクトリからバックアップディレクトリへ移動する。
+     *
+     * このメソッドは内部で永続ディレクトリとバックアップディレクトリを指定して [moveImageFile] を呼び出している。
+     * 処理内容、例外の詳細は [moveImageFile]を参照。
+     *
+     * @param fileName 移動する画像ファイル名 (拡張子付き)。
+     */
+    fun moveImageFileToBackup(fileName: String) {
+        moveImageFile(fileName, imagePermanentDir, imageBackupDir)
+    }
+
+    /**
+     * 指定されたファイル名の画像をバックアップディレクトリから永続ディレクトリへ戻す。
+     *
+     * このメソッドは内部でバックアップディレクトリと永続ディレクトリを指定して [moveImageFile] を呼び出している。
+     * 処理内容、例外の詳細は [moveImageFile]を参照。
+     *
+     * @param fileName 移動する画像ファイル名 (拡張子付き)。
+     */
+    fun restoreImageFileFromBackup(fileName: String) {
+        moveImageFile(fileName, imageBackupDir, imagePermanentDir)
+    }
+
+    /**
+     * 指定されたファイル名の画像をキャッシュディレクトリから永続ディレクトリへ移動する。
+     *
+     * 移動先に同名のファイルが既に存在する場合は [FileAlreadyExistsException] をスローする。
      *
      * @param fileName 移動する画像ファイル名 (拡張子付き)。
      * @throws InvalidFilePathException 指定されたファイル名の拡張子が無効の場合。
      * @throws FileNotFoundException 移動元ファイルが見つからない場合。
-     * @throws FilePermissionDeniedException ファイルアクセス権限がない場合。
+     * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
+     * @throws FileAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
      * @throws FileWriteException 移動先への書き込みに失敗した場合。
      * @throws InsufficientStorageException ストレージの空き容量が不足した場合。
      * @throws FileDeleteException 移動元ファイルの削除に失敗した場合。
      */
-    fun moveImageFileToPermanent(fileName: String) {
+    private fun moveImageFile(fileName: String, sourceDir: File, destinationDir: File) {
         if (!isImageFileExtension(fileName))
             throw InvalidFilePathException(fileName, invalidFilePathExceptionReason)
 
         // 移動元ファイルクラス生成
-        val sourceFile = File(imagePermanentDir, fileName)
+        val sourceFile = File(sourceDir, fileName)
         try {
             if (!sourceFile.exists()) throw FileNotFoundException(sourceFile.absolutePath)
         } catch (e: SecurityException) {
             throw FilePermissionDeniedException(sourceFile.absolutePath, e)
+        } catch (e: IOException) {
+            throw FileReadException(sourceFile.absolutePath, e)
         }
 
-        // 移動先ファイルクラス生成、移動(コピー)
-        val destinationFile = File(imagePermanentDir, sourceFile.name)
+        // 移動先ファイルクラス生成、同名ファイル存在確認
+        val destinationFile = File(destinationDir, sourceFile.name)
+        try {
+            if (destinationFile.exists())
+                throw FileAlreadyExistsException(destinationFile.absolutePath)
+        } catch (e: SecurityException) {
+            throw FilePermissionDeniedException(destinationFile.absolutePath, e)
+        } catch (e: IOException) {
+            throw FileReadException(destinationFile.absolutePath, e)
+        }
+
+        // 移動(コピー)
         try {
             sourceFile.inputStream().use { input ->
 
@@ -254,6 +352,8 @@ internal class ImageFileDataSource(
                     }
                 } catch (e: java.io.FileNotFoundException) {
                     throw FileNotFoundException(destinationFile.absolutePath, e)
+                } catch (e: SecurityException) {
+                    throw FilePermissionDeniedException(destinationFile.absolutePath, e)
                 } catch (e: IOException) {
                     // 不完全な移動先ファイルを削除する
                     try {
@@ -262,7 +362,7 @@ internal class ImageFileDataSource(
                         // 削除失敗のログは残しても良いが、元の例外を優先してスローする
                         Log.w(
                             logTag,
-                            "移動先(永続)不完全ファイルの削除に失敗 (パス: ${destinationFile.absolutePath})。",
+                            "移動先の不完全ファイルの削除に失敗 (パス: ${destinationFile.absolutePath})。",
                             e
                         )
                     }
@@ -272,21 +372,19 @@ internal class ImageFileDataSource(
                     } else {
                         throw FileWriteException(destinationFile.absolutePath, e)
                     }
-                } catch (e: SecurityException) {
-                    throw FilePermissionDeniedException(destinationFile.absolutePath, e)
                 }
 
             }
         } catch (e: java.io.FileNotFoundException) {
             throw FileNotFoundException(sourceFile.absolutePath, e)
-        } catch (e: IOException) {
-            throw FileReadException(sourceFile.absolutePath, e)
         } catch (e: SecurityException) {
             throw FilePermissionDeniedException(sourceFile.absolutePath, e)
+        } catch (e: IOException) {
+            throw FileReadException(sourceFile.absolutePath, e)
         }
 
         // 移動元ファイル削除
-        val deleteFailureLogMessage = "元ファイル(キャッシュ)の削除に失敗 (パス: ${sourceFile.absolutePath})。"
+        val deleteFailureLogMessage = "元ファイルの削除に失敗 (パス: ${sourceFile.absolutePath})。"
         try {
             val isSuccess = sourceFile.delete()
             if (!isSuccess) Log.w(logTag, deleteFailureLogMessage)
@@ -298,20 +396,58 @@ internal class ImageFileDataSource(
     }
 
     /**
+     * 指定されたファイル名の画像をキャッシュディレクトリから削除する。
+
+     * このメソッドは内部でキャッシュディレクトリを指定して [deleteImageFile] を呼び出している。
+     * 処理内容、例外の詳細は [deleteImageFile]を参照。
+     *
+     * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
+     */
+    @Suppress("unused") //MEMO:将来対応用
+    fun deleteImageFileInCache(fileName: String) {
+        deleteImageFile(fileName, imageCacheDir)
+    }
+
+    /**
      * 指定されたファイル名の画像を永続ディレクトリから削除する。
+
+     * このメソッドは内部で永続ディレクトリを指定して [deleteImageFile] を呼び出している。
+     * 処理内容、例外の詳細は [deleteImageFile]を参照。
      *
+     * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
+     */
+    fun deleteImageFileInPermanent(fileName: String) {
+        deleteImageFile(fileName, imagePermanentDir)
+    }
+
+    /**
+     * 指定されたファイル名の画像をバックアップディレクトリから削除する。
+
+     * このメソッドは内部でバックアップディレクトリを指定して [deleteImageFile] を呼び出している。
+     * 処理内容、例外の詳細は [deleteImageFile]を参照。
      *
-     * @param fileName 削除する画像ファイル名 (拡張子付き)。
+     * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
+     */
+    @Suppress("unused") //MEMO:将来対応用
+    fun deleteImageFileInBackup(fileName: String) {
+        deleteImageFile(fileName, imageBackupDir)
+    }
+
+    /**
+     * 指定されたファイル名の画像ファイルを指定されたディレクトリから削除する。
+     *
+     * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
+     * @param targetDir 削除する画像ファイルが配置されているディレクトリ。
      * @throws InvalidFilePathException 指定されたファイル名の拡張子が無効の場合。
      * @throws FileNotFoundException 削除対象ファイルが見つからない場合。
+     * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
      * @throws FileDeleteException ファイルの削除に失敗した場合。
-     * @throws FilePermissionDeniedException ファイルアクセス権限がない場合。
      */
-    fun deleteImageFileFromPermanent(fileName: String) {
+    private fun deleteImageFile(fileName: String, targetDir: File) {
         if (!isImageFileExtension(fileName))
             throw InvalidFilePathException(fileName, invalidFilePathExceptionReason)
 
-        val file = File(imagePermanentDir, fileName)
+        val file = File(targetDir, fileName)
         try {
             if (file.exists()) {
                 val isSuccess = file.delete()
@@ -319,29 +455,177 @@ internal class ImageFileDataSource(
             } else {
                 throw FileNotFoundException(file.absolutePath)
             }
-        } catch (e: IOException) {
-            throw FileDeleteException(file.absolutePath, e)
         } catch (e: SecurityException) {
             throw FilePermissionDeniedException(file.absolutePath, e)
+        } catch (e: IOException) {
+            throw FileDeleteException(file.absolutePath, e)
         }
     }
 
-
-    // TODO:不要？
     /**
-     * 指定されたファイルからキャッシュディレクトリのルートからの相対パスを構築する。
+     * キャッシュディレクトリ直下および全てのサブディレクトリ内の全てのファイルを削除する。
      *
-     * APIレベル26以上が必要な `java.nio.file.Paths`、`java.nio.file.Path` 等 を使用するが、
-     * API desugaring により下位互換性を確保している。
-     *
-     * @param targetFile 相対パスを構築する対象のファイル。
-     * @return キャッシュルートからの相対パス。
+     * このメソッドは内部でキャッシュディレクトリを指定して [deleteAllFilesInDirectory] を呼び出している。
+     * 処理内容、例外の詳細は [deleteAllFilesInDirectory]を参照。
      */
-    @SuppressLint("NewApi")
-    private fun buildRelativePathToCache(targetFile: File): Path {
-        val baseCachePath = Paths.get(cacheDirPath) // キャッシュディレクトリのルートパス
-        val outputFilePath = targetFile.toPath() // 保存したファイルのPathオブジェクト
-        return baseCachePath.relativize(outputFilePath) // 例: "image/my_image.jpg"
+    fun deleteAllFilesInCache() {
+        deleteAllFilesInDirectory(imageCacheDir)
+    }
+
+    /**
+     * 永続ディレクトリ直下および全てのサブディレクトリ内の全てのファイルを削除する。
+     *
+     * 永続ディレクトリのサブディレクトリであるバックアップディレクトリも対象。
+     *
+     * このメソッドは内部で永続ディレクトリを指定して [deleteAllFilesInDirectory] を呼び出している。
+     * 処理内容、例外の詳細は [deleteAllFilesInDirectory]を参照。
+     */
+    private fun deleteAllFilesInPermanent() {
+        deleteAllFilesInDirectory(imagePermanentDir)
+    }
+
+    /**
+     * バックアップディレクトリ直下および全てのサブディレクトリ内の全てのファイルを削除する。
+     *
+     * このメソッドは内部でバックアップ(永続)ディレクトリを指定して [deleteAllFilesInDirectory] を呼び出している。
+     * 処理内容、例外の詳細は [deleteAllFilesInDirectory]を参照。
+     */
+    fun deleteAllFilesInBackup() {
+        deleteAllFilesInDirectory(imageBackupDir)
+    }
+
+    /**
+     * 全てのファイルを削除する。
+     *
+     * このメソッドは内部で [deleteAllFilesInCache] 、 [deleteAllFilesInPermanent] を呼び出している。
+     * 処理内容は [deleteAllFilesInDirectory]を参照。
+     *
+     * @throws DirectoryDeletionFailedException 一つ以上のファイルの削除に失敗した場合。
+     */
+    fun deleteAllFiles() {
+        val allFailures = mutableListOf<Pair<String, Exception>>()
+        try {
+            deleteAllFilesInCache()
+        } catch (e: FileNotFoundException) {
+            allFailures.add(Pair(imageCacheDir.absolutePath, e))
+        } catch (e: FilePermissionDeniedException) {
+            allFailures.add(Pair(imageCacheDir.absolutePath, e))
+        } catch (e: DirectoryDeletionFailedException) {
+            allFailures.addAll(e.individualFailures)
+        }
+
+        try {
+            deleteAllFilesInPermanent()
+        } catch (e: FileNotFoundException) {
+            allFailures.add(Pair(imagePermanentDir.absolutePath, e))
+        } catch (e: FilePermissionDeniedException) {
+            allFailures.add(Pair(imagePermanentDir.absolutePath, e))
+        } catch (e: DirectoryDeletionFailedException) {
+            allFailures.addAll(e.individualFailures)
+        }
+
+        if (allFailures.isNotEmpty())
+            throw DirectoryDeletionFailedException(individualFailures = allFailures)
+    }
+
+    /**
+     * 指定されたディレクトリ直下および全てのサブディレクトリ内の全てのファイルを削除する。
+     *
+     * このメソッドは再帰的に動作し、指定されたディレクトリ (`directory`) 及びその全ての
+     * サブディレクトリを探索し、見つかった全てのファイルを削除対象とする。
+     * サブディレクトリの構造自体は保持され、サブディレクトリが空になるだけで、サブディレクトリ自体は削除されない。
+     * 指定されたトップレベルの `directory` 自体も削除されない。
+     *
+     * 一つ以上のファイルの削除に失敗した場合、
+     * このメソッドは処理を継続し、削除可能なファイルは全て削除しようと試みる。
+     * 最終的に、一つでもファイルの削除に失敗すれば、
+     * 全ての失敗情報を含む [DirectoryDeletionFailedException] をスローする。
+     *
+     * @param directory ファイル削除の起点となるディレクトリ。
+     * @throws FileNotFoundException 指定されたディレクトリが存在しないか、ディレクトリではない場合。
+     * @throws FilePermissionDeniedException 指定されたディレクトリへのアクセス権限がない場合。
+     * @throws DirectoryDeletionFailedException 一つ以上のファイルの削除に失敗した場合。
+     */
+    // TODO:処理内容確認
+    private fun deleteAllFilesInDirectory(directory: File) {
+        // 1. ディレクトリ存在チェックと初期の権限チェック
+        try {
+            if (!directory.isDirectory) {
+                throw FileNotFoundException(directory.absolutePath)
+            }
+        } catch (e: SecurityException) {
+            // ディレクトリ自体の情報取得に関する権限エラー
+            throw FilePermissionDeniedException(directory.absolutePath, e)
+        }
+
+        // 2. 失敗した操作を記録するためのリストを初期化
+        val failures = mutableListOf<Pair<String, Exception>>()
+
+        // 3. ディレクトリ内のエントリを処理
+        val files = try {
+            directory.listFiles()
+        } catch (e: SecurityException) {
+            // listFiles() 自体の権限エラー -> これも DirectoryDeletionFailedException の一部として報告する
+            failures.add(
+                Pair(
+                    directory.absolutePath,
+                    FilePermissionDeniedException(directory.absolutePath, e)
+                )
+            )
+            // listFiles() が失敗した場合、これ以上処理できないので、収集したエラーで例外をスロー
+            throw DirectoryDeletionFailedException(directory.absolutePath, failures)
+        } catch (e: IOException) {
+            // listFiles() でのその他のIOエラー
+            failures.add(
+                Pair(
+                    directory.absolutePath,
+                    FileOperationException(directory.absolutePath, e)))
+            throw DirectoryDeletionFailedException(directory.absolutePath, failures)
+        }
+
+        files?.forEach { file ->
+            try {
+                if (file.isFile) {
+                    if (!file.delete()) {
+                        failures.add(
+                            Pair(file.absolutePath, FileDeleteException(file.absolutePath))
+                        )
+                    }
+                } else if (file.isDirectory) {
+                    try {
+                        // サブディレクトリの場合、再帰的に削除処理を呼び出す
+                        deleteAllFilesInDirectory(file)
+                    } catch (e: DirectoryDeletionFailedException) {
+                        // 再帰呼び出しで発生した DirectoryDeletionFailedException をキャッチし、
+                        // その中の個々の失敗を現在のリストに追加 (エラーの連鎖)
+                        failures.addAll(e.individualFailures)
+                    }
+                    // 注意: ここで DirectoryDeletionFailedException 以外の FileOperationException (FileNotFoundなど) を
+                    // キャッチして failures に追加することも検討できるが、
+                    // deleteAllFilesInDirectory の責務は「中身の全削除」なので、
+                    // サブディレクトリ自体が見つからないケースは listFiles の時点で処理されるか、
+                    // あるいは deleteAllFilesInDirectory の冒頭の isDirectory チェックで処理されるべき。
+                    // ここでは、サブディレクトリの「内容」削除時のエラーを集約することに主眼を置く。
+                }
+            } catch (e: FileDeleteException) {
+                // file.delete() が FileDeleteException をスローした場合 (もし FileDeleteException を直接スローする実装なら)
+                failures.add(Pair(file.absolutePath, e))
+            } catch (e: FilePermissionDeniedException) {
+                // file.delete() が FilePermissionDeniedException をスローした場合 (もし FilePermissionDeniedException を直接スローする実装なら)
+                failures.add(Pair(file.absolutePath, e))
+            } catch (e: SecurityException) {
+                // file.delete() などで発生する可能性のある SecurityException
+                failures.add(Pair(file.absolutePath, FilePermissionDeniedException(file.absolutePath, e)))
+            } catch (e: IOException) {
+                // file.delete() などで発生する可能性のあるその他の IOException
+                failures.add(Pair(file.absolutePath, FileDeleteException(file.absolutePath, e))) // FileDeleteException にラップ
+            }
+        }
+
+        // 4. 処理の最後に、失敗が一つでもあれば DirectoryDeletionFailedException をスロー
+        if (failures.isNotEmpty()) {
+            throw DirectoryDeletionFailedException(directory.absolutePath, failures)
+        }
     }
 
     /**

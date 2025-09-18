@@ -27,14 +27,14 @@ internal sealed class AllDiariesDeleteException(
     )
 
     /**
-     * 全ての永続的URI権限の解放に失敗した場合の例外。
+     * 全ての画像ファイルの削除に失敗した場合の例外。
      *
-     * @param cause 発生した根本的な原因となった [Throwable]。
+     * @param cause 発生した根本的な原因となった[Throwable]。
      */
-    class PersistableUriPermissionReleaseFailure(
+    class ImageFileDeleteFailure(
         cause: Throwable
     ) : AllDiariesDeleteException(
-        "全ての永続的URI権限の解放に失敗しました。",
+        "全ての画像ファイルの削除に失敗しました。",
         cause
     )
 }

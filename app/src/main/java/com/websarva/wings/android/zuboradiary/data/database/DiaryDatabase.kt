@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
 
+// TODO:引数名へんなのがあるので変更、トランザクション内でDaoを再度生成しているので改善
 // MEMO:テーブル構成変更手順
 //      https://qiita.com/kazuma_f/items/8c15e7087623e8f6706b
 /*@Database(entities =  {DiaryEntity.class, DiaryItemTitleSelectionHistoryItemEntity.class}, version = 4, exportSchema = true,
@@ -40,40 +41,32 @@ internal abstract class DiaryDatabase : RoomDatabase() {
     abstract fun createDiaryItemTitleSelectionHistoryDao(): DiaryItemTitleSelectionHistoryDao
 
     /**
-     * 日記データと日記項目タイトル選択履歴データをトランザクション内で保存する。
-     *
-     * 新しい日記を挿入し、選択履歴を更新後、古い選択履歴を削除する。
-     *
-     * @param diaryEntity 保存する日記データ。
-     * @param updateTitleList 更新する日記項目タイトル選択履歴データのリスト。
-     */
-    @Transaction
-    suspend fun saveDiary(
-        diaryEntity: DiaryEntity,
-        updateTitleList: List<DiaryItemTitleSelectionHistoryEntity>
-    ) {
-        createDiaryDao().insertDiary(diaryEntity)
-        createDiaryItemTitleSelectionHistoryDao().insertHistory(updateTitleList)
-        createDiaryItemTitleSelectionHistoryDao().deleteOldHistory()
-    }
-
-    /**
      * 保存する日記データと同じ日付の日記データを削除し、保存する日記データと日記項目タイトル選択履歴データをトランザクション内で保存する。
      *
      * まず保存する日記データと同じ日付の日記を削除し、その後保存する日記を挿入する。
-     * 選択履歴も更新し、古い選択履歴を削除する。
      *
      * @param createDiaryEntity 新しく保存する日記データ。
-     * @param updateTitleList 更新する日記項目タイトル選択履歴データのリスト。
      */
     @Transaction
     suspend fun deleteAndSaveDiary(
         createDiaryEntity: DiaryEntity,
-        updateTitleList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
         createDiaryDao().deleteDiary(createDiaryEntity.date)
         createDiaryDao().insertDiary(createDiaryEntity)
-        createDiaryItemTitleSelectionHistoryDao().insertHistory(updateTitleList)
+    }
+
+    /**
+     * 日記項目タイトル選択履歴データをトランザクション内で保存する。
+     *
+     * 選択履歴を更新し、その後、最新の50件を除く最終使用日時が古い順の履歴を削除する。
+     *
+     * @param historyList 更新する日記項目タイトル選択履歴データのリスト。
+     */
+    @Transaction
+    suspend fun updateDiaryItemTitleSelectionHistory(
+        historyList: List<DiaryItemTitleSelectionHistoryEntity>
+    ) {
+        createDiaryItemTitleSelectionHistoryDao().insertHistory(historyList)
         createDiaryItemTitleSelectionHistoryDao().deleteOldHistory()
     }
 

@@ -1,19 +1,22 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthListItem
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
 
 @JvmName("toUiModelStandard")
-internal fun DiaryYearMonthList<DiaryDayListItem.Standard>.toUiModel(
+internal suspend fun DiaryYearMonthList<DiaryDayListItem.Standard>.toUiModel(
+    processFileNameToPath: suspend (ImageFileName?) -> ImageFilePathUi
 ): DiaryYearMonthListUi<DiaryDayListItemUi.Standard> {
     return DiaryYearMonthListUi(
         itemList.map {
             when (it) {
-                is DiaryYearMonthListItem.Diary -> it.toUiModel()
+                is DiaryYearMonthListItem.Diary -> it.toUiModel(processFileNameToPath)
                 is DiaryYearMonthListItem.NoDiaryMessage -> DiaryYearMonthListItemUi.NoDiaryMessage()
                 is DiaryYearMonthListItem.ProgressIndicator -> DiaryYearMonthListItemUi.ProgressIndicator()
             }

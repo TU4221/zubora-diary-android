@@ -27,7 +27,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         private const val SAVED_CONDITION_STATE_KEY = "condition"
         private const val SAVED_TITLE_STATE_KEY = "title"
         private const val SAVED_NUM_VISIBLE_ITEMS_STATE_KEY = "numVisibleItems"
-        private const val SAVED_IMAGE_URI_STATE_KEY = "imageUri"
+        private const val SAVED_IMAGE_FILE_NAME_STATE_KEY = "imageFileName"
         private const val SAVED_LOG_STATE_KEY = "log"
     }
 
@@ -61,9 +61,9 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
     override val items =
         Array(MAX_ITEMS) { i -> DiaryItemStateFlow(scope, handle, i + 1) }
 
-    override val imageUri =
+    override val imageFileName =
         MutableStateFlow(
-            handle[SAVED_IMAGE_URI_STATE_KEY] ?: initialImageUri
+            handle[SAVED_IMAGE_FILE_NAME_STATE_KEY] ?: initialImageFileName
         )
 
     override val log =
@@ -93,9 +93,6 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         numVisibleItems.onEach {
             handle[SAVED_NUM_VISIBLE_ITEMS_STATE_KEY] = it
         }.launchIn(scope)
-        imageUri.onEach {
-            handle[SAVED_IMAGE_URI_STATE_KEY] = it
-        }.launchIn(scope)
         log.onEach {
             handle[SAVED_LOG_STATE_KEY] = it
         }.launchIn(scope)
@@ -122,7 +119,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             items[3].comment.value?.trim(),
             items[4].title.value?.trim(),
             items[4].comment.value?.trim(),
-            imageUri.value?.toString()
+            imageFileName.value
             )
     }
 

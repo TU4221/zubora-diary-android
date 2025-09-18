@@ -1,15 +1,14 @@
 package com.websarva.wings.android.zuboradiary.di.domain
 
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultsExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CreateDiaryImageFileUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.IsImageUriUsedInDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewestDiaryUseCase
@@ -24,7 +23,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewWordSe
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearchResultListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshWordSearchResultListUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ReleaseDiaryImageUriPermissionUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryLoadConfirmationUseCase
@@ -32,9 +30,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequest
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestWeatherInfoConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.UpdateDiaryListFooterUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.UpdateWordSearchResultListFooterUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.file.SaveImageFileUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.ReleasePersistableUriPermissionUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.uri.TakePersistableUriPermissionUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -80,12 +75,6 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideCreateDiaryImageFileUseCase(
-        saveImageFileUseCase: SaveImageFileUseCase
-    ): CreateDiaryImageFileUseCase = CreateDiaryImageFileUseCase(saveImageFileUseCase)
-
-    @Singleton
-    @Provides
     fun provideDeleteDiaryItemTitleSelectionHistoryUseCase(
         diaryRepository: DiaryRepository
     ): DeleteDiaryItemTitleSelectionHistoryUseCase =
@@ -95,21 +84,15 @@ internal object DiaryUseCaseModule {
     @Provides
     fun provideDeleteDiaryUseCase(
         diaryRepository: DiaryRepository,
-        releaseDiaryImageUriPermissionUseCase: ReleaseDiaryImageUriPermissionUseCase
+        fileRepository: FileRepository
     ): DeleteDiaryUseCase =
-        DeleteDiaryUseCase(diaryRepository, releaseDiaryImageUriPermissionUseCase)
+        DeleteDiaryUseCase(diaryRepository, fileRepository)
 
     @Singleton
     @Provides
     fun provideDoesDiaryExistUseCase(
         diaryRepository: DiaryRepository
     ): DoesDiaryExistUseCase = DoesDiaryExistUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
-    fun provideIsImageUriUsedInDiariesUseCase(
-        diaryRepository: DiaryRepository
-    ): IsImageUriUsedInDiariesUseCase = IsImageUriUsedInDiariesUseCase(diaryRepository)
 
     @Singleton
     @Provides
@@ -218,29 +201,10 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideReleaseDiaryImageUriPermissionUseCase(
-        isImageUriUsedInDiariesUseCase: IsImageUriUsedInDiariesUseCase,
-        releasePersistableUriPermissionUseCase: ReleasePersistableUriPermissionUseCase
-    ): ReleaseDiaryImageUriPermissionUseCase =
-        ReleaseDiaryImageUriPermissionUseCase(
-            isImageUriUsedInDiariesUseCase,
-            releasePersistableUriPermissionUseCase
-        )
-
-    @Singleton
-    @Provides
     fun provideSaveDiaryUseCase(
         diaryRepository: DiaryRepository,
-        doesDiaryExistUseCase: DoesDiaryExistUseCase,
-        takePersistableUriPermissionUseCase: TakePersistableUriPermissionUseCase,
-        releaseDiaryImageUriPermissionUseCase: ReleaseDiaryImageUriPermissionUseCase
-    ): SaveDiaryUseCase =
-        SaveDiaryUseCase(
-            diaryRepository,
-            doesDiaryExistUseCase,
-            takePersistableUriPermissionUseCase,
-            releaseDiaryImageUriPermissionUseCase
-        )
+        fileRepository: FileRepository
+    ): SaveDiaryUseCase = SaveDiaryUseCase(diaryRepository, fileRepository)
 
     @Singleton
     @Provides

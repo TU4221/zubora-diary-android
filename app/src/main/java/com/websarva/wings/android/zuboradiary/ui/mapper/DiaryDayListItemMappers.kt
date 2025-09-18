@@ -1,15 +1,19 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
-import android.net.Uri
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 
 @JvmName("toUiModelStandard")
-internal fun DiaryDayListItem.Standard.toUiModel(): DiaryDayListItemUi.Standard {
+internal suspend fun DiaryDayListItem.Standard.toUiModel(
+    processFileNameToPath: suspend (ImageFileName?) -> ImageFilePathUi
+): DiaryDayListItemUi.Standard {
     return DiaryDayListItemUi.Standard(
         date,
         title,
-        imageUriString?.let { Uri.parse(it) }
+        imageFileName,
+        processFileNameToPath(imageFileName)
     )
 }
 
@@ -30,7 +34,7 @@ internal fun DiaryDayListItemUi.Standard.toDomainModel(): DiaryDayListItem.Stand
     return DiaryDayListItem.Standard(
         date,
         title,
-        imageUri?.let { toString() }
+        imageFileName
     )
 }
 

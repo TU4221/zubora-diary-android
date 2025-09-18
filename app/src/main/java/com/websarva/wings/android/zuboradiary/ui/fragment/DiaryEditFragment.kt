@@ -24,6 +24,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
@@ -52,6 +53,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinnerAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.WeatherSpinnerAdapter
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -736,13 +738,19 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
     private fun setUpImageInputField() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.imageUri
-                .collectLatest { value: Uri? ->
+            mainViewModel.imageFileName
+                .collectLatest { value: ImageFileName? ->
+                    mainViewModel.onDiaryImageFileNameChanged(value)
+                }
+        }
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.imageFilePath
+                .collectLatest { value: ImageFilePathUi ->
                     // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
                     DiaryImageConfigurator()
                         .setUpImageOnDiary(
                             binding.imageAttachedImage,
-                            value,
+                            null, // TODO:ライブラリのVerをあげてからコイルを実装し、その後対応。
                             themeColor
                         )
                 }

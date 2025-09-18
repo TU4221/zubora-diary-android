@@ -40,17 +40,6 @@ internal interface DiaryRepository {
     suspend fun existsDiary(date: LocalDate): Boolean
 
     /**
-     * 指定された画像のURI文字列が、いずれかの日記データで使用されているかどうかを確認する。
-     *
-     * 画像が他の日記で参照されているかをチェックし、安全に削除できるかを判断するために使用される。
-     *
-     * @param uriString 確認対象の画像のURI文字列。
-     * @return 指定されたURIが使用されていれば `true`、使用されていなければ `false`。
-     * @throws DataStorageException 画像URIの使用状況確認処理に失敗した場合。
-     */
-    suspend fun existsImageUri(uriString: String): Boolean
-
-    /**
      * 指定された日付の日記データを読み込む。
      *
      * @param date 読み込み対象の日付。
@@ -100,31 +89,20 @@ internal interface DiaryRepository {
     /**
      * 新しい日記データを保存する。
      *
-     * 同時に、日記アイテムのタイトル選択履歴も更新する。
-     *
      * @param diary 保存する日記データ。
-     * @param historyItemList 保存または更新する日記アイテムのタイトル選択履歴リスト。
      * @throws DataStorageException 日記データの保存に失敗した場合。
      */
-    suspend fun saveDiary(
-        diary: Diary,
-        historyItemList: List<DiaryItemTitleSelectionHistory>
-    )
+    suspend fun saveDiary(diary: Diary)
 
     /**
      * 保存する日記データと同じ日付の日記データを削除し、保存する日記データを保存する。
      *
      * この操作はトランザクションで処理されることを期待。
-     * 同時に、日記アイテムのタイトル選択履歴も更新する。
      *
      * @param diary 保存する日記データ。
-     * @param historyItemList 保存または更新する日記アイテムのタイトル選択履歴リスト。
      * @throws DataStorageException 日記の削除または新しい日記の保存に失敗した場合。
      */
-    suspend fun deleteAndSaveDiary(
-        diary: Diary,
-        historyItemList: List<DiaryItemTitleSelectionHistory>
-    )
+    suspend fun deleteAndSaveDiary(diary: Diary)
 
     /**
      * 指定された日付の日記データを削除する。
@@ -185,6 +163,16 @@ internal interface DiaryRepository {
     fun loadDiaryItemTitleSelectionHistoryList(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryListItem>>
+
+    /**
+     * 日記アイテムのタイトル選択履歴を更新する。
+     *
+     * @param historyItemList 更新する日記アイテムのタイトル選択履歴リスト。
+     * @throws DataStorageException 履歴の更新に失敗した場合。
+     */
+    suspend fun updateDiaryItemTitleSelectionHistory(
+        historyItemList: List<DiaryItemTitleSelectionHistory>
+    )
 
     /**
      * 指定されたタイトルの日記アイテム選択履歴を削除する。

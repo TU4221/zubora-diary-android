@@ -39,6 +39,14 @@ internal sealed class SettingsAppMessage(
         private fun readResolve(): Any = AllDiaryDeleteFailure
     }
 
+    data object AllDiaryImagesDeleteFailure :  SettingsAppMessage(
+        R.string.dialog_app_message_title_access_error,
+        R.string.dialog_settings_app_message_all_diary_images_failure
+    ) {
+        // デシリアライズ時のシングルトン性を維持
+        private fun readResolve(): Any = AllDiaryDeleteFailure
+    }
+
     data object AllSettingsInitializationFailure :  SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_settings_app_message_all_settings_initialization_failure

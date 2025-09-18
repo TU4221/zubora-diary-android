@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.file.BuildImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.message.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -23,9 +24,11 @@ import javax.inject.Inject
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
-    private val loadDiaryUseCase: LoadDiaryUseCase
+    private val loadDiaryUseCase: LoadDiaryUseCase,
+    buildImageFilePathUseCase: BuildImageFilePathUseCase
 ) : BaseDiaryShowViewModel<CalendarEvent, CalendarAppMessage, CalendarState>(
-    CalendarState.Idle
+    CalendarState.Idle,
+    buildImageFilePathUseCase
 ) {
 
     val logTag = createLogTag()

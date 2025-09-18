@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -24,6 +23,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBinding
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.ui.theme.CalendarThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -34,6 +34,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpd
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -536,16 +537,23 @@ class CalendarFragment :
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
-            //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
-            //      クリアという意味合いでデフォルト画像をセットする。
-            mainViewModel.imageUri
-                .collectLatest { value: Uri? ->
+            mainViewModel.imageFileName
+                .collectLatest { value: ImageFileName? ->
+                    mainViewModel.onDiaryImageFileNameChanged(value)
+                }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.imageFilePath
+                .collectLatest { value: ImageFilePathUi ->
+                    // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
+                    //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
+                    //      クリアという意味合いでデフォルト画像をセットする。
                     DiaryImageUpdater()
                         .update(
                             themeColor,
                             binding.includeDiaryShow.imageAttachedImage,
-                            value
+                            null, // TODO:ライブラリのVerをあげてからコイルを実装し、その後対応。
                         )
                 }
         }

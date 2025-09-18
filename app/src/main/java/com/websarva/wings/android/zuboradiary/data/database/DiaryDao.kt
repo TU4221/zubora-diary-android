@@ -42,15 +42,6 @@ internal interface DiaryDao {
     suspend fun existsDiary(date: String): Boolean
 
     /**
-     * 指定された画像URIを持つ日記が存在するかどうかを確認する。
-     *
-     * @param uriString 確認する画像のURI文字列。
-     * @return 画像URIを持つ日記が存在すればtrue、しなければfalse。
-     */
-    @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE image_uri = :uriString)")
-    suspend fun existsImageUri(uriString: String): Boolean
-
-    /**
      * 指定された日付の日記エンティティを取得する。
      *
      * @param date 取得する日記の日付。
@@ -82,7 +73,7 @@ internal interface DiaryDao {
      * @param offset 取得を開始するオフセット位置。
      * @return 日記リストアイテムデータのリスト。対象の日記が存在しない場合は空のリストを返す。
      */
-    @Query("SELECT date, title, image_uri FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
+    @Query("SELECT date, title, image_file_name FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int
@@ -96,7 +87,7 @@ internal interface DiaryDao {
      * @param startDate この日付以前の日記を取得する (この日付を含む)。
      * @return 日記リストアイテムデータのリスト。対象の日記が存在しない場合は空のリストを返す。
      */
-    @Query("SELECT date, title, image_uri FROM diaries WHERE date <= :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
+    @Query("SELECT date, title, image_file_name FROM diaries WHERE date <= :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int,

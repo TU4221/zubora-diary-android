@@ -40,6 +40,8 @@ hiltWorker = "1.2.0"
 desugar = "2.1.5"
 calendar = "2.5.0"
 
+coil = "3.3.0"
+
 aboutLibraries = "11.6.3"
 
 leakcanaryAndroid = "2.14"
@@ -136,6 +138,11 @@ androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref =
 desugar-jdk-libs = { module = "com.android.tools:desugar_jdk_libs", version.ref = "desugar" }
 kizitonwose-calendar-view = { module = "com.kizitonwose.calendar:view", version.ref = "calendar" }
 kizitonwose-calendar-compose = { module = "com.kizitonwose.calendar:compose", version.ref = "calendar" }
+
+# Coil 3 (画像表示)
+# https://coil-kt.github.io/coil/
+coil = { module = "io.coil-kt.coil3:coil", version.ref = "coil" }
+
 
 # AboutLibraries
 # https://github.com/mikepenz/AboutLibraries

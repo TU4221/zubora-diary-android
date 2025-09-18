@@ -1,9 +1,10 @@
 package com.websarva.wings.android.zuboradiary.di.domain
 
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
-import com.websarva.wings.android.zuboradiary.domain.usecase.file.DeleteFileUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.file.ClearCacheFileUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.file.BuildImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.file.MoveFileToPermanentUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.file.SaveImageFileUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.file.CacheDiaryImageUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,9 +25,15 @@ internal object FileUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideDeleteFileUseCase(
+    fun provideBuildImageFilePathUseCase(
         fileRepository: FileRepository
-    ): DeleteFileUseCase = DeleteFileUseCase(fileRepository)
+    ): BuildImageFilePathUseCase = BuildImageFilePathUseCase(fileRepository)
+
+    @Singleton
+    @Provides
+    fun provideClearCacheFileUseCase(
+        fileRepository: FileRepository
+    ): ClearCacheFileUseCase = ClearCacheFileUseCase(fileRepository)
 
     @Singleton
     @Provides
@@ -36,7 +43,7 @@ internal object FileUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideSaveImageFileUseCase(
+    fun provideCacheDiaryImageUseCase(
         fileRepository: FileRepository
-    ): SaveImageFileUseCase = SaveImageFileUseCase(fileRepository)
+    ): CacheDiaryImageUseCase = CacheDiaryImageUseCase(fileRepository)
 }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.file.BuildImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -26,9 +27,11 @@ import javax.inject.Inject
 internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
     private val loadDiaryUseCase: LoadDiaryUseCase,
-    private val deleteDiaryUseCase: DeleteDiaryUseCase
+    private val deleteDiaryUseCase: DeleteDiaryUseCase,
+    buildImageFilePathUseCase: BuildImageFilePathUseCase
 ) : BaseDiaryShowViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>(
-    DiaryShowState.Idle
+    DiaryShowState.Idle,
+    buildImageFilePathUseCase
 ) {
 
     companion object {
@@ -107,9 +110,9 @@ internal class DiaryShowViewModel @Inject constructor(
         if (uiState.value != DiaryShowState.LoadSuccess) return
 
         val date = diaryStateFlow.date.requireValue()
-        val imageUri = diaryStateFlow.imageUri.value
+        val imageFileName = diaryStateFlow.imageFileName.value
         viewModelScope.launch {
-            val parameters = DiaryDeleteParameters(date, imageUri)
+            val parameters = DiaryDeleteParameters(date, imageFileName)
             emitUiEvent(
                 DiaryShowEvent.NavigateDiaryDeleteDialog(parameters)
             )
@@ -183,10 +186,10 @@ internal class DiaryShowViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         val date = diaryStateFlow.date.requireValue()
-        val imageUriString  = diaryStateFlow.imageUri.value?.toString()
+        val imageFileName  = diaryStateFlow.imageFileName.value
 
         updateUiState(DiaryShowState.Deleting)
-        when (val result = deleteDiaryUseCase(date, imageUriString)) {
+        when (val result = deleteDiaryUseCase(date, imageFileName)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 emitUiEvent(

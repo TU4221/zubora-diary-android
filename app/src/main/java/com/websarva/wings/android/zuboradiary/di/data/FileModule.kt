@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.di.data
 
 import android.content.Context
-import com.websarva.wings.android.zuboradiary.data.uri.UriPermissionDataSource
+import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -10,7 +10,7 @@ import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
 /**
- * URI権限管理関連の依存性を提供するHiltモジュール。
+ * ファイル操作関連の依存性を提供するHiltモジュール。
  *
  * このモジュールは、[SingletonComponent] にインストールされ、
  * アプリケーション全体で共有されるシングルトンインスタンスを提供する。
@@ -19,11 +19,16 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal object UriModule {
+internal object FileModule {
 
     @Singleton
     @Provides
-    fun provideUriPermissionDataSource(
+    fun provideImageFileDataSource(
         @ApplicationContext context: Context
-    ):  UriPermissionDataSource = UriPermissionDataSource(context.contentResolver)
+    ):  ImageFileDataSource =
+        ImageFileDataSource(
+            context.contentResolver,
+            context.cacheDir,
+            context.filesDir
+        )
 }

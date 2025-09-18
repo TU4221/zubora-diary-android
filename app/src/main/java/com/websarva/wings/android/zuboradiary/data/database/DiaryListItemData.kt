@@ -9,11 +9,11 @@ import androidx.room.ColumnInfo
  *
  * @property date 日記の日付。
  * @property title 日記のタイトル。
- * @property imageUriString 日記に添付した画像のURI文字列 (オプショナル)。
+ * @property imageFileName 日記に添付した画像ファイル名。未添付の場合 `null`。
  */
 internal data class DiaryListItemData(
     var date: String,
     var title: String,
-    @ColumnInfo(name = "image_uri")
-    var imageUriString: String?,
+    @ColumnInfo(name = "image_file_name")
+    val imageFileName: String?
 )

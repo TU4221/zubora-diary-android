@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.repository.exception
 
+// TODO:ResourceNotFoundに変更
 /**
  * 要求されたデータが見つからなかった場合の例外。
  *

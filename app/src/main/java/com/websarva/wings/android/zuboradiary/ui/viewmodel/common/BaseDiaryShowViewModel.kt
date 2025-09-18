@@ -1,17 +1,24 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.file.BuildImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 
 internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : UiState> (
-    initialViewUiState: S
+    initialViewUiState: S,
+    protected val buildImageFilePathUseCase: BuildImageFilePathUseCase
 ) : BaseViewModel<E, M, S>(
     initialViewUiState
 ) {
@@ -55,10 +62,32 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
         get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).comment.asStateFlow()
     val item5Comment
         get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).comment.asStateFlow()
-    val imageUri
-        get() = diaryStateFlow.imageUri.asStateFlow()
+    val imageFileName
+        get() = diaryStateFlow.imageFileName.asStateFlow()
+    val imageFilePath
+        get() = diaryStateFlow.imageFilePath.asStateFlow()
     val log
         get() = diaryStateFlow.log.asStateFlow()
+
+    fun onDiaryImageFileNameChanged(fileName: ImageFileName?) {
+        if (fileName == null) {
+            updateImageFilePath(ImageFilePathUi.NoImage)
+            return
+        }
+
+        viewModelScope.launch {
+            val imageFilePathUi =
+                when (val result = buildImageFilePathUseCase(fileName)) {
+                    is UseCaseResult.Success -> {
+                        ImageFilePathUi.Valid(result.value)
+                    }
+                    is UseCaseResult.Failure -> {
+                        ImageFilePathUi.Invalid
+                    }
+                }
+            updateImageFilePath(imageFilePathUi)
+        }
+    }
 
     protected fun initializeDiary() {
         diaryStateFlow.initialize()
@@ -68,5 +97,9 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
 
     protected fun updateDiary(diary: Diary) {
         diaryStateFlow.update(diary)
+    }
+
+    private fun updateImageFilePath(imageFilePath: ImageFilePathUi) {
+        diaryStateFlow.imageFilePath.value = imageFilePath
     }
 }
