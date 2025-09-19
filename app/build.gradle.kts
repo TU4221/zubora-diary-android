@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.aboutLibraries
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -37,7 +39,7 @@ android {
 
     defaultConfig {
         applicationId = "com.websarva.wings.android.zuboradiary"
-        minSdk = 21
+        minSdk = 24
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -67,9 +69,11 @@ android {
         viewBinding = true
         compose = true
     }
+}
 
-    kotlinOptions {
-        jvmTarget = "17"
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
     }
 }
 
@@ -191,7 +195,7 @@ dependencies {
     implementation(libs.kizitonwose.calendar.compose)
 
     // Coil 3 (For Android Views) (画像表示)
-    //implementation(libs.coil)
+    implementation(libs.coil)
 
     // AboutLibraries
     // https://github.com/mikepenz/AboutLibraries
@@ -214,5 +218,7 @@ room {
 
 // AboutLibraries Libraries手動追加
 aboutLibraries {
-    configPath = "$projectDir/src/main/assets/about_libraries"
+    collect {
+        configPath.set(layout.projectDirectory.dir("src/main/assets/about_libraries"))
+    }
 }
