@@ -35,12 +35,12 @@ plugins {
 
 android {
     namespace = "com.websarva.wings.android.zuboradiary"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.websarva.wings.android.zuboradiary"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
