@@ -10,8 +10,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
+import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
+import com.mikepenz.aboutlibraries.ui.compose.chipColors
+import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
-import com.mikepenz.aboutlibraries.ui.compose.m3.LibraryDefaults
 import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
 
 class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<FragmentOpenSourceLicensesBinding>() {
@@ -36,6 +39,7 @@ class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<Fragm
             }
     }
 
+    // TODO:VerUpによる仮修正
     private fun setUpAboutLibraries() {
         binding.composeViewAboutLibraries
             .apply {
@@ -43,9 +47,33 @@ class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<Fragm
                     ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
                 )
                 setContent {
+                    // rememberLibraries を使ってライブラリ情報をロード
+                    val libraries = rememberLibraries()
+
+                    // 新しい LibrariesContainer のシグネチャに合わせて修正
                     LibrariesContainer(
+                        libraries = libraries.value, // Libs オブジェクトを渡す
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(16.dp),
+                        colors = LibraryDefaults.libraryColors(
+                            backgroundColor = Color(themeColor.getSecondaryContainerColor(resources)),
+                            contentColor = Color(themeColor.getPrimaryColor(resources)),
+                            licenseChipColors = LibraryDefaults.chipColors(),
+                            dialogConfirmButtonColor = Color(themeColor.getPrimaryColor(resources))
+                        ),
+                        // itemContentPadding と itemSpacing は padding や dimensions パラメータに統合されたか、
+                        // LibraryDefaults 内で設定するようになった可能性があります。
+                        // LibraryDefaults.libraryPadding() や LibraryDefaults.libraryDimensions() を確認してください。
+                        // もしこれらの引数が直接ない場合は、一旦削除してデフォルトの挙動を確認するか、
+                        // ライブラリのドキュメントで新しい指定方法を確認してください。
+                        // 例として、LibraryDefaults を使った padding の設定例 (実際のAPIと異なる場合があります)
+                        // padding = LibraryDefaults.libraryPadding(content = LibraryDefaults.ContentPadding),
+                        // dimensions = LibraryDefaults.libraryDimensions(itemSpacing = 8.dp)
+                    )
+
+                    /*LibrariesContainer(
+                        modifier = Modifier.fillMaxSize(), //
+                        contentPadding = PaddingValues(16.dp),//
                         colors = LibraryDefaults.libraryColors(
                             backgroundColor = Color(themeColor.getSecondaryContainerColor(resources)),
                             badgeBackgroundColor = Color(themeColor.getPrimaryColor(resources)),
@@ -53,7 +81,7 @@ class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<Fragm
                         ),
                         itemContentPadding = LibraryDefaults.ContentPadding,
                         itemSpacing = 8.dp
-                    )
+                    )*/
                 }
             }
     }
