@@ -109,6 +109,7 @@ internal class DiaryDayListAdapter
             val date = item.date
             val context = binding.root.context
             val strDayOfWeek = date.dayOfWeek.toDiaryListDayOfWeekString(context)
+            val imageFilePath = item.imageFilePath
             binding.includeDay.textDayOfWeek.text = strDayOfWeek
             binding.includeDay.textDayOfMonth.text =
                 NumberFormat.getInstance().format(date.dayOfMonth)
@@ -116,7 +117,7 @@ internal class DiaryDayListAdapter
             DiaryImageConfigurator()
                 .setUpImageOnDiaryList(
                     binding.imageAttachedImage,
-                    null, // TODO:ライブラリのVerをあげてからコイルを実装し、その後対応。
+                    imageFilePath,
                     themeColor
                 )
 

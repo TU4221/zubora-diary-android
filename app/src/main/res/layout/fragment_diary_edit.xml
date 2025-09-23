@@ -354,8 +354,8 @@
                                 android:contentDescription="@string/fragment_diary_edit_attached_image_attachment"
                                 android:scaleType="fitCenter"
                                 android:adjustViewBounds="true"
-                                android:src="@drawable/diary_edit_image_ic_photo_library_24px"
                                 android:onClick="@{() -> viewModel.onAttachedImageClick()}"
+                                tools:src="@drawable/ic_photo_library_24px"
                                 tools:tint="?attr/colorOnSurfaceVariant" />
 
                         </FrameLayout>

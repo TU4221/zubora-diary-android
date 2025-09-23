@@ -3,10 +3,10 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
@@ -52,11 +52,11 @@ internal open class DiaryStateFlow {
     protected open val items: Array<out DiaryItemStateFlow> =
         Array(MAX_ITEMS) { i -> DiaryItemStateFlow(i + 1) }
 
-    protected val initialImageFileName = initialDiary.imageFileName
+    protected val initialImageFileName = initialDiary.imageFileName?.toUiModel()
     open val imageFileName = MutableStateFlow(initialImageFileName)
 
-    private val initialImageFilePath = ImageFilePathUi.NoImage
-    val imageFilePath = MutableStateFlow<ImageFilePathUi>(initialImageFilePath)
+    private val initialImageFilePath: ImageFilePathUi? = null
+    val imageFilePath = MutableStateFlow(initialImageFilePath)
 
     protected val initialLog = null // MEMO:Logは保存記録の意味合となるため日記新規作成時を考慮してnullとする。
     open val log =
@@ -107,7 +107,7 @@ internal open class DiaryStateFlow {
             }
             updateNumVisibleItems(numVisibleItems)
 
-            updateImageFileName(imageFileName)
+            updateImageFileName(imageFileName?.toUiModel())
             updateLog(log)
         }
     }
@@ -160,7 +160,7 @@ internal open class DiaryStateFlow {
         this.numVisibleItems.value = count
     }
 
-    private fun updateImageFileName(imageFileName: ImageFileName?) {
+    private fun updateImageFileName(imageFileName: ImageFileNameUi?) {
         this.imageFileName.value = imageFileName
     }
 

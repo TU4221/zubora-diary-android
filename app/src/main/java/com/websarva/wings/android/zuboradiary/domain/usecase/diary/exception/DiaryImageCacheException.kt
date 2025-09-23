@@ -1,7 +1,7 @@
-package com.websarva.wings.android.zuboradiary.domain.usecase.file.exception
+package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.usecase.file.CacheDiaryImageUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CacheDiaryImageUseCase
 
 /**
  * [CacheDiaryImageUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。

@@ -1,66 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- MEMO:親タグのFrameLayoutにpadding属性を設定するのではなく、子タグにmargin属性を設定する理由は、
-              スワイプ時にViewの端が途切れずに画面外に出てくような動きを表現するため。 -->
-    <include
-        layout="@layout/row_left_swipe_delete_button_background"
-        android:id="@+id/include_background"
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginHorizontal="@dimen/row_diary_day_list_layout_margin_horizontal_between_items"
-        android:layout_marginTop="@dimen/row_diary_day_list_layout_margin_vertical_between_items" />
+        android:layout_height="wrap_content">
 
-    <LinearLayout
-        style="@style/DiaryDayListBackgroundLayoutStyle"
-        android:id="@+id/liner_layout_foreground"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="@dimen/row_diary_day_list_layout_margin_horizontal_between_items"
-        android:layout_marginTop="@dimen/row_diary_day_list_layout_margin_vertical_between_items"
-        android:minHeight="@dimen/row_diary_day_list_height"
-        android:orientation="horizontal"
-        android:padding="8dp">
-
+        <!-- MEMO:親タグのFrameLayoutにpadding属性を設定するのではなく、子タグにmargin属性を設定する理由は、
+                  スワイプ時にViewの端が途切れずに画面外に出てくような動きを表現するため。 -->
         <include
-            layout="@layout/layout_diary_list_item_day"
-            android:id="@+id/include_day"
-            android:layout_width="0dp"
+            layout="@layout/row_left_swipe_delete_button_background"
+            android:id="@+id/include_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/row_diary_day_list_layout_margin_horizontal_between_items"
+            android:layout_marginTop="@dimen/row_diary_day_list_layout_margin_vertical_between_items" />
+
+        <LinearLayout
+            style="@style/DiaryDayListBackgroundLayoutStyle"
+            android:id="@+id/liner_layout_foreground"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"/>
+            android:layout_marginHorizontal="@dimen/row_diary_day_list_layout_margin_horizontal_between_items"
+            android:layout_marginTop="@dimen/row_diary_day_list_layout_margin_vertical_between_items"
+            android:minHeight="@dimen/row_diary_day_list_height"
+            android:orientation="horizontal"
+            android:padding="8dp">
 
-        <TextView
-            style="@style/DiaryDayListTextViewStyle"
-            android:id="@+id/text_title"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="2"
-            android:layout_gravity="center_vertical"
-            android:gravity="center_vertical"
-            android:hint="@string/row_diary_day_list_title_hint"
-            android:textAppearance="@style/DiaryListDayTextAppearance"
-            android:textSize="20sp"
-            android:maxLines="1"
-            android:ellipsize="end" />
+            <include
+                layout="@layout/layout_diary_list_item_day"
+                android:id="@+id/include_day"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
 
-        <ImageView
-            style="@style/DiaryDayListImageViewStyle"
-            android:id="@+id/image_attached_image"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/row_diary_day_list_image_height"
-            android:layout_weight="1"
-            android:layout_gravity="center_vertical"
-            android:foregroundGravity="center_vertical"
-            android:scaleType="fitXY"
-            android:contentDescription="@string/row_diary_day_list_image_description"
-            android:src="@drawable/ic_image_24px"
-            tools:tint="?attr/colorOnSecondaryContainer"/>
+            <TextView
+                style="@style/DiaryDayListTextViewStyle"
+                android:id="@+id/text_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:hint="@string/row_diary_day_list_title_hint"
+                android:textAppearance="@style/DiaryListDayTextAppearance"
+                android:textSize="20sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
 
-    </LinearLayout>
+            <ImageView
+                style="@style/DiaryDayListImageViewStyle"
+                android:id="@+id/image_attached_image"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/row_diary_day_list_image_height"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:foregroundGravity="center_vertical"
+                android:scaleType="fitXY"
+                android:contentDescription="@string/row_diary_day_list_image_description"
+                tools:src="@drawable/ic_image_24px"
+                tools:tint="?attr/colorOnSecondaryContainer" />
+
+        </LinearLayout>
 
 
-</FrameLayout>
+    </FrameLayout>
+</layout>
 

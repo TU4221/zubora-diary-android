@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonth
 
 @JvmName("toUiModelStandard")
 internal suspend fun DiaryYearMonthListItem.Diary<DiaryDayListItem.Standard>.toUiModel(
-    processFileNameToPath: suspend (ImageFileName?) -> ImageFilePathUi
+    processFileNameToPath: suspend (ImageFileName?) -> ImageFilePathUi?
 ): DiaryYearMonthListItemUi.Diary<DiaryDayListItemUi.Standard> {
     return DiaryYearMonthListItemUi.Diary(
         yearMonth,

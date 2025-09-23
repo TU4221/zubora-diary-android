@@ -2,10 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.file.BuildImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
@@ -18,7 +19,7 @@ import java.time.LocalDate
 
 internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : UiState> (
     initialViewUiState: S,
-    protected val buildImageFilePathUseCase: BuildImageFilePathUseCase
+    protected val buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
 ) : BaseViewModel<E, M, S>(
     initialViewUiState
 ) {
@@ -69,23 +70,9 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
     val log
         get() = diaryStateFlow.log.asStateFlow()
 
-    fun onDiaryImageFileNameChanged(fileName: ImageFileName?) {
-        if (fileName == null) {
-            updateImageFilePath(ImageFilePathUi.NoImage)
-            return
-        }
-
+    fun onDiaryImageFileNameChanged(fileName: ImageFileNameUi?) {
         viewModelScope.launch {
-            val imageFilePathUi =
-                when (val result = buildImageFilePathUseCase(fileName)) {
-                    is UseCaseResult.Success -> {
-                        ImageFilePathUi.Valid(result.value)
-                    }
-                    is UseCaseResult.Failure -> {
-                        ImageFilePathUi.Invalid
-                    }
-                }
-            updateImageFilePath(imageFilePathUi)
+            buildImageFilePath(fileName)
         }
     }
 
@@ -99,7 +86,24 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
         diaryStateFlow.update(diary)
     }
 
-    private fun updateImageFilePath(imageFilePath: ImageFilePathUi) {
+    private suspend fun buildImageFilePath(fileName: ImageFileNameUi?) {
+        val imageFilePathUi =
+            if (fileName == null) {
+                null
+            } else {
+                when (val result = buildDiaryImageFilePathUseCase(fileName.toDomainModel())) {
+                    is UseCaseResult.Success -> {
+                        ImageFilePathUi(result.value)
+                    }
+                    is UseCaseResult.Failure -> {
+                        ImageFilePathUi()
+                    }
+                }
+            }
+        updateImageFilePath(imageFilePathUi)
+    }
+
+    private fun updateImageFilePath(imageFilePath: ImageFilePathUi?) {
         diaryStateFlow.imageFilePath.value = imageFilePath
     }
 }

@@ -34,7 +34,7 @@ import java.io.InputStream
  * @property cacheDir アプリケーションのキャッシュファイル用ディレクトリ。
  * @property permanentDir アプリケーションの永続ファイル用ディレクトリ。
  */
-internal class ImageFileDataSource(
+class ImageFileDataSource(
     private val contentResolver: ContentResolver,
     private val cacheDir: File,
     private val permanentDir: File
@@ -60,7 +60,7 @@ internal class ImageFileDataSource(
     }
 
     private val imageBackupDir: File by lazy {
-        File(imagePermanentDir, "backup")
+        File(imageCacheDir, "backup")
             .also { it.mkdir() }
     }
 
@@ -389,9 +389,9 @@ internal class ImageFileDataSource(
             val isSuccess = sourceFile.delete()
             if (!isSuccess) Log.w(logTag, deleteFailureLogMessage)
         } catch (e: IOException) {
-            Log.w(logTag, deleteFailureLogMessage)
+            Log.w(logTag, deleteFailureLogMessage, e)
         } catch (e: SecurityException) {
-            Log.w(logTag, deleteFailureLogMessage)
+            Log.w(logTag, deleteFailureLogMessage, e)
         }
     }
 
@@ -465,6 +465,8 @@ internal class ImageFileDataSource(
     /**
      * キャッシュディレクトリ直下および全てのサブディレクトリ内の全てのファイルを削除する。
      *
+     * キャッシュディレクトリのサブディレクトリであるバックアップディレクトリも対象。
+     *
      * このメソッドは内部でキャッシュディレクトリを指定して [deleteAllFilesInDirectory] を呼び出している。
      * 処理内容、例外の詳細は [deleteAllFilesInDirectory]を参照。
      */
@@ -474,8 +476,6 @@ internal class ImageFileDataSource(
 
     /**
      * 永続ディレクトリ直下および全てのサブディレクトリ内の全てのファイルを削除する。
-     *
-     * 永続ディレクトリのサブディレクトリであるバックアップディレクトリも対象。
      *
      * このメソッドは内部で永続ディレクトリを指定して [deleteAllFilesInDirectory] を呼び出している。
      * 処理内容、例外の詳細は [deleteAllFilesInDirectory]を参照。
@@ -544,44 +544,34 @@ internal class ImageFileDataSource(
      * @param directory ファイル削除の起点となるディレクトリ。
      * @throws FileNotFoundException 指定されたディレクトリが存在しないか、ディレクトリではない場合。
      * @throws FilePermissionDeniedException 指定されたディレクトリへのアクセス権限がない場合。
+     * @throws FileOperationException 指定されたディレクトリ内のファイルの操作に失敗した場合。
      * @throws DirectoryDeletionFailedException 一つ以上のファイルの削除に失敗した場合。
      */
-    // TODO:処理内容確認
     private fun deleteAllFilesInDirectory(directory: File) {
-        // 1. ディレクトリ存在チェックと初期の権限チェック
+        // 指定ファイルクラスのディレクトリ確認
         try {
             if (!directory.isDirectory) {
                 throw FileNotFoundException(directory.absolutePath)
             }
         } catch (e: SecurityException) {
-            // ディレクトリ自体の情報取得に関する権限エラー
             throw FilePermissionDeniedException(directory.absolutePath, e)
         }
 
-        // 2. 失敗した操作を記録するためのリストを初期化
-        val failures = mutableListOf<Pair<String, Exception>>()
-
-        // 3. ディレクトリ内のエントリを処理
-        val files = try {
-            directory.listFiles()
-        } catch (e: SecurityException) {
-            // listFiles() 自体の権限エラー -> これも DirectoryDeletionFailedException の一部として報告する
-            failures.add(
-                Pair(
-                    directory.absolutePath,
-                    FilePermissionDeniedException(directory.absolutePath, e)
+        // ディレクトリ内のファイル(ディレクトリ)を配列化
+        val files =
+            try {
+                directory.listFiles()
+            } catch (e: SecurityException) {
+                throw FilePermissionDeniedException(directory.absolutePath, e)
+            } catch (e: IOException) {
+                throw FileOperationException(
+                    "ディレクトリ内のファイルのリスト化に失敗しました。 (パス: $directory.absolutePath)",
+                    e
                 )
-            )
-            // listFiles() が失敗した場合、これ以上処理できないので、収集したエラーで例外をスロー
-            throw DirectoryDeletionFailedException(directory.absolutePath, failures)
-        } catch (e: IOException) {
-            // listFiles() でのその他のIOエラー
-            failures.add(
-                Pair(
-                    directory.absolutePath,
-                    FileOperationException(directory.absolutePath, e)))
-            throw DirectoryDeletionFailedException(directory.absolutePath, failures)
-        }
+            }
+
+        // 削除に関する例外を記録するためのリストを用意
+        val failures = mutableListOf<Pair<String, Exception>>()
 
         files?.forEach { file ->
             try {
@@ -593,36 +583,31 @@ internal class ImageFileDataSource(
                     }
                 } else if (file.isDirectory) {
                     try {
-                        // サブディレクトリの場合、再帰的に削除処理を呼び出す
-                        deleteAllFilesInDirectory(file)
+                        deleteAllFilesInDirectory(file) // 再帰呼び出し
                     } catch (e: DirectoryDeletionFailedException) {
-                        // 再帰呼び出しで発生した DirectoryDeletionFailedException をキャッチし、
-                        // その中の個々の失敗を現在のリストに追加 (エラーの連鎖)
-                        failures.addAll(e.individualFailures)
+                        failures.addAll(e.individualFailures) // 再帰呼び出しで発生した例外を追加
                     }
-                    // 注意: ここで DirectoryDeletionFailedException 以外の FileOperationException (FileNotFoundなど) を
-                    // キャッチして failures に追加することも検討できるが、
-                    // deleteAllFilesInDirectory の責務は「中身の全削除」なので、
-                    // サブディレクトリ自体が見つからないケースは listFiles の時点で処理されるか、
-                    // あるいは deleteAllFilesInDirectory の冒頭の isDirectory チェックで処理されるべき。
-                    // ここでは、サブディレクトリの「内容」削除時のエラーを集約することに主眼を置く。
                 }
-            } catch (e: FileDeleteException) {
-                // file.delete() が FileDeleteException をスローした場合 (もし FileDeleteException を直接スローする実装なら)
-                failures.add(Pair(file.absolutePath, e))
-            } catch (e: FilePermissionDeniedException) {
-                // file.delete() が FilePermissionDeniedException をスローした場合 (もし FilePermissionDeniedException を直接スローする実装なら)
-                failures.add(Pair(file.absolutePath, e))
             } catch (e: SecurityException) {
-                // file.delete() などで発生する可能性のある SecurityException
-                failures.add(Pair(file.absolutePath, FilePermissionDeniedException(file.absolutePath, e)))
+                failures.add(
+                    Pair(
+                        file.absolutePath,
+                        FilePermissionDeniedException(file.absolutePath, e)
+                    )
+                )
             } catch (e: IOException) {
-                // file.delete() などで発生する可能性のあるその他の IOException
-                failures.add(Pair(file.absolutePath, FileDeleteException(file.absolutePath, e))) // FileDeleteException にラップ
+                failures.add(
+                    Pair(
+                        file.absolutePath,
+                        FileDeleteException(file.absolutePath, e)
+                    )
+                )
+            } catch (e: FileOperationException) { // 再帰呼び出し用
+                failures.add(Pair(file.absolutePath, e))
             }
         }
 
-        // 4. 処理の最後に、失敗が一つでもあれば DirectoryDeletionFailedException をスロー
+        // 削除に関する例外が一つでもあればスロー
         if (failures.isNotEmpty()) {
             throw DirectoryDeletionFailedException(directory.absolutePath, failures)
         }
@@ -636,8 +621,7 @@ internal class ImageFileDataSource(
      * @return 画像ファイル拡張子であれば true、そうでなければ false。
      */
     private fun isImageFileExtension(fileName: String): Boolean {
-        val lowercasedFileName = fileName.lowercase()
-        return lowercasedFileName.endsWith(".${imageFileExtension.name}")
+        return fileName.endsWith(".${imageFileExtension.name}", true)
     }
 
     /**

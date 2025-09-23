@@ -13,20 +13,37 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.work.Configuration
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
+import coil3.memory.MemoryCache
+import coil3.request.crossfade
+import coil3.util.DebugLogger
+import com.squareup.leakcanary.core.BuildConfig
+import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import com.websarva.wings.android.zuboradiary.ui.notification.ReminderNotificationManager
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 
 @HiltAndroidApp
-class ZuboraDiaryApplication : Application(), DefaultLifecycleObserver, Configuration.Provider {
+class ZuboraDiaryApplication :
+    Application(),
+    DefaultLifecycleObserver,
+    Configuration.Provider,
+    SingletonImageLoader.Factory {
 
     private val logTag = createLogTag()
 
     @Inject
+    lateinit var imageFileDataSource: ImageFileDataSource
+
+    @Inject
     lateinit var workerFactory: HiltWorkerFactory
+
     var isAppInForeground = false
         private set
+
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder().setWorkerFactory(workerFactory).build()
 
@@ -39,6 +56,12 @@ class ZuboraDiaryApplication : Application(), DefaultLifecycleObserver, Configur
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         setUpReminderNotificationChannel()
+        try {
+            imageFileDataSource.deleteAllFilesInCache()
+        } catch (e: Exception) {
+            Log.w(logTag, "キャッシュストレージの画像ファイルのクリア失敗", e)
+        }
+
     }
 
     override fun onStart(owner: LifecycleOwner) {
@@ -77,5 +100,22 @@ class ZuboraDiaryApplication : Application(), DefaultLifecycleObserver, Configur
                 }
             notificationManager.createNotificationChannel(channel)
         }
+    }
+
+    override fun newImageLoader(context: PlatformContext): ImageLoader {
+        return ImageLoader.Builder(context)
+            .memoryCache { // メモリキャッシュ設定
+                MemoryCache.Builder()
+                    .maxSizePercent(context, 0.20) // 利用可能なアプリメモリからメモリキャッシュへの使用料
+                    .build()
+            }
+            .diskCache(null) // ローカルファイルの読み込みの為、ディスクキャッシュを無効化
+            .crossfade(true) // 画像表示時のクロスフェード有無
+            .apply {
+                if (BuildConfig.DEBUG) {
+                    logger(DebugLogger()) // ロギング (開発中のみ)
+                }
+            }
+            .build()
     }
 }

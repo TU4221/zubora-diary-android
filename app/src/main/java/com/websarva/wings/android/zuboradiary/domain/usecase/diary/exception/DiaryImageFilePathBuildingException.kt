@@ -1,16 +1,16 @@
-package com.websarva.wings.android.zuboradiary.domain.usecase.file.exception
+package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.usecase.file.BuildImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 
 /**
- * [BuildImageFilePathUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
+ * [BuildDiaryImageFilePathUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
  *
  * @param message 例外メッセージ。
  * @param cause この例外を引き起こした根本的な原因となった [Throwable]、または `null`。
  */
-internal sealed class ImageFilePathGettingException(
+internal sealed class DiaryImageFilePathBuildingException(
     message: String,
     cause: Throwable? = null
 ) : UseCaseException(message, cause) {
@@ -20,10 +20,10 @@ internal sealed class ImageFilePathGettingException(
      *
      * @param cause 発生した根本的な原因となった [Throwable]。
      */
-    class GettingFailure(
+    class BuildingFailure(
         cause: Throwable
-    ) : ImageFilePathGettingException(
-        "画像ファイルのパスの取得に失敗しました。",
+    ) : DiaryImageFilePathBuildingException(
+        "日記画像ファイルのパスの生成に失敗しました。",
         cause
     )
 
@@ -35,8 +35,8 @@ internal sealed class ImageFilePathGettingException(
     class FileNotFound(
         imageFileName: ImageFileName,
         cause: Throwable? = null
-    ) : ImageFilePathGettingException(
-        "画像ファイル `$imageFileName` が見つかりませんでした。",
+    ) : DiaryImageFilePathBuildingException(
+        "日記画像ファイル `$imageFileName` が見つかりませんでした。",
         cause
     )
 }

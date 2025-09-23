@@ -7,12 +7,12 @@ import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListIt
 
 @JvmName("toUiModelStandard")
 internal suspend fun DiaryDayListItem.Standard.toUiModel(
-    processFileNameToPath: suspend (ImageFileName?) -> ImageFilePathUi
+    processFileNameToPath: suspend (ImageFileName?) -> ImageFilePathUi?
 ): DiaryDayListItemUi.Standard {
     return DiaryDayListItemUi.Standard(
         date,
         title,
-        imageFileName,
+        imageFileName?.toUiModel(),
         processFileNameToPath(imageFileName)
     )
 }
@@ -34,7 +34,7 @@ internal fun DiaryDayListItemUi.Standard.toDomainModel(): DiaryDayListItem.Stand
     return DiaryDayListItem.Standard(
         date,
         title,
-        imageFileName
+        imageFileName?.toDomainModel()
     )
 }
 

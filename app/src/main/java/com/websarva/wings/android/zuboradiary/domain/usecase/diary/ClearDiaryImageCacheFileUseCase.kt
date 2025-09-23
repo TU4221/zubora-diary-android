@@ -1,18 +1,18 @@
-package com.websarva.wings.android.zuboradiary.domain.usecase.file
+package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.file.exception.CacheFileClearException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageCacheFileClearException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
- * キャッシュストレージのファイルをクリアするユースケース。
+ * キャッシュストレージの日記画像ファイルをクリアするユースケース。
  *
  * @property fileRepository ファイル関連の操作を行うリポジトリ。
  */
-internal class ClearCacheFileUseCase(
+internal class ClearDiaryImageCacheFileUseCase(
     private val fileRepository: FileRepository
 ) {
 
@@ -23,9 +23,9 @@ internal class ClearCacheFileUseCase(
      * ユースケースを実行し、キャッシュストレージのファイルをクリアする。
      *
      * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
-     *   失敗した場合は [UseCaseResult.Failure] に [CacheFileClearException] を格納して返す。
+     *   失敗した場合は [UseCaseResult.Failure] に [DiaryImageCacheFileClearException] を格納して返す。
      */
-    suspend operator fun invoke(): UseCaseResult<Unit, CacheFileClearException> {
+    suspend operator fun invoke(): UseCaseResult<Unit, DiaryImageCacheFileClearException> {
         Log.i(logTag, "${logMsg}開始")
 
         return try {
@@ -35,7 +35,7 @@ internal class ClearCacheFileUseCase(
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_クリア処理エラー", e)
             return UseCaseResult.Failure(
-                CacheFileClearException.ClearFailure(e)
+                DiaryImageCacheFileClearException.ClearFailure(e)
             )
         }
     }

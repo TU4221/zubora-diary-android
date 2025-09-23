@@ -2,9 +2,12 @@ package com.websarva.wings.android.zuboradiary.di.domain
 
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CacheDiaryImageUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultsExistUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ClearDiaryImageCacheFileUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
@@ -50,6 +53,18 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
+    fun provideBuildDiaryImageFilePathUseCase(
+        fileRepository: FileRepository
+    ): BuildDiaryImageFilePathUseCase = BuildDiaryImageFilePathUseCase(fileRepository)
+
+    @Singleton
+    @Provides
+    fun provideCacheDiaryImageUseCase(
+        fileRepository: FileRepository
+    ): CacheDiaryImageUseCase = CacheDiaryImageUseCase(fileRepository)
+
+    @Singleton
+    @Provides
     fun provideCheckUnloadedDiariesExistUseCase(
         countDiariesUseCase: CountDiariesUseCase
     ): CheckUnloadedDiariesExistUseCase = CheckUnloadedDiariesExistUseCase(countDiariesUseCase)
@@ -60,6 +75,12 @@ internal object DiaryUseCaseModule {
         countWordSearchResultsUseCase: CountWordSearchResultsUseCase
     ): CheckUnloadedWordSearchResultsExistUseCase =
         CheckUnloadedWordSearchResultsExistUseCase(countWordSearchResultsUseCase)
+
+    @Singleton
+    @Provides
+    fun provideClearDiaryImageCacheFileUseCase(
+        fileRepository: FileRepository
+    ): ClearDiaryImageCacheFileUseCase = ClearDiaryImageCacheFileUseCase(fileRepository)
 
     @Singleton
     @Provides

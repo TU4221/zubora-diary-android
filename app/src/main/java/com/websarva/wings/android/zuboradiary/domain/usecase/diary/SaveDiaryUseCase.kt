@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelecti
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -191,49 +192,56 @@ internal class SaveDiaryUseCase(
         originalDiaryImageFileName: ImageFileName?,
         deleteDiaryImageFileName: ImageFileName?
     ) {
-
-        if (deleteDiaryImageFileName != null) {
-            // 別ID削除日記画像ファイル削除(バックアップへ移動)
+        deleteDiaryImageFileName?.let {
             try {
-                fileRepository.moveImageFileToBackup(deleteDiaryImageFileName)
-            } catch (e: RepositoryException) {
-                throw DiarySaveException.StorageImageFileUpdateFailure(e)
-            }
-        }
-
-        if (saveDiaryImageFileName == null) {
-            if (originalDiaryImageFileName != null) {
-                // 同ID日記旧画像ファイル削除(バックアップへ移動)
+                fileRepository.moveImageFileToBackup(it)
+            } catch (e: NotFoundException) {
+                Log.w(logTag, "${logMsg}警告_削除する日記の画像ファイルがみつからない", e)
+            }  catch (e: RepositoryException) {
                 try {
-                    fileRepository.moveImageFileToBackup(originalDiaryImageFileName)
-                } catch (e: RepositoryException) {
-                    try {
-                        rollbackImageFiles(null, originalDiaryImageFileName, deleteDiaryImageFileName)
-                    } catch (re: RollbackException) {
-                        e.addSuppressed(re)
-                    }
-                    throw DiarySaveException.StorageImageFileUpdateFailure(e)
-                }
-            }
-        } else {
-            // 同ID日記新画像ファイル保存
-            try {
-                if (fileRepository.existsImageFileInPermanent(saveDiaryImageFileName)) {
-                    fileRepository.moveImageFileToBackup(saveDiaryImageFileName)
-                }
-            } catch (e: RepositoryException) {
-                try {
-                    rollbackImageFiles(saveDiaryImageFileName, originalDiaryImageFileName, deleteDiaryImageFileName)
+                    rollbackImageFiles(
+                        saveDiaryImageFileName,
+                        originalDiaryImageFileName,
+                        deleteDiaryImageFileName
+                    )
                 } catch (re: RollbackException) {
                     e.addSuppressed(re)
                 }
                 throw DiarySaveException.StorageImageFileUpdateFailure(e)
             }
+        }
+
+        if (saveDiaryImageFileName == originalDiaryImageFileName) return
+
+        originalDiaryImageFileName?.let {
+            try {
+                fileRepository.moveImageFileToBackup(it)
+            } catch (e: NotFoundException) {
+                Log.w(logTag, "${logMsg}警告_編集元の日記の画像ファイルがみつからない", e)
+            } catch (e: RepositoryException) {
+                try {
+                    rollbackImageFiles(
+                        saveDiaryImageFileName,
+                        originalDiaryImageFileName,
+                        deleteDiaryImageFileName
+                    )
+                } catch (re: RollbackException) {
+                    e.addSuppressed(re)
+                }
+                throw DiarySaveException.StorageImageFileUpdateFailure(e)
+            }
+        }
+
+        saveDiaryImageFileName?.let {
             try {
                 fileRepository.moveImageFileToPermanent(saveDiaryImageFileName)
             } catch (e: RepositoryException) {
                 try {
-                    rollbackImageFiles(saveDiaryImageFileName, originalDiaryImageFileName, deleteDiaryImageFileName)
+                    rollbackImageFiles(
+                        saveDiaryImageFileName,
+                        originalDiaryImageFileName,
+                        deleteDiaryImageFileName
+                    )
                 } catch (re: RollbackException) {
                     e.addSuppressed(re)
                 }
@@ -265,16 +273,19 @@ internal class SaveDiaryUseCase(
         try {
             if (isNewDiary) {
                 if (deletedDiary == null) {
+                    Log.d("20250922", "新規ロールバック_deletedDiary(保存日記_${savedDiary.date})")
                     diaryRepository.deleteDiary(savedDiary.date)
                 } else {
+                    Log.d("20250922", "新規ロールバック_deleteAndSaveDiary(削除日記_${deletedDiary.date})")
                     diaryRepository.deleteAndSaveDiary(deletedDiary)
                 }
             } else {
-                if (deletedDiary == null) {
-                    diaryRepository.saveDiary(originalDiary)
-                } else {
+                if (deletedDiary != null) {
+                    Log.d("20250922", "編集ロールバック_deleteAndSaveDiary(削除日記_${originalDiary.date})")
                     diaryRepository.deleteAndSaveDiary(deletedDiary)
                 }
+                Log.d("20250922", "編集ロールバック_saveDiary(編集元日記_${savedDiary.date})")
+                diaryRepository.saveDiary(originalDiary)
             }
         } catch (e: RepositoryException) {
             throw RollbackException(cause = e)
@@ -297,21 +308,21 @@ internal class SaveDiaryUseCase(
         deletedDiaryImageFileName: ImageFileName?
     ) {
         try {
-            if (savedDiaryImageFileName != null) {
-                if (fileRepository.existsImageFileInPermanent(savedDiaryImageFileName)) {
-                    fileRepository.restoreImageFileFromPermanent(savedDiaryImageFileName)
+            if (savedDiaryImageFileName != originalDiaryImageFileName) {
+                if (savedDiaryImageFileName != null) {
+                    if (fileRepository.existsImageFileInPermanent(savedDiaryImageFileName)) {
+                        fileRepository.restoreImageFileFromPermanent(savedDiaryImageFileName)
+                    }
                 }
-                if (fileRepository.existsImageFileInBackup(savedDiaryImageFileName)) {
-                    fileRepository.restoreImageFileFromBackup(savedDiaryImageFileName)
-                }
-            }
-            if (originalDiaryImageFileName != null) {
-                if (fileRepository.existsImageFileInBackup(originalDiaryImageFileName)) {
-                    fileRepository.restoreImageFileFromBackup(originalDiaryImageFileName)
+                if (originalDiaryImageFileName != null) {
+                    if (fileRepository.existsImageFileInBackup(originalDiaryImageFileName)) {
+                        fileRepository.restoreImageFileFromBackup(originalDiaryImageFileName)
+                    }
                 }
             }
             if (deletedDiaryImageFileName != null) {
                 if (fileRepository.existsImageFileInBackup(deletedDiaryImageFileName)) {
+                    Log.d("20250922", "ロールバック_deletedDiary")
                     fileRepository.restoreImageFileFromBackup(deletedDiaryImageFileName)
                 }
             }

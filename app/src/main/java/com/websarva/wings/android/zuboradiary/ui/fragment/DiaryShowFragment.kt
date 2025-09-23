@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
-import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryConditionTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryImageUpdater
@@ -20,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpd
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
@@ -220,14 +220,14 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
     private fun setUpImage() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.imageFileName
-                .collectLatest { value: ImageFileName? ->
+                .collectLatest { value: ImageFileNameUi? ->
                     mainViewModel.onDiaryImageFileNameChanged(value)
                 }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.imageFilePath
-                .collectLatest { value: ImageFilePathUi ->
+                .collectLatest { value: ImageFilePathUi? ->
                     // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
                     //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
                     //      クリアという意味合いでデフォルト画像をセットする。
@@ -235,7 +235,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
                         .update(
                             themeColor,
                             binding.includeDiaryShow.imageAttachedImage,
-                            null, // TODO:ライブラリのVerをあげてからコイルを実装し、その後対応。
+                            value
                         )
                 }
         }

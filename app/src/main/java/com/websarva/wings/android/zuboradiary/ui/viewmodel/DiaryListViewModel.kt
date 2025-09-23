@@ -14,9 +14,10 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewDiaryL
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListStartYearMonthPickerDateRangeUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
-import com.websarva.wings.android.zuboradiary.domain.usecase.file.BuildImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
@@ -50,7 +51,7 @@ internal class DiaryListViewModel @Inject constructor(
     private val refreshDiaryListUseCase: RefreshDiaryListUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
     private val loadDiaryListStartYearMonthPickerDateRangeUseCase: LoadDiaryListStartYearMonthPickerDateRangeUseCase,
-    private val buildImageFilePathUseCase: BuildImageFilePathUseCase
+    private val buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
 ) : BaseViewModel<DiaryListEvent, DiaryListAppMessage, DiaryListState>(
     DiaryListState.Idle
 ) {
@@ -276,7 +277,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private fun handleDiaryDeleteDialogPositiveResult(date: LocalDate, fileName: ImageFileName?) {
+    private fun handleDiaryDeleteDialogPositiveResult(date: LocalDate, fileName: ImageFileNameUi?) {
         val currentList = _diaryList.value
         viewModelScope.launch {
             deleteDiary(date, fileName, currentList)
@@ -351,10 +352,11 @@ internal class DiaryListViewModel @Inject constructor(
                 when (val result = processLoad(currentList)) {
                     is UseCaseResult.Success -> {
                         result.value.toUiModel { fileName: ImageFileName? ->
-                            if (fileName == null) return@toUiModel ImageFilePathUi.NoImage
-                            when (val buildResult = buildImageFilePathUseCase(fileName)) {
-                                is UseCaseResult.Success -> ImageFilePathUi.Valid(buildResult.value)
-                                is UseCaseResult.Failure -> ImageFilePathUi.Invalid
+                            fileName?.let {
+                                when (val buildResult = buildDiaryImageFilePathUseCase(fileName)) {
+                                    is UseCaseResult.Success -> ImageFilePathUi(buildResult.value)
+                                    is UseCaseResult.Failure -> ImageFilePathUi()
+                                }
                             }
                         }
                     }
@@ -386,14 +388,14 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun deleteDiary(
         date: LocalDate,
-        fileName: ImageFileName?,
+        fileName: ImageFileNameUi?,
         currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
     ) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryListState.DeletingDiary)
-        when (val result = deleteDiaryUseCase(date, fileName)) {
+        when (val result = deleteDiaryUseCase(date, fileName?.toDomainModel())) {
             is UseCaseResult.Success -> {
                 refreshDiaryList(currentList)
                 Log.i(logTag, "${logMsg}_完了")

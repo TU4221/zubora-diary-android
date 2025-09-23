@@ -6,7 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.file.BuildImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -28,10 +29,10 @@ internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
     private val loadDiaryUseCase: LoadDiaryUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
-    buildImageFilePathUseCase: BuildImageFilePathUseCase
+    buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
 ) : BaseDiaryShowViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>(
     DiaryShowState.Idle,
-    buildImageFilePathUseCase
+    buildDiaryImageFilePathUseCase
 ) {
 
     companion object {
@@ -189,7 +190,7 @@ internal class DiaryShowViewModel @Inject constructor(
         val imageFileName  = diaryStateFlow.imageFileName.value
 
         updateUiState(DiaryShowState.Deleting)
-        when (val result = deleteDiaryUseCase(date, imageFileName)) {
+        when (val result = deleteDiaryUseCase(date, imageFileName?.toDomainModel())) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 emitUiEvent(

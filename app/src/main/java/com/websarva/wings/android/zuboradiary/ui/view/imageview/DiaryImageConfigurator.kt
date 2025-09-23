@@ -1,95 +1,81 @@
 package com.websarva.wings.android.zuboradiary.ui.view.imageview
 
-import android.content.Context
-import android.net.Uri
-import android.util.Log
 import android.widget.ImageView
 import androidx.core.content.ContextCompat
+import coil3.asImage
+import coil3.dispose
+import coil3.load
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import java.io.File
 
 internal class DiaryImageConfigurator {
 
-    private val logTag = createLogTag()
+    fun setUpImageOnDiary(imageView: ImageView, path: ImageFilePathUi?, themeColor: ThemeColorUi) {
+        val context = imageView.context
+        loadImage(
+            imageView,
+            path,
+            themeColor.getOnSurfaceVariantColor(context.resources),
+            R.drawable.ic_photo_library_24px,
+        )
+    }
 
-    fun setUpImageOnDiary(imageView: ImageView, uri: Uri?, themeColor: ThemeColorUi) {
-        if (uri == null) {
-            setUpDefaultIconOnDiary(imageView, themeColor)
+    fun setUpImageOnDiaryList(imageView: ImageView, path: ImageFilePathUi?, themeColor: ThemeColorUi) {
+        val context = imageView.context
+        loadImage(
+            imageView,
+            path,
+            themeColor.getOnSecondaryContainerColor(context.resources),
+            R.drawable.ic_image_24px
+        )
+    }
+
+    private fun loadImage(
+        imageView: ImageView,
+        path: ImageFilePathUi?,
+        colorInt: Int,
+        defaultIconRes: Int
+    ) {
+
+
+        // 読み込み画像がない場合デフォルト画像を表示
+        if (path == null) {
+            imageView.apply {
+                setImageResource(defaultIconRes)
+                setColorFilter(colorInt)
+            }
             return
         }
 
-        val logMsg = "日記添付写真読込"
-        try {
-            Log.i(logTag, "${logMsg}_開始")
-            setUpImage(imageView, uri)
-            Log.i(logTag, "${logMsg}_完了")
-        } catch (e: SecurityException) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            setUpPermissionDenialIconOnDiary(imageView, themeColor)
+        val context = imageView.context
+        val data = File(path.path)
+        val currentImage = imageView.drawable?.asImage()
+        val placeHolderImage =
+            if (currentImage == null) {
+                imageView.setColorFilter(colorInt)
+                ContextCompat.getDrawable(context, defaultIconRes)?.asImage()
+            } else {
+                currentImage
+            }
+        imageView.dispose()
+        imageView.load(data) {
+            // デフォルトアイコン設定
+            currentImage?.let { placeholder(placeHolderImage) }
+            // エラーアイコン設定
+            error(
+                ContextCompat.getDrawable(context, R.drawable.ic_hide_image_24px)?.asImage()
+            )
+            // カラー設定
+            listener(
+                onSuccess = { _, _ ->
+                    imageView.clearColorFilter()
+                },
+                onError = { _, _ ->
+                    imageView.setColorFilter(colorInt)
+                }
+            )
         }
-    }
-
-    private fun setUpDefaultIconOnDiary(imageView: ImageView, themeColor: ThemeColorUi) {
-        val iconColorInt = getIconColorOnDiary(imageView.context, themeColor)
-        setUpIcon(imageView, R.drawable.diary_edit_image_ic_photo_library_24px, iconColorInt)
-    }
-
-    private fun setUpPermissionDenialIconOnDiary(imageView: ImageView, themeColor: ThemeColorUi) {
-        val iconColorInt = getIconColorOnDiary(imageView.context, themeColor)
-        setUpIcon(imageView, R.drawable.diary_image_ic_hide_image_24px, iconColorInt)
-    }
-
-    private fun getIconColorOnDiary(context: Context, themeColor: ThemeColorUi): Int {
-        return themeColor.getOnSurfaceVariantColor(context.resources)
-    }
-
-    fun setUpImageOnDiaryList(imageView: ImageView, uri: Uri?, themeColor: ThemeColorUi) {
-        if (uri == null) {
-            setUpDefaultIconOnDiaryList(imageView, themeColor)
-            return
-        }
-
-        val logMsg = "日記リスト添付写真読込"
-        try {
-            Log.i(logTag, "${logMsg}_開始")
-            setUpImage(imageView, uri)
-            Log.i(logTag, "${logMsg}_完了")
-        } catch (e: SecurityException) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            setUpPermissionDenialIconOnDiaryList(imageView, themeColor)
-        }
-    }
-
-    private fun setUpDefaultIconOnDiaryList(imageView: ImageView, themeColor: ThemeColorUi) {
-        val iconColorInt = getIconColorOnDiaryList(imageView.context, themeColor)
-        setUpIcon(imageView, R.drawable.ic_image_24px, iconColorInt)
-    }
-
-    private fun setUpPermissionDenialIconOnDiaryList(imageView: ImageView, themeColor: ThemeColorUi) {
-        val iconColorInt = getIconColorOnDiaryList(imageView.context, themeColor)
-        setUpIcon(imageView, R.drawable.ic_hide_image_24px, iconColorInt)
-    }
-
-    private fun getIconColorOnDiaryList(context: Context, themeColor: ThemeColorUi): Int {
-        return themeColor.getOnSecondaryContainerColor(context.resources)
-    }
-
-    private fun setUpIcon(imageView: ImageView, iconResId: Int, iconColor: Int) {
-        val icon = ContextCompat.getDrawable(imageView.context, iconResId)
-        imageView.setImageDrawable(icon)
-        setUpIconColor(imageView, iconColor)
-    }
-
-    // MEMO:添付写真と未添付時のアイコンを動的に切替表示を行うため下記処理が必要。
-    //      ImageView#setImageDrawable()で設定したDrawableの色はThemeColorInflaterの設定色ではなく、
-    //      Manifest.xmlのapplicationタグのtheme属性で設定されている色が反映される為、毎度下記コードで色を設定する。
-    private fun setUpIconColor(imageView: ImageView, iconColor: Int) {
-        imageView.setColorFilter(iconColor)
-    }
-
-    private fun setUpImage(imageView: ImageView, uri: Uri) {
-        imageView.setImageURI(uri)
-        imageView.colorFilter = null
     }
 }
