@@ -3,8 +3,8 @@ package com.websarva.wings.android.zuboradiary.data.file.exception
 /**
  * ディレクトリ内のファイル削除処理中に一つ以上のエラーが発生したことを示す例外。
  *
- * @param directoryPath 対象となったディレクトリのパス。
- * @param individualFailures 個々の失敗に関する情報 (ファイルパスと発生した例外のペアのリスト)。
+ * @property directoryPath 対象となったディレクトリのパス。
+ * @property individualFailures 個々の失敗に関する情報 (ファイルパスと発生した例外のペアのリスト)。
  */
 internal class DirectoryDeletionFailedException(
     private val directoryPath: String? = null,

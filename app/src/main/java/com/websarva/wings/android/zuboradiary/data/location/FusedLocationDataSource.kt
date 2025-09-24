@@ -23,8 +23,8 @@ import java.util.concurrent.TimeoutException
  * 位置情報へのアクセス権限がない場合や、タイムアウトが発生した場合に発生する特定の例外を
  * [FusedLocationAccessFailureException] にラップする。
  *
- * @param fusedLocationProviderClient デバイスの位置情報を取得するために使用される。
- * @param permissionChecker 位置情報アクセスパーミッションなど、必要な権限が付与されているかを確認する機能を提供。
+ * @property fusedLocationProviderClient デバイスの位置情報を取得するために使用される。
+ * @property permissionChecker 位置情報アクセスパーミッションなど、必要な権限が付与されているかを確認する機能を提供。
  * @property dispatcher 位置情報の取得を実行するスレッドプール。
  */
 internal class FusedLocationDataSource(

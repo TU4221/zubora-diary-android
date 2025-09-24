@@ -30,7 +30,7 @@ import javax.inject.Inject
  * 設定の読み込みはFlowとして提供し、変更をリアクティブに監視できる。
  * 設定の書き込みはsuspend関数として提供。
  *
- * @param preferencesDataStore ユーザー設定を永続化するためのに使用される。
+ * @property preferencesDataStore ユーザー設定を永続化するためのに使用される。
  * @property appScope アプリケーションスコープのコルーチンスコープ。Flowの共有などに使用される。
  * @property dispatcher ユーザー設定の操作を実行するスレッドプール。
  */
