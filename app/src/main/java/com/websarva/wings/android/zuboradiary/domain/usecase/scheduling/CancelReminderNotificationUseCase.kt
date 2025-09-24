@@ -25,7 +25,7 @@ internal class CancelReminderNotificationUseCase(
      * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
      *   失敗した場合は [UseCaseResult.Failure] に [ReminderNotificationCancelException] を格納して返す。
      */
-    operator fun invoke(): UseCaseResult<Unit, ReminderNotificationCancelException> {
+    suspend operator fun invoke(): UseCaseResult<Unit, ReminderNotificationCancelException> {
         Log.i(logTag, "${logMsg}開始")
 
         try {

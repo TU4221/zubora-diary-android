@@ -19,12 +19,12 @@ internal interface SchedulingRepository {
      * @param settingTime リマインダー通知を設定する時刻。
      * @throws SchedulingException リマインダー通知の登録に失敗した場合。
      */
-    fun registerReminderNotification(settingTime: LocalTime)
+    suspend fun registerReminderNotification(settingTime: LocalTime)
 
     /**
      * 現在スケジュールされているリマインダー通知をキャンセルする。
      *
      * @throws SchedulingException リマインダー通知のキャンセルに失敗した場合。
      */
-    fun cancelReminderNotification()
+    suspend fun cancelReminderNotification()
 }

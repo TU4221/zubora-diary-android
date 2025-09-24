@@ -23,7 +23,7 @@ internal interface FileRepository {
      * @param fileName 相対パスを構築する対象のファイル名。
      * @return 構築されたファイルパス。
      */
-    suspend fun buildImageFileAbsolutePathFromCache(fileName: ImageFileName): String
+    fun buildImageFileAbsolutePathFromCache(fileName: ImageFileName): String
 
     /**
      * 指定された画像ファイル名から永続ストレージ相対パスを構築する。
@@ -31,7 +31,7 @@ internal interface FileRepository {
      * @param fileName 相対パスを構築する対象のファイル名。
      * @return 構築されたファイルパス。
      */
-    suspend fun buildImageFileAbsolutePathFromPermanent(fileName: ImageFileName): String
+    fun buildImageFileAbsolutePathFromPermanent(fileName: ImageFileName): String
 
     /**
      * 指定された画像ファイルがキャッシュに存在するか確認する。

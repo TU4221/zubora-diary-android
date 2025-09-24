@@ -169,7 +169,7 @@ internal class UpdateReminderNotificationSettingUseCase(
      * @param notificationTime 通知時刻。
      * @throws ReminderNotificationRegisterException 通知の登録に失敗した場合。
      */
-    private fun registerReminderNotification(notificationTime: LocalTime) {
+    private suspend fun registerReminderNotification(notificationTime: LocalTime) {
         when (val result = registerReminderNotificationUseCase(notificationTime)) {
             is UseCaseResult.Success -> {
                 // 処理不要
@@ -185,7 +185,7 @@ internal class UpdateReminderNotificationSettingUseCase(
      *
      * @throws ReminderNotificationCancelException 通知のキャンセルに失敗した場合。
      */
-    private fun cancelReminderNotification() {
+    private suspend fun cancelReminderNotification() {
         when (val result = cancelReminderNotificationUseCase()) {
             is UseCaseResult.Success -> {
                 // 処理不要

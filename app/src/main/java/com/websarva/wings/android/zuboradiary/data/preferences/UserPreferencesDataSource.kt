@@ -9,7 +9,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.websarva.wings.android.zuboradiary.di.ApplicationScope
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,6 +19,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 /**
  * ユーザー設定 (Preferences DataStore) へのアクセスを提供するデータソースクラス。
@@ -29,10 +32,12 @@ import javax.inject.Inject
  *
  * @param preferencesDataStore ユーザー設定を永続化するためのに使用される。
  * @property appScope アプリケーションスコープのコルーチンスコープ。Flowの共有などに使用される。
+ * @property dispatcher ユーザー設定の操作を実行するスレッドプール。
  */
 internal class UserPreferencesDataSource @Inject constructor(
     private val preferencesDataStore: DataStore<Preferences>,
-    @ApplicationScope private val appScope: CoroutineScope
+    @ApplicationScope private val appScope: CoroutineScope,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     private val themeColorPreferenceKey = intPreferencesKey("theme_color")
@@ -266,8 +271,10 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
     suspend fun updateThemeColorPreference(value: ThemeColorPreference) {
-        executeDataStoreEditOperation { preferences ->
-            preferences[themeColorPreferenceKey] = value.themeColorNumber
+        withContext(dispatcher) {
+            executeDataStoreEditOperation { preferences ->
+                preferences[themeColorPreferenceKey] = value.themeColorNumber
+            }
         }
     }
 
@@ -278,8 +285,10 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
     suspend fun updateCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
-        executeDataStoreEditOperation { preferences ->
-            preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
+        withContext(dispatcher) {
+            executeDataStoreEditOperation { preferences ->
+                preferences[calendarStartDayOfWeekPreferenceKey] = value.dayOfWeekNumber
+            }
         }
     }
 
@@ -290,9 +299,11 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
     suspend fun updateReminderNotificationPreference(value: ReminderNotificationPreference) {
-        executeDataStoreEditOperation { preferences ->
-            preferences[isEnabledReminderNotificationPreferenceKey] = value.isEnabled
-            preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
+        withContext(dispatcher) {
+            executeDataStoreEditOperation { preferences ->
+                preferences[isEnabledReminderNotificationPreferenceKey] = value.isEnabled
+                preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
+            }
         }
     }
 
@@ -303,9 +314,11 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
     suspend fun updatePasscodeLockPreference(value: PasscodeLockPreference) {
-        executeDataStoreEditOperation { preferences ->
-            preferences[isEnabledPasscodeLockPreferenceKey] = value.isEnabled
-            preferences[passcodePreferenceKey] = value.passcode
+        withContext(dispatcher) {
+            executeDataStoreEditOperation { preferences ->
+                preferences[isEnabledPasscodeLockPreferenceKey] = value.isEnabled
+                preferences[passcodePreferenceKey] = value.passcode
+            }
         }
     }
 
@@ -316,8 +329,10 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
      */
     suspend fun updateWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
-        executeDataStoreEditOperation { preferences ->
-            preferences[isEnabledWeatherInfoFetchPreferenceKey] = value.isEnabled
+        withContext(dispatcher) {
+            executeDataStoreEditOperation { preferences ->
+                preferences[isEnabledWeatherInfoFetchPreferenceKey] = value.isEnabled
+            }
         }
     }
 

@@ -3,8 +3,11 @@ package com.websarva.wings.android.zuboradiary.data.database
 import android.database.sqlite.SQLiteException
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.withContext
 import java.time.LocalDate
 
 /**
@@ -17,11 +20,13 @@ import java.time.LocalDate
  * @property diaryDatabase 日記データベースのインスタンス。
  * @property diaryDao 日記データアクセスオブジェクト。
  * @property diaryItemTitleSelectionHistoryDao 日記項目タイトル選択履歴データアクセスオブジェクト。
+ * @property dispatcher データベース操作を実行するスレッドプール。
  */
 internal class DiaryDataSource(
     private val diaryDatabase: DiaryDatabase,
     private val diaryDao: DiaryDao,
-    private val diaryItemTitleSelectionHistoryDao: DiaryItemTitleSelectionHistoryDao
+    private val diaryItemTitleSelectionHistoryDao: DiaryItemTitleSelectionHistoryDao,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     private val logTag = createLogTag()
@@ -34,8 +39,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun countDiaries(): Int {
-        return executeSuspendDbOperation {
-            diaryDao.countDiaries()
+        return  withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.countDiaries()
+            }
         }
     }
 
@@ -47,8 +54,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun countDiaries(date: LocalDate): Int {
-        return executeSuspendDbOperation {
-            diaryDao.countDiaries(date.toString())
+        return withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.countDiaries(date.toString())
+            }
         }
     }
 
@@ -60,8 +69,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun existsDiary(date: LocalDate): Boolean {
-        return executeSuspendDbOperation {
-            diaryDao.existsDiary(date.toString())
+        return withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.existsDiary(date.toString())
+            }
         }
     }
 
@@ -73,8 +84,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun selectDiary(date: LocalDate): DiaryEntity? {
-        return executeSuspendDbOperation {
-            diaryDao.selectDiary(date.toString())
+        return withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.selectDiary(date.toString())
+            }
         }
     }
 
@@ -85,8 +98,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun selectNewestDiary(): DiaryEntity? {
-        return executeSuspendDbOperation {
-            diaryDao.selectNewestDiary()
+        return withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.selectNewestDiary()
+            }
         }
     }
 
@@ -97,8 +112,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun selectOldestDiary(): DiaryEntity? {
-        return executeSuspendDbOperation {
-            diaryDao.selectOldestDiary()
+        return withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.selectOldestDiary()
+            }
         }
     }
 
@@ -123,11 +140,13 @@ internal class DiaryDataSource(
         require(num >= 1)
         require(offset >= 0)
 
-        return executeSuspendDbOperation {
-            if (date == null) {
-                diaryDao.selectDiaryListOrderByDateDesc(num, offset)
-            } else {
-                diaryDao.selectDiaryListOrderByDateDesc(num, offset, date.toString())
+        return withContext(dispatcher) {
+            executeSuspendDbOperation {
+                if (date == null) {
+                    diaryDao.selectDiaryListOrderByDateDesc(num, offset)
+                } else {
+                    diaryDao.selectDiaryListOrderByDateDesc(num, offset, date.toString())
+                }
             }
         }
     }
@@ -141,8 +160,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun saveDiary(diary: DiaryEntity) {
-        executeSuspendDbOperation {
-            diaryDao.insertDiary(diary)
+        withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.insertDiary(diary)
+            }
         }
     }
 
@@ -155,8 +176,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun deleteAndSaveDiary(diary: DiaryEntity) {
-        executeSuspendDbOperation {
-            diaryDatabase.deleteAndSaveDiary(diary)
+        withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDatabase.deleteAndSaveDiary(diary)
+            }
         }
     }
 
@@ -173,11 +196,13 @@ internal class DiaryDataSource(
     suspend fun updateDiaryItemTitleSelectionHistory(
         historyItemList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
-        executeSuspendDbOperation {
-            diaryDatabase
-                .updateDiaryItemTitleSelectionHistory(
-                    historyItemList
-                )
+        withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDatabase
+                    .updateDiaryItemTitleSelectionHistory(
+                        historyItemList
+                    )
+            }
         }
     }
 
@@ -188,8 +213,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun deleteDiary(date: LocalDate) {
-        executeSuspendDbOperation {
-            diaryDao.deleteDiary(date.toString())
+        withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.deleteDiary(date.toString())
+            }
         }
     }
 
@@ -199,8 +226,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun deleteAllDiaries() {
-        executeSuspendDbOperation {
-            diaryDao.deleteAllDiaries()
+        withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.deleteAllDiaries()
+            }
         }
     }
     //endregion
@@ -214,8 +243,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun countWordSearchResults(searchWord: String): Int {
-        return executeSuspendDbOperation {
-            diaryDao.countWordSearchResults(searchWord)
+        return withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.countWordSearchResults(searchWord)
+            }
         }
     }
 
@@ -239,8 +270,10 @@ internal class DiaryDataSource(
         require(num >= 1)
         require(offset >= 0)
 
-        return executeSuspendDbOperation {
-            diaryDao.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
+        return withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDao.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
+            }
         }
     }
     //endregion
@@ -275,8 +308,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun deleteHistoryItem(title: String) {
-        return executeSuspendDbOperation {
-            diaryItemTitleSelectionHistoryDao.deleteHistory(title)
+        withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryItemTitleSelectionHistoryDao.deleteHistory(title)
+            }
         }
     }
     //endregion
@@ -290,8 +325,10 @@ internal class DiaryDataSource(
      * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
      */
     suspend fun deleteAllData() {
-        executeSuspendDbOperation {
-            diaryDatabase.deleteAllData()
+        withContext(dispatcher) {
+            executeSuspendDbOperation {
+                diaryDatabase.deleteAllData()
+            }
         }
     }
     //endregion

@@ -9,7 +9,10 @@ import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.websarva.wings.android.zuboradiary.data.common.PermissionChecker
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
 import java.util.concurrent.TimeoutException
 
@@ -22,10 +25,12 @@ import java.util.concurrent.TimeoutException
  *
  * @param fusedLocationProviderClient デバイスの位置情報を取得するために使用される。
  * @param permissionChecker 位置情報アクセスパーミッションなど、必要な権限が付与されているかを確認する機能を提供。
+ * @property dispatcher 位置情報の取得を実行するスレッドプール。
  */
 internal class FusedLocationDataSource(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
-    private val permissionChecker: PermissionChecker
+    private val permissionChecker: PermissionChecker,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     val logTag = createLogTag()
@@ -43,49 +48,51 @@ internal class FusedLocationDataSource(
      */
     @SuppressLint("MissingPermission")
     suspend fun fetchCurrentLocation(timeoutMillis: Long = 10000L): Location {
-        val logMsg = "現在位置取得"
-        Log.i(logTag, "${logMsg}_開始")
-        val cancellationTokenSource = CancellationTokenSource()
-        try {
-            if (!permissionChecker.isAccessLocationGranted) {
-                Log.i(logTag, "${logMsg}_権限未許可")
-                throw SecurityException()
-            }
-            return withTimeoutOrNull(timeoutMillis) {
-                val locationRequest =
-                    CurrentLocationRequest.Builder()
-                        // MEMO:"PRIORITY_BALANCED_POWER_ACCURACY"だとnullが返ってくることがある為、
-                        //      "PRIORITY_HIGH_ACCURACY"とする。
-                        .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
-                        .setDurationMillis(timeoutMillis)
-                        .build()
-                val location =
-                    fusedLocationProviderClient.getCurrentLocation(
-                        locationRequest,
-                        cancellationTokenSource.token
-                    ).await()
-
-                if (location == null) {
-                    return@withTimeoutOrNull null
-                } else {
-                    Log.i(logTag, "${logMsg}_完了_location:$location")
+        return withContext(dispatcher) {
+            val logMsg = "現在位置取得"
+            Log.i(logTag, "${logMsg}_開始")
+            val cancellationTokenSource = CancellationTokenSource()
+            try {
+                if (!permissionChecker.isAccessLocationGranted) {
+                    Log.i(logTag, "${logMsg}_権限未許可")
+                    throw SecurityException()
                 }
-                return@withTimeoutOrNull location
-            } ?: run {
-                Log.w(logTag, "${logMsg}_失敗_location:null")
-                throw TimeoutException()
+                return@withContext withTimeoutOrNull(timeoutMillis) {
+                    val locationRequest =
+                        CurrentLocationRequest.Builder()
+                            // MEMO:"PRIORITY_BALANCED_POWER_ACCURACY"だとnullが返ってくることがある為、
+                            //      "PRIORITY_HIGH_ACCURACY"とする。
+                            .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+                            .setDurationMillis(timeoutMillis)
+                            .build()
+                    val location =
+                        fusedLocationProviderClient.getCurrentLocation(
+                            locationRequest,
+                            cancellationTokenSource.token
+                        ).await()
+
+                    if (location == null) {
+                        return@withTimeoutOrNull null
+                    } else {
+                        Log.i(logTag, "${logMsg}_完了_location:$location")
+                    }
+                    return@withTimeoutOrNull location
+                } ?: run {
+                    Log.w(logTag, "${logMsg}_失敗_location:null")
+                    throw TimeoutException()
+                }
+            } catch (e: SecurityException) {
+                Log.e(logTag, "${logMsg}_失敗", e)
+                throw FusedLocationAccessFailureException(e)
+            } catch (e: IllegalStateException) {
+                Log.e(logTag, "${logMsg}_失敗", e)
+                throw FusedLocationAccessFailureException(e)
+            } catch (e: TimeoutException) {
+                Log.e(logTag, "${logMsg}_失敗", e)
+                throw FusedLocationAccessFailureException(e)
+            } finally {
+                cancellationTokenSource.cancel()
             }
-        } catch (e: SecurityException) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            throw FusedLocationAccessFailureException(e)
-        } catch (e: IllegalStateException) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            throw FusedLocationAccessFailureException(e)
-        } catch (e: TimeoutException) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            throw FusedLocationAccessFailureException(e)
-        } finally {
-            cancellationTokenSource.cancel()
         }
     }
 }

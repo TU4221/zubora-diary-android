@@ -10,7 +10,7 @@ internal class SchedulingRepositoryImpl(
     private val notificationSchedulingDataSource: NotificationSchedulingDataSource
 ) : SchedulingRepository {
 
-    override fun registerReminderNotification(settingTime: LocalTime) {
+    override suspend fun registerReminderNotification(settingTime: LocalTime) {
         try {
             notificationSchedulingDataSource.registerReminderNotificationWorker(settingTime)
         } catch (e: WorkProfileAccessFailureException) {
@@ -18,7 +18,7 @@ internal class SchedulingRepositoryImpl(
         }
     }
 
-    override fun cancelReminderNotification() {
+    override suspend fun cancelReminderNotification() {
         try {
             notificationSchedulingDataSource.cancelReminderNotificationWorker()
         } catch (e: WorkProfileAccessFailureException) {

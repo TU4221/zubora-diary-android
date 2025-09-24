@@ -18,6 +18,9 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.FileReadExcept
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileWriteException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileNotFoundException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -33,11 +36,13 @@ import java.io.InputStream
  * @property contentResolver コンテンツURIへのアクセスに必要。
  * @property cacheDir アプリケーションのキャッシュファイル用ディレクトリ。
  * @property permanentDir アプリケーションの永続ファイル用ディレクトリ。
+ * @property dispatcher ファイル操作を実行するスレッドプール。
  */
 class ImageFileDataSource(
     private val contentResolver: ContentResolver,
     private val cacheDir: File,
-    private val permanentDir: File
+    private val permanentDir: File,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     private val logTag = createLogTag()
@@ -92,8 +97,15 @@ class ImageFileDataSource(
      * @throws FileReadException ファイルの存在確認に失敗した場合。
      * @return 構築された絶対パス。
      */
-    fun existsImageFileInCache(fileName: String): Boolean {
-        return File(imageCacheDir, fileName).exists()
+    suspend fun existsImageFileInCache(fileName: String): Boolean {
+        val file = File(imageCacheDir, fileName)
+        return withContext(dispatcher) {
+            try {
+                file.exists()
+            } catch (e: SecurityException) {
+                throw FilePermissionDeniedException(file.absolutePath, e)
+            }
+        }
     }
 
     /**
@@ -104,8 +116,15 @@ class ImageFileDataSource(
      * @throws FileReadException ファイルの存在確認に失敗した場合。
      * @return 構築された絶対パス。
      */
-    fun existsImageFileInPermanent(fileName: String): Boolean {
-        return File(imagePermanentDir, fileName).exists()
+    suspend fun existsImageFileInPermanent(fileName: String): Boolean {
+        val file = File(imagePermanentDir, fileName)
+        return withContext(dispatcher) {
+            try {
+                file.exists()
+            } catch (e: SecurityException) {
+                throw FilePermissionDeniedException(file.absolutePath, e)
+            }
+        }
     }
 
     /**
@@ -116,8 +135,15 @@ class ImageFileDataSource(
      * @throws FileReadException ファイルの存在確認に失敗した場合。
      * @return 構築された絶対パス。
      */
-    fun existsImageFileInBackup(fileName: String): Boolean {
-        return File(imageBackupDir, fileName).exists()
+    suspend fun existsImageFileInBackup(fileName: String): Boolean {
+        val file = File(imageBackupDir, fileName)
+        return withContext(dispatcher) {
+            try {
+                file.exists()
+            } catch (e: SecurityException) {
+                throw FilePermissionDeniedException(file.absolutePath, e)
+            }
+        }
     }
 
     /**
@@ -135,54 +161,57 @@ class ImageFileDataSource(
      * @throws FileWriteException 画像の書き込みに失敗した場合。
      * @throws InsufficientStorageException ストレージの空き容量が不足した場合。
      */
-    fun cacheImageFile(
+    suspend fun cacheImageFile(
         uriString: String,
         fileBaseName: String,
         width: Int = 0,
         height: Int = 0,
         quality: Int = 100
     ): String {
-        val uri = Uri.parse(uriString)
-        val outputFileName = "$fileBaseName.${imageFileExtension.name}"
-        val outputFile = File(imageCacheDir, outputFileName)
-        var bitmap: Bitmap? = null
+        return withContext(dispatcher) {
+            val uri = Uri.parse(uriString)
+            val outputFileName = "$fileBaseName.${imageFileExtension.name}"
+            val outputFile = File(imageCacheDir, outputFileName)
+            var bitmap: Bitmap? = null
 
-        // URI指定画像ファイル読み出し
-        try {
-            contentResolver.openInputStream(uri)?.use { inputStream ->
-                bitmap = decodeSampledBitmapFromStream(inputStream, width, height)
-            } ?: throw FileReadException(uri.path.toString())
-        } catch (e: java.io.FileNotFoundException) {
-            throw FileNotFoundException(uri.path.toString() ,e)
-        } catch (e: IOException) {
-            throw FileReadException(uri.path.toString(), e)
-        } catch (e: SecurityException) {
-            throw FilePermissionDeniedException(uri.toString(), e)
-        }
-
-        val bitmapNotNull = bitmap ?: throw FileOperationException("bitmap変数がNullのままです。")
-
-        // キャッシュディレクトリへ書き込み(保存)
-        try {
-            FileOutputStream(outputFile).use { outputStream ->
-                val isSuccess = bitmapNotNull.compress(imageFileExtension, quality, outputStream)
-                if (!isSuccess) throw FileWriteException(outputFile.path)
+            // URI指定画像ファイル読み出し
+            try {
+                contentResolver.openInputStream(uri)?.use { inputStream ->
+                    bitmap = decodeSampledBitmapFromStream(inputStream, width, height)
+                } ?: throw FileReadException(uri.path.toString())
+            } catch (e: java.io.FileNotFoundException) {
+                throw FileNotFoundException(uri.path.toString(), e)
+            } catch (e: IOException) {
+                throw FileReadException(uri.path.toString(), e)
+            } catch (e: SecurityException) {
+                throw FilePermissionDeniedException(uri.toString(), e)
             }
-        } catch (e: java.io.FileNotFoundException) {
-            throw FileNotFoundException(outputFile.absolutePath, e)
-        } catch (e: IOException) {
-            if (isInsufficientStorageException(e)) {
-                throw InsufficientStorageException(outputFile.absolutePath, e)
-            } else {
-                throw FileWriteException(outputFile.absolutePath, e)
-            }
-        } catch (e: SecurityException) {
-            throw FilePermissionDeniedException(outputFile.absolutePath, e)
-        } finally {
-            bitmapNotNull.recycle()
-        }
 
-        return outputFile.name
+            val bitmapNotNull = bitmap ?: throw FileOperationException("bitmap変数がNullのままです。")
+
+            // キャッシュディレクトリへ書き込み(保存)
+            try {
+                FileOutputStream(outputFile).use { outputStream ->
+                    val isSuccess =
+                        bitmapNotNull.compress(imageFileExtension, quality, outputStream)
+                    if (!isSuccess) throw FileWriteException(outputFile.path)
+                }
+            } catch (e: java.io.FileNotFoundException) {
+                throw FileNotFoundException(outputFile.absolutePath, e)
+            } catch (e: IOException) {
+                if (isInsufficientStorageException(e)) {
+                    throw InsufficientStorageException(outputFile.absolutePath, e)
+                } else {
+                    throw FileWriteException(outputFile.absolutePath, e)
+                }
+            } catch (e: SecurityException) {
+                throw FilePermissionDeniedException(outputFile.absolutePath, e)
+            } finally {
+                bitmapNotNull.recycle()
+            }
+
+            outputFile.name
+        }
     }
 
     /**
@@ -263,8 +292,10 @@ class ImageFileDataSource(
      *
      * @param fileName 移動する画像ファイル名 (拡張子付き)。
      */
-    fun moveImageFileToPermanent(fileName: String) {
-        moveImageFile(fileName, imageCacheDir, imagePermanentDir)
+    suspend fun moveImageFileToPermanent(fileName: String) {
+        withContext(dispatcher) {
+            moveImageFile(fileName, imageCacheDir, imagePermanentDir)
+        }
     }
 
     /**
@@ -275,8 +306,10 @@ class ImageFileDataSource(
      *
      * @param fileName 移動する画像ファイル名 (拡張子付き)。
      */
-    fun restoreImageFileFromPermanent(fileName: String) {
-        moveImageFile(fileName, imagePermanentDir, imageCacheDir)
+    suspend fun restoreImageFileFromPermanent(fileName: String) {
+        withContext(dispatcher) {
+            moveImageFile(fileName, imagePermanentDir, imageCacheDir)
+        }
     }
 
     /**
@@ -287,8 +320,10 @@ class ImageFileDataSource(
      *
      * @param fileName 移動する画像ファイル名 (拡張子付き)。
      */
-    fun moveImageFileToBackup(fileName: String) {
-        moveImageFile(fileName, imagePermanentDir, imageBackupDir)
+    suspend fun moveImageFileToBackup(fileName: String) {
+        withContext(dispatcher) {
+            moveImageFile(fileName, imagePermanentDir, imageBackupDir)
+        }
     }
 
     /**
@@ -299,8 +334,10 @@ class ImageFileDataSource(
      *
      * @param fileName 移動する画像ファイル名 (拡張子付き)。
      */
-    fun restoreImageFileFromBackup(fileName: String) {
-        moveImageFile(fileName, imageBackupDir, imagePermanentDir)
+    suspend fun restoreImageFileFromBackup(fileName: String) {
+        withContext(dispatcher) {
+            moveImageFile(fileName, imageBackupDir, imagePermanentDir)
+        }
     }
 
     /**
@@ -404,8 +441,10 @@ class ImageFileDataSource(
      * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
      */
     @Suppress("unused") //MEMO:将来対応用
-    fun deleteImageFileInCache(fileName: String) {
-        deleteImageFile(fileName, imageCacheDir)
+    suspend fun deleteImageFileInCache(fileName: String) {
+        withContext(dispatcher) {
+            deleteImageFile(fileName, imageCacheDir)
+        }
     }
 
     /**
@@ -416,8 +455,10 @@ class ImageFileDataSource(
      *
      * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
      */
-    fun deleteImageFileInPermanent(fileName: String) {
-        deleteImageFile(fileName, imagePermanentDir)
+    suspend fun deleteImageFileInPermanent(fileName: String) {
+        withContext(dispatcher) {
+            deleteImageFile(fileName, imagePermanentDir)
+        }
     }
 
     /**
@@ -429,8 +470,10 @@ class ImageFileDataSource(
      * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
      */
     @Suppress("unused") //MEMO:将来対応用
-    fun deleteImageFileInBackup(fileName: String) {
-        deleteImageFile(fileName, imageBackupDir)
+    suspend fun deleteImageFileInBackup(fileName: String) {
+        withContext(dispatcher) {
+            deleteImageFile(fileName, imageBackupDir)
+        }
     }
 
     /**
@@ -470,8 +513,10 @@ class ImageFileDataSource(
      * このメソッドは内部でキャッシュディレクトリを指定して [deleteAllFilesInDirectory] を呼び出している。
      * 処理内容、例外の詳細は [deleteAllFilesInDirectory]を参照。
      */
-    fun deleteAllFilesInCache() {
-        deleteAllFilesInDirectory(imageCacheDir)
+    suspend fun deleteAllFilesInCache() {
+        withContext(dispatcher) {
+            deleteAllFilesInDirectory(imageCacheDir)
+        }
     }
 
     /**
@@ -480,8 +525,10 @@ class ImageFileDataSource(
      * このメソッドは内部で永続ディレクトリを指定して [deleteAllFilesInDirectory] を呼び出している。
      * 処理内容、例外の詳細は [deleteAllFilesInDirectory]を参照。
      */
-    private fun deleteAllFilesInPermanent() {
-        deleteAllFilesInDirectory(imagePermanentDir)
+    private suspend fun deleteAllFilesInPermanent() {
+        withContext(dispatcher) {
+            deleteAllFilesInDirectory(imagePermanentDir)
+        }
     }
 
     /**
@@ -490,8 +537,10 @@ class ImageFileDataSource(
      * このメソッドは内部でバックアップ(永続)ディレクトリを指定して [deleteAllFilesInDirectory] を呼び出している。
      * 処理内容、例外の詳細は [deleteAllFilesInDirectory]を参照。
      */
-    fun deleteAllFilesInBackup() {
-        deleteAllFilesInDirectory(imageBackupDir)
+    suspend fun deleteAllFilesInBackup() {
+        withContext(dispatcher) {
+            deleteAllFilesInDirectory(imageBackupDir)
+        }
     }
 
     /**
@@ -502,30 +551,32 @@ class ImageFileDataSource(
      *
      * @throws DirectoryDeletionFailedException 一つ以上のファイルの削除に失敗した場合。
      */
-    fun deleteAllFiles() {
-        val allFailures = mutableListOf<Pair<String, Exception>>()
-        try {
-            deleteAllFilesInCache()
-        } catch (e: FileNotFoundException) {
-            allFailures.add(Pair(imageCacheDir.absolutePath, e))
-        } catch (e: FilePermissionDeniedException) {
-            allFailures.add(Pair(imageCacheDir.absolutePath, e))
-        } catch (e: DirectoryDeletionFailedException) {
-            allFailures.addAll(e.individualFailures)
-        }
+    suspend fun deleteAllFiles() {
+        withContext(dispatcher) {
+            val allFailures = mutableListOf<Pair<String, Exception>>()
+            try {
+                deleteAllFilesInCache()
+            } catch (e: FileNotFoundException) {
+                allFailures.add(Pair(imageCacheDir.absolutePath, e))
+            } catch (e: FilePermissionDeniedException) {
+                allFailures.add(Pair(imageCacheDir.absolutePath, e))
+            } catch (e: DirectoryDeletionFailedException) {
+                allFailures.addAll(e.individualFailures)
+            }
 
-        try {
-            deleteAllFilesInPermanent()
-        } catch (e: FileNotFoundException) {
-            allFailures.add(Pair(imagePermanentDir.absolutePath, e))
-        } catch (e: FilePermissionDeniedException) {
-            allFailures.add(Pair(imagePermanentDir.absolutePath, e))
-        } catch (e: DirectoryDeletionFailedException) {
-            allFailures.addAll(e.individualFailures)
-        }
+            try {
+                deleteAllFilesInPermanent()
+            } catch (e: FileNotFoundException) {
+                allFailures.add(Pair(imagePermanentDir.absolutePath, e))
+            } catch (e: FilePermissionDeniedException) {
+                allFailures.add(Pair(imagePermanentDir.absolutePath, e))
+            } catch (e: DirectoryDeletionFailedException) {
+                allFailures.addAll(e.individualFailures)
+            }
 
-        if (allFailures.isNotEmpty())
-            throw DirectoryDeletionFailedException(individualFailures = allFailures)
+            if (allFailures.isNotEmpty())
+                throw DirectoryDeletionFailedException(individualFailures = allFailures)
+        }
     }
 
     /**
@@ -565,7 +616,7 @@ class ImageFileDataSource(
                 throw FilePermissionDeniedException(directory.absolutePath, e)
             } catch (e: IOException) {
                 throw FileOperationException(
-                    "ディレクトリ内のファイルのリスト化に失敗しました。 (パス: $directory.absolutePath)",
+                    "ディレクトリ内のファイルのリスト化に失敗しました。 (パス: ${directory.absolutePath})",
                     e
                 )
             }

@@ -12,6 +12,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.work.Configuration
 import coil3.ImageLoader
 import coil3.PlatformContext
@@ -24,6 +25,7 @@ import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import com.websarva.wings.android.zuboradiary.ui.notification.ReminderNotificationManager
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.HiltAndroidApp
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -56,12 +58,13 @@ class ZuboraDiaryApplication :
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         setUpReminderNotificationChannel()
-        try {
-            imageFileDataSource.deleteAllFilesInCache()
-        } catch (e: Exception) {
-            Log.w(logTag, "キャッシュストレージの画像ファイルのクリア失敗", e)
+        ProcessLifecycleOwner.get().lifecycleScope.launch {
+            try {
+                imageFileDataSource.deleteAllFilesInCache()
+            } catch (e: Exception) {
+                Log.w(logTag, "キャッシュストレージの画像ファイルのクリア失敗", e)
+            }
         }
-
     }
 
     override fun onStart(owner: LifecycleOwner) {

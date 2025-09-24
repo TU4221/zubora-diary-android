@@ -5,6 +5,9 @@ import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.datastore.core.IOException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import java.net.ConnectException
 import java.net.UnknownHostException
@@ -19,8 +22,12 @@ import javax.net.ssl.SSLException
  * APIへのアクセス失敗等で発生する特定の例外を[WeatherApiException] にラップする。
  *
  * @property weatherApiService Retrofitサービスインターフェースのインスタンス。
+ * @property dispatcher 天気情報の取得を実行するスレッドプール。
  */
-internal class WeatherApiDataSource(private val weatherApiService: WeatherApiService) {
+internal class WeatherApiDataSource(
+    private val weatherApiService: WeatherApiService,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
 
     private val logTag = createLogTag()
 
@@ -63,11 +70,13 @@ internal class WeatherApiDataSource(private val weatherApiService: WeatherApiSer
         if (!canFetchWeatherInfo(date)) throw WeatherApiException.DateOutOfRange(date)
 
         val currentDate = LocalDate.now()
-        return if (date == currentDate) {
-            fetchTodayWeatherInfo(latitude, longitude)
-        } else {
-            val betweenDays = ChronoUnit.DAYS.between(date, currentDate).toInt()
-            fetchPastDayWeatherInfo(latitude, longitude, betweenDays)
+        return withContext(dispatcher) {
+            if (date == currentDate) {
+                fetchTodayWeatherInfo(latitude, longitude)
+            } else {
+                val betweenDays = ChronoUnit.DAYS.between(date, currentDate).toInt()
+                fetchPastDayWeatherInfo(latitude, longitude, betweenDays)
+            }
         }
     }
 

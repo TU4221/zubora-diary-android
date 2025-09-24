@@ -14,13 +14,10 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 import java.time.LocalDate
-
 
 internal class DiaryRepositoryImpl (
     private val diaryDataSource: DiaryDataSource
@@ -30,59 +27,49 @@ internal class DiaryRepositoryImpl (
 
     //region Diary
     override suspend fun countDiaries(date: LocalDate?): Int {
-        return withContext(Dispatchers.IO) {
-            try {
-                if (date == null) {
-                    diaryDataSource.countDiaries()
-                } else {
-                    diaryDataSource.countDiaries(date)
-                }
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
+        return try {
+            if (date == null) {
+                diaryDataSource.countDiaries()
+            } else {
+                diaryDataSource.countDiaries(date)
             }
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun existsDiary(date: LocalDate): Boolean {
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.existsDiary(date)
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        return try {
+            diaryDataSource.existsDiary(date)
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun loadDiary(date: LocalDate): Diary {
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.selectDiary(date)?.toDomainModel()
-                    ?: throw NotFoundException()
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        return try {
+            diaryDataSource.selectDiary(date)?.toDomainModel()
+                ?: throw NotFoundException()
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun loadNewestDiary(): Diary {
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.selectNewestDiary()?.toDomainModel()
-                    ?: throw NotFoundException()
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        return try {
+            diaryDataSource.selectNewestDiary()?.toDomainModel()
+                ?: throw NotFoundException()
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun loadOldestDiary(): Diary {
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.selectOldestDiary()?.toDomainModel()
-                    ?: throw NotFoundException()
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        return try {
+            diaryDataSource.selectOldestDiary()?.toDomainModel()
+                ?: throw NotFoundException()
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
 
@@ -95,74 +82,62 @@ internal class DiaryRepositoryImpl (
         require(num >= 1)
         require(offset >= 0)
 
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource
-                    .selectDiaryListOrderByDateDesc(num, offset, date)
-                    .map { it.toDomainModel() }
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        return try {
+            diaryDataSource
+                .selectDiaryListOrderByDateDesc(num, offset, date)
+                .map { it.toDomainModel() }
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun saveDiary(
         diary: Diary
     ) {
-        withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.saveDiary(
-                    diary.toDataModel()
-                )
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            diaryDataSource.saveDiary(
+                diary.toDataModel()
+            )
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun deleteAndSaveDiary(
         diary: Diary
     ) {
-        withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.deleteAndSaveDiary(
-                    diary.toDataModel()
-                )
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            diaryDataSource.deleteAndSaveDiary(
+                diary.toDataModel()
+            )
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun deleteDiary(date: LocalDate) {
-        withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.deleteDiary(date)
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            diaryDataSource.deleteDiary(date)
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun deleteAllDiaries() {
-        withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.deleteAllDiaries()
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            diaryDataSource.deleteAllDiaries()
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
     //endregion
 
     //region WordSearchResult
     override suspend fun countWordSearchResults(searchWord: String): Int {
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.countWordSearchResults(searchWord)
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        return try {
+            diaryDataSource.countWordSearchResults(searchWord)
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
 
@@ -174,14 +149,12 @@ internal class DiaryRepositoryImpl (
         require(num >= 1)
         require(offset >= 0)
 
-        return withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource
-                    .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
-                    .map { it.toDomainModel() }
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        return try {
+            diaryDataSource
+                .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
+                .map { it.toDomainModel() }
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
     //endregion
@@ -196,7 +169,12 @@ internal class DiaryRepositoryImpl (
         return diaryDataSource
             .selectHistoryListOrderByLogDesc(num, offset)
             .catch {
-                throw DataStorageException(cause = it)
+                // Flowストリーム内で発生した例外をDataStorageExceptionにラップ
+                if (it is DataBaseAccessFailureException) {
+                    throw DataStorageException(cause = it)
+                } else {
+                    throw it // その他の予期せぬ例外はそのままスロー
+                }
             }
             .map { list ->
                 list.map { it.toDomainModel() }
@@ -206,30 +184,30 @@ internal class DiaryRepositoryImpl (
     override suspend fun updateDiaryItemTitleSelectionHistory(
         historyItemList: List<DiaryItemTitleSelectionHistory>
     ) {
-        diaryDataSource.updateDiaryItemTitleSelectionHistory(
-            historyItemList.map { it.toDataModel() }
-        )
+        try {
+            diaryDataSource.updateDiaryItemTitleSelectionHistory(
+                historyItemList.map { it.toDataModel() }
+            )
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
+        }
     }
 
     override suspend fun deleteDiaryItemTitleSelectionHistory(title: String) {
-        withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.deleteHistoryItem(title)
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            diaryDataSource.deleteHistoryItem(title)
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
     //endregion
 
     //region Options
     override suspend fun deleteAllData() {
-        withContext(Dispatchers.IO) {
-            try {
-                diaryDataSource.deleteAllData()
-            } catch (e: DataBaseAccessFailureException) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            diaryDataSource.deleteAllData()
+        } catch (e: DataBaseAccessFailureException) {
+            throw DataStorageException(cause = e)
         }
     }
     //endregion

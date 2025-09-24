@@ -5,6 +5,9 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
@@ -15,8 +18,12 @@ import java.util.concurrent.TimeUnit
  * [ReminderNotificationWorker] の定期実行を管理する。
  *
  * @property workManager WorkManagerのインスタンス。
+ * @property dispatcher WorkManagerの操作を実行するスレッドプール。
  */
-internal class NotificationSchedulingDataSource(private val workManager: WorkManager) {
+internal class NotificationSchedulingDataSource(
+    private val workManager: WorkManager,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
 
     private val reminderNotificationWorkTag = "ReminderNotification"
     private val reminderNotificationUniqueWorkName = reminderNotificationWorkTag
@@ -31,7 +38,7 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
      * @param settingTime 通知を毎日表示する時刻。
      * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
      */
-    fun registerReminderNotificationWorker(settingTime: LocalTime) {
+    suspend fun registerReminderNotificationWorker(settingTime: LocalTime) {
         cancelReminderNotificationWorker()
 
         val nowTime = LocalTime.now()
@@ -46,12 +53,14 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
                 .addTag(reminderNotificationWorkTag)
                 .setInitialDelay(initialDelaySeconds, TimeUnit.SECONDS)
                 .build()
-        executeWorkOperation {
-            workManager.enqueueUniquePeriodicWork(
-                reminderNotificationUniqueWorkName,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
-                request
-            )
+        withContext(dispatcher) {
+            executeWorkOperation {
+                workManager.enqueueUniquePeriodicWork(
+                    reminderNotificationUniqueWorkName,
+                    ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                    request
+                )
+            }
         }
     }
 
@@ -78,11 +87,13 @@ internal class NotificationSchedulingDataSource(private val workManager: WorkMan
      *
      * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
      */
-    fun cancelReminderNotificationWorker() {
-        executeWorkOperation {
-            workManager.apply {
-                cancelAllWorkByTag(reminderNotificationWorkTag)
-                cancelUniqueWork(reminderNotificationUniqueWorkName)
+    suspend fun cancelReminderNotificationWorker() {
+        withContext(dispatcher) {
+            executeWorkOperation {
+                workManager.apply {
+                    cancelAllWorkByTag(reminderNotificationWorkTag)
+                    cancelUniqueWork(reminderNotificationUniqueWorkName)
+                }
             }
         }
     }

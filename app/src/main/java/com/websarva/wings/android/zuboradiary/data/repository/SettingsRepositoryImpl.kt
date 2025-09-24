@@ -13,11 +13,9 @@ import com.websarva.wings.android.zuboradiary.domain.repository.SettingsReposito
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
 
 internal class SettingsRepositoryImpl(
     private val userPreferencesDataSource: UserPreferencesDataSource
@@ -79,57 +77,47 @@ internal class SettingsRepositoryImpl(
     }
 
     override suspend fun updateThemeColorSetting(setting: ThemeColorSetting) {
-        withContext(Dispatchers.IO) {
-            try {
-                val preference = setting.toDataModel()
-                userPreferencesDataSource.updateThemeColorPreference(preference)
-            } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            val preference = setting.toDataModel()
+            userPreferencesDataSource.updateThemeColorPreference(preference)
+        } catch (e: UserPreferencesException.DataStoreAccessFailure) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun updateCalendarStartDayOfWeekSetting(setting: CalendarStartDayOfWeekSetting) {
-        withContext(Dispatchers.IO) {
-            try {
-                val preference = setting.toDataModel()
-                userPreferencesDataSource.updateCalendarStartDayOfWeekPreference(preference)
-            } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            val preference = setting.toDataModel()
+            userPreferencesDataSource.updateCalendarStartDayOfWeekPreference(preference)
+        } catch (e: UserPreferencesException.DataStoreAccessFailure) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun updateReminderNotificationSetting(setting: ReminderNotificationSetting) {
-        withContext(Dispatchers.IO) {
-            try {
-                val preference = setting.toDataModel()
-                userPreferencesDataSource.updateReminderNotificationPreference(preference)
-            } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            val preference = setting.toDataModel()
+            userPreferencesDataSource.updateReminderNotificationPreference(preference)
+        } catch (e: UserPreferencesException.DataStoreAccessFailure) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun updatePasscodeLockSetting(setting: PasscodeLockSetting) {
-        withContext(Dispatchers.IO) {
-            try {
-                val preference = setting.toDataModel()
-                userPreferencesDataSource.updatePasscodeLockPreference(preference)
-            } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            val preference = setting.toDataModel()
+            userPreferencesDataSource.updatePasscodeLockPreference(preference)
+        } catch (e: UserPreferencesException.DataStoreAccessFailure) {
+            throw DataStorageException(cause = e)
         }
     }
 
     override suspend fun updateWeatherInfoFetchSetting(setting: WeatherInfoFetchSetting) {
-        withContext(Dispatchers.IO) {
-            try {
-                val preference = setting.toDataModel()
-                userPreferencesDataSource.updateWeatherInfoFetchPreference(preference)
-            } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-                throw DataStorageException(cause = e)
-            }
+        try {
+            val preference = setting.toDataModel()
+            userPreferencesDataSource.updateWeatherInfoFetchPreference(preference)
+        } catch (e: UserPreferencesException.DataStoreAccessFailure) {
+            throw DataStorageException(cause = e)
         }
     }
 

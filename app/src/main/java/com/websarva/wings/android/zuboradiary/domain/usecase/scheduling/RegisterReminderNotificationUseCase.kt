@@ -27,7 +27,7 @@ internal class RegisterReminderNotificationUseCase(
      * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
      *   失敗した場合は [UseCaseResult.Failure] に [ReminderNotificationRegisterException] を格納して返す。
      */
-    operator fun invoke(notificationTime: LocalTime): UseCaseResult<Unit, ReminderNotificationRegisterException> {
+    suspend operator fun invoke(notificationTime: LocalTime): UseCaseResult<Unit, ReminderNotificationRegisterException> {
         Log.i(logTag, "${logMsg}開始 (通知時刻: $notificationTime)")
 
         try {
