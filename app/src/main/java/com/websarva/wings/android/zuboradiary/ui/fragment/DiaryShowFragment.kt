@@ -233,8 +233,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
                     //      クリアという意味合いでデフォルト画像をセットする。
                     DiaryImageUpdater()
                         .update(
-                            themeColor,
-                            binding.includeDiaryShow.imageAttachedImage,
+                            binding.includeDiaryShow.imageProgressAttachedImage,
                             value
                         )
                 }

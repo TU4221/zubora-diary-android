@@ -8,7 +8,6 @@ import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeSimpleCallback.LeftSwipeViewHolder
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDayListBaseDiffUtilItemCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryDayListAdapter.DiaryDayListViewHolder
@@ -114,12 +113,7 @@ internal class DiaryDayListAdapter
             binding.includeDay.textDayOfMonth.text =
                 NumberFormat.getInstance().format(date.dayOfMonth)
             binding.textTitle.text = item.title
-            DiaryImageConfigurator()
-                .setUpImageOnDiaryList(
-                    binding.imageAttachedImage,
-                    imageFilePath,
-                    themeColor
-                )
+            binding.imageProgressAttachedImage.loadImage(imageFilePath?.path)
 
             setUpForegroundViewOnClickListener {
                 onItemClick(item)

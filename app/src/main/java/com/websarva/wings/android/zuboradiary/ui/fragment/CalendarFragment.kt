@@ -548,8 +548,7 @@ class CalendarFragment :
                 .collectLatest { value: ImageFilePathUi? ->
                     DiaryImageUpdater()
                         .update(
-                            themeColor,
-                            binding.includeDiaryShow.imageAttachedImage,
+                            binding.includeDiaryShow.imageProgressAttachedImage,
                             value
                         )
                 }

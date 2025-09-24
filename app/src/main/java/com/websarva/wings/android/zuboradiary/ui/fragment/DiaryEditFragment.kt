@@ -27,7 +27,6 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBindi
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.view.imageview.DiaryImageConfigurator
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.DatePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
@@ -746,12 +745,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.imageFilePath
                 .collectLatest { value: ImageFilePathUi? ->
-                    DiaryImageConfigurator()
-                        .setUpImageOnDiary(
-                            binding.imageAttachedImage,
-                            value,
-                            themeColor
-                        )
+                    binding.imageProgressAttachedImage.loadImage(value?.path)
                 }
         }
     }

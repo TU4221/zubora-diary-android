@@ -158,17 +158,19 @@
 
         <!-- MEMO:本レイアウトはincludeタグ使用先でスクロール機能を用意してもらう前提のため、警告"partially hidden in layout"
                   を"tools:ignore="VisualLintBounds""で無視する。 -->
-        <ImageView
-            style="@style/AppImageViewStyle"
-            android:id="@+id/image_attached_image"
+        <com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
+            android:id="@+id/image_progress_attached_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_small_margin_top"
             android:layout_gravity="center"
-            android:scaleType="fitCenter"
-            android:adjustViewBounds="true"
-            android:contentDescription="@string/layout_diary_show_attached_image_description"
             android:visibility="@{viewModel.imageFileName == null ? View.GONE : View.VISIBLE}"
+            app:defaultIcon="@drawable/ic_image_24px"
+            app:errorIcon="@drawable/ic_hide_image_24px"
+            app:iconTint="?attr/colorOnSurfaceVariant"
+            app:imageScaleType="fitCenter"
+            app:imageContentDescription="@string/layout_diary_show_attached_image_description"
+            app:imageAdjustViewBounds="true"
             tools:ignore="VisualLintBounds" />
 
         <TextView

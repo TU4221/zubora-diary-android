@@ -10,6 +10,7 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.databinding.BindingAdapter
 import com.google.android.material.appbar.MaterialToolbar
+import com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
 import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
 
 internal object BindingAdapters {
@@ -29,6 +30,15 @@ internal object BindingAdapters {
     @BindingAdapter("onNavigationIconClick")
     fun setOnNavigationIconClickListener(toolbar: MaterialToolbar, listener: View.OnClickListener) {
         toolbar.setNavigationOnClickListener(listener)
+    }
+
+    /**
+     * ImageProgressView にカスタム属性を介してクリックリスナーを設定するためのBindingAdapter。
+     */
+    @JvmStatic
+    @BindingAdapter("onImageClick")
+    fun setImageProgressViewClickListener(view: ImageProgressView, listener: View.OnClickListener?) {
+        view.setImageOnClickListener(listener)
     }
 
 

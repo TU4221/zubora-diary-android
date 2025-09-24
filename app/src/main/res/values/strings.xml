@@ -361,6 +361,9 @@
     <string name="reminder_notification_worker_content_title">お疲れ様です</string>
     <string name="reminder_notification_worker_content_text">今日の出来事を日記に書きましょう。</string>
 
+    <!-- ImageProgressView -->
+    <string name="view_image_progress_image_default_description">画像</string>
+
     <!--*****************************************************************************************-->
 
 </resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ImageProgressView">
+        <!-- デフォルトで表示するアイコンのリソースID -->
+        <attr name="defaultIcon" format="reference" />
+        <!-- エラー時に表示するアイコンのリソースID -->
+        <attr name="errorIcon" format="reference" />
+        <!-- アイコンに適用する色のリソースIDまたはカラーコード -->
+        <attr name="iconTint" format="color|reference" />
+        <!-- 表示する画像のスケールタイプ -->
+        <attr name="imageScaleType" format="enum" >
+            <enum name="matrix" value="0" />
+            <enum name="fitXY" value="1" />
+            <enum name="fitStart" value="2" />
+            <enum name="fitCenter" value="3" />
+            <enum name="fitEnd" value="4" />
+            <enum name="center" value="5" />
+            <enum name="centerCrop" value="6" />
+            <enum name="centerInside" value="7" />
+        </attr>
+        <attr name="imageContentDescription" format="string" />
+        <attr name="imageAdjustViewBounds" format="boolean" />
+    </declare-styleable>
+</resources>

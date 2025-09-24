@@ -110,7 +110,13 @@ class ZuboraDiaryApplication :
                     .build()
             }
             .diskCache(null) // ローカルファイルの読み込みの為、ディスクキャッシュを無効化
-            .crossfade(true) // 画像表示時のクロスフェード有無
+
+            // MEMO:画像切替時の表示不具合対策としてクロスフェードを無効化。
+            //      有効の場合、アプリリソース画像とストレージ画像間の高速な切り替え時に、以下の問題が発生することがある。
+            //      1. 画像が薄く表示される (アルファ値の問題の可能性)
+            //      2. ImageView で指定した ScaleType が適用されない
+            .crossfade(false) // 画像表示時のクロスフェード有無
+
             .apply {
                 if (BuildConfig.DEBUG) {
                     logger(DebugLogger()) // ロギング (開発中のみ)

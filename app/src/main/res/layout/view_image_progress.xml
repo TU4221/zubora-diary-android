@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 背景タップで下のViewが反応しないように'android:clickable="true"'とする。 -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" >
+
+        <ImageView
+            style="@style/AppImageViewStyle"
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="@string/view_image_progress_image_default_description" />
+
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            style="@style/AppMediumCircularProgressIndicatorStyle"
+            android:id="@+id/progress"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="invisible"
+            tools:visibility="visible" />
+
+    </FrameLayout>
+</layout>
