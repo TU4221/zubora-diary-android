@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepositoryExceptionMapperImpl
+import com.websarva.wings.android.zuboradiary.data.mapper.scheduling.SchedulingRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherApiRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
@@ -68,7 +69,11 @@ internal object RepositoryModule {
     @Provides
     fun provideSchedulingRepository(
         workManager: NotificationSchedulingDataSource
-    ): SchedulingRepository = SchedulingRepositoryImpl(workManager)
+    ): SchedulingRepository =
+        SchedulingRepositoryImpl(
+            workManager,
+            SchedulingRepositoryExceptionMapperImpl
+            )
 
     @Singleton
     @Provides

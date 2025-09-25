@@ -4,6 +4,8 @@ import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
+import com.websarva.wings.android.zuboradiary.data.worker.exception.WorkerCancellationException
+import com.websarva.wings.android.zuboradiary.data.worker.exception.WorkerEnqueueException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +38,8 @@ internal class NotificationSchedulingDataSource(
      * 既存の同じ名前のワーカーが存在する場合は、キャンセルしてから新しいワーカーを登録する
      *
      * @param settingTime 通知を毎日表示する時刻。
-     * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
+     * @throws WorkerCancellationException 現在スケジュールされているワーカーの解除に失敗した場合。
+     * @throws WorkerEnqueueException ワーカーの登録に失敗した場合。
      */
     suspend fun registerReminderNotificationWorker(settingTime: LocalTime) {
         cancelReminderNotificationWorker()
@@ -53,13 +56,17 @@ internal class NotificationSchedulingDataSource(
                 .addTag(reminderNotificationWorkTag)
                 .setInitialDelay(initialDelaySeconds, TimeUnit.SECONDS)
                 .build()
+
         withContext(dispatcher) {
-            executeWorkOperation {
+            try {
                 workManager.enqueueUniquePeriodicWork(
                     reminderNotificationUniqueWorkName,
                     ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
                     request
                 )
+            } catch (e: IllegalStateException) {
+                // WorkManagerが未初期化、または内部状態が不正な場合に発生
+                throw WorkerEnqueueException(reminderNotificationUniqueWorkName, e)
             }
         }
     }
@@ -85,37 +92,19 @@ internal class NotificationSchedulingDataSource(
     /**
      * 現在スケジュールされているリマインダー通知ワーカーを全てキャンセルする。
      *
-     * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
+     * @throws WorkerCancellationException 現在スケジュールされているワーカーの解除に失敗した場合。
      */
     suspend fun cancelReminderNotificationWorker() {
         withContext(dispatcher) {
-            executeWorkOperation {
+            try {
                 workManager.apply {
                     cancelAllWorkByTag(reminderNotificationWorkTag)
                     cancelUniqueWork(reminderNotificationUniqueWorkName)
                 }
+            } catch (e: IllegalStateException) {
+                // WorkManagerが未初期化、または内部状態が不正な場合に発生
+                throw WorkerCancellationException(reminderNotificationUniqueWorkName, e)
             }
-        }
-    }
-
-    /**
-     * WorkManagerの操作を安全に実行するための共通ヘルパー関数。
-     *
-     * 指定された [operation] を実行し、[IllegalStateException] が発生した場合は
-     * [WorkProfileAccessFailureException] としてラップして再スローする。
-     * これは、WorkManagerが未初期化、または内部状態が不正な場合に発生する。
-     *
-     * @param operation WorkManagerに対する操作を行う関数。
-     * @throws WorkProfileAccessFailureException WorkManagerの操作に失敗した場合。
-     */
-    private fun executeWorkOperation(
-        operation: () -> Unit
-    ) {
-        try {
-            operation()
-        } catch (e: IllegalStateException) {
-            // WorkManagerが未初期化、または内部状態が不正な場合に発生しうるためキャッチ
-            throw WorkProfileAccessFailureException(e)
         }
     }
 }

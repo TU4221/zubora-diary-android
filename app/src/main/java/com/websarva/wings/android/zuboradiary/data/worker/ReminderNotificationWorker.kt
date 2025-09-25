@@ -59,7 +59,7 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
     private suspend fun existsSavedTodayDiary(): Boolean {
         return try {
             diaryRepository.existsDiary(LocalDate.now())
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             false
         }
     }
@@ -73,7 +73,11 @@ internal class ReminderNotificationWorker @AssistedInject constructor(
     private fun showHeadsUpNotification(): Result {
         if (!permissionChecker.isPostNotificationsGranted) return Result.failure()
 
-        reminderNotifier.show()
+        try {
+            reminderNotifier.show()
+        } catch (_: Exception) {
+            return Result.success()
+        }
         return Result.success()
     }
 }

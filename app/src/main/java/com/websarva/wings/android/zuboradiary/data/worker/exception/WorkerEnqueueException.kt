@@ -9,4 +9,4 @@ package com.websarva.wings.android.zuboradiary.data.worker.exception
 internal class WorkerEnqueueException(
     workerName: String,
     cause: Throwable? = null
-) : WorkerException("ワーカー '$workerName' のエンキューに失敗しました。", cause)
+) : WorkerOperationException("ワーカー '$workerName' のエンキューに失敗しました。", cause)

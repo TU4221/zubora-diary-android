@@ -3,21 +3,17 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
+import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.exception.ReminderNotificationCancelException
-import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.exception.ReminderNotificationRegisterException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.RegisterReminderNotificationUseCase
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.SchedulingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import java.time.LocalTime
 
 /**
  * リマインダー通知設定を更新するユースケース。
@@ -25,15 +21,13 @@ import java.time.LocalTime
  * 設定の有効/無効に応じて、通知の登録またはキャンセルも行う。
  *
  * @property settingsRepository 設定関連の操作を行うリポジトリ。
+ * @property schedulingRepository スケジューリング関連の操作を行うリポジトリ。
  * @property loadReminderNotificationSettingUseCase リマインダー通知設定を読み込むユースケース。
- * @property registerReminderNotificationUseCase リマインダー通知を登録するユースケース。
- * @property cancelReminderNotificationUseCase リマインダー通知をキャンセルするユースケース。
  */
 internal class UpdateReminderNotificationSettingUseCase(
     private val settingsRepository: SettingsRepository,
-    private val loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase,
-    private val registerReminderNotificationUseCase: RegisterReminderNotificationUseCase,
-    private val cancelReminderNotificationUseCase: CancelReminderNotificationUseCase
+    private val schedulingRepository: SchedulingRepository,
+    private val loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase
 ) {
 
     private val logTag = createLogTag()
@@ -120,24 +114,31 @@ internal class UpdateReminderNotificationSettingUseCase(
         try {
             when (settingValue) {
                 is ReminderNotificationSetting.Enabled -> {
-                    registerReminderNotification(settingValue.notificationTime)
+                    try {
+                        schedulingRepository.registerReminderNotification(
+                            settingValue.notificationTime
+                        )
+                    } catch (e: SchedulingException) {
+                        throw ReminderNotificationSettingUpdateException
+                            .SchedulingRegisterFailure(e)
+                    }
                 }
                 ReminderNotificationSetting.Disabled -> {
-                    cancelReminderNotification()
+                    try {
+                        schedulingRepository.cancelReminderNotification()
+                    } catch (e: SchedulingException) {
+                        throw ReminderNotificationSettingUpdateException
+                            .SchedulingCancelFailure(e)
+                    }
                 }
             }
-        } catch (e: UseCaseException) {
-            rollbackReminderNotification(backupSettingValue)
-
-            throw when (e) {
-                is ReminderNotificationRegisterException -> {
-                    ReminderNotificationSettingUpdateException.SchedulingRegisterFailure(e)
-                }
-                is ReminderNotificationCancelException -> {
-                    ReminderNotificationSettingUpdateException.SchedulingCancelFailure(e)
-                }
-                else -> IllegalStateException()
+        } catch (e:  ReminderNotificationSettingUpdateException) {
+            try {
+                rollbackReminderNotification(backupSettingValue)
+            } catch (e: ReminderNotificationSettingUpdateException.RollbackFailure) {
+                throw e
             }
+            throw e
         }
     }
 
@@ -160,39 +161,6 @@ internal class UpdateReminderNotificationSettingUseCase(
                         }
                     }
                 }.first()
-        }
-    }
-
-    /**
-     * 指定された時刻でリマインダー通知を登録する。
-     *
-     * @param notificationTime 通知時刻。
-     * @throws ReminderNotificationRegisterException 通知の登録に失敗した場合。
-     */
-    private suspend fun registerReminderNotification(notificationTime: LocalTime) {
-        when (val result = registerReminderNotificationUseCase(notificationTime)) {
-            is UseCaseResult.Success -> {
-                // 処理不要
-            }
-            is UseCaseResult.Failure -> {
-                throw ReminderNotificationSettingUpdateException.SchedulingRegisterFailure(result.exception)
-            }
-        }
-    }
-
-    /**
-     * リマインダー通知をキャンセルする。
-     *
-     * @throws ReminderNotificationCancelException 通知のキャンセルに失敗した場合。
-     */
-    private suspend fun cancelReminderNotification() {
-        when (val result = cancelReminderNotificationUseCase()) {
-            is UseCaseResult.Success -> {
-                // 処理不要
-            }
-            is UseCaseResult.Failure -> {
-                throw ReminderNotificationSettingUpdateException.SchedulingCancelFailure(result.exception)
-            }
         }
     }
 

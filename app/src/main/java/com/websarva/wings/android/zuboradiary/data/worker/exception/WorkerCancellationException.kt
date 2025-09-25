@@ -9,4 +9,4 @@ package com.websarva.wings.android.zuboradiary.data.worker.exception
 internal class WorkerCancellationException(
     workerName: String,
     cause: Throwable? = null
-) : WorkerException("ワーカー '$workerName' のキャンセル処理に失敗しました。", cause)
+) : WorkerOperationException("ワーカー '$workerName' のキャンセル処理に失敗しました。", cause)
