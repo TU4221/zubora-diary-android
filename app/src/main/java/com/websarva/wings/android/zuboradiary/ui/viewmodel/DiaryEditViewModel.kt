@@ -960,8 +960,13 @@ internal class DiaryEditViewModel @Inject constructor(
         isGranted: Boolean,
         date: LocalDate
     ) {
+        if (!isGranted) {
+            updateUiState(DiaryEditState.Editing)
+            emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
+        }
+
         updateUiState(DiaryEditState.FetchingWeatherInfo)
-        when (val result = fetchWeatherInfoUseCase(isGranted, date)) {
+        when (val result = fetchWeatherInfoUseCase(date)) {
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)
                 updateWeather1(result.value.toUiModel())

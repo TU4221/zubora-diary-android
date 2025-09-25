@@ -4,12 +4,17 @@ import android.util.Log
 import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.datastore.core.IOException
+import com.websarva.wings.android.zuboradiary.data.network.exception.HttpException
+import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkConnectivityException
+import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOperationException
+import com.websarva.wings.android.zuboradiary.data.network.exception.ResponseParsingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import java.net.ConnectException
+import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -49,11 +54,15 @@ internal class WeatherApiDataSource(
      *
      * 現在日付の場合は当日の天気情報を、過去日の場合は過去の天気情報を取得する。
      *
-     * @param date 天気情報を取得する日付。
+     * @param date 天気情報を取得する日付。(現在の日付から[MAX_PAST_DAYS]で定義された最大過去日数までの日付の範囲。)
      * @param latitude 天気情報を取得する地点の緯度 (-90.0 から 90.0 の範囲)。
      * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
      * @return 取得した天気情報データ。
-     * @throws WeatherApiException APIアクセスに失敗した場合、または日付が範囲外の場合。
+     * @throws IllegalArgumentException 引数が許容範囲外の場合。
+     * @throws NetworkConnectivityException ネットワーク接続に問題がある場合。
+     * @throws NetworkOperationException ネットワーク操作中に問題が発生した場合 (タイムアウト、SSLエラー、一般的なI/Oエラーなど)。
+     * @throws HttpException HTTPレスポンスがエラーを示している場合。
+     * @throws ResponseParsingException レスポンスボディがnullまたはパース不可能な場合。
      */
     suspend fun fetchWeatherInfo(
         date: LocalDate,
@@ -62,12 +71,11 @@ internal class WeatherApiDataSource(
         @FloatRange(from = -180.0, to = 180.0)
         longitude: Double
     ): WeatherApiData {
-        require(latitude >= -90)
-        require(latitude <= 90)
-        require(longitude >= -180)
-        require(longitude <= 180)
-
-        if (!canFetchWeatherInfo(date)) throw WeatherApiException.DateOutOfRange(date)
+        require(latitude >= -90) { "緯度 `$latitude` が不正値" }
+        require(latitude <= 90) { "緯度 `$latitude` が不正値" }
+        require(longitude >= -180) { "経度 `$longitude` が不正値" }
+        require(longitude <= 180) { "経度 `$longitude` が不正値" }
+        if (!canFetchWeatherInfo(date)) throw IllegalArgumentException("日付 `$date` が不正値")
 
         val currentDate = LocalDate.now()
         return withContext(dispatcher) {
@@ -108,7 +116,11 @@ internal class WeatherApiDataSource(
      * @param latitude 天気情報を取得する地点の緯度 (-90.0 から 90.0 の範囲)。
      * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
      * @return 取得した今日の天気情報データ ([WeatherApiData])。
-     * @throws WeatherApiException.ApiAccessFailure APIアクセスに失敗した場合。
+     * @throws IllegalArgumentException numPastDaysが不正な範囲の場合。
+     * @throws NetworkConnectivityException ネットワーク接続に問題がある場合。
+     * @throws NetworkOperationException ネットワーク操作中に問題が発生した場合 (タイムアウト、SSLエラー、一般的なI/Oエラーなど)。
+     * @throws HttpException HTTPレスポンスがエラーを示している場合。
+     * @throws ResponseParsingException レスポンスボディがnullまたはパース不可能な場合。
      */
     private suspend fun fetchTodayWeatherInfo(
         @FloatRange(from = -90.0, to = 90.0)
@@ -137,8 +149,11 @@ internal class WeatherApiDataSource(
      * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
      * @param numPastDays 何日前の天気情報を取得するか ([MIN_PAST_DAYS] から [MAX_PAST_DAYS] の範囲)。
      * @return 取得した過去の天気情報データ。
-     * @throws WeatherApiException.ApiAccessFailure APIアクセスに失敗した場合。
      * @throws IllegalArgumentException numPastDaysが不正な範囲の場合。
+     * @throws NetworkConnectivityException ネットワーク接続に問題がある場合。
+     * @throws NetworkOperationException ネットワーク操作中に問題が発生した場合 (タイムアウト、SSLエラー、一般的なI/Oエラーなど)。
+     * @throws HttpException HTTPレスポンスがエラーを示している場合。
+     * @throws ResponseParsingException レスポンスボディがnullまたはパース不可能な場合。
      */
     private suspend fun fetchPastDayWeatherInfo(
         @FloatRange(from = -90.0, to = 90.0)
@@ -168,12 +183,10 @@ internal class WeatherApiDataSource(
     /**
      * Retrofitの[Response]を[WeatherApiData]に変換する。
      *
-     * レスポンスが成功し、かつボディが存在する場合はそれを返す。
-     * それ以外の場合は[WeatherApiException.ApiAccessFailure]をスローする。
-     *
      * @param response Retrofitからのレスポンスオブジェクト。
      * @return 変換された[WeatherApiData]。
-     * @throws WeatherApiException.ApiAccessFailure レスポンスが不成功またはボディがnullの場合。
+     * @throws HttpException HTTPレスポンスがエラーを示している場合。
+     * @throws ResponseParsingException レスポンスボディがnullまたはパース不可能な場合。
      */
     private fun toWeatherApiData(response: Response<WeatherApiData>): WeatherApiData {
         Log.d(logTag, "code = " + response.code())
@@ -181,20 +194,17 @@ internal class WeatherApiDataSource(
 
         return if (response.isSuccessful) {
             Log.d(logTag, "body = " + response.body())
-            val result =
-                response.body()
-                    ?: throw WeatherApiException.ApiAccessFailure(IOException())
+            val result = response.body() ?: throw ResponseParsingException()
             result
         } else {
             // HTTPエラー (4xx, 5xx)
-            response.errorBody().use { errorBody ->
-                val errorBodyString = errorBody?.string() ?: "null"
-                Log.d(
-                    logTag,
-                    "errorBody = $errorBodyString"
-                )
-            }
-            throw WeatherApiException.ApiAccessFailure(IOException())
+            val errorBodyString = response.errorBody()?.string() ?: "null"
+            Log.d(logTag, "errorBody = $errorBodyString")
+            throw HttpException(
+                response.code(),
+                response.message(),
+                errorBodyString
+            )
         }
     }
 
@@ -203,15 +213,16 @@ internal class WeatherApiDataSource(
      *
      * [UnknownHostException] (DNS解決失敗など)、
      * [ConnectException] (サーバー接続失敗など)、
-     * [java.net.SocketTimeoutException] (タイムアウト)、
+     * [SocketTimeoutException] (タイムアウト)、
      * [SSLException] (SSL/TLSハンドシェイクエラー)、
-     * またはその他の [java.io.IOException] (予期せぬ接続切断など) が発生した場合、
-     * それを [WeatherApiException.ApiAccessFailure] でラップして再スローする。
+     * またはその他の [IOException] (予期せぬ接続切断など) が発生した場合、
+     * それを [NetworkOperationException] 、またはそのサブクラスでラップして再スローする。
      *
      * @param R 操作の結果の型。
      * @param operation 実行するsuspend関数形式のWeb API操作。
      * @return Web API操作の結果。
-     * @throws WeatherApiException.ApiAccessFailure Web APIアクセスに失敗した場合。
+     * @throws NetworkConnectivityException ネットワーク接続に問題がある場合。
+     * @throws NetworkOperationException ネットワーク操作中に問題が発生した場合 (タイムアウト、SSLエラー、一般的なI/Oエラーなど)。
      */
     private suspend fun <R> executeWebApiOperation(
         operation: suspend () -> R
@@ -220,19 +231,19 @@ internal class WeatherApiDataSource(
             operation()
         } catch (e: UnknownHostException) {
             // DNS解決に失敗した場合 (例: インターネット接続なし、ホスト名間違い)
-            throw WeatherApiException.ApiAccessFailure(e)
+            throw NetworkConnectivityException(e)
         } catch (e: ConnectException) {
             // サーバーへのTCP接続に失敗した場合 (例: サーバーダウン、ポートが開いていない)
-            throw WeatherApiException.ApiAccessFailure(e)
-        } catch (e: java.net.SocketTimeoutException) {
-            // 接続または読み取りタイムアウト
-            throw WeatherApiException.ApiAccessFailure(e)
+            throw NetworkConnectivityException(e)
+        } catch (e: SocketTimeoutException) {
+            // 読み取りタイムアウト
+            throw NetworkOperationException("読み取りタイムアウトエラー", e)
         } catch (e: SSLException) {
             // SSL/TLS ハンドシェイクエラー
-            throw WeatherApiException.ApiAccessFailure(e)
+            throw NetworkOperationException("SSL/TLS ハンドシェイクエラー", e)
         } catch (e: IOException) {
             // 上記以外の一般的なI/Oエラー (例: 予期せぬ接続切断など)
-            throw WeatherApiException.ApiAccessFailure(e)
+            throw NetworkOperationException("ネットワークエラー", e)
         }
     }
 }

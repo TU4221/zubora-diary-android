@@ -8,6 +8,10 @@ import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
 import com.websarva.wings.android.zuboradiary.data.common.PermissionChecker
+import com.websarva.wings.android.zuboradiary.data.location.exception.LocationAccessException
+import com.websarva.wings.android.zuboradiary.data.location.exception.LocationProviderException
+import com.websarva.wings.android.zuboradiary.data.location.exception.LocationUnavailableException
+import com.websarva.wings.android.zuboradiary.data.location.exception.PermissionDeniedException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -20,8 +24,7 @@ import java.util.concurrent.TimeoutException
  * Fused Location Provider APIを利用して位置情報を取得するデータソースクラス。
  *
  * このクラスは、デバイスの現在位置を取得する機能を提供する。
- * 位置情報へのアクセス権限がない場合や、タイムアウトが発生した場合に発生する特定の例外を
- * [FusedLocationAccessFailureException] にラップする。
+ * 位置情報に関するエラーは、定義されたカスタム例外 ([LocationProviderException] のサブクラスなど) をスローする。
  *
  * @property fusedLocationProviderClient デバイスの位置情報を取得するために使用される。
  * @property permissionChecker 位置情報アクセスパーミッションなど、必要な権限が付与されているかを確認する機能を提供。
@@ -44,7 +47,9 @@ internal class FusedLocationDataSource(
      *
      * @param timeoutMillis タイムアウトまでの時間 (ミリ秒単位)。デフォルトは10000ミリ秒。
      * @return 取得した位置情報。
-     * @throws FusedLocationAccessFailureException 位置情報の取得に失敗した場合 (権限不足、タイムアウト、その他の内部エラー)。
+     * @throws PermissionDeniedException 位置情報へのアクセス権限がない場合。
+     * @throws LocationAccessException 位置情報のアクセスに失敗した場合。
+     * @throws LocationUnavailableException 指定時間内に位置情報を取得できない、または現在地が特定できない場合。
      */
     @SuppressLint("MissingPermission")
     suspend fun fetchCurrentLocation(timeoutMillis: Long = 10000L): Location {
@@ -83,13 +88,13 @@ internal class FusedLocationDataSource(
                 }
             } catch (e: SecurityException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
-                throw FusedLocationAccessFailureException(e)
+                throw PermissionDeniedException(e)
             } catch (e: IllegalStateException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
-                throw FusedLocationAccessFailureException(e)
+                throw LocationAccessException(e)
             } catch (e: TimeoutException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
-                throw FusedLocationAccessFailureException(e)
+                throw LocationUnavailableException(e)
             } finally {
                 cancellationTokenSource.cancel()
             }

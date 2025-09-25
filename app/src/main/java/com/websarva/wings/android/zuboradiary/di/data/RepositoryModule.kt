@@ -4,6 +4,8 @@ import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
 import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExceptionMapperImpl
+import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepositoryExceptionMapperImpl
+import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherApiRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
@@ -53,7 +55,8 @@ internal object RepositoryModule {
     @Provides
     fun provideLocationRepository(
         fusedLocationDataSource: FusedLocationDataSource
-    ): LocationRepository = LocationRepositoryImpl(fusedLocationDataSource)
+    ): LocationRepository =
+        LocationRepositoryImpl(fusedLocationDataSource, LocationRepositoryExceptionMapperImpl)
 
     @Singleton
     @Provides
@@ -77,5 +80,6 @@ internal object RepositoryModule {
     @Provides
     fun provideWeatherApiRepository(
         weatherApiDataSource: WeatherApiDataSource
-    ): WeatherInfoRepository = WeatherInfoRepositoryImpl(weatherApiDataSource)
+    ): WeatherInfoRepository =
+        WeatherInfoRepositoryImpl(weatherApiDataSource, WeatherApiRepositoryExceptionMapperImpl)
 }

@@ -1,8 +1,7 @@
 package com.websarva.wings.android.zuboradiary.di.domain
 
+import com.websarva.wings.android.zuboradiary.domain.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
-import com.websarva.wings.android.zuboradiary.domain.usecase.location.FetchCurrentLocationUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.CanFetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.FetchWeatherInfoUseCase
 import dagger.Module
 import dagger.Provides
@@ -24,20 +23,8 @@ internal object WeatherInfoUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideCanFetchWeatherInfoUseCase(
-        weatherInfoRepository: WeatherInfoRepository
-    ): CanFetchWeatherInfoUseCase = CanFetchWeatherInfoUseCase(weatherInfoRepository)
-
-    @Singleton
-    @Provides
     fun provideFetchWeatherInfoUseCase(
         weatherInfoRepository: WeatherInfoRepository,
-        canFetchWeatherInfoUseCase: CanFetchWeatherInfoUseCase,
-        fetchCurrentLocationUseCase: FetchCurrentLocationUseCase
-    ): FetchWeatherInfoUseCase =
-        FetchWeatherInfoUseCase(
-            weatherInfoRepository,
-            canFetchWeatherInfoUseCase,
-            fetchCurrentLocationUseCase
-        )
+        locationRepository: LocationRepository
+    ): FetchWeatherInfoUseCase = FetchWeatherInfoUseCase(weatherInfoRepository, locationRepository)
 }
