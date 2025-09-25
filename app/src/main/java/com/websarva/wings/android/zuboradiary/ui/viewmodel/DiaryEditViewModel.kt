@@ -25,7 +25,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequest
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ClearDiaryImageCacheFileUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CacheDiaryImageUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.CheckWeatherInfoFetchEnabledUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -70,7 +70,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val loadDiaryUseCase: LoadDiaryUseCase,
     private val saveDiaryUseCase: SaveDiaryUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
-    private val isWeatherInfoFetchEnabledUseCase: IsWeatherInfoFetchEnabledUseCase,
+    private val checkWeatherInfoFetchEnabledUseCase: CheckWeatherInfoFetchEnabledUseCase,
     private val fetchWeatherInfoUseCase: FetchWeatherInfoUseCase,
     private val shouldFetchWeatherInfoUseCase: ShouldFetchWeatherInfoUseCase,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
@@ -920,7 +920,7 @@ internal class DiaryEditViewModel @Inject constructor(
     // 天気情報取得関係
     private suspend fun processWeatherInfoFetch(date: LocalDate, previousDate: LocalDate?) {
         updateUiState(DiaryEditState.CheckingWeatherAvailability)
-        val isEnabled = isWeatherInfoFetchEnabledUseCase().value
+        val isEnabled = checkWeatherInfoFetchEnabledUseCase().value
         updateUiState(DiaryEditState.Editing)
         if (!isEnabled) {
             return

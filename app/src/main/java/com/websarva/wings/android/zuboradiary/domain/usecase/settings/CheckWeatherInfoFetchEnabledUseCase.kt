@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
  *
  * @property loadWeatherInfoFetchSettingUseCase 天気情報取得設定を読み込むユースケース。
  */
-internal class IsWeatherInfoFetchEnabledUseCase(
+internal class CheckWeatherInfoFetchEnabledUseCase(
     private val loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase
 ) {
 

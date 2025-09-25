@@ -2,9 +2,8 @@ package com.websarva.wings.android.zuboradiary.di.domain
 
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.CancelReminderNotificationUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.scheduling.RegisterReminderNotificationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteAllDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
@@ -13,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadRemind
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.IsWeatherInfoFetchEnabledUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.CheckWeatherInfoFetchEnabledUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateCalendarStartDayOfWeekSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdatePasscodeLockSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateReminderNotificationSettingUseCase
@@ -80,10 +79,10 @@ internal object SettingsUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideIsWeatherInfoFetchEnabledUseCase(
+    fun provideCheckWeatherInfoFetchEnabledUseCase(
         loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase
-    ): IsWeatherInfoFetchEnabledUseCase =
-        IsWeatherInfoFetchEnabledUseCase(loadWeatherInfoFetchSettingUseCase)
+    ): CheckWeatherInfoFetchEnabledUseCase =
+        CheckWeatherInfoFetchEnabledUseCase(loadWeatherInfoFetchSettingUseCase)
 
     @Singleton
     @Provides
@@ -138,15 +137,13 @@ internal object SettingsUseCaseModule {
     @Provides
     fun provideUpdateReminderNotificationSettingUseCase(
         settingsRepository: SettingsRepository,
-        loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase,
-        registerReminderNotificationUseCase: RegisterReminderNotificationUseCase,
-        cancelReminderNotificationUseCase: CancelReminderNotificationUseCase
+        schedulingRepository: SchedulingRepository,
+        loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase
     ): UpdateReminderNotificationSettingUseCase =
         UpdateReminderNotificationSettingUseCase(
             settingsRepository,
-            loadReminderNotificationSettingUseCase,
-            registerReminderNotificationUseCase,
-            cancelReminderNotificationUseCase
+            schedulingRepository,
+            loadReminderNotificationSettingUseCase
         )
 
     @Singleton
