@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchListFooterUpdateException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -37,7 +38,7 @@ internal class UpdateWordSearchResultListFooterUseCase(
     ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, WordSearchListFooterUpdateException> {
         Log.i(logTag, "${logMsg}開始 (リスト件数: ${list.countDiaries()}, 検索ワード: \"$searchWord\")")
 
-        try {
+        return try {
             val numLoadedDiaries = list.countDiaries()
             val unloadedResultsExist = checkUnloadedWordSearchResultsExist(searchWord, numLoadedDiaries)
             val replacedResultList =
@@ -50,9 +51,12 @@ internal class UpdateWordSearchResultListFooterUseCase(
                     Log.i(logTag, "${logMsg}完了_未読込の検索結果なし (フッターをメッセージに置換)")
                     list.replaceFooterWithNoDiaryMessage()
                 }
-            return UseCaseResult.Success(replacedResultList)
-        } catch (e: WordSearchListFooterUpdateException) {
-            return UseCaseResult.Failure(e)
+            UseCaseResult.Success(replacedResultList)
+        } catch (e: WordSearchResultCountException) {
+            Log.e(logTag, "${logMsg}失敗_未読込の検索結果存在確認エラー", e)
+            UseCaseResult.Failure(
+                WordSearchListFooterUpdateException.UpdateFailure(e)
+            )
         }
     }
 
@@ -64,7 +68,7 @@ internal class UpdateWordSearchResultListFooterUseCase(
      * @param searchWord 検索するキーワード。
      * @param numLoadedDiaries 現在UIに読み込まれている、この検索ワードに一致する日記の数。
      * @return 未読み込みの日記が存在すれば `true`、そうでなければ `false`。
-     * @throws WordSearchListFooterUpdateException.UpdateFailure 検索ワードに一致する日記の総数の取得に失敗した場合。
+     * @throws WordSearchResultCountException 検索ワードに一致する日記の総数の取得に失敗した場合。
      */
     private suspend fun checkUnloadedWordSearchResultsExist(
         searchWord: String,
@@ -81,8 +85,7 @@ internal class UpdateWordSearchResultListFooterUseCase(
                 }
 
                 is UseCaseResult.Failure -> {
-                    Log.e(logTag, "${logMsg}失敗_未読込の検索結果存在確認エラー", result.exception)
-                    throw WordSearchListFooterUpdateException.UpdateFailure(result.exception)
+                    throw result.exception
                 }
             }
     }

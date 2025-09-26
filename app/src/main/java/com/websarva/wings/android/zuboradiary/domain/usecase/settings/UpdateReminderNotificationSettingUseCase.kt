@@ -49,62 +49,51 @@ internal class UpdateReminderNotificationSettingUseCase(
         setting: ReminderNotificationSetting
     ): UseCaseResult<Unit, ReminderNotificationSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
+
         try {
-            val backupSetting = fetchCurrentReminderNotificationSetting(setting)
-            updateReminderNotificationSetting(setting)
+            val backupSetting = fetchCurrentReminderNotificationSetting()
+            settingsRepository.updateReminderNotificationSetting(setting)
             updateReminderScheduling(setting, backupSetting)
-            Log.i(logTag, "${logMsg}完了")
-            return UseCaseResult.Success(Unit)
-        } catch (e: ReminderNotificationSettingUpdateException) {
-            return UseCaseResult.Failure(e)
+        } catch (e: ReminderNotificationSettingLoadException) {
+            Log.e(logTag, "${logMsg}失敗_設定読込(バックアップ用)エラー", e)
+            return UseCaseResult.Failure(
+                ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
+            )
+        } catch (e: DataStorageException) {
+            Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
+            return UseCaseResult.Failure(
+                ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
+            )
+        } catch (e: SchedulingException) {
+            Log.e(logTag, "${logMsg}失敗_スケジューリング更新エラー", e)
+            return UseCaseResult.Failure(
+                ReminderNotificationSettingUpdateException.SchedulingUpdateFailure(setting, e)
+            )
         }
+
+        Log.i(logTag, "${logMsg}完了")
+        return UseCaseResult.Success(Unit)
     }
 
     /**
      * 現在のリマインダー通知設定を読み込む。
      *
-     * @param setting 現在の設定。例外発生時の情報として使用。
      * @return 現在のリマインダー通知設定。
-     * @throws ReminderNotificationSettingUpdateException.SettingUpdateFailure 設定読み込みに失敗した場合。
+     * @throws ReminderNotificationSettingUpdateException 設定読み込みに失敗した場合。
      */
-    private suspend fun fetchCurrentReminderNotificationSetting(
-        setting: ReminderNotificationSetting
-    ): ReminderNotificationSetting {
+    private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationSetting {
         return withContext(Dispatchers.IO) {
-            try {
-                loadReminderNotificationSettingUseCase()
-                    .map {
-                        when (it) {
-                            is UseCaseResult.Success -> {
-                                it.value
-                            }
-                            is UseCaseResult.Failure -> {
-                                throw it.exception
-                            }
+            loadReminderNotificationSettingUseCase()
+                .map {
+                    when (it) {
+                        is UseCaseResult.Success -> {
+                            it.value
                         }
-                    }.first()
-            } catch (e: ReminderNotificationSettingLoadException) {
-                Log.e(logTag, "${logMsg}失敗_設定読込(バックアップ用)エラー", e)
-                throw ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
-            }
-        }
-    }
-
-    /**
-     * リマインダー通知設定を更新する。
-     *
-     * @param setting 更新するリマインダー通知設定。
-     * @throws ReminderNotificationSettingUpdateException.SettingUpdateFailure 設定の更新に失敗した場合。
-     */
-    private suspend fun updateReminderNotificationSetting(setting: ReminderNotificationSetting) {
-        try {
-            settingsRepository.updateReminderNotificationSetting(setting)
-        } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
-            throw ReminderNotificationSettingUpdateException.SettingUpdateFailure(
-                setting,
-                e
-            )
+                        is UseCaseResult.Failure -> {
+                            throw it.exception
+                        }
+                    }
+                }.first()
         }
     }
 
@@ -115,6 +104,7 @@ internal class UpdateReminderNotificationSettingUseCase(
      *
      * @param updateSetting 更新後のリマインダー通知設定。
      * @param backupSetting ロールバック用の更新前のリマインダー通知設定。
+     * @throws SchedulingException スケジューリング処理に失敗した場合。
      */
     private suspend fun updateReminderScheduling(
         updateSetting: ReminderNotificationSetting,
@@ -142,7 +132,7 @@ internal class UpdateReminderNotificationSettingUseCase(
      * @param updateSetting 更新後のリマインダー通知設定。
      * @param backupSetting ロールバック用の更新前のリマインダー通知設定。
      * @param processScheduling 実行するスケジューリング処理（通知登録または解除）。
-     * @throws ReminderNotificationSettingUpdateException.SchedulingUpdateFailure スケジューリング処理に失敗した場合。
+     * @throws SchedulingException スケジューリング処理に失敗した場合。
      */
     private suspend fun executeSchedulingWithRollback(
         updateSetting: ReminderNotificationSetting,
@@ -164,9 +154,7 @@ internal class UpdateReminderNotificationSettingUseCase(
                     )
                 )
             }
-            Log.e(logTag, "${logMsg}失敗_スケジューリング更新エラー", e)
-            throw ReminderNotificationSettingUpdateException
-                .SchedulingUpdateFailure(updateSetting, e)
+            throw e
         }
     }
 }

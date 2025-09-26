@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -52,8 +52,11 @@ internal class UpdateDiaryListFooterUseCase(
                     list.replaceFooterWithNoDiaryMessage()
                 }
             UseCaseResult.Success(replacedDiaryList)
-        } catch (e: DiaryListFooterUpdateException) {
-            UseCaseResult.Failure(e)
+        } catch (e: DataStorageException) {
+            Log.e(logTag, "${logMsg}失敗_未読込の日記存在確認エラー", e)
+            UseCaseResult.Failure(
+                DiaryListFooterUpdateException.UpdateFailure(e)
+            )
         }
     }
 
@@ -65,19 +68,13 @@ internal class UpdateDiaryListFooterUseCase(
      * @param numLoadedDiaries 現在リストに読み込まれている日記の数。
      * @param startDate 日記の総数をカウントする際の開始日。`null` の場合は全期間が対象。
      * @return 未読み込みの日記が存在すれば `true`、そうでなければ `false`。
-     * @throws DiaryListFooterUpdateException.UpdateFailure 日記の総数の取得に失敗した場合。
+     * @throws DataStorageException 日記の総数の取得に失敗した場合。
      */
     private suspend fun checkUnloadedDiariesExist(
         numLoadedDiaries: Int,
         startDate: LocalDate?
     ): Boolean {
-        val numExistingDiaries =
-            try {
-                diaryRepository.countDiaries(startDate)
-            } catch (e: RepositoryException) {
-                Log.e(logTag, "${logMsg}失敗_未読込の日記存在確認エラー", e)
-                throw DiaryListFooterUpdateException.UpdateFailure(e)
-            }
+        val numExistingDiaries = diaryRepository.countDiaries(startDate)
         return if (numExistingDiaries <= 0) {
                 false
             } else {
