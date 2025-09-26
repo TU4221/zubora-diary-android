@@ -5,7 +5,6 @@ import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CacheDiaryImageUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultsExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ClearDiaryImageCacheFileUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
@@ -58,13 +57,6 @@ internal object DiaryUseCaseModule {
     fun provideCacheDiaryImageUseCase(
         fileRepository: FileRepository
     ): CacheDiaryImageUseCase = CacheDiaryImageUseCase(fileRepository)
-
-    @Singleton
-    @Provides
-    fun provideCheckUnloadedWordSearchResultsExistUseCase(
-        countWordSearchResultsUseCase: CountWordSearchResultsUseCase
-    ): CheckUnloadedWordSearchResultsExistUseCase =
-        CheckUnloadedWordSearchResultsExistUseCase(countWordSearchResultsUseCase)
 
     @Singleton
     @Provides
@@ -237,7 +229,7 @@ internal object DiaryUseCaseModule {
     @Singleton
     @Provides
     fun provideUpdateWordSearchResultListFooterUseCase(
-        checkUnloadedWordSearchResultsExistUseCase: CheckUnloadedWordSearchResultsExistUseCase
+        countWordSearchResultsUseCase: CountWordSearchResultsUseCase
     ): UpdateWordSearchResultListFooterUseCase =
-        UpdateWordSearchResultListFooterUseCase(checkUnloadedWordSearchResultsExistUseCase)
+        UpdateWordSearchResultListFooterUseCase(countWordSearchResultsUseCase)
 }
