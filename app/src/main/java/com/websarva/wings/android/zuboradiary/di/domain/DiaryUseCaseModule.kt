@@ -5,10 +5,8 @@ import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CacheDiaryImageUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedDiariesExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CheckUnloadedWordSearchResultsExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ClearDiaryImageCacheFileUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
@@ -63,12 +61,6 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideCheckUnloadedDiariesExistUseCase(
-        countDiariesUseCase: CountDiariesUseCase
-    ): CheckUnloadedDiariesExistUseCase = CheckUnloadedDiariesExistUseCase(countDiariesUseCase)
-
-    @Singleton
-    @Provides
     fun provideCheckUnloadedWordSearchResultsExistUseCase(
         countWordSearchResultsUseCase: CountWordSearchResultsUseCase
     ): CheckUnloadedWordSearchResultsExistUseCase =
@@ -79,12 +71,6 @@ internal object DiaryUseCaseModule {
     fun provideClearDiaryImageCacheFileUseCase(
         fileRepository: FileRepository
     ): ClearDiaryImageCacheFileUseCase = ClearDiaryImageCacheFileUseCase(fileRepository)
-
-    @Singleton
-    @Provides
-    fun provideCountDiariesUseCase(
-        diaryRepository: DiaryRepository
-    ): CountDiariesUseCase = CountDiariesUseCase(diaryRepository)
 
     @Singleton
     @Provides
@@ -244,9 +230,9 @@ internal object DiaryUseCaseModule {
     @Singleton
     @Provides
     fun provideUpdateDiaryListFooterUseCase(
-        checkUnloadedDiariesExistUseCase: CheckUnloadedDiariesExistUseCase
+        diaryRepository: DiaryRepository
     ): UpdateDiaryListFooterUseCase =
-        UpdateDiaryListFooterUseCase(checkUnloadedDiariesExistUseCase)
+        UpdateDiaryListFooterUseCase(diaryRepository)
 
     @Singleton
     @Provides

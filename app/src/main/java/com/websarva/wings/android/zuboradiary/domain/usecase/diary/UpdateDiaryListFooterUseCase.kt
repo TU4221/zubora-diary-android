@@ -3,9 +3,10 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListFooterUpdateException
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.UnloadedDiariesExistCheckException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -15,10 +16,10 @@ import java.time.LocalDate
  * 未読込の日記が存在するかどうかを確認し、存在しない場合はリストのフッターを
  * プログレスインディケーターから「これ以上の日記はありません」というメッセージに置き換える。
  *
- * @property checkUnloadedDiariesExistUseCase 未読込の日記が存在するかどうかを確認するユースケース。
+ * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
 internal class UpdateDiaryListFooterUseCase(
-    private val checkUnloadedDiariesExistUseCase: CheckUnloadedDiariesExistUseCase
+    private val diaryRepository: DiaryRepository
 ) {
 
     private val logTag = createLogTag()
@@ -39,27 +40,48 @@ internal class UpdateDiaryListFooterUseCase(
     ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, DiaryListFooterUpdateException> {
         Log.i(logTag, "${logMsg}開始 (リスト件数: ${list.countDiaries()}, 開始日: ${startDate ?: "全期間"})")
 
-        try {
+        return try {
             val numLoadedDiaries = list.countDiaries()
-            val resultList =
-                when (val result = checkUnloadedDiariesExistUseCase(numLoadedDiaries, startDate)) {
-                    is UseCaseResult.Success -> {
-                        if (result.value) {
-                            Log.i(logTag, "${logMsg}完了_未読込の日記あり (リスト変更なし)")
-                            list
-                        } else {
-                            Log.i(logTag, "${logMsg}完了_未読込の日記なし (フッターをメッセージに置換)")
-                            list.replaceFooterWithNoDiaryMessage()
-                        }
-                    }
-                    is UseCaseResult.Failure -> throw result.exception
+            val unloadedDiariesExist = checkUnloadedDiariesExist(numLoadedDiaries, startDate)
+            val replacedDiaryList =
+                if (unloadedDiariesExist) {
+                    Log.i(logTag, "${logMsg}完了_未読込の日記あり (リスト変更なし)")
+                    list
+                } else {
+                    Log.i(logTag, "${logMsg}完了_未読込の日記なし (フッターをメッセージに置換)")
+                    list.replaceFooterWithNoDiaryMessage()
                 }
-            return UseCaseResult.Success(resultList)
-        } catch (e: UnloadedDiariesExistCheckException) {
-            Log.e(logTag, "${logMsg}失敗_未読込の日記存在確認エラー", e)
-            return UseCaseResult.Failure(
-                DiaryListFooterUpdateException.UpdateFailure(e)
-            )
+            UseCaseResult.Success(replacedDiaryList)
+        } catch (e: DiaryListFooterUpdateException) {
+            UseCaseResult.Failure(e)
         }
+    }
+
+    /**
+     * 未読込の日記が存在するかどうかを確認する。
+     *
+     * 読み込み済みの日記数と全日記数を比較し、未読込の日記が存在するかを判定する。
+     *
+     * @param numLoadedDiaries 現在リストに読み込まれている日記の数。
+     * @param startDate 日記の総数をカウントする際の開始日。`null` の場合は全期間が対象。
+     * @return 未読込の日記が存在すれば `true`、そうでなければ `false`。
+     * @throws DiaryListFooterUpdateException.UpdateFailure リポジトリからの日記総数の取得に失敗した場合。
+     */
+    private suspend fun checkUnloadedDiariesExist(
+        numLoadedDiaries: Int,
+        startDate: LocalDate?
+    ): Boolean {
+        val numExistingDiaries =
+            try {
+                diaryRepository.countDiaries(startDate)
+            } catch (e: RepositoryException) {
+                Log.e(logTag, "${logMsg}失敗_未読込の日記存在確認エラー", e)
+                throw DiaryListFooterUpdateException.UpdateFailure(e)
+            }
+        return if (numExistingDiaries <= 0) {
+                false
+            } else {
+                numLoadedDiaries < numExistingDiaries
+            }
     }
 }
