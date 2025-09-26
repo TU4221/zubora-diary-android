@@ -9,5 +9,5 @@ package com.websarva.wings.android.zuboradiary.domain.exception
  */
 internal class PermissionException(
     message: String = "権限の操作に問題が発生。",
-    cause: Throwable?
+    cause: Throwable? = null
 ) : DomainException(message, cause)

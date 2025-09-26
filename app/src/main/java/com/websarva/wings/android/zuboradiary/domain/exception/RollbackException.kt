@@ -10,5 +10,5 @@ package com.websarva.wings.android.zuboradiary.domain.exception
  */
 internal class RollbackException(
     message: String = "ロールバック処理に問題が発生。",
-    cause: Throwable?
+    cause: Throwable? = null
 ) : DomainException(message, cause)

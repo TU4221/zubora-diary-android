@@ -9,5 +9,5 @@ package com.websarva.wings.android.zuboradiary.domain.exception
  */
 internal class NetworkConnectionException(
     message: String = "ネットワーク接続の問題が発生。",
-    cause: Throwable?
+    cause: Throwable? = null
 ) : DomainException(message, cause)

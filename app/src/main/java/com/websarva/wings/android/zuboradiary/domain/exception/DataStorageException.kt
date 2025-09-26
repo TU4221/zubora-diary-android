@@ -9,5 +9,5 @@ package com.websarva.wings.android.zuboradiary.domain.exception
  */
 internal class DataStorageException(
     message: String = "データストレージの操作に問題が発生。",
-    cause: Throwable?
+    cause: Throwable? = null
 ) : DomainException(message, cause)

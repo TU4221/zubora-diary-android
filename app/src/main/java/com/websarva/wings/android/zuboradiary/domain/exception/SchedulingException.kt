@@ -9,5 +9,5 @@ package com.websarva.wings.android.zuboradiary.domain.exception
  */
 internal class SchedulingException(
     message: String = "スケジューリングの操作に問題が発生。",
-    cause: Throwable?
+    cause: Throwable? = null
 ) : DomainException(message, cause)

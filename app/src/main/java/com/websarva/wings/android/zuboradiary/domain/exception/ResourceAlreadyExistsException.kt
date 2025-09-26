@@ -11,5 +11,5 @@ package com.websarva.wings.android.zuboradiary.domain.exception
  */
 internal class ResourceAlreadyExistsException(
     message: String = "指定されたリソースは既に存在します。",
-    cause: Throwable?
+    cause: Throwable? = null
 ) : DomainException(message, cause)

@@ -9,5 +9,5 @@ package com.websarva.wings.android.zuboradiary.domain.exception
  */
 internal class LocationException(
     message: String = "位置情報の取得に問題が発生。",
-    cause: Throwable?
+    cause: Throwable? = null
 ) : DomainException(message, cause)

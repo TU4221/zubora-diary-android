@@ -9,5 +9,5 @@ package com.websarva.wings.android.zuboradiary.domain.exception
  */
 internal class InvalidParameterException(
     message: String = "無効なパラメータ。",
-    cause: Throwable?
+    cause: Throwable? = null
 ) : DomainException(message, cause)
