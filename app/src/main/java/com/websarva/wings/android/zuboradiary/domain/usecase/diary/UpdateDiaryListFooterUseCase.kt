@@ -58,14 +58,14 @@ internal class UpdateDiaryListFooterUseCase(
     }
 
     /**
-     * 未読込の日記が存在するかどうかを確認する。
+     * 未読み込みの日記が存在するかどうかを確認する。
      *
-     * 読み込み済みの日記数と全日記数を比較し、未読込の日記が存在するかを判定する。
+     * 読み込み済みの日記数と全日記数を比較し、未読み込みの日記が存在するかを判定する。
      *
      * @param numLoadedDiaries 現在リストに読み込まれている日記の数。
      * @param startDate 日記の総数をカウントする際の開始日。`null` の場合は全期間が対象。
-     * @return 未読込の日記が存在すれば `true`、そうでなければ `false`。
-     * @throws DiaryListFooterUpdateException.UpdateFailure リポジトリからの日記総数の取得に失敗した場合。
+     * @return 未読み込みの日記が存在すれば `true`、そうでなければ `false`。
+     * @throws DiaryListFooterUpdateException.UpdateFailure 日記の総数の取得に失敗した場合。
      */
     private suspend fun checkUnloadedDiariesExist(
         numLoadedDiaries: Int,
