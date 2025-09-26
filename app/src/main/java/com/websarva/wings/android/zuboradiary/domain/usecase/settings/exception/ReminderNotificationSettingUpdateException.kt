@@ -15,24 +15,12 @@ internal sealed class ReminderNotificationSettingUpdateException(
     cause: Throwable
 ) : UseCaseException(message, cause) {
     /**
-     * リマインダー通知設定のバックアップの取得(設定の読込)に失敗した場合にスローされる例外。
-     *
-     * @param cause 発生した根本的な原因となった[Throwable]。
-     */
-    class BackupFailure(
-        cause: Throwable
-    ) : ReminderNotificationSettingUpdateException(
-        "リマインダー通知設定のバックアップの取得(設定の読込)に失敗しました。",
-        cause
-    )
-
-    /**
      * リマインダー通知設定の更新に失敗した場合にスローされる例外。
      *
      * @param setting 更新しようとした設定 [ReminderNotificationSetting] 。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
-    class UpdateFailure(
+    class SettingUpdateFailure(
         setting: ReminderNotificationSetting,
         cause: Throwable
     ) : ReminderNotificationSettingUpdateException(
@@ -47,40 +35,17 @@ internal sealed class ReminderNotificationSettingUpdateException(
     )
 
     /**
-     * リマインダー通知設定のスケジュール登録に失敗した場合にスローされる例外。
+     * リマインダー通知設定のスケジュール更新に失敗した場合にスローされる例外。
      *
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
-    class SchedulingRegisterFailure(
-        cause: Throwable
-    ) : ReminderNotificationSettingUpdateException("リマインダー通知のスケジュール登録に失敗しました。", cause)
-
-    /**
-     * リマインダー通知設定のスケジュール解除に失敗した場合にスローされる例外。
-     *
-     * @param cause 発生した根本的な原因となった[Throwable]。
-     */
-    class SchedulingCancelFailure(
-        cause: Throwable
-    ) : ReminderNotificationSettingUpdateException("リマインダー通知のスケジュール解除に失敗しました。", cause)
-
-    /**
-     * リマインダー通知設定のスケジュール操作に失敗した後のロールバックに失敗した場合にスローされる例外。
-     *
-     * @param setting ロールバックしようとした設定 [ReminderNotificationSetting] 。
-     * @param cause 発生した根本的な原因となった[Throwable]。
-     */
-    class RollbackFailure(
+    class SchedulingUpdateFailure(
         setting: ReminderNotificationSetting,
         cause: Throwable
     ) : ReminderNotificationSettingUpdateException(
-        "リマインダー通知設定 '${
-            if (setting is ReminderNotificationSetting.Enabled) {
-                "有効 '${setting.notificationTime}'"
-            } else {
-                "無効"
-            }
-        }' のロールバックに失敗しました。"
-        , cause
+        "リマインダー通知のスケジュール" +
+                (if (setting.isEnabled) "登録" else "解除") +
+                "に失敗しました。",
+        cause
     )
 }

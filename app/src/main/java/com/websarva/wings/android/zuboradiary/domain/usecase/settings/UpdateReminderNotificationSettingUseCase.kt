@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.SettingsReposito
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.repository.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.domain.repository.exception.SchedulingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
@@ -19,6 +20,7 @@ import kotlinx.coroutines.withContext
  * リマインダー通知設定を更新するユースケース。
  *
  * 設定の有効/無効に応じて、通知の登録またはキャンセルも行う。
+ * 通知の登録、キャンセルに失敗した場合、元の設定値に戻すようにロールバック処理が行われる。
  *
  * @property settingsRepository 設定関連の操作を行うリポジトリ。
  * @property schedulingRepository スケジューリング関連の操作を行うリポジトリ。
@@ -47,141 +49,124 @@ internal class UpdateReminderNotificationSettingUseCase(
         setting: ReminderNotificationSetting
     ): UseCaseResult<Unit, ReminderNotificationSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
-
         try {
-            updateReminderNotification(setting)
+            val backupSetting = fetchCurrentReminderNotificationSetting(setting)
+            updateReminderNotificationSetting(setting)
+            updateReminderScheduling(setting, backupSetting)
+            Log.i(logTag, "${logMsg}完了")
+            return UseCaseResult.Success(Unit)
         } catch (e: ReminderNotificationSettingUpdateException) {
-            when (e) {
-                is ReminderNotificationSettingUpdateException.BackupFailure -> {
-                    Log.e(logTag, "${logMsg}失敗_設定読込エラー", e)
-                }
-                is ReminderNotificationSettingUpdateException.UpdateFailure -> {
-                    Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
-                }
-                is ReminderNotificationSettingUpdateException.SchedulingRegisterFailure -> {
-                    Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック成功", e)
-                }
-                is ReminderNotificationSettingUpdateException.SchedulingCancelFailure -> {
-                    Log.e(logTag, "${logMsg}失敗_通知キャンセルエラー、設定ロールバック成功", e)
-                }
-                is ReminderNotificationSettingUpdateException.RollbackFailure -> {
-                    when (setting) {
-                        is ReminderNotificationSetting.Enabled -> {
-                            Log.e(logTag, "${logMsg}失敗_通知登録エラー、設定ロールバック失敗", e)
-                        }
-                        ReminderNotificationSetting.Disabled -> {
-                            Log.e(logTag, "${logMsg}失敗_通知キャンセルエラー、設定ロールバック失敗", e)
-                        }
-                    }
-                }
-            }
             return UseCaseResult.Failure(e)
-        }
-
-        Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(Unit)
-    }
-
-    // TODO:細分化。可読性が悪い。
-    /**
-     * リマインダー通知設定を更新。
-     *
-     * リマインダー通知設定を有効とした場合、通知を登録する。無効とした場合、通知をキャンセルする。
-     *
-     * 通知の登録、キャンセルに失敗した場合、元の設定値に戻すようにロールバック処理が行われる。
-     *
-     * @throws ReminderNotificationSettingUpdateException 設定の更新に失敗した場合。
-     * */
-    private suspend fun updateReminderNotification(
-        settingValue: ReminderNotificationSetting,
-    ) {
-        val backupSettingValue =
-            try {
-                fetchCurrentReminderNotificationSetting()
-            } catch (e: ReminderNotificationSettingLoadException) {
-                throw ReminderNotificationSettingUpdateException.BackupFailure(e)
-            }
-
-        try {
-            settingsRepository.updateReminderNotificationSetting(settingValue)
-        } catch (e: DataStorageException) {
-            throw ReminderNotificationSettingUpdateException.UpdateFailure(
-                settingValue,
-                e
-            )
-        }
-
-        try {
-            when (settingValue) {
-                is ReminderNotificationSetting.Enabled -> {
-                    try {
-                        schedulingRepository.registerReminderNotification(
-                            settingValue.notificationTime
-                        )
-                    } catch (e: SchedulingException) {
-                        throw ReminderNotificationSettingUpdateException
-                            .SchedulingRegisterFailure(e)
-                    }
-                }
-                ReminderNotificationSetting.Disabled -> {
-                    try {
-                        schedulingRepository.cancelReminderNotification()
-                    } catch (e: SchedulingException) {
-                        throw ReminderNotificationSettingUpdateException
-                            .SchedulingCancelFailure(e)
-                    }
-                }
-            }
-        } catch (e:  ReminderNotificationSettingUpdateException) {
-            try {
-                rollbackReminderNotification(backupSettingValue)
-            } catch (e: ReminderNotificationSettingUpdateException.RollbackFailure) {
-                throw e
-            }
-            throw e
         }
     }
 
     /**
      * 現在のリマインダー通知設定を読み込む。
      *
+     * @param setting 現在の設定。例外発生時の情報として使用。
      * @return 現在のリマインダー通知設定。
-     * @throws ReminderNotificationSettingLoadException 設定の読み込みに失敗した場合。
+     * @throws ReminderNotificationSettingUpdateException.SettingUpdateFailure 設定読み込みに失敗した場合。
      */
-    private suspend fun fetchCurrentReminderNotificationSetting(): ReminderNotificationSetting {
+    private suspend fun fetchCurrentReminderNotificationSetting(
+        setting: ReminderNotificationSetting
+    ): ReminderNotificationSetting {
         return withContext(Dispatchers.IO) {
-            loadReminderNotificationSettingUseCase()
-                .map {
-                    when (it) {
-                        is UseCaseResult.Success -> {
-                            it.value
+            try {
+                loadReminderNotificationSettingUseCase()
+                    .map {
+                        when (it) {
+                            is UseCaseResult.Success -> {
+                                it.value
+                            }
+                            is UseCaseResult.Failure -> {
+                                throw it.exception
+                            }
                         }
-                        is UseCaseResult.Failure -> {
-                            throw it.exception
-                        }
-                    }
-                }.first()
+                    }.first()
+            } catch (e: ReminderNotificationSettingLoadException) {
+                Log.e(logTag, "${logMsg}失敗_設定読込(バックアップ用)エラー", e)
+                throw ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
+            }
         }
     }
 
     /**
-     * リマインダー通知設定を指定された値にロールバックする。
+     * リマインダー通知設定を更新する。
      *
-     * 通知の登録やキャンセル処理に失敗した際に、設定を以前の状態に戻すために使用される。
-     *
-     * @param backupSettingValue ロールバック先のリマインダー通知設定値。
-     * @throws ReminderNotificationSettingUpdateException.RollbackFailure ロールバック処理に失敗した場合。
+     * @param setting 更新するリマインダー通知設定。
+     * @throws ReminderNotificationSettingUpdateException.SettingUpdateFailure 設定の更新に失敗した場合。
      */
-    private suspend fun rollbackReminderNotification(
-        backupSettingValue: ReminderNotificationSetting
-    ) {
+    private suspend fun updateReminderNotificationSetting(setting: ReminderNotificationSetting) {
         try {
-            settingsRepository.updateReminderNotificationSetting(backupSettingValue)
+            settingsRepository.updateReminderNotificationSetting(setting)
         } catch (e: DataStorageException) {
-            throw ReminderNotificationSettingUpdateException.RollbackFailure(
-                backupSettingValue,
+            Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
+            throw ReminderNotificationSettingUpdateException.SettingUpdateFailure(
+                setting,
                 e
             )
+        }
+    }
+
+    /**
+     * リマインダー通知のスケジュールを登録またはキャンセルする。
+     *
+     * [updateSetting]が有効な場合は通知をスケジュールし、無効な場合はキャンセルする。
+     *
+     * @param updateSetting 更新後のリマインダー通知設定。
+     * @param backupSetting ロールバック用の更新前のリマインダー通知設定。
+     */
+    private suspend fun updateReminderScheduling(
+        updateSetting: ReminderNotificationSetting,
+        backupSetting: ReminderNotificationSetting
+    ) {
+        when (updateSetting) {
+            is ReminderNotificationSetting.Enabled -> {
+                executeSchedulingWithRollback(updateSetting, backupSetting) {
+                    schedulingRepository.registerReminderNotification(
+                        updateSetting.notificationTime
+                    )
+                }
+            }
+            ReminderNotificationSetting.Disabled -> {
+                executeSchedulingWithRollback(updateSetting, backupSetting) {
+                    schedulingRepository.cancelReminderNotification()
+                }
+            }
+        }
+    }
+
+    /**
+     * スケジューリング処理(登録または解除)を実行し、失敗時には設定をロールバックする。
+     *
+     * @param updateSetting 更新後のリマインダー通知設定。
+     * @param backupSetting ロールバック用の更新前のリマインダー通知設定。
+     * @param processScheduling 実行するスケジューリング処理（通知登録または解除）。
+     * @throws ReminderNotificationSettingUpdateException.SchedulingUpdateFailure スケジューリング処理に失敗した場合。
+     */
+    private suspend fun executeSchedulingWithRollback(
+        updateSetting: ReminderNotificationSetting,
+        backupSetting: ReminderNotificationSetting,
+        processScheduling: suspend (updateSetting: ReminderNotificationSetting) -> Unit
+    ) {
+        try {
+            processScheduling(updateSetting)
+        } catch (e: SchedulingException) {
+            try {
+                settingsRepository.updateReminderNotificationSetting(backupSetting)
+            } catch(de: DataStorageException) {
+                Log.w(logTag, "${logMsg}_ロールバックエラー", e)
+                val isEnabledString = if (backupSetting.isEnabled) "有効" else "無効"
+                e.addSuppressed(
+                    RollbackException(
+                        "通知${isEnabledString}化処理中のエラー後、設定ロールバックに失敗",
+                        de
+                    )
+                )
+            }
+            Log.e(logTag, "${logMsg}失敗_スケジューリング更新エラー", e)
+            throw ReminderNotificationSettingUpdateException
+                .SchedulingUpdateFailure(updateSetting, e)
         }
     }
 }
