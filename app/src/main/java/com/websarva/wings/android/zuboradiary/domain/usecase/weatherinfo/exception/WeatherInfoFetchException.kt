@@ -62,4 +62,16 @@ internal sealed class WeatherInfoFetchException(
         "日付 '$date' の天気情報の取得に失敗しました。",
         cause
     )
+
+    /**
+     * 予期せぬエラーが発生した場合の例外。
+     *
+     * @param cause 発生した根本的な原因となった [Throwable]。
+     */
+    class Unknown(
+        cause: Throwable
+    ) : WeatherInfoFetchException(
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

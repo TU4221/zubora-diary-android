@@ -978,13 +978,12 @@ internal class DiaryEditViewModel @Inject constructor(
                     is WeatherInfoFetchException.LocationPermissionNotGranted -> {
                         emitAppMessageEvent(DiaryEditAppMessage.AccessLocationPermissionRequest)
                     }
-                    is WeatherInfoFetchException.LocationAccessFailure -> {
-                        emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoFetchFailure)
-                    }
                     is WeatherInfoFetchException.DateOutOfRange -> {
                         emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoDateOutOfRange)
                     }
-                    is WeatherInfoFetchException.FetchFailure -> {
+                    is WeatherInfoFetchException.LocationAccessFailure,
+                    is WeatherInfoFetchException.FetchFailure,
+                    is WeatherInfoFetchException.Unknown -> {
                         emitAppMessageEvent(DiaryEditAppMessage.WeatherInfoFetchFailure)
                     }
                 }

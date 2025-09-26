@@ -39,41 +39,38 @@ internal class FetchWeatherInfoUseCase(
     suspend operator fun invoke(date: LocalDate): UseCaseResult<Weather, WeatherInfoFetchException> {
         Log.i(logTag, "${logMsg}開始 (日付: $date)")
 
-        if (!weatherInfoRepository.canFetchWeatherInfo(date)) {
-            val exception = WeatherInfoFetchException.DateOutOfRange(date)
-            Log.w(logTag, "${logMsg}失敗_取得対象外の日付 (日付: $date)", exception)
-            return UseCaseResult.Failure(exception)
-        }
-
-        val location =
-            try {
-                 locationRepository.fetchCurrentLocation()
-            } catch (e: PermissionException) {
-                Log.w(logTag, "${logMsg}失敗_位置情報権限未取得", e)
-                return UseCaseResult.Failure(
-                    WeatherInfoFetchException.LocationPermissionNotGranted(e)
-                )
-            } catch (e: LocationException) {
-                Log.e(logTag, "${logMsg}失敗_位置情報アクセスエラー", e)
-                return UseCaseResult.Failure(
-                    WeatherInfoFetchException.LocationAccessFailure(e)
-                )
-            }
-
         return try {
+            if (!weatherInfoRepository.canFetchWeatherInfo(date)) {
+                throw InvalidParameterException()
+            }
+            val location = locationRepository.fetchCurrentLocation()
             val weather = weatherInfoRepository.fetchWeatherInfo(date, location)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(weather)
+        } catch (e: InvalidParameterException) {
+            Log.e(logTag, "${logMsg}失敗_取得対象外の日付 (日付: $date)", e)
+            UseCaseResult.Failure(
+                WeatherInfoFetchException.DateOutOfRange(date, e)
+            )
+        } catch (e: PermissionException) {
+            Log.w(logTag, "${logMsg}失敗_位置情報権限未取得", e)
+            UseCaseResult.Failure(
+                WeatherInfoFetchException.LocationPermissionNotGranted(e)
+            )
+        } catch (e: LocationException) {
+            Log.e(logTag, "${logMsg}失敗_位置情報アクセスエラー", e)
+            UseCaseResult.Failure(
+                WeatherInfoFetchException.LocationAccessFailure(e)
+            )
         } catch (e: NetworkConnectionException) {
             Log.e(logTag, "${logMsg}失敗_APIアクセスエラー", e)
             UseCaseResult.Failure(
                 WeatherInfoFetchException.FetchFailure(date, e)
             )
-        } catch (e: InvalidParameterException) {
-            // MEMO:このパスは通常 canFetchWeatherInfoUseCase で防がれる
-            Log.e(logTag, "${logMsg}失敗_取得対象外の日付 (日付: $date)", e)
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
             UseCaseResult.Failure(
-                WeatherInfoFetchException.DateOutOfRange(date, e)
+                WeatherInfoFetchException.Unknown(e)
             )
         }
     }
