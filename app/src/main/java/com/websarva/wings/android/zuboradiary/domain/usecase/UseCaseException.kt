@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase
 
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+
 /**
  * ユースケース層で発生する例外の基底となる抽象クラス。
  *
@@ -12,4 +14,4 @@ package com.websarva.wings.android.zuboradiary.domain.usecase
 internal abstract class UseCaseException(
     message: String,
     cause: Throwable? = null
-) : Exception(message, cause)
+) : DomainException(message, cause)
