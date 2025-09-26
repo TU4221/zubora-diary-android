@@ -10,9 +10,9 @@ import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDa
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -123,7 +123,7 @@ internal class SettingsRepositoryImpl(
 
     private fun mapPreferenceExceptionToRepositoryException(
         preferenceException: UserPreferencesException
-    ): RepositoryException {
+    ): DomainException {
         return when (preferenceException) {
             is UserPreferencesException.DataStoreAccessFailure -> {
                 DataStorageException(cause = preferenceException)

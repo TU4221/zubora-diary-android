@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.repository.exception
+package com.websarva.wings.android.zuboradiary.domain.exception
 
 /**
  * 位置情報の取得中に問題が発生した場合の例外。
@@ -10,4 +10,4 @@ package com.websarva.wings.android.zuboradiary.domain.repository.exception
 internal class LocationException(
     message: String = "位置情報の取得に問題が発生。",
     cause: Throwable?
-) : RepositoryException(message, cause)
+) : DomainException(message, cause)

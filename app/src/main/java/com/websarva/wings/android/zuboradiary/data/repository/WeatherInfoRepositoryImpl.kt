@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOper
 import com.websarva.wings.android.zuboradiary.domain.model.SimpleLocation
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.InvalidParameterException
+import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import java.time.LocalDate
 
 internal class WeatherInfoRepositoryImpl (

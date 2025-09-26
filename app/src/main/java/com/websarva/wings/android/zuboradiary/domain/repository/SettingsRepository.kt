@@ -6,8 +6,8 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLock
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
 import kotlinx.coroutines.flow.Flow
 
 /**

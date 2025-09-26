@@ -4,8 +4,8 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.SavedDiaryDateRange
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 

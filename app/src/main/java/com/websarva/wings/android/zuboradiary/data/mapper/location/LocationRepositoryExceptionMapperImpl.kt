@@ -4,12 +4,12 @@ import com.websarva.wings.android.zuboradiary.data.location.exception.LocationAc
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationProviderException
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationUnavailableException
 import com.websarva.wings.android.zuboradiary.data.location.exception.PermissionDeniedException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.LocationException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.PermissionException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
+import com.websarva.wings.android.zuboradiary.domain.exception.LocationException
+import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 
 internal object LocationRepositoryExceptionMapperImpl : LocationRepositoryExceptionMapper {
-    override fun toRepositoryException(e: LocationProviderException): RepositoryException {
+    override fun toRepositoryException(e: LocationProviderException): DomainException {
         return when (e) {
             is LocationAccessException -> LocationException(cause = e)
             is LocationUnavailableException -> LocationException(cause = e)

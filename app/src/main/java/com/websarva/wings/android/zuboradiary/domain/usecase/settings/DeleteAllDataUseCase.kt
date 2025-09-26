@@ -4,8 +4,8 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllDataDeleteException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -83,7 +83,7 @@ internal class DeleteAllDataUseCase(
     private suspend fun deleteAllImageFile() {
         try {
             fileRepository.clearAllImageFiles()
-        } catch (e: RepositoryException) {
+        } catch (e: DomainException) {
             throw AllDataDeleteException.ImageFileDeleteFailure(e)
         }
     }

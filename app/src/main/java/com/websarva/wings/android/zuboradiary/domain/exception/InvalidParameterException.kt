@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.repository.exception
+package com.websarva.wings.android.zuboradiary.domain.exception
 
 /**
  * パラメータが無効だった場合の例外。
@@ -10,4 +10,4 @@ package com.websarva.wings.android.zuboradiary.domain.repository.exception
 internal class InvalidParameterException(
     message: String = "無効なパラメータ。",
     cause: Throwable?
-) : RepositoryException(message, cause)
+) : DomainException(message, cause)

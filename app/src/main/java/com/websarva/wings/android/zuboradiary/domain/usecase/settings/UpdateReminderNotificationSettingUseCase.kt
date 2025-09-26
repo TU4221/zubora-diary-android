@@ -7,9 +7,9 @@ import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingReposi
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RollbackException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.SchedulingException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
+import com.websarva.wings.android.zuboradiary.domain.exception.SchedulingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first

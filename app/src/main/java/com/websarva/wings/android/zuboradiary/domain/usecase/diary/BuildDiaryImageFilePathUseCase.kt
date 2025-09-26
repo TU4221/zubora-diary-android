@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageFilePathBuildingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -44,7 +44,7 @@ internal class BuildDiaryImageFilePathUseCase(
             } catch (e: DiaryImageFilePathBuildingException.FileNotFound) {
                 Log.e(logTag, "${logMsg}失敗_対象ファイルなし", e)
                 return UseCaseResult.Failure(e)
-            } catch (e: RepositoryException) {
+            } catch (e: DomainException) {
                 Log.e(logTag, "${logMsg}失敗_対象ファイルパス生成処理エラー", e)
                 return UseCaseResult.Failure(
                     DiaryImageFilePathBuildingException.BuildingFailure(e)

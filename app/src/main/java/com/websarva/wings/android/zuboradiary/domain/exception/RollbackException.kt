@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.repository.exception
+package com.websarva.wings.android.zuboradiary.domain.exception
 
 // TODO:RepositoryExceptionをRepositoryレベルではなくDomainレベルに変更する？
 /**
@@ -11,4 +11,4 @@ package com.websarva.wings.android.zuboradiary.domain.repository.exception
 internal class RollbackException(
     message: String = "ロールバック処理に問題が発生。",
     cause: Throwable?
-) : RepositoryException(message, cause)
+) : DomainException(message, cause)

@@ -6,9 +6,9 @@ import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -70,7 +70,7 @@ internal class DeleteDiaryUseCase(
             } catch (e: NotFoundException) {
                 Log.w(logTag, "${logMsg}警告_削除する日記の画像ファイルがみつからない", e)
                 // 成功とみなす
-            } catch (e: RepositoryException) {
+            } catch (e: DomainException) {
                 Log.e(logTag, "${logMsg}失敗_画像ファイル削除エラー", e)
 
                 try {

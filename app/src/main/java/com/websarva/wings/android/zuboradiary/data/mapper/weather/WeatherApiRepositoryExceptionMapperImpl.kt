@@ -4,11 +4,11 @@ import com.websarva.wings.android.zuboradiary.data.network.exception.HttpExcepti
 import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkConnectivityException
 import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOperationException
 import com.websarva.wings.android.zuboradiary.data.network.exception.ResponseParsingException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.NetworkConnectionException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
+import com.websarva.wings.android.zuboradiary.domain.exception.NetworkConnectionException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 
 internal object WeatherApiRepositoryExceptionMapperImpl : WeatherApiRepositoryExceptionMapper {
-    override fun toRepositoryException(e: NetworkOperationException): RepositoryException {
+    override fun toRepositoryException(e: NetworkOperationException): DomainException {
         return when (e) {
             is HttpException -> NetworkConnectionException(cause = e)
             is NetworkConnectivityException -> NetworkConnectionException(cause = e)

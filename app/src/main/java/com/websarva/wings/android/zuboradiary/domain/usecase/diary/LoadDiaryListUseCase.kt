@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.mapper.toDiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 

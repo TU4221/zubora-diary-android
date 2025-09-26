@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.repository.exception
+package com.websarva.wings.android.zuboradiary.domain.exception
 
 // TODO:ResourceNotFoundに変更
 /**
@@ -11,4 +11,4 @@ package com.websarva.wings.android.zuboradiary.domain.repository.exception
 internal class NotFoundException(
     message: String = "要求されたデータが見つかりません。",
     cause: Throwable? = null
-) : RepositoryException(message, cause)
+) : DomainException(message, cause)

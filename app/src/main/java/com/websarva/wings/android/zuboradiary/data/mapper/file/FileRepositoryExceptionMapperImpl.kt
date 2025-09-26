@@ -10,15 +10,15 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.FileReadExcept
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileWriteException
 import com.websarva.wings.android.zuboradiary.data.file.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.data.file.exception.InvalidFilePathException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.InvalidParameterException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.PermissionException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.ResourceAlreadyExistsException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
+import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
 
 internal object FileRepositoryExceptionMapperImpl : FileRepositoryExceptionMapper {
-    override fun toRepositoryException(e: FileOperationException): RepositoryException {
+    override fun toRepositoryException(e: FileOperationException): DomainException {
         return when (e) {
             is DirectoryDeletionFailedException -> DataStorageException(cause = e)
             is FileAlreadyExistsException -> ResourceAlreadyExistsException(cause = e)

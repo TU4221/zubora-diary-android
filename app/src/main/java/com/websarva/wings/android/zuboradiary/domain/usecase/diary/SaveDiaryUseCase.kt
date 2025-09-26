@@ -8,10 +8,10 @@ import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RepositoryException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.RollbackException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -121,7 +121,7 @@ internal class SaveDiaryUseCase(
         // バックアップ画像ファイル削除
         try {
             fileRepository.clearAllImageFilesInBackup()
-        } catch (e: RepositoryException) {
+        } catch (e: DomainException) {
             Log.w(logTag, "${logMsg}バックアップ画像ファイル削除処理エラー", e)
             // 日記保存は成功している為、成功とみなす。
         }
@@ -197,7 +197,7 @@ internal class SaveDiaryUseCase(
                 fileRepository.moveImageFileToBackup(it)
             } catch (e: NotFoundException) {
                 Log.w(logTag, "${logMsg}警告_削除する日記の画像ファイルがみつからない", e)
-            }  catch (e: RepositoryException) {
+            }  catch (e: DomainException) {
                 try {
                     rollbackImageFiles(
                         saveDiaryImageFileName,
@@ -218,7 +218,7 @@ internal class SaveDiaryUseCase(
                 fileRepository.moveImageFileToBackup(it)
             } catch (e: NotFoundException) {
                 Log.w(logTag, "${logMsg}警告_編集元の日記の画像ファイルがみつからない", e)
-            } catch (e: RepositoryException) {
+            } catch (e: DomainException) {
                 try {
                     rollbackImageFiles(
                         saveDiaryImageFileName,
@@ -235,7 +235,7 @@ internal class SaveDiaryUseCase(
         saveDiaryImageFileName?.let {
             try {
                 fileRepository.moveImageFileToPermanent(saveDiaryImageFileName)
-            } catch (e: RepositoryException) {
+            } catch (e: DomainException) {
                 try {
                     rollbackImageFiles(
                         saveDiaryImageFileName,
@@ -287,7 +287,7 @@ internal class SaveDiaryUseCase(
                 Log.d("20250922", "編集ロールバック_saveDiary(編集元日記_${savedDiary.date})")
                 diaryRepository.saveDiary(originalDiary)
             }
-        } catch (e: RepositoryException) {
+        } catch (e: DomainException) {
             throw RollbackException(cause = e)
         }
     }
@@ -326,7 +326,7 @@ internal class SaveDiaryUseCase(
                     fileRepository.restoreImageFileFromBackup(deletedDiaryImageFileName)
                 }
             }
-        } catch (e: RepositoryException) {
+        } catch (e: DomainException) {
             throw RollbackException(cause = e)
         }
     }

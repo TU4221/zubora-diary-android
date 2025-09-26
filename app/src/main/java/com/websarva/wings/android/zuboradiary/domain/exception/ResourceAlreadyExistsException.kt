@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.repository.exception
+package com.websarva.wings.android.zuboradiary.domain.exception
 
 /**
  * 作成または保存しようとしたリソースが、指定された識別子や場所で既に存在することを示す例外。
@@ -12,4 +12,4 @@ package com.websarva.wings.android.zuboradiary.domain.repository.exception
 internal class ResourceAlreadyExistsException(
     message: String = "指定されたリソースは既に存在します。",
     cause: Throwable?
-) : RepositoryException(message, cause)
+) : DomainException(message, cause)

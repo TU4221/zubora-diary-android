@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.repository.exception
+package com.websarva.wings.android.zuboradiary.domain.exception
 
 /**
  * データストレージ (データベース、ファイルシステムなど) へのアクセス中に問題が発生した場合の例外。
@@ -10,4 +10,4 @@ package com.websarva.wings.android.zuboradiary.domain.repository.exception
 internal class DataStorageException(
     message: String = "データストレージの操作に問題が発生。",
     cause: Throwable?
-) : RepositoryException(message, cause)
+) : DomainException(message, cause)

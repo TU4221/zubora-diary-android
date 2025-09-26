@@ -6,8 +6,8 @@ import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelecti
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.repository.exception
+package com.websarva.wings.android.zuboradiary.domain.exception
 
 /**
  * ネットワーク(WebApiなど)への接続性に関連する問題が発生した場合の例外。
@@ -10,4 +10,4 @@ package com.websarva.wings.android.zuboradiary.domain.repository.exception
 internal class NetworkConnectionException(
     message: String = "ネットワーク接続の問題が発生。",
     cause: Throwable?
-) : RepositoryException(message, cause)
+) : DomainException(message, cause)

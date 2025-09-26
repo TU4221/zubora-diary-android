@@ -6,10 +6,10 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.LocationRepository
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.InvalidParameterException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.LocationException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.NetworkConnectionException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.PermissionException
+import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
+import com.websarva.wings.android.zuboradiary.domain.exception.LocationException
+import com.websarva.wings.android.zuboradiary.domain.exception.NetworkConnectionException
+import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 

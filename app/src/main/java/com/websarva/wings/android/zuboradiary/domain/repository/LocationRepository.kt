@@ -2,8 +2,8 @@ package com.websarva.wings.android.zuboradiary.domain.repository
 
 import com.websarva.wings.android.zuboradiary.domain.model.SimpleLocation
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.LocationException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.PermissionException
+import com.websarva.wings.android.zuboradiary.domain.exception.LocationException
+import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
 
 /**
  * 位置情報の取得処理を抽象化するリポジトリインターフェース。

@@ -2,11 +2,11 @@ package com.websarva.wings.android.zuboradiary.domain.repository
 
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.InvalidParameterException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.NotFoundException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.PermissionException
-import com.websarva.wings.android.zuboradiary.domain.repository.exception.ResourceAlreadyExistsException
+import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
+import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
+import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
 
 /**
  * ファイル関連へのアクセスと永続化を抽象化するリポジトリインターフェース。
