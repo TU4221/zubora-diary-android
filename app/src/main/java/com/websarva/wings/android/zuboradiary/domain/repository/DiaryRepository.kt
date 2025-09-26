@@ -52,7 +52,7 @@ internal interface DiaryRepository {
     /**
      * 保存されている日記の中で、最も新しい日付の日記データを読み込む。
      *
-     * @return 最新の日記データ。日記が一つも存在しない場合は `null`。
+     * @return 最新の日記データ。
      * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
      * @throws NotFoundException 該当の日記データが見つからなかった場合。
      */
@@ -61,7 +61,7 @@ internal interface DiaryRepository {
     /**
      * 保存されている日記の中で、最も古い日付の日記データを読み込む。
      *
-     * @return 最古の日記データ。日記が一つも存在しない場合は `null`。
+     * @return 最古の日記データ。
      * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
      * @throws NotFoundException 該当の日記データが見つからなかった場合。
      */
