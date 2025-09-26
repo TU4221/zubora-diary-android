@@ -814,7 +814,8 @@ internal class SettingsViewModel @Inject constructor(
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
                 Log.e(logTag, "全日記削除_失敗", result.exception)
                 when (result.exception) {
-                    is AllDiariesDeleteException.DeleteFailure -> {
+                    is AllDiariesDeleteException.DeleteFailure,
+                    is AllDiariesDeleteException.Unknown -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
                     }
                     is AllDiariesDeleteException.ImageFileDeleteFailure -> {
@@ -847,7 +848,8 @@ internal class SettingsViewModel @Inject constructor(
                 Log.e(logTag, "アプリ全データ削除_失敗", result.exception)
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
                 when (result.exception) {
-                    is AllDataDeleteException.DiariesDeleteFailure -> {
+                    is AllDataDeleteException.DiariesDeleteFailure,
+                    is AllDataDeleteException.Unknown -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
                     }
                     is AllDataDeleteException.ImageFileDeleteFailure -> {

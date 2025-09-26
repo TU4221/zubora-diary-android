@@ -29,4 +29,19 @@ internal sealed class CalendarStartDayOfWeekSettingLoadException (
         fallbackSetting: CalendarStartDayOfWeekSetting,
         cause: Throwable
     ) : CalendarStartDayOfWeekSettingLoadException(fallbackSetting, "カレンダー開始曜日設定の読込に失敗しました。", cause)
+
+    /**
+     * 予期せぬエラーが発生した場合の例外。
+     *
+     * @param fallbackSetting 例外発生時に代わりに利用する設定。
+     * @param cause 発生した根本的な原因となった [Throwable]。
+     */
+    class Unknown(
+        fallbackSetting: CalendarStartDayOfWeekSetting,
+        cause: Throwable
+    ) : CalendarStartDayOfWeekSettingLoadException(
+        fallbackSetting,
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

@@ -29,4 +29,19 @@ internal sealed class WeatherInfoFetchSettingLoadException (
         fallbackSetting: WeatherInfoFetchSetting,
         cause: Throwable
     ) : WeatherInfoFetchSettingLoadException(fallbackSetting, "天気情報取得設定の読込に失敗しました。", cause)
+
+    /**
+     * 予期せぬエラーが発生した場合の例外。
+     *
+     * @param fallbackSetting 例外発生時に代わりに利用する設定。
+     * @param cause 発生した根本的な原因となった [Throwable]。
+     */
+    class Unknown(
+        fallbackSetting: WeatherInfoFetchSetting,
+        cause: Throwable
+    ) : WeatherInfoFetchSettingLoadException(
+        fallbackSetting,
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

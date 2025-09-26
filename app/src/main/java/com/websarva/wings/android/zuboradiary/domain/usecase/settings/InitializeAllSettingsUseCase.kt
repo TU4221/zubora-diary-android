@@ -52,40 +52,44 @@ internal class InitializeAllSettingsUseCase(
     suspend operator fun invoke(): UseCaseResult<Unit, AllSettingsInitializationException> {
         Log.i(logTag, "${logMsg}開始")
 
-        try {
+        return try {
             updateThemeColorSettingUseCase(ThemeColorSetting())
             updateCalendarStartDayOfWeekSettingUseCase(CalendarStartDayOfWeekSetting())
             updateReminderNotificationSettingUseCase(ReminderNotificationSetting.Disabled)
             updatePasscodeLockSettingUseCase(PasscodeLockSetting.Disabled)
             updateWeatherInfoFetchSettingUseCase(WeatherInfoFetchSetting())
+            Log.i(logTag, "${logMsg}完了")
+            UseCaseResult.Success(Unit)
         } catch (e: ThemeColorSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_テーマカラー設定保存エラー", e)
-            return UseCaseResult.Failure(
+            UseCaseResult.Failure(
                 AllSettingsInitializationException.ThemeColorInitializationFailure(e)
             )
         } catch (e: CalendarStartDayOfWeekSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_カレンダー開始曜日設定保存エラー", e)
-            return UseCaseResult.Failure(
+            UseCaseResult.Failure(
                 AllSettingsInitializationException.CalendarStartDayOfWeeksInitializationFailure(e)
             )
         } catch (e: ReminderNotificationSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_リマインダー通知設定保存エラー", e)
-            return UseCaseResult.Failure(
+            UseCaseResult.Failure(
                 AllSettingsInitializationException.ReminderNotificationInitializationFailure(e)
             )
         } catch (e: PassCodeSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_パスコードロック設定保存エラー", e)
-            return UseCaseResult.Failure(
+            UseCaseResult.Failure(
                 AllSettingsInitializationException.PasscodeInitializationFailure(e)
             )
         } catch (e: WeatherInfoFetchSettingUpdateException) {
             Log.e(logTag, "${logMsg}失敗_天気情報取得設定保存エラー", e)
-            return UseCaseResult.Failure(
+            UseCaseResult.Failure(
                 AllSettingsInitializationException.WeatherInfoFetchInitializationFailure(e)
             )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                AllSettingsInitializationException.Unknown(e)
+            )
         }
-
-        Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(Unit)
     }
 }

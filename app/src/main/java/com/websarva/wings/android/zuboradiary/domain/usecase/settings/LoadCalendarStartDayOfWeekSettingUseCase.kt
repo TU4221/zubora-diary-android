@@ -76,7 +76,18 @@ internal class LoadCalendarStartDayOfWeekSettingUseCase(
                             )
                             UseCaseResult.Success(defaultSettingValue)
                         }
-                        else -> throw cause
+                        else -> {
+                            Log.w(
+                                logTag,
+                                "${logMsg}失敗_原因不明、" +
+                                        "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
+                                cause
+                            )
+                            UseCaseResult.Failure(
+                                CalendarStartDayOfWeekSettingLoadException
+                                    .Unknown(defaultSettingValue, cause),
+                            )
+                        }
                     }
                 emit(result)
             }

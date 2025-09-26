@@ -29,4 +29,19 @@ internal sealed class ReminderNotificationSettingLoadException (
         fallbackSetting: ReminderNotificationSetting,
         cause: Throwable
     ) : ReminderNotificationSettingLoadException(fallbackSetting, "リマインダー通知設定の読込に失敗しました。", cause)
+
+    /**
+     * 予期せぬエラーが発生した場合の例外。
+     *
+     * @param fallbackSetting 例外発生時に代わりに利用する設定。
+     * @param cause 発生した根本的な原因となった [Throwable]。
+     */
+    class Unknown(
+        fallbackSetting: ReminderNotificationSetting,
+        cause: Throwable
+    ) : ReminderNotificationSettingLoadException(
+        fallbackSetting,
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

@@ -50,29 +50,41 @@ internal class UpdateReminderNotificationSettingUseCase(
     ): UseCaseResult<Unit, ReminderNotificationSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
 
-        try {
+        return try {
             val backupSetting = fetchCurrentReminderNotificationSetting()
             settingsRepository.updateReminderNotificationSetting(setting)
             updateReminderScheduling(setting, backupSetting)
+            Log.i(logTag, "${logMsg}完了")
+            UseCaseResult.Success(Unit)
         } catch (e: ReminderNotificationSettingLoadException) {
-            Log.e(logTag, "${logMsg}失敗_設定読込(バックアップ用)エラー", e)
-            return UseCaseResult.Failure(
-                ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
-            )
+            val wrappedException =
+                when (e) {
+                    is ReminderNotificationSettingLoadException.Unknown -> {
+                        Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                        ReminderNotificationSettingUpdateException.Unknown(e)
+                    }
+                    else -> {
+                        Log.e(logTag, "${logMsg}失敗_設定読込(バックアップ用)エラー", e)
+                        ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
+                    }
+                }
+            UseCaseResult.Failure(wrappedException)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
-            return UseCaseResult.Failure(
+            UseCaseResult.Failure(
                 ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
             )
         } catch (e: SchedulingException) {
             Log.e(logTag, "${logMsg}失敗_スケジューリング更新エラー", e)
-            return UseCaseResult.Failure(
+            UseCaseResult.Failure(
                 ReminderNotificationSettingUpdateException.SchedulingUpdateFailure(setting, e)
             )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                ReminderNotificationSettingUpdateException.Unknown(e)
+            )
         }
-
-        Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(Unit)
     }
 
     /**

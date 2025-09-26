@@ -32,16 +32,20 @@ internal class UpdateThemeColorSettingUseCase(
     ): UseCaseResult<Unit, ThemeColorSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
 
-        try {
+        return try {
             settingsRepository.updateThemeColorSetting(setting)
+            Log.i(logTag, "${logMsg}完了")
+            UseCaseResult.Success(Unit)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
             return UseCaseResult.Failure(
                 ThemeColorSettingUpdateException.UpdateFailure(setting, e)
             )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                ThemeColorSettingUpdateException.Unknown(e)
+            )
         }
-
-        Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(Unit)
     }
 }

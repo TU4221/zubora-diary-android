@@ -32,16 +32,20 @@ internal class UpdatePasscodeLockSettingUseCase(
     ): UseCaseResult<Unit, PassCodeSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (有効: ${setting.isEnabled}")
 
-        try {
+        return try {
             settingsRepository.updatePasscodeLockSetting(setting)
+            Log.i(logTag, "${logMsg}完了")
+            UseCaseResult.Success(Unit)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
-            return UseCaseResult.Failure(
+            UseCaseResult.Failure(
                 PassCodeSettingUpdateException.UpdateFailure(setting, e)
             )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                PassCodeSettingUpdateException.Unknown(e)
+            )
         }
-
-        Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(Unit)
     }
 }

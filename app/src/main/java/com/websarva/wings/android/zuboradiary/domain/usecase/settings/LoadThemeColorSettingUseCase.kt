@@ -71,7 +71,18 @@ internal class LoadThemeColorSettingUseCase(
                             )
                             UseCaseResult.Success(defaultSettingValue)
                         }
-                        else -> throw cause
+                        else -> {
+                            Log.w(
+                                logTag,
+                                "${logMsg}失敗_原因不明、" +
+                                        "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
+                                cause
+                            )
+                            UseCaseResult.Failure(
+                                ThemeColorSettingLoadException
+                                    .Unknown(defaultSettingValue, cause),
+                            )
+                        }
                     }
                 emit(result)
             }

@@ -32,16 +32,20 @@ internal class UpdateWeatherInfoFetchSettingUseCase(
     ): UseCaseResult<Unit, WeatherInfoFetchSettingUpdateException> {
         Log.i(logTag, "${logMsg}開始 (設定値: $setting)")
 
-        try {
+        return try {
             settingsRepository.updateWeatherInfoFetchSetting(setting)
+            Log.i(logTag, "${logMsg}完了")
+            UseCaseResult.Success(Unit)
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
-            return UseCaseResult.Failure(
+            UseCaseResult.Failure(
                 WeatherInfoFetchSettingUpdateException.UpdateFailure(setting, e)
             )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                WeatherInfoFetchSettingUpdateException.Unknown(e)
+            )
         }
-
-        Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(Unit)
     }
 }
