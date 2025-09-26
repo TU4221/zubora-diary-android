@@ -14,8 +14,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryIt
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewestDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadOldestDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
@@ -144,13 +142,9 @@ internal object DiaryUseCaseModule {
     @Singleton
     @Provides
     fun provideLoadDiaryListStartYearMonthPickerDateRange(
-        loadNewestDiaryUseCase: LoadNewestDiaryUseCase,
-        loadOldestDiaryUseCase: LoadOldestDiaryUseCase
+        diaryRepository: DiaryRepository
     ): LoadDiaryListStartYearMonthPickerDateRangeUseCase =
-        LoadDiaryListStartYearMonthPickerDateRangeUseCase(
-            loadNewestDiaryUseCase,
-            loadOldestDiaryUseCase
-        )
+        LoadDiaryListStartYearMonthPickerDateRangeUseCase(diaryRepository)
 
     @Singleton
     @Provides
@@ -174,12 +168,6 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideLoadNewestDiaryUseCase(
-        diaryRepository: DiaryRepository
-    ): LoadNewestDiaryUseCase = LoadNewestDiaryUseCase(diaryRepository)
-
-    @Singleton
-    @Provides
     fun provideLoadNewWordSearchResultListUseCase(
         loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
         updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
@@ -188,12 +176,6 @@ internal object DiaryUseCaseModule {
             loadWordSearchResultListUseCase,
             updateWordSearchResultListFooterUseCase
         )
-
-    @Singleton
-    @Provides
-    fun provideLoadOldestDiaryUseCase(
-        diaryRepository: DiaryRepository
-    ): LoadOldestDiaryUseCase = LoadOldestDiaryUseCase(diaryRepository)
 
     @Singleton
     @Provides
