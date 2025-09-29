@@ -61,30 +61,80 @@ internal class InitializeAllSettingsUseCase(
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
         } catch (e: ThemeColorSettingUpdateException) {
-            Log.e(logTag, "${logMsg}失敗_テーマカラー設定保存エラー", e)
-            UseCaseResult.Failure(
-                AllSettingsInitializationException.ThemeColorInitializationFailure(e)
-            )
+            when (e) {
+                is ThemeColorSettingUpdateException.UpdateFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_テーマカラー設定保存エラー", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.InitializationFailure(e)
+                    )
+                }
+                is ThemeColorSettingUpdateException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.Unknown(e)
+                    )
+                }
+            }
         } catch (e: CalendarStartDayOfWeekSettingUpdateException) {
-            Log.e(logTag, "${logMsg}失敗_カレンダー開始曜日設定保存エラー", e)
-            UseCaseResult.Failure(
-                AllSettingsInitializationException.CalendarStartDayOfWeeksInitializationFailure(e)
-            )
+            when (e) {
+                is CalendarStartDayOfWeekSettingUpdateException.UpdateFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_カレンダー開始曜日設定保存エラー", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.InitializationFailure(e)
+                    )
+                }
+                is CalendarStartDayOfWeekSettingUpdateException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.Unknown(e)
+                    )
+                }
+            }
         } catch (e: ReminderNotificationSettingUpdateException) {
-            Log.e(logTag, "${logMsg}失敗_リマインダー通知設定保存エラー", e)
-            UseCaseResult.Failure(
-                AllSettingsInitializationException.ReminderNotificationInitializationFailure(e)
-            )
+            when (e) {
+                is ReminderNotificationSettingUpdateException.SettingUpdateFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_リマインダー通知設定保存エラー", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.InitializationFailure(e)
+                    )
+                }
+                is ReminderNotificationSettingUpdateException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.Unknown(e)
+                    )
+                }
+            }
         } catch (e: PassCodeSettingUpdateException) {
-            Log.e(logTag, "${logMsg}失敗_パスコードロック設定保存エラー", e)
-            UseCaseResult.Failure(
-                AllSettingsInitializationException.PasscodeInitializationFailure(e)
-            )
+            when (e) {
+                is PassCodeSettingUpdateException.UpdateFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_パスコードロック設定保存エラー", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.InitializationFailure(e)
+                    )
+                }
+                is PassCodeSettingUpdateException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.Unknown(e)
+                    )
+                }
+            }
         } catch (e: WeatherInfoFetchSettingUpdateException) {
-            Log.e(logTag, "${logMsg}失敗_天気情報取得設定保存エラー", e)
-            UseCaseResult.Failure(
-                AllSettingsInitializationException.WeatherInfoFetchInitializationFailure(e)
-            )
+            when (e) {
+                is WeatherInfoFetchSettingUpdateException.UpdateFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_天気情報取得設定保存エラー", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.InitializationFailure(e)
+                    )
+                }
+                is WeatherInfoFetchSettingUpdateException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.Unknown(e)
+                    )
+                }
+            }
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}失敗_原因不明", e)
             UseCaseResult.Failure(

@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllDataDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -42,33 +42,46 @@ internal class DeleteAllDataUseCase(
 
         try {
             diaryRepository.deleteAllData()
-        } catch (e: DataStorageException) {
+        } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_日記データ削除エラー", e)
+            return UseCaseResult.Failure(
+                AllDataDeleteException.DiariesDeleteFailure(e)
+            )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
             return UseCaseResult.Failure(
                 AllDataDeleteException.DiariesDeleteFailure(e)
             )
         }
 
-        return try {
+        try {
             fileRepository.clearAllImageFiles()
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗_画像ファイル削除エラー", e)
+            return UseCaseResult.Failure(
+                AllDataDeleteException.ImageFileDeleteFailure(e)
+            )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            return UseCaseResult.Failure(
+                AllDataDeleteException.ImageFileDeleteFailure(e)
+            )
+        }
+
+        return try {
             initializeAllSettings()
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
-        } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_画像ファイル削除エラー", e)
-            UseCaseResult.Failure(
-                AllDataDeleteException.ImageFileDeleteFailure(e)
-            )
         } catch (e: AllSettingsInitializationException) {
             val wrappedException =
                 when (e) {
+                    is AllSettingsInitializationException.InitializationFailure -> {
+                        Log.e(logTag, "${logMsg}失敗_設定初期化エラー", e)
+                        AllDataDeleteException.SettingsInitializationFailure(e)
+                    }
                     is AllSettingsInitializationException.Unknown -> {
                         Log.e(logTag, "${logMsg}失敗_原因不明", e)
                         AllDataDeleteException.Unknown(e)
-                    }
-                    else -> {
-                        Log.e(logTag, "${logMsg}失敗_設定初期化エラー", e)
-                        AllDataDeleteException.SettingsInitializationFailure(e)
                     }
                 }
             UseCaseResult.Failure(wrappedException)
