@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingReposi
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.domain.exception.SchedulingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -59,25 +59,20 @@ internal class UpdateReminderNotificationSettingUseCase(
         } catch (e: ReminderNotificationSettingLoadException) {
             val wrappedException =
                 when (e) {
+                    is ReminderNotificationSettingLoadException.LoadFailure -> {
+                        Log.e(logTag, "${logMsg}失敗_設定読込(バックアップ用)エラー", e)
+                        ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
+                    }
                     is ReminderNotificationSettingLoadException.Unknown -> {
                         Log.e(logTag, "${logMsg}失敗_原因不明", e)
                         ReminderNotificationSettingUpdateException.Unknown(e)
                     }
-                    else -> {
-                        Log.e(logTag, "${logMsg}失敗_設定読込(バックアップ用)エラー", e)
-                        ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
-                    }
                 }
             UseCaseResult.Failure(wrappedException)
-        } catch (e: DataStorageException) {
+        } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
             UseCaseResult.Failure(
                 ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
-            )
-        } catch (e: SchedulingException) {
-            Log.e(logTag, "${logMsg}失敗_スケジューリング更新エラー", e)
-            UseCaseResult.Failure(
-                ReminderNotificationSettingUpdateException.SchedulingUpdateFailure(setting, e)
             )
         } catch (e: Exception) {
             Log.e(logTag, "${logMsg}失敗_原因不明", e)
@@ -153,11 +148,11 @@ internal class UpdateReminderNotificationSettingUseCase(
     ) {
         try {
             processScheduling(updateSetting)
-        } catch (e: SchedulingException) {
+        } catch (e: Exception) {
             try {
                 settingsRepository.updateReminderNotificationSetting(backupSetting)
-            } catch(de: DataStorageException) {
-                Log.w(logTag, "${logMsg}_ロールバックエラー", e)
+            } catch(de: Exception) {
+                Log.w(logTag, "${logMsg}警告_ロールバックエラー", e)
                 val isEnabledString = if (backupSetting.isEnabled) "有効" else "無効"
                 e.addSuppressed(
                     RollbackException(

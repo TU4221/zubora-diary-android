@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStar
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -36,7 +36,7 @@ internal class UpdateCalendarStartDayOfWeekSettingUseCase(
             settingsRepository.updateCalendarStartDayOfWeekSetting(setting)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
-        } catch (e: DataStorageException) {
+        } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
             UseCaseResult.Failure(
                 CalendarStartDayOfWeekSettingUpdateException.UpdateFailure(setting, e)

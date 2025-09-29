@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
@@ -52,7 +52,15 @@ internal class LoadReminderNotificationSettingUseCase(
                 val defaultSettingValue = ReminderNotificationSetting.Disabled
                 val result =
                     when (cause) {
-                        is DataStorageException -> {
+                        is NotFoundException -> {
+                            Log.i(
+                                logTag,
+                                "${logMsg}_データ未発見_" +
+                                        "デフォルト値を設定値として使用 (デフォルト値: $defaultSettingValue)"
+                            )
+                            UseCaseResult.Success(defaultSettingValue)
+                        }
+                        is DomainException -> {
                             Log.w(
                                 logTag,
                                 "${logMsg}失敗_アクセス失敗、" +
@@ -63,14 +71,6 @@ internal class LoadReminderNotificationSettingUseCase(
                                 ReminderNotificationSettingLoadException
                                     .LoadFailure(defaultSettingValue, cause),
                             )
-                        }
-                        is NotFoundException -> {
-                            Log.i(
-                                logTag,
-                                "${logMsg}_データ未発見_" +
-                                        "デフォルト値を設定値として使用 (デフォルト値: $defaultSettingValue)"
-                            )
-                            UseCaseResult.Success(defaultSettingValue)
                         }
                         else -> {
                             Log.w(
