@@ -285,11 +285,13 @@
     <!-- AppMessageCommonMessage -->
     <string name="dialog_app_message_diary_load_failure">日記の読込に失敗しました。</string>
     <string name="dialog_app_message_diary_delete_failure">日記の削除に失敗しました。</string>
+    <string name="dialog_app_message_diary_image_delete_failure">日記の削除には成功しましたが、添付画像ファイルの削除に失敗しました。</string>
     <string name="dialog_app_message_diary_info_load_failure">日記情報の読込に失敗しました。</string>
     <string name="dialog_app_message_setting_load_failure">設定の読込に失敗しました。</string>
     <!-- DiaryListAppMessage -->
     <string name="dialog_diary_list_app_message_diary_list_load_failure">日記リストの読込に失敗しました。</string>
     <string name="dialog_diary_list_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>
+    <string name="dialog_diary_list_app_message_diary_image_delete_failure">@string/dialog_app_message_diary_image_delete_failure</string>
     <string name="dialog_diary_list_app_message_diary_info_load_failure">@string/dialog_app_message_diary_info_load_failure</string>
     <!-- WordSearchAppMessage -->
     <string name="dialog_word_search_app_message_search_result_list_load_failure">検索結果リストの読込に失敗しました。</string>
@@ -306,10 +308,12 @@
     <string name="dialog_settings_app_message_all_data_delete_failure">全てのデータの削除に失敗しました。</string>
     <!-- DiaryShowAppMessage -->
     <string name="dialog_diary_show_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>
+    <string name="dialog_diary_show_app_message_diary_image_delete_failure">@string/dialog_app_message_diary_image_delete_failure</string>
     <!-- DiaryEditAppMessage -->
     <string name="dialog_diary_edit_app_message_diary_load_failure">@string/dialog_app_message_diary_load_failure</string>
     <string name="dialog_diary_edit_app_message_diary_save_failure">日記の保存に失敗しました。</string>
     <string name="dialog_diary_edit_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>
+    <string name="dialog_diary_edit_app_message_diary_image_delete_failure">@string/dialog_app_message_diary_image_delete_failure</string>
     <string name="dialog_diary_edit_app_message_diary_info_load_failure">@string/dialog_app_message_diary_info_load_failure</string>
     <string name="dialog_diary_edit_app_message_weather_info_fetch_failure">天気情報の取得に失敗しました。</string>
     <string name="dialog_diary_edit_app_message_weather_info_date_out_of_range">選択された日付の天気情報は取得できませんでした。本日より過去92日間の天気が取得可能です。</string>

@@ -25,6 +25,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequest
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ClearDiaryImageCacheFileUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CacheDiaryImageUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.CheckWeatherInfoFetchEnabledUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
@@ -827,7 +828,7 @@ internal class DiaryEditViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}開始")
 
         updateUiState(DiaryEditState.Deleting)
-        when (deleteDiaryUseCase(date, imageFileName?.toDomainModel())) {
+        when (val result = deleteDiaryUseCase(date, imageFileName?.toDomainModel())) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 clearDiaryImageCacheFileUseCase()
@@ -842,7 +843,13 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}失敗")
                 updateUiState(DiaryEditState.Editing)
-                emitAppMessageEvent(DiaryEditAppMessage.DiaryDeleteFailure)
+                val appMsg =
+                    when (result.exception) {
+                        is DiaryDeleteException.DiaryDataDeleteFailure,
+                        is DiaryDeleteException.Unknown -> DiaryEditAppMessage.DiaryDeleteFailure
+                        is DiaryDeleteException.ImageFileDeleteFailure -> DiaryEditAppMessage.DiaryImageDeleteFailure
+                    }
+                emitAppMessageEvent(appMsg)
             }
         }
     }
@@ -1203,6 +1210,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // TODO:テスト用の為、最終的に削除
+    // TODO:上手く保存されない。保存ユースケースの条件を変えたため？
     fun test() {
         viewModelScope.launch {
             isTesting = true

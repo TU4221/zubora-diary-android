@@ -24,4 +24,16 @@ internal sealed class WordSearchResultListLoadException(
         searchWord: String,
         cause: Throwable
     ) : WordSearchResultListLoadException("'$searchWord' の検索結果の読込に失敗しました。", cause)
+
+    /**
+     * 予期せぬエラーが発生した場合の例外。
+     *
+     * @param cause 発生した根本的な原因となった [Throwable]。
+     */
+    class Unknown(
+        cause: Throwable
+    ) : WordSearchResultListLoadException(
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

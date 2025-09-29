@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -35,10 +35,15 @@ internal class DoesDiaryExistUseCase(
             val exists = diaryRepository.existsDiary(date)
             Log.i(logTag, "${logMsg}完了 (結果: $exists)")
             UseCaseResult.Success(exists)
-        } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_存在確認処理エラー", e)
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗_存在確認エラー", e)
             UseCaseResult.Failure(
                 DiaryExistenceCheckException.CheckFailure(date, e)
+            )
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                DiaryExistenceCheckException.Unknown(e)
             )
         }
     }

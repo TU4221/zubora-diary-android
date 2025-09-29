@@ -13,8 +13,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionD
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListStartYearMonthPickerDateRangeUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshDiaryListUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
@@ -403,7 +403,13 @@ internal class DiaryListViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiStateOnDiaryListLoadCompleted(currentList)
-                emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
+                val appMsg =
+                    when (result.exception) {
+                        is DiaryDeleteException.DiaryDataDeleteFailure,
+                        is DiaryDeleteException.Unknown -> DiaryListAppMessage.DiaryDeleteFailure
+                        is DiaryDeleteException.ImageFileDeleteFailure -> DiaryListAppMessage.DiaryImageDeleteFailure
+                    }
+                emitAppMessageEvent(appMsg)
             }
         }
     }
@@ -412,12 +418,8 @@ internal class DiaryListViewModel @Inject constructor(
         when (val result = loadDiaryListStartYearMonthPickerDateRangeUseCase()) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> {
-                when (result.exception) {
-                    is DiaryListStartYearMonthPickerDateRangeLoadException.DiaryInfoLoadFailure -> {
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
-                        return result.exception.fallbackDateRange
-                    }
-                }
+                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                return result.exception.fallbackDateRange
             }
         }
     }

@@ -25,4 +25,16 @@ internal sealed class DiaryLoadConfirmationCheckException (
         "日記の読み込み確認ダイアログを表示する必要があるかどうかを判断するのに失敗しました。",
         cause
     )
+
+    /**
+     * 予期せぬエラーが発生した場合の例外。
+     *
+     * @param cause 発生した根本的な原因となった [Throwable]。
+     */
+    class Unknown(
+        cause: Throwable
+    ) : DiaryLoadConfirmationCheckException(
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryList
  * @param cause この例外を引き起こした根本的な原因となった [Throwable]。
  */
 internal sealed class DiaryListStartYearMonthPickerDateRangeLoadException(
+    val fallbackDateRange: SavedDiaryDateRange = SavedDiaryDateRange(),
     message: String,
     cause: Throwable
 ) : UseCaseException(message, cause) {
@@ -24,7 +25,18 @@ internal sealed class DiaryListStartYearMonthPickerDateRangeLoadException(
      * @param cause この例外を引き起こした根本的な原因となった [Throwable]。
      */
     class DiaryInfoLoadFailure(
-        val fallbackDateRange: SavedDiaryDateRange = SavedDiaryDateRange(),
         cause: Throwable
-    ) : DiaryListStartYearMonthPickerDateRangeLoadException("日付範囲情報の取得に失敗しました。", cause)
+    ) : DiaryListStartYearMonthPickerDateRangeLoadException(message = "日付範囲情報の取得に失敗しました。", cause = cause)
+
+    /**
+     * 予期せぬエラーが発生した場合の例外。
+     *
+     * @param cause 発生した根本的な原因となった [Throwable]。
+     */
+    class Unknown(
+        cause: Throwable
+    ) : DiaryListStartYearMonthPickerDateRangeLoadException(
+        message = "予期せぬエラーが発生しました。",
+        cause = cause
+    )
 }

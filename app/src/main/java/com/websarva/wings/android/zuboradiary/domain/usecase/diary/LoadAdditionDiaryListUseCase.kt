@@ -41,33 +41,53 @@ internal class LoadAdditionDiaryListUseCase(
     ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, DiaryListAdditionLoadException> {
         Log.i(logTag, "${logMsg}開始 (現リスト件数: ${currentList.countDiaries()}, 開始日: ${startDate ?: "全期間"})")
 
-        val loadedDiaryList =
-            try {
+
+        return try {
+            val loadedDiaryList =
                 loadDiaryList(
                     currentList.countDiaries(),
                     startDate
                 )
-            } catch (e: DiaryListLoadException) {
-                Log.e(logTag, "${logMsg}失敗_追加日記リスト読込処理エラー", e)
-                return UseCaseResult.Failure(
-                    DiaryListAdditionLoadException.LoadFailure(e)
-                )
+            val combinedList = currentList.combineDiaryLists(loadedDiaryList)
+            val resultList =updateDiaryListFooter(combinedList, startDate)
+            Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
+            UseCaseResult.Success(resultList)
+        } catch (e: DiaryListLoadException) {
+            when (e) {
+                is DiaryListLoadException.LoadFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_追加日記リスト読込エラー", e)
+                    UseCaseResult.Failure(
+                        DiaryListAdditionLoadException.LoadFailure(e)
+                    )
+                }
+                is DiaryListLoadException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(
+                        DiaryListAdditionLoadException.Unknown(e)
+                    )
+                }
             }
-
-        val combinedList = currentList.combineDiaryLists(loadedDiaryList)
-
-        val resultList =
-            try {
-                updateDiaryListFooter(combinedList, startDate)
-            } catch (e: DiaryListFooterUpdateException) {
-                Log.e(logTag, "${logMsg}失敗_フッター更新処理エラー", e)
-                return UseCaseResult.Failure(
-                    DiaryListAdditionLoadException.FooterUpdateFailure(e)
-                )
+        } catch (e: DiaryListFooterUpdateException) {
+            when (e) {
+                is DiaryListFooterUpdateException.UpdateFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_フッター更新エラー", e)
+                    UseCaseResult.Failure(
+                        DiaryListAdditionLoadException.LoadFailure(e)
+                    )
+                }
+                is DiaryListFooterUpdateException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(
+                        DiaryListAdditionLoadException.Unknown(e)
+                    )
+                }
             }
-
-        Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
-        return UseCaseResult.Success(resultList)
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                DiaryListAdditionLoadException.Unknown(e)
+            )
+        }
     }
 
     /**

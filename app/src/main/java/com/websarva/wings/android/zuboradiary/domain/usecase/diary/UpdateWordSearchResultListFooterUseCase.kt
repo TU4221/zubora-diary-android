@@ -53,10 +53,19 @@ internal class UpdateWordSearchResultListFooterUseCase(
                 }
             UseCaseResult.Success(replacedResultList)
         } catch (e: WordSearchResultCountException) {
-            Log.e(logTag, "${logMsg}失敗_未読込の検索結果存在確認エラー", e)
-            UseCaseResult.Failure(
-                WordSearchListFooterUpdateException.UpdateFailure(e)
-            )
+            when (e) {
+                is WordSearchResultCountException.CountFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_未読込の検索結果存在確認エラー", e)
+                    UseCaseResult.Failure(WordSearchListFooterUpdateException.UpdateFailure(e))
+                }
+                is WordSearchResultCountException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(WordSearchListFooterUpdateException.Unknown(e))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(WordSearchListFooterUpdateException.Unknown(e))
         }
     }
 

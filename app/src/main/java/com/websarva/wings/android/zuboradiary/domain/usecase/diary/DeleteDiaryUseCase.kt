@@ -1,14 +1,12 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -45,21 +43,20 @@ internal class DeleteDiaryUseCase(
     ): UseCaseResult<Unit, DiaryDeleteException> {
         Log.i(logTag, "${logMsg}開始 (日付: $date, 画像ファイル名: ${imageFileName?.let { "\"$it\"" } ?: "なし"})")
 
-        val backupDiary: Diary?
-
         // 日記データ削除
         try {
-            backupDiary = diaryRepository.loadDiary(date)
             diaryRepository.deleteDiary(date)
-        } catch (e: DataStorageException) {
+        } catch (e: NotFoundException) {
+            Log.w(logTag, "${logMsg}警告_削除する日記データがみつからないため、成功とみなす", e)
+        } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_日記データ削除エラー", e)
             return UseCaseResult.Failure(
                 DiaryDeleteException.DiaryDataDeleteFailure(date, e)
             )
-        } catch (e: NotFoundException) {
-            Log.e(logTag, "${logMsg}失敗_削除する日記データがみつからない", e)
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
             return UseCaseResult.Failure(
-                DiaryDeleteException.DiaryDataNotFound(date, e)
+                DiaryDeleteException.Unknown(e)
             )
         }
 
@@ -68,21 +65,25 @@ internal class DeleteDiaryUseCase(
             try {
                 fileRepository.deleteImageFileInPermanent(imageFileName)
             } catch (e: NotFoundException) {
-                Log.w(logTag, "${logMsg}警告_削除する日記の画像ファイルがみつからない", e)
-                // 成功とみなす
+                Log.w(logTag, "${logMsg}警告_削除する日記の画像ファイルがみつからないため、成功とみなす", e)
             } catch (e: DomainException) {
-                Log.e(logTag, "${logMsg}失敗_画像ファイル削除エラー", e)
-
-                try {
-                    diaryRepository.saveDiary(backupDiary)
-                } catch (e: DataStorageException) {
-                    Log.w(logTag, "${logMsg}警告_日記データロールバックエラーの為、削除成功とみなす", e)
-                    // 日記データがメインとなる為、成功とみなす
-                    return UseCaseResult.Success(Unit)
-                }
-
+                // TODO:下記仕様で問題ないか後で検討。
+                //      現在考えれる問題点
+                //      - 画像ファイル名が日記IDで構成されている為、ユーザーが手動で削除するのは難しい。
+                //      - 画像ファイル名に日記日付を加えると画像添付もとの日記の日付が変更された時、
+                //        画像ファイル名も変更する必要がある。
+                //        (データベースの日記データの添付画像ファイル名も変更する必要が出てくる)
+                // MEMO:本アプリの日記は一日一件のみ保存が可能となる仕様のため、画像ファイル削除失敗が続くと、
+                //      その日付に対しての新しい日記を作成できなくなる。
+                //      そのためロールバック処理を廃止し、画像ファイル削除失敗をユーザーに通知するのみとする。
+                Log.e(logTag, "${logMsg}警告_画像ファイル削除エラー", e)
                 return UseCaseResult.Failure(
-                    DiaryDeleteException.DiaryImageFileDeleteFailure(date, imageFileName, e)
+                    DiaryDeleteException.ImageFileDeleteFailure(date, imageFileName, e)
+                )
+            } catch (e: Exception) {
+                Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                return UseCaseResult.Failure(
+                    DiaryDeleteException.Unknown(e)
                 )
             }
         }

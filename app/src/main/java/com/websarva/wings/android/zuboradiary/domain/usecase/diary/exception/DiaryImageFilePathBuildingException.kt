@@ -21,22 +21,22 @@ internal sealed class DiaryImageFilePathBuildingException(
      * @param cause 発生した根本的な原因となった [Throwable]。
      */
     class BuildingFailure(
+        imageFileName: ImageFileName,
         cause: Throwable
     ) : DiaryImageFilePathBuildingException(
-        "日記画像ファイルのパスの生成に失敗しました。",
+        "日記画像ファイル `$imageFileName` のパスの生成に失敗しました。",
         cause
     )
 
     /**
-     * 対象の画像ファイルが見つからなかった場合の例外。
+     * 予期せぬエラーが発生した場合の例外。
      *
      * @param cause 発生した根本的な原因となった [Throwable]。
      */
-    class FileNotFound(
-        imageFileName: ImageFileName,
-        cause: Throwable? = null
+    class Unknown(
+        cause: Throwable
     ) : DiaryImageFilePathBuildingException(
-        "日記画像ファイル `$imageFileName` が見つかりませんでした。",
+        "予期せぬエラーが発生しました。",
         cause
     )
 }

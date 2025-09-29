@@ -24,11 +24,14 @@ internal sealed class WordSearchResultListRefreshException (
     ) : WordSearchResultListRefreshException("既存のワード検索結果リストの再読込に失敗しました。", cause)
 
     /**
-     * 日記リストのフッターの更新に失敗した場合にスローされる例外。
+     * 予期せぬエラーが発生した場合の例外。
      *
-     * @param cause 発生した根本的な原因となった[Throwable]。
+     * @param cause 発生した根本的な原因となった [Throwable]。
      */
-    class FooterUpdateFailure(
+    class Unknown(
         cause: Throwable
-    ) : WordSearchResultListRefreshException("ワード検索結果リストのフッターの更新に失敗しました。", cause)
+    ) : WordSearchResultListRefreshException(
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

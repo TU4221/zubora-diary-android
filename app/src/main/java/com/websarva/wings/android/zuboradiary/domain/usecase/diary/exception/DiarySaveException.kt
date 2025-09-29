@@ -21,26 +21,20 @@ internal sealed class DiarySaveException(
      * @param date 保存しようとした日記の日付。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
-    class SaveDiaryDataFailure(
+    class SaveFailure(
         date: LocalDate,
         cause: Throwable
     ) : DiarySaveException("日付 '$date' の日記の保存に失敗しました。", cause)
 
     /**
-     * ストレージに保存された画像ファイルの更新に失敗した場合にスローされる例外。
+     * 予期せぬエラーが発生した場合の例外。
      *
-     * @param cause 発生した根本的な原因となった[Throwable]。
+     * @param cause 発生した根本的な原因となった [Throwable]。
      */
-    class StorageImageFileUpdateFailure(
+    class Unknown(
         cause: Throwable
-    ) : DiarySaveException("ストレージに保存された画像ファイルの更新に失敗しました。", cause)
-
-    /**
-     * 日記項目タイトル選択履歴の更新に失敗した場合にスローされる例外。
-     *
-     * @param cause 発生した根本的な原因となった[Throwable]。
-     */
-    class SaveDiaryItemTileSelectionHistoryFailure(
-        cause: Throwable
-    ) : DiarySaveException("日記項目タイトル選択履歴の更新に失敗しました。", cause)
+    ) : DiarySaveException(
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

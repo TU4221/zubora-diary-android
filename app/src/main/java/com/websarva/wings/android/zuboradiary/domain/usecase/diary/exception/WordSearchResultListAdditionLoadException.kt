@@ -24,11 +24,14 @@ internal sealed class WordSearchResultListAdditionLoadException (
     ) : WordSearchResultListAdditionLoadException("ワード検索結果リストの追加読込に失敗しました。", cause)
 
     /**
-     * ワード検索結果リストのフッターの更新に失敗した場合にスローされる例外。
+     * 予期せぬエラーが発生した場合の例外。
      *
-     * @param cause 発生した根本的な原因となった[Throwable]。
+     * @param cause 発生した根本的な原因となった [Throwable]。
      */
-    class FooterUpdateFailure(
+    class Unknown(
         cause: Throwable
-    ) : WordSearchResultListAdditionLoadException("ワード検索結果リストのフッターの更新に失敗しました。", cause)
+    ) : WordSearchResultListAdditionLoadException(
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

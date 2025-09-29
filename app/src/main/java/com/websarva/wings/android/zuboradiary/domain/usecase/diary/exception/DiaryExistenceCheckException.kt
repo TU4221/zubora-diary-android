@@ -25,4 +25,16 @@ internal sealed class DiaryExistenceCheckException(
         date: LocalDate,
         cause: Throwable
     ) : DiaryExistenceCheckException("日付 '$date' の日記の存在確認に失敗しました。", cause)
+
+    /**
+     * 予期せぬエラーが発生した場合の例外。
+     *
+     * @param cause 発生した根本的な原因となった [Throwable]。
+     */
+    class Unknown(
+        cause: Throwable
+    ) : DiaryExistenceCheckException(
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

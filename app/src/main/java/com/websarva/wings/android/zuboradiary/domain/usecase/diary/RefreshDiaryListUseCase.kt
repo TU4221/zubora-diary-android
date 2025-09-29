@@ -43,42 +43,54 @@ internal class RefreshDiaryListUseCase(
         Log.i(logTag, "${logMsg}開始 (現リスト件数: ${currentList.countDiaries()}," +
                 " 読込予定件数: ${currentList.countDiaries()}, 開始日: ${startDate ?: "全期間"})")
 
-        var numLoadItems = currentList.countDiaries()
 
-        // HACK:リストが空の状態、又は画面サイズより少ないアイテム数で日記を追加し、
-        //      リスト画面に戻った際に以下の問題が発生する回避策。
-        //      問題点:
-        //      1. 新しく追加された日記が表示されず、追加前のアイテム数でリストが描画される。
-        //      2. スクロールによる追加読み込みも機能しない。
-        //      対策:
-        //      NUM_LOAD_ITEMS に満たない場合は、強制的に NUM_LOAD_ITEMS 分の読み込みを行うことで、
-        //      新規追加されたアイテムの表示とスクロール更新を可能にする。
-        if (numLoadItems < NUM_LOAD_ITEMS) {
-            numLoadItems = NUM_LOAD_ITEMS
+
+
+        return try {
+            var numLoadItems = currentList.countDiaries()
+
+            // HACK:リストが空の状態、又は画面サイズより少ないアイテム数で日記を追加し、
+            //      リスト画面に戻った際に以下の問題が発生する回避策。
+            //      問題点:
+            //      1. 新しく追加された日記が表示されず、追加前のアイテム数でリストが描画される。
+            //      2. スクロールによる追加読み込みも機能しない。
+            //      対策:
+            //      NUM_LOAD_ITEMS に満たない場合は、強制的に NUM_LOAD_ITEMS 分の読み込みを行うことで、
+            //      新規追加されたアイテムの表示とスクロール更新を可能にする。
+            if (numLoadItems < NUM_LOAD_ITEMS) {
+                numLoadItems = NUM_LOAD_ITEMS
+            }
+
+            val loadedDiaryList = loadDiaryList(numLoadItems, startDate)
+            val resultList = updateDiaryListFooter(loadedDiaryList, startDate)
+            Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
+            UseCaseResult.Success(resultList)
+        } catch (e: DiaryListLoadException) {
+            when (e) {
+                is DiaryListLoadException.LoadFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_再読込エラー", e)
+                    UseCaseResult.Failure(DiaryListRefreshException.RefreshFailure(e))
+                }
+                is DiaryListLoadException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(DiaryListRefreshException.Unknown(e))
+                }
+            }
+        } catch (e: DiaryListFooterUpdateException) {
+            when (e) {
+                is DiaryListFooterUpdateException.UpdateFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_フッター更新エラー", e)
+                    UseCaseResult.Failure(DiaryListRefreshException.RefreshFailure(e))
+                }
+                is DiaryListFooterUpdateException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(DiaryListRefreshException.Unknown(e))
+                }
+            }
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(DiaryListRefreshException.Unknown(e))
         }
-
-        val loadedDiaryList =
-            try {
-                loadDiaryList(numLoadItems, startDate)
-            } catch (e: DiaryListLoadException) {
-                Log.e(logTag, "${logMsg}失敗_再読込処理エラー", e)
-                return UseCaseResult.Failure(
-                    DiaryListRefreshException.RefreshFailure(e)
-                )
-            }
-
-        val resultList =
-            try {
-                updateDiaryListFooter(loadedDiaryList, startDate)
-            } catch (e: DiaryListFooterUpdateException) {
-                Log.e(logTag, "${logMsg}失敗_フッター更新処理エラー", e)
-                return UseCaseResult.Failure(
-                    DiaryListRefreshException.FooterUpdateFailure(e)
-                )
-            }
-
-        Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
-        return UseCaseResult.Success(resultList)
     }
 
     /**

@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.mapper.toDiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -51,7 +51,7 @@ internal class LoadDiaryListUseCase(
             "${logMsg}不正引数_読み込みオフセットは0以上必須 (オフセット: $loadOffset)"
         }
 
-        try {
+        return try {
             val loadedDiaryList =
                 diaryRepository.loadDiaryList(
                     numLoadItems,
@@ -60,12 +60,13 @@ internal class LoadDiaryListUseCase(
                 )
             val convertedList = convertDiaryYearMonthList(loadedDiaryList)
             Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${convertedList.countDiaries()})")
-            return UseCaseResult.Success(convertedList)
-        } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_読込処理エラー", e)
-            return UseCaseResult.Failure(
-                DiaryListLoadException.LoadFailure(e)
-            )
+            UseCaseResult.Success(convertedList)
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗_読込エラー", e)
+            UseCaseResult.Failure(DiaryListLoadException.LoadFailure(e))
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(DiaryListLoadException.Unknown(e))
         }
     }
 

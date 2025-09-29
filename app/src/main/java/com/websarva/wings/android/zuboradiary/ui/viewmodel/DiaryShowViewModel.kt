@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
@@ -202,7 +203,13 @@ internal class DiaryShowViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiState(DiaryShowState.LoadSuccess)
-                emitAppMessageEvent(DiaryShowAppMessage.DiaryDeleteFailure)
+                val app =
+                    when (result.exception) {
+                        is DiaryDeleteException.DiaryDataDeleteFailure,
+                        is DiaryDeleteException.Unknown -> DiaryShowAppMessage.DiaryDeleteFailure
+                        is DiaryDeleteException.ImageFileDeleteFailure -> DiaryShowAppMessage.DiaryImageDeleteFailure
+                    }
+                emitAppMessageEvent(app)
             }
         }
     }

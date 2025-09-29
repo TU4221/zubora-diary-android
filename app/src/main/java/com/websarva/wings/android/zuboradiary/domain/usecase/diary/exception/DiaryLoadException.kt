@@ -27,13 +27,14 @@ internal sealed class DiaryLoadException (
     ) : DiaryLoadException("指定された日付 '$date' の日記の読込に失敗しました。", cause)
 
     /**
-     * 日記が見つからなかった場合にスローされる例外。
+     * 予期せぬエラーが発生した場合の例外。
      *
-     * @param date 日記読込対象の日付。
-     * @param cause 発生した根本的な原因となった[Throwable]。
+     * @param cause 発生した根本的な原因となった [Throwable]。
      */
-    class DataNotFound(
-        date: LocalDate,
+    class Unknown(
         cause: Throwable
-    ) : DiaryLoadException("指定された日付 '$date' の日記が見つかりませんでした。", cause)
+    ) : DiaryLoadException(
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }

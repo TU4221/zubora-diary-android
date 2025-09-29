@@ -4,7 +4,6 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.AllDiariesDeleteException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -27,7 +26,6 @@ internal class DeleteAllDiariesUseCase(
     private val logTag = createLogTag()
     private val logMsg = "全日記データ削除_"
 
-    // TODO:権限解放時のエラーハンドリングが不適切。(日記データ削除したあとでも失敗になる)
     /**
      * ユースケースを実行し、全ての日記データ (項目タイトル選択履歴除く) と関連画像ファイルを削除する。
      *
@@ -38,45 +36,33 @@ internal class DeleteAllDiariesUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         try {
-            deleteAllDiaries()
-            deleteAllImageFile()
-        } catch (e: AllDiariesDeleteException) {
-            when (e) {
-                is AllDiariesDeleteException.DeleteFailure ->
-                    Log.e(logTag, "${logMsg}失敗_日記データ削除処理エラー", e)
-                is AllDiariesDeleteException.ImageFileDeleteFailure ->
-                    Log.e(logTag, "${logMsg}失敗_権限解放処理エラー", e)
-            }
-            return UseCaseResult.Failure(e)
-        }
-
-        Log.i(logTag, "${logMsg}完了")
-        return UseCaseResult.Success(Unit)
-    }
-
-    /**
-     * 全ての日記データを削除する。
-     *
-     * @throws AllDiariesDeleteException.DeleteFailure 日記データの削除に失敗した場合。
-     */
-    private suspend fun deleteAllDiaries() {
-        try {
             diaryRepository.deleteAllDiaries()
-        } catch (e: DataStorageException) {
-            throw AllDiariesDeleteException.DeleteFailure(e)
-        }
-    }
-
-    /**
-     * 全ての画像ファイルを削除する。
-     *
-     * @throws AllDiariesDeleteException.ImageFileDeleteFailure 画像ファイルの削除に失敗した場合。
-     */
-    private suspend fun deleteAllImageFile() {
-        try {
-            fileRepository.clearAllImageFiles()
         } catch (e: DomainException) {
-            throw AllDiariesDeleteException.ImageFileDeleteFailure(e)
+            Log.e(logTag, "${logMsg}失敗_日記データ削除エラー", e)
+            return UseCaseResult.Failure(
+                AllDiariesDeleteException.DeleteFailure(e)
+            )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            return UseCaseResult.Failure(
+                AllDiariesDeleteException.Unknown(e)
+            )
+        }
+
+        return try {
+            fileRepository.clearAllImageFiles()
+            Log.i(logTag, "${logMsg}完了")
+            UseCaseResult.Success(Unit)
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗_画像ファイル削除エラー", e)
+            UseCaseResult.Failure(
+                AllDiariesDeleteException.ImageFileDeleteFailure(e)
+            )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                AllDiariesDeleteException.Unknown(e)
+            )
         }
     }
 }

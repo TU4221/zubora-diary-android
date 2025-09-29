@@ -38,28 +38,47 @@ internal class LoadNewWordSearchResultListUseCase(
     ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, WordSearchResultListNewLoadException> {
         Log.i(logTag, "${logMsg}開始 (検索ワード: \"$searchWord\")")
 
-        val loadedDiaryList =
-            try {
-                loadDiaryList(searchWord)
-            } catch (e: WordSearchResultListLoadException) {
-                Log.e(logTag, "${logMsg}失敗_新規ワード検索結果読込処理エラー", e)
-                return UseCaseResult.Failure(
-                    WordSearchResultListNewLoadException.LoadFailure(e)
-                )
+        return try {
+            val loadedDiaryList = loadDiaryList(searchWord)
+            val resultList = updateDiaryListFooter(loadedDiaryList, searchWord)
+            Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
+            UseCaseResult.Success(resultList)
+        } catch (e: WordSearchResultListLoadException) {
+            when (e) {
+                is WordSearchResultListLoadException.LoadFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_新規ワード検索結果読込エラー", e)
+                    UseCaseResult.Failure(
+                        WordSearchResultListNewLoadException.LoadFailure(e)
+                    )
+                }
+                is WordSearchResultListLoadException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(
+                        WordSearchResultListNewLoadException.Unknown(e)
+                    )
+                }
             }
-
-        val resultList =
-            try {
-                updateDiaryListFooter(loadedDiaryList, searchWord)
-            } catch (e: WordSearchListFooterUpdateException) {
-                Log.e(logTag, "${logMsg}失敗_フッター更新処理エラー", e)
-                return UseCaseResult.Failure(
-                    WordSearchResultListNewLoadException.FooterUpdateFailure(e)
-                )
+        } catch (e: WordSearchListFooterUpdateException) {
+            when (e) {
+                is WordSearchListFooterUpdateException.UpdateFailure -> {
+                    Log.e(logTag, "${logMsg}失敗_フッター更新エラー", e)
+                    UseCaseResult.Failure(
+                        WordSearchResultListNewLoadException.LoadFailure(e)
+                    )
+                }
+                is WordSearchListFooterUpdateException.Unknown -> {
+                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                    UseCaseResult.Failure(
+                        WordSearchResultListNewLoadException.Unknown(e)
+                    )
+                }
             }
-
-        Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
-        return UseCaseResult.Success(resultList)
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                WordSearchResultListNewLoadException.Unknown(e)
+            )
+        }
     }
 
     /**

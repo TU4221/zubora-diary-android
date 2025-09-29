@@ -23,6 +23,14 @@ internal sealed class DiaryListAppMessage(
         private fun readResolve(): Any = DiaryDeleteFailure
     }
 
+    data object DiaryImageDeleteFailure :  DiaryListAppMessage(
+        R.string.dialog_app_message_title_access_error,
+        R.string.dialog_diary_list_app_message_diary_image_delete_failure
+    ) {
+        // デシリアライズ時のシングルトン性を維持
+        private fun readResolve(): Any = DiaryImageDeleteFailure
+    }
+
     data object DiaryInfoLoadFailure :  DiaryListAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_list_app_message_diary_info_load_failure

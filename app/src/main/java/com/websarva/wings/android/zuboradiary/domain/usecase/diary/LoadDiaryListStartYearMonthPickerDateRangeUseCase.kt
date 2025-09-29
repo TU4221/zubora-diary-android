@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.model.SavedDiaryDateRange
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -24,6 +24,7 @@ internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
     private val logTag = createLogTag()
     private val logMsg = "日記リスト先頭年月選択範囲の読込_"
 
+    // TODO:年月を返すようにしてもいいかも
     /**
      * ユースケースを実行し、日記リストの先頭年月ピッカー用の日付範囲情報を返す。
      *
@@ -35,23 +36,31 @@ internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
             SavedDiaryDateRange, DiaryListStartYearMonthPickerDateRangeLoadException> {
         Log.i(logTag, "${logMsg}開始")
 
-        val dateRange =
-            try {
-                val newestDiary = diaryRepository.loadNewestDiary()
-                val oldestDiary = diaryRepository.loadOldestDiary()
-                SavedDiaryDateRange(newestDiary.date, oldestDiary.date)
-            } catch (e: DataStorageException) {
-                Log.e(logTag, "${logMsg}失敗_読込処理エラー", e)
-                return UseCaseResult.Failure(
-                    DiaryListStartYearMonthPickerDateRangeLoadException
-                        .DiaryInfoLoadFailure(cause = e)
-                )
-            } catch (e: NotFoundException) {
-                Log.i(logTag, "${logMsg}保存された日記が存在しない", e)
-                SavedDiaryDateRange()
-            }
+        return try {
+            val newestDiary = diaryRepository.loadNewestDiary()
+            val oldestDiary = diaryRepository.loadOldestDiary()
 
-        Log.i(logTag, "${logMsg}完了 (結果: $dateRange)")
-        return UseCaseResult.Success(dateRange)
+            val dateRange =
+                SavedDiaryDateRange(
+                    newestDiary.date,
+                    oldestDiary.date
+                )
+            Log.i(logTag, "${logMsg}完了 (結果: $dateRange)")
+            UseCaseResult.Success(dateRange)
+        } catch (e: NotFoundException) {
+            Log.i(logTag, "${logMsg}完了_保存された日記が存在しない為、今日の日付のみを範囲とする", e)
+            UseCaseResult.Success(SavedDiaryDateRange())
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗_読込エラー", e)
+            UseCaseResult.Failure(
+                DiaryListStartYearMonthPickerDateRangeLoadException
+                    .DiaryInfoLoadFailure(e)
+            )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                DiaryListStartYearMonthPickerDateRangeLoadException.Unknown(e)
+            )
+        }
     }
 }

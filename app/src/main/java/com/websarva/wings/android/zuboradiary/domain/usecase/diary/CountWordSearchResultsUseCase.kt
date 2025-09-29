@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -35,10 +35,15 @@ internal class CountWordSearchResultsUseCase(
             val numDiaries =diaryRepository.countWordSearchResults(searchWord)
             Log.i(logTag, "${logMsg}完了 (結果: $numDiaries)")
             UseCaseResult.Success(numDiaries)
-        } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_カウント処理エラー", e)
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗_カウントエラー", e)
             UseCaseResult.Failure(
                 WordSearchResultCountException.CountFailure(searchWord, e)
+            )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                WordSearchResultCountException.Unknown(e)
             )
         }
     }

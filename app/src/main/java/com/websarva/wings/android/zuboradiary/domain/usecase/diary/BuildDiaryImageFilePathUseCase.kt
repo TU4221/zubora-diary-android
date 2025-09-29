@@ -1,9 +1,10 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageFilePathBuildingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -32,26 +33,28 @@ internal class BuildDiaryImageFilePathUseCase(
     ): UseCaseResult<String, DiaryImageFilePathBuildingException> {
         Log.i(logTag, "${logMsg}開始 (ファイル名: $fileName)")
 
-        val path =
-            try {
+        return try {
+            val path =
                 if (fileRepository.existsImageFileInCache(fileName)) {
                     fileRepository.buildImageFileAbsolutePathFromCache(fileName)
                 } else if (fileRepository.existsImageFileInPermanent(fileName)) {
                     fileRepository.buildImageFileAbsolutePathFromPermanent(fileName)
                 } else {
-                    throw DiaryImageFilePathBuildingException.FileNotFound(fileName, )
+                    throw NotFoundException()
                 }
-            } catch (e: DiaryImageFilePathBuildingException.FileNotFound) {
-                Log.e(logTag, "${logMsg}失敗_対象ファイルなし", e)
-                return UseCaseResult.Failure(e)
-            } catch (e: DomainException) {
-                Log.e(logTag, "${logMsg}失敗_対象ファイルパス生成処理エラー", e)
-                return UseCaseResult.Failure(
-                    DiaryImageFilePathBuildingException.BuildingFailure(e)
-                )
-            }
-
-        Log.i(logTag, "${logMsg}完了 (ファイルパス: $path)")
-        return UseCaseResult.Success(path)
+            Log.i(logTag, "${logMsg}完了 (ファイルパス: $path)")
+            UseCaseResult.Success(path)
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗_ファイルパス構築エラー", e)
+            UseCaseResult.Failure(
+                DiaryImageFilePathBuildingException
+                    .BuildingFailure(fileName, e)
+            )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            return UseCaseResult.Failure(
+                DiaryImageFilePathBuildingException.Unknown(e)
+            )
+        }
     }
 }

@@ -11,6 +11,9 @@ import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
+import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
+import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
 import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -55,79 +58,104 @@ internal class SaveDiaryUseCase(
         Log.i(logTag, "${logMsg}開始 (新規: $isNewDiary, 日付: ${diary.date}, 元日付: ${originalDiary.date})")
 
         val saveDate = diary.date
-        val originalDate = originalDiary.date
-        var deleteDiary: Diary? = null
+        val deleteDiary: Diary?
 
-        // 日記データ保存処理方法判断
+        // 日記データ保存
         try {
-            if (shouldDeleteSameDateDiary(saveDate, originalDate, isNewDiary)) {
-                Log.i(logTag, "${logMsg}同じ日付の日記削除と保存実行 (日付: $saveDate)")
-
-                deleteDiary = diaryRepository.loadDiary(diary.date)
-                diaryRepository.deleteAndSaveDiary(diary)
-            } else {
+            deleteDiary = saveDiary(isNewDiary, diary, originalDiary)
+            if (deleteDiary == null) {
                 Log.i(logTag, "${logMsg}日記保存実行 (日付: $saveDate)")
-                diaryRepository.saveDiary(diary)
+            } else {
+                Log.i(logTag, "${logMsg}同じ日付の日記削除と保存実行 (日付: $saveDate)")
             }
-        } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_日記データ保存処理エラー", e)
-            return UseCaseResult.Failure(
-                DiarySaveException.SaveDiaryDataFailure(saveDate, e)
-            )
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗_日記データ保存エラー", e)
+            return UseCaseResult.Failure(DiarySaveException.SaveFailure(saveDate, e))
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            return UseCaseResult.Failure(DiarySaveException.Unknown(e))
         }
 
-        // 画像ファイル処理
+        // 画像ファイル処理、日記項目選択履歴データ処理
         try {
             updateStorageDiaryImageFile(
                 diary.imageFileName,
                 originalDiary.imageFileName,
                 deleteDiary?.imageFileName
             )
-        } catch (e: DiarySaveException.StorageImageFileUpdateFailure) {
-            try {
-                rollbackDiaryData(diary, originalDiary, isNewDiary, deleteDiary)
-            } catch (re: RollbackException) {
-                Log.w(logTag, "${logMsg}警告_日記データロールバック処理エラー", e)
-                e.addSuppressed(re)
-            }
-            Log.e(logTag, "${logMsg}失敗_日記画像ファイル処理エラー", e)
-            return UseCaseResult.Failure(e)
-        }
-
-        // 日記項目選択履歴データ処理
-        try {
             diaryRepository
                 .updateDiaryItemTitleSelectionHistory(
                     diaryItemTitleSelectionHistoryItemList
                 )
-        } catch (e: DataStorageException) {
+        } catch (e: Exception) {
             try {
-                rollbackImageFiles(
-                    diary.imageFileName,
-                    originalDiary.imageFileName,
-                    deleteDiary?.imageFileName
+                rollbackDiaryImageFileAndData(
+                    isNewDiary,
+                    diary,
+                    originalDiary,
+                    deleteDiary
                 )
-                rollbackDiaryData(diary, originalDiary, isNewDiary, deleteDiary)
             } catch (re: RollbackException) {
-                Log.w(logTag, "${logMsg}警告_日記データ、画像ロールバック処理エラー", e)
+                Log.w(logTag, "${logMsg}警告_日記データロールバックエラー", re)
                 e.addSuppressed(re)
             }
-            Log.e(logTag, "${logMsg}失敗_日記項目選択履歴更新処理エラー", e)
-            return UseCaseResult.Failure(
-                DiarySaveException.SaveDiaryItemTileSelectionHistoryFailure(e)
-            )
+            val wrappedException =
+                when (e) {
+                    is DomainException -> {
+                        Log.e(logTag, "${logMsg}失敗_日記保存エラー", e)
+                        DiarySaveException.SaveFailure(saveDate, e)
+                    }
+                    else -> {
+                        Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                        DiarySaveException.Unknown(e)
+                    }
+                }
+            return UseCaseResult.Failure(wrappedException)
         }
 
         // バックアップ画像ファイル削除
         try {
             fileRepository.clearAllImageFilesInBackup()
-        } catch (e: DomainException) {
-            Log.w(logTag, "${logMsg}バックアップ画像ファイル削除処理エラー", e)
+        } catch (e: Exception) {
+            Log.w(logTag, "${logMsg}警告_バックアップ画像ファイル削除エラー", e)
             // 日記保存は成功している為、成功とみなす。
         }
 
-        Log.i(logTag, "${logMsg}完了 (日付: ${diary.date})")
+        Log.i(logTag, "${logMsg}完了 (日付: ${saveDate})")
         return UseCaseResult.Success(Unit)
+    }
+
+    /**
+     * 日記データを保存する。
+     *
+     * 保存する日記データの日付が、既存の日記データの日付と重複する場合、
+     * 日記データをデータベースに保存または更新（置換）し、日付の重複により置き換えられた古い日記データを返す。
+     *
+     * @param isNewDiary 新規作成の日記かどうかを示すフラグ。
+     * @param saveDiary 保存する(編集後の)日記。
+     * @param originalDiary 編集前の日記。
+     * @return 保存する日記データと同じ日付の既存日記データを削除した場合、削除した日記データを返す。削除しなかった場合は `null` を返す。
+     * @throws DataStorageException 保存に失敗した場合。
+     */
+    private suspend fun saveDiary(
+        isNewDiary: Boolean,
+        saveDiary: Diary,
+        originalDiary: Diary
+    ): Diary? {
+        val shouldDeleteSameDateDiary =
+            shouldDeleteSameDateDiary(
+                isNewDiary,
+                saveDiary.date,
+                originalDiary.date
+            )
+        return if (shouldDeleteSameDateDiary) {
+            val deleteDiary = diaryRepository.loadDiary(saveDiary.date)
+            diaryRepository.deleteAndSaveDiary(saveDiary)
+            deleteDiary
+        } else {
+            diaryRepository.saveDiary(saveDiary)
+            null
+        }
     }
 
     /**
@@ -136,16 +164,16 @@ internal class SaveDiaryUseCase(
      * 新規日記、かつ同じ日付の日記データがデータベースに存在する場合は削除を必要とする。
      * 編集日記、かつ編集前後の日付が異なる、かつ編集後と同じ日付の日記データがデータベースに存在する場合は削除を必要とする。
      *
+     * @param isNewDiary 新規作成の日記かどうかを示すフラグ。
      * @param saveDiaryDate 保存する(編集後の)日記の日付。
      * @param originalDiaryDate 編集前の日記の日付。
-     * @param isNewDiary 新規作成の日記かどうかを示すフラグ。
      * @return 保存する日記データと同じ日付の既存日記データを削除する必要があれば `true`、そうでなければ `false`。
      * @throws DataStorageException 確認に失敗した場合。
      */
     private suspend fun shouldDeleteSameDateDiary(
+        isNewDiary: Boolean,
         saveDiaryDate: LocalDate,
-        originalDiaryDate: LocalDate,
-        isNewDiary: Boolean
+        originalDiaryDate: LocalDate
     ): Boolean {
         /* TODO:動作確認後削除
         * 新規保存 -> 同日付既存日記なし -> 新規日記保存
@@ -179,13 +207,15 @@ internal class SaveDiaryUseCase(
      *
      * 新しい画像ファイルの保存、古い画像ファイルのバックアップ移動、
      * または日付変更に伴い削除される別日記の画像ファイルのバックアップ移動を行う。
-     * 各ファイル操作でエラーが発生した場合、それまでの操作を可能な範囲でロールバックし、
-     * [DiarySaveException.StorageImageFileUpdateFailure] をスローする。
      *
      * @param saveDiaryImageFileName 保存または更新する日記の画像ファイル名。画像がない場合は `null`。
      * @param originalDiaryImageFileName 更新前の元の日記の画像ファイル名。新規作成時や元画像がない場合は `null`。
      * @param deleteDiaryImageFileName 日付重複により削除される日記の画像ファイル名。該当がない、画像がない場合は `null`。
-     * @throws DiarySaveException.StorageImageFileUpdateFailure 画像ファイルの更新処理に失敗した場合。
+     * @throws DataStorageException いずれかの画像ファイルの更新処理に失敗した場合。
+     * @throws InvalidParameterException いずれかの画像ファイル名が無効の場合。
+     * @throws NotFoundException 保存日記の添付画像ファイルが見つからない場合。
+     * @throws PermissionException いずれかの画像ファイルへのアクセス権限がない場合。
+     * @throws ResourceAlreadyExistsException いずれかの画像ファイルの移動先に同名のファイルが既に存在する場合。
      */
     private suspend fun updateStorageDiaryImageFile(
         saveDiaryImageFileName: ImageFileName?,
@@ -196,58 +226,46 @@ internal class SaveDiaryUseCase(
             try {
                 fileRepository.moveImageFileToBackup(it)
             } catch (e: NotFoundException) {
-                Log.w(logTag, "${logMsg}警告_削除する日記の画像ファイルがみつからない", e)
-            }  catch (e: DomainException) {
-                try {
-                    rollbackImageFiles(
-                        saveDiaryImageFileName,
-                        originalDiaryImageFileName,
-                        deleteDiaryImageFileName
-                    )
-                } catch (re: RollbackException) {
-                    e.addSuppressed(re)
-                }
-                throw DiarySaveException.StorageImageFileUpdateFailure(e)
+                Log.w(logTag, "${logMsg}警告_削除する日記の画像ファイルがみつからない為、削除スキップ", e)
             }
         }
-
         if (saveDiaryImageFileName == originalDiaryImageFileName) return
-
         originalDiaryImageFileName?.let {
             try {
                 fileRepository.moveImageFileToBackup(it)
             } catch (e: NotFoundException) {
-                Log.w(logTag, "${logMsg}警告_編集元の日記の画像ファイルがみつからない", e)
-            } catch (e: DomainException) {
-                try {
-                    rollbackImageFiles(
-                        saveDiaryImageFileName,
-                        originalDiaryImageFileName,
-                        deleteDiaryImageFileName
-                    )
-                } catch (re: RollbackException) {
-                    e.addSuppressed(re)
-                }
-                throw DiarySaveException.StorageImageFileUpdateFailure(e)
+                Log.w(logTag, "${logMsg}警告_編集元の日記の画像ファイルがみつからないため、バックアップ移動スキップ", e)
             }
         }
-
         saveDiaryImageFileName?.let {
-            try {
-                fileRepository.moveImageFileToPermanent(saveDiaryImageFileName)
-            } catch (e: DomainException) {
-                try {
-                    rollbackImageFiles(
-                        saveDiaryImageFileName,
-                        originalDiaryImageFileName,
-                        deleteDiaryImageFileName
-                    )
-                } catch (re: RollbackException) {
-                    e.addSuppressed(re)
-                }
-                throw DiarySaveException.StorageImageFileUpdateFailure(e)
-            }
+            fileRepository.moveImageFileToPermanent(saveDiaryImageFileName)
         }
+    }
+
+    /**
+     * 画像ファイルのストレージ操作をロールバック ( [rollbackImageFiles] )し、
+     * 日記データの保存、更新処理をロールバック ( [rollbackDiaryData] )する。
+     *
+     * ロールバック処理途中で例外が発生したら、その時点でロールバック処理を停止する。
+     *
+     * @param isNewDiary `true` の場合は新規日記の保存に対するロールバック、`false` の場合は既存日記の更新に対するロールバック。
+     * @param savedDiary 保存または更新された日記データ。
+     * @param originalDiary 編集前の日記データ。新規作成の場合は初期状態を示す。
+     * @param deletedDiary 新規保存または日付変更更新の際に、日付の重複により事前に削除された可能性のある日記データ。該当がない場合は `null`。
+     * @throws RollbackException 日記データのロールバック処理に失敗した場合。
+     */
+    private suspend fun rollbackDiaryImageFileAndData(
+        isNewDiary: Boolean,
+        savedDiary: Diary,
+        originalDiary: Diary,
+        deletedDiary: Diary?,
+    ) {
+        rollbackImageFiles(
+            savedDiary.imageFileName,
+            originalDiary.imageFileName,
+            deletedDiary?.imageFileName
+        )
+        rollbackDiaryData(isNewDiary, savedDiary, originalDiary, deletedDiary)
     }
 
     /**
@@ -258,36 +276,36 @@ internal class SaveDiaryUseCase(
      * - 既存更新時: 日記を更新前の内容に戻す。
      *   - 日付変更があり、変更後の日付に別の日記が存在し削除された場合: その別日記を復元し、元の日記も復元。
      *
+     * @param isNewDiary `true` の場合は新規日記の保存に対するロールバック、`false` の場合は既存日記の更新に対するロールバック。
      * @param savedDiary 保存または更新された日記データ。
      * @param originalDiary 編集前の日記データ。新規作成の場合は初期状態を示す。
-     * @param isNewDiary `true` の場合は新規日記の保存に対するロールバック、`false` の場合は既存日記の更新に対するロールバック。
      * @param deletedDiary 新規保存または日付変更更新の際に、日付の重複により事前に削除された可能性のある日記データ。該当がない場合は `null`。
      * @throws RollbackException 日記データのロールバック処理に失敗した場合。
      */
     private suspend fun rollbackDiaryData(
+        isNewDiary: Boolean,
         savedDiary: Diary,
         originalDiary: Diary,
-        isNewDiary: Boolean,
         deletedDiary: Diary?,
     ) {
         try {
             if (isNewDiary) {
                 if (deletedDiary == null) {
-                    Log.d("20250922", "新規ロールバック_deletedDiary(保存日記_${savedDiary.date})")
+                    Log.d(logTag, "新規ロールバック_保存日記削除 (保存日記日付: ${savedDiary.date})")
                     diaryRepository.deleteDiary(savedDiary.date)
                 } else {
-                    Log.d("20250922", "新規ロールバック_deleteAndSaveDiary(削除日記_${deletedDiary.date})")
+                    Log.d(logTag, "新規ロールバック_保存日記削除、削除日記復元 (保存日記日付: ${savedDiary.date}、削除日記日付: ${deletedDiary.date})")
                     diaryRepository.deleteAndSaveDiary(deletedDiary)
                 }
             } else {
                 if (deletedDiary != null) {
-                    Log.d("20250922", "編集ロールバック_deleteAndSaveDiary(削除日記_${originalDiary.date})")
+                    Log.d(logTag, "編集ロールバック_保存日記削除、削除日記復元 (保存日記日付: ${savedDiary.date}、削除日記日付: ${deletedDiary.date})")
                     diaryRepository.deleteAndSaveDiary(deletedDiary)
                 }
-                Log.d("20250922", "編集ロールバック_saveDiary(編集元日記_${savedDiary.date})")
+                Log.d(logTag, "編集ロールバック_編集元日記復元 (編集元日記日付: ${originalDiary.date})")
                 diaryRepository.saveDiary(originalDiary)
             }
-        } catch (e: DomainException) {
+        } catch (e: Exception) {
             throw RollbackException(cause = e)
         }
     }
@@ -311,22 +329,24 @@ internal class SaveDiaryUseCase(
             if (savedDiaryImageFileName != originalDiaryImageFileName) {
                 if (savedDiaryImageFileName != null) {
                     if (fileRepository.existsImageFileInPermanent(savedDiaryImageFileName)) {
+                        Log.d(logTag, "保存日記画像ファイルロールバック (ファイル名: ${savedDiaryImageFileName.fullName})")
                         fileRepository.restoreImageFileFromPermanent(savedDiaryImageFileName)
                     }
                 }
                 if (originalDiaryImageFileName != null) {
                     if (fileRepository.existsImageFileInBackup(originalDiaryImageFileName)) {
+                        Log.d(logTag, "編集元画像ファイルロールバック (ファイル名: ${originalDiaryImageFileName.fullName})")
                         fileRepository.restoreImageFileFromBackup(originalDiaryImageFileName)
                     }
                 }
             }
             if (deletedDiaryImageFileName != null) {
                 if (fileRepository.existsImageFileInBackup(deletedDiaryImageFileName)) {
-                    Log.d("20250922", "ロールバック_deletedDiary")
+                    Log.d(logTag, "削除日記画像ファイルロールバック (ファイル名: ${deletedDiaryImageFileName.fullName})")
                     fileRepository.restoreImageFileFromBackup(deletedDiaryImageFileName)
                 }
             }
-        } catch (e: DomainException) {
+        } catch (e: Exception) {
             throw RollbackException(cause = e)
         }
     }

@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSea
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -59,7 +59,7 @@ internal class LoadWordSearchResultListUseCase(
         }
         require(searchWord.isNotEmpty()) { "${logMsg}不正引数_検索ワードは空であってはいけない" }
 
-        try {
+        return try {
             val wordSearchResultList =
                 diaryRepository.loadWordSearchResultList(
                     numLoadItems,
@@ -68,12 +68,15 @@ internal class LoadWordSearchResultListUseCase(
                 )
             val convertedList = convertWordSearchResultList(wordSearchResultList, searchWord)
             Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${convertedList.countDiaries()})")
-            return UseCaseResult.Success(convertedList)
-        } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_読込処理エラー", e)
-            return UseCaseResult.Failure(
+            UseCaseResult.Success(convertedList)
+        } catch (e: DomainException) {
+            Log.e(logTag, "${logMsg}失敗_読込エラー", e)
+            UseCaseResult.Failure(
                 WordSearchResultListLoadException.LoadFailure(searchWord, e)
             )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(WordSearchResultListLoadException.Unknown(e))
         }
     }
 

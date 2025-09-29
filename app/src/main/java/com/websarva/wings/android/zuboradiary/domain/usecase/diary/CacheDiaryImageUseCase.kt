@@ -48,9 +48,14 @@ internal class CacheDiaryImageUseCase(
             Log.i(logTag, "${logMsg}完了 (ファイル名: $fileName)")
             UseCaseResult.Success(fileName)
         } catch (e: DomainException) {
-            Log.e(logTag, "${logMsg}失敗_キャッシュ処理エラー", e)
-            return UseCaseResult.Failure(
+            Log.e(logTag, "${logMsg}失敗_キャッシュエラー", e)
+            UseCaseResult.Failure(
                 DiaryImageCacheException.CacheFailure(e)
+            )
+        } catch (e: Exception) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                DiaryImageCacheException.Unknown(e)
             )
         }
     }

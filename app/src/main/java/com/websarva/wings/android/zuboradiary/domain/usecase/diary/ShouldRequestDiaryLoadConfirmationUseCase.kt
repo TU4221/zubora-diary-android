@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadConfirmationCheckException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -63,10 +64,18 @@ internal class ShouldRequestDiaryLoadConfirmationUseCase(
                 UseCaseResult.Success(shouldConfirm)
             }
             is UseCaseResult.Failure -> {
-                Log.e(logTag, "${logMsg}失敗_日記存在確認エラー", result.exception)
-                UseCaseResult.Failure(
-                    DiaryLoadConfirmationCheckException.CheckFailure(result.exception)
-                )
+                val wrappedException =
+                    when (val e = result.exception) {
+                        is DiaryExistenceCheckException.CheckFailure -> {
+                            Log.e(logTag, "${logMsg}失敗_日記存在確認エラー", e)
+                            DiaryLoadConfirmationCheckException.CheckFailure(e)
+                        }
+                        is DiaryExistenceCheckException.Unknown -> {
+                            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                            DiaryLoadConfirmationCheckException.Unknown(e)
+                        }
+                    }
+                UseCaseResult.Failure(wrappedException)
             }
         }
     }

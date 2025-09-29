@@ -22,4 +22,16 @@ internal sealed class DiaryListFooterUpdateException (
     class UpdateFailure (
         cause: Throwable
     ) : DiaryListFooterUpdateException("日記リストのフッターを更新に失敗しました。", cause)
+
+    /**
+     * 予期せぬエラーが発生した場合の例外。
+     *
+     * @param cause 発生した根本的な原因となった [Throwable]。
+     */
+    class Unknown(
+        cause: Throwable
+    ) : DiaryListFooterUpdateException(
+        "予期せぬエラーが発生しました。",
+        cause
+    )
 }
