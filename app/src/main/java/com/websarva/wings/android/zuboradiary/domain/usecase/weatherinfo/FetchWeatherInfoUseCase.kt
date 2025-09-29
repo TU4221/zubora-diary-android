@@ -53,9 +53,9 @@ internal class FetchWeatherInfoUseCase(
                 WeatherInfoFetchException.DateOutOfRange(date, e)
             )
         } catch (e: PermissionException) {
-            Log.w(logTag, "${logMsg}失敗_位置情報権限未取得", e)
+            Log.e(logTag, "${logMsg}失敗_位置情報権限未取得", e)
             UseCaseResult.Failure(
-                WeatherInfoFetchException.LocationPermissionNotGranted(e)
+                WeatherInfoFetchException.LocationPermissionNotGranted(e) // TODO:権限確認はUI側で行うようにし、データ層からの権限例外はユースケース失敗例外にラップする
             )
         } catch (e: LocationException) {
             Log.e(logTag, "${logMsg}失敗_位置情報アクセスエラー", e)
