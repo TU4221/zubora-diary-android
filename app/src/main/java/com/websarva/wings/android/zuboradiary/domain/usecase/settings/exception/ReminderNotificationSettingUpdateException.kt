@@ -35,21 +35,6 @@ internal sealed class ReminderNotificationSettingUpdateException(
     )
 
     /**
-     * リマインダー通知設定のスケジュール更新に失敗した場合にスローされる例外。
-     *
-     * @param cause 発生した根本的な原因となった[Throwable]。
-     */
-    class SchedulingUpdateFailure(
-        setting: ReminderNotificationSetting,
-        cause: Throwable
-    ) : ReminderNotificationSettingUpdateException(
-        "リマインダー通知のスケジュール" +
-                (if (setting.isEnabled) "登録" else "解除") +
-                "に失敗しました。",
-        cause
-    )
-
-    /**
      * 予期せぬエラーが発生した場合の例外。
      *
      * @param cause 発生した根本的な原因となった [Throwable]。
