@@ -43,7 +43,7 @@ internal class DeleteAllDataUseCase(
         try {
             diaryRepository.deleteAllData()
         } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_日記データ削除処理エラー", e)
+            Log.e(logTag, "${logMsg}失敗_日記データ削除エラー", e)
             return UseCaseResult.Failure(
                 AllDataDeleteException.DiariesDeleteFailure(e)
             )
@@ -55,7 +55,7 @@ internal class DeleteAllDataUseCase(
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
         } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_画像ファイル削除処理エラー", e)
+            Log.e(logTag, "${logMsg}失敗_画像ファイル削除エラー", e)
             UseCaseResult.Failure(
                 AllDataDeleteException.ImageFileDeleteFailure(e)
             )
@@ -67,7 +67,7 @@ internal class DeleteAllDataUseCase(
                         AllDataDeleteException.Unknown(e)
                     }
                     else -> {
-                        Log.e(logTag, "${logMsg}失敗_設定初期化処理エラー", e)
+                        Log.e(logTag, "${logMsg}失敗_設定初期化エラー", e)
                         AllDataDeleteException.SettingsInitializationFailure(e)
                     }
                 }

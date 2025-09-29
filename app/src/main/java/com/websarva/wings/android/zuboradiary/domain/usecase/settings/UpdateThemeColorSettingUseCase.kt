@@ -37,7 +37,7 @@ internal class UpdateThemeColorSettingUseCase(
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
         } catch (e: DataStorageException) {
-            Log.e(logTag, "${logMsg}失敗_設定更新処理エラー", e)
+            Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
             return UseCaseResult.Failure(
                 ThemeColorSettingUpdateException.UpdateFailure(setting, e)
             )
