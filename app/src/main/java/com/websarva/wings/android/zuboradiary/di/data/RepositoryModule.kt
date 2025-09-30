@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.di.data
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
+import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.mapper.scheduling.SchedulingRepositoryExceptionMapperImpl
@@ -44,7 +45,8 @@ internal object RepositoryModule {
     @Provides
     fun provideDiaryRepositoryImpl(
         diaryDataSource: DiaryDataSource
-    ): DiaryRepositoryImpl = DiaryRepositoryImpl(diaryDataSource)
+    ): DiaryRepositoryImpl =
+        DiaryRepositoryImpl(diaryDataSource, DiaryRepositoryExceptionMapperImpl)
 
     @Singleton
     @Provides
