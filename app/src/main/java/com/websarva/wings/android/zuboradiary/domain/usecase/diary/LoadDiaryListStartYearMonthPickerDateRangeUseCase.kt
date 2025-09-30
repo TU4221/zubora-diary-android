@@ -24,7 +24,6 @@ internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
     private val logTag = createLogTag()
     private val logMsg = "日記リスト先頭年月選択範囲の読込_"
 
-    // TODO:年月を返すようにしてもいいかも
     /**
      * ユースケースを実行し、日記リストの先頭年月ピッカー用の日付範囲情報を返す。
      *
