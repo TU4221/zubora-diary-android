@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.data.database.DataBaseAccessFailureException
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
+import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseException
 import com.websarva.wings.android.zuboradiary.data.mapper.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
@@ -33,7 +33,7 @@ internal class DiaryRepositoryImpl (
             } else {
                 diaryDataSource.countDiaries(date)
             }
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -41,7 +41,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun existsDiary(date: LocalDate): Boolean {
         return try {
             diaryDataSource.existsDiary(date)
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -50,7 +50,7 @@ internal class DiaryRepositoryImpl (
         return try {
             diaryDataSource.selectDiary(date)?.toDomainModel()
                 ?: throw ResourceNotFoundException()
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -59,7 +59,7 @@ internal class DiaryRepositoryImpl (
         return try {
             diaryDataSource.selectNewestDiary()?.toDomainModel()
                 ?: throw ResourceNotFoundException()
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -68,7 +68,7 @@ internal class DiaryRepositoryImpl (
         return try {
             diaryDataSource.selectOldestDiary()?.toDomainModel()
                 ?: throw ResourceNotFoundException()
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -86,7 +86,7 @@ internal class DiaryRepositoryImpl (
             diaryDataSource
                 .selectDiaryListOrderByDateDesc(num, offset, date)
                 .map { it.toDomainModel() }
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -98,7 +98,7 @@ internal class DiaryRepositoryImpl (
             diaryDataSource.saveDiary(
                 diary.toDataModel()
             )
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -110,7 +110,7 @@ internal class DiaryRepositoryImpl (
             diaryDataSource.deleteAndSaveDiary(
                 diary.toDataModel()
             )
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -118,7 +118,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun deleteDiary(date: LocalDate) {
         try {
             diaryDataSource.deleteDiary(date)
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -126,7 +126,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun deleteAllDiaries() {
         try {
             diaryDataSource.deleteAllDiaries()
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -136,7 +136,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun countWordSearchResults(searchWord: String): Int {
         return try {
             diaryDataSource.countWordSearchResults(searchWord)
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -153,7 +153,7 @@ internal class DiaryRepositoryImpl (
             diaryDataSource
                 .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
                 .map { it.toDomainModel() }
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -170,7 +170,7 @@ internal class DiaryRepositoryImpl (
             .selectHistoryListOrderByLogDesc(num, offset)
             .catch {
                 // Flowストリーム内で発生した例外をDataStorageExceptionにラップ
-                if (it is DataBaseAccessFailureException) {
+                if (it is DatabaseException) {
                     throw DataStorageException(cause = it)
                 } else {
                     throw it // その他の予期せぬ例外はそのままスロー
@@ -188,7 +188,7 @@ internal class DiaryRepositoryImpl (
             diaryDataSource.updateDiaryItemTitleSelectionHistory(
                 historyItemList.map { it.toDataModel() }
             )
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -196,7 +196,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun deleteDiaryItemTitleSelectionHistory(title: String) {
         try {
             diaryDataSource.deleteHistoryItem(title)
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }
@@ -206,7 +206,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun deleteAllData() {
         try {
             diaryDataSource.deleteAllData()
-        } catch (e: DataBaseAccessFailureException) {
+        } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }
     }

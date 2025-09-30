@@ -2,6 +2,12 @@ package com.websarva.wings.android.zuboradiary.data.database
 
 import android.database.sqlite.SQLiteException
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseException
+import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseInitializationException
+import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseStateException
+import com.websarva.wings.android.zuboradiary.data.database.exception.RecordDeleteException
+import com.websarva.wings.android.zuboradiary.data.database.exception.RecordReadException
+import com.websarva.wings.android.zuboradiary.data.database.exception.RecordUpdateException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -15,7 +21,7 @@ import java.time.LocalDate
  *
  * このクラスは、[DiaryDatabase]、[DiaryDao]、[DiaryItemTitleSelectionHistoryDao] を使用して、
  * 日記データと日記項目タイトル選択履歴データへのアクセスを一元的に管理する。
- * データベース操作中に発生する可能性のある特定の例外を [DataBaseAccessFailureException] にラップする。
+ * データベース操作中に発生する可能性のある特定の例外を [DatabaseException] のサブクラスにラップする。
  *
  * @property diaryDatabase 日記データベースのインスタンス。
  * @property diaryDao 日記データアクセスオブジェクト。
@@ -36,11 +42,12 @@ internal class DiaryDataSource(
      * データベースに保存されている日記の総数を取得する。
      *
      * @return 日記の総数。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun countDiaries(): Int {
         return  withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbReadOperation {
                 diaryDao.countDiaries()
             }
         }
@@ -51,11 +58,12 @@ internal class DiaryDataSource(
      *
      * @param date この日付以前の日記をカウントする (この日付を含む)。
      * @return 指定された日付より前の日記の総数。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun countDiaries(date: LocalDate): Int {
         return withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbReadOperation {
                 diaryDao.countDiaries(date.toString())
             }
         }
@@ -66,11 +74,12 @@ internal class DiaryDataSource(
      *
      * @param date 確認する日記の日付。
      * @return 日記が存在すればtrue、しなければfalse。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun existsDiary(date: LocalDate): Boolean {
         return withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbReadOperation {
                 diaryDao.existsDiary(date.toString())
             }
         }
@@ -81,11 +90,12 @@ internal class DiaryDataSource(
      *
      * @param date 取得する日記の日付。
      * @return 指定された日付の日記データ。見つからない場合はnull。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun selectDiary(date: LocalDate): DiaryEntity? {
         return withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbReadOperation {
                 diaryDao.selectDiary(date.toString())
             }
         }
@@ -95,11 +105,12 @@ internal class DiaryDataSource(
      * 最新の日記データを1件取得する。
      *
      * @return 最新の日記データ。日記が存在しない場合はnull。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun selectNewestDiary(): DiaryEntity? {
         return withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbReadOperation {
                 diaryDao.selectNewestDiary()
             }
         }
@@ -109,11 +120,12 @@ internal class DiaryDataSource(
      * 最古の日記データを1件取得する。
      *
      * @return 最古の日記データ。日記が存在しない場合はnull。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun selectOldestDiary(): DiaryEntity? {
         return withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbReadOperation {
                 diaryDao.selectOldestDiary()
             }
         }
@@ -128,7 +140,8 @@ internal class DiaryDataSource(
      * @param offset 取得を開始するオフセット位置 (0以上である必要がある)。
      * @param date この日付以前の日記を取得する (この日付を含む)。nullの場合は全日記対象。
      * @return 日記リストアイテムデータのリスト。対象の日記が存在しない場合は空のリストを返す。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      * @throws IllegalArgumentException numまたはoffsetの引数が不正な場合。
      */
     suspend fun selectDiaryListOrderByDateDesc(
@@ -141,7 +154,7 @@ internal class DiaryDataSource(
         require(offset >= 0)
 
         return withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbReadOperation {
                 if (date == null) {
                     diaryDao.selectDiaryListOrderByDateDesc(num, offset)
                 } else {
@@ -157,11 +170,12 @@ internal class DiaryDataSource(
      * この操作はトランザクションとして実行される。
      *
      * @param diary 保存する日記データ。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordUpdateException データベースからのレコードの更新に失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun saveDiary(diary: DiaryEntity) {
         withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbUpdateOperation {
                 diaryDao.insertDiary(diary)
             }
         }
@@ -173,11 +187,12 @@ internal class DiaryDataSource(
      * この操作はトランザクションとして実行される。
      *
      * @param diary 新しく保存する日記データ。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordUpdateException データベースからのレコードの更新に失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun deleteAndSaveDiary(diary: DiaryEntity) {
         withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbUpdateOperation {
                 diaryDatabase.deleteAndSaveDiary(diary)
             }
         }
@@ -191,13 +206,14 @@ internal class DiaryDataSource(
      * この操作はトランザクションとして実行される。
      *
      * @param historyItemList 更新する日記項目タイトル選択履歴データのリスト。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordUpdateException データベースからのレコードの更新に失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun updateDiaryItemTitleSelectionHistory(
         historyItemList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
         withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbUpdateOperation {
                 diaryDatabase
                     .updateDiaryItemTitleSelectionHistory(
                         historyItemList
@@ -210,11 +226,12 @@ internal class DiaryDataSource(
      * 指定された日付の日記をデータベースから削除する。
      *
      * @param date 削除する日記の日付。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordDeleteException データベースからのレコードの書き込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun deleteDiary(date: LocalDate) {
         withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbDeleteOperation {
                 diaryDao.deleteDiary(date.toString())
             }
         }
@@ -223,11 +240,12 @@ internal class DiaryDataSource(
     /**
      * 全ての日記をデータベースから削除する。
      *
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordDeleteException データベースからのレコードの書き込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun deleteAllDiaries() {
         withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbDeleteOperation {
                 diaryDao.deleteAllDiaries()
             }
         }
@@ -240,11 +258,12 @@ internal class DiaryDataSource(
      *
      * @param searchWord 検索する単語。
      * @return 検索条件に一致する日記の総数。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun countWordSearchResults(searchWord: String): Int {
         return withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbReadOperation {
                 diaryDao.countWordSearchResults(searchWord)
             }
         }
@@ -259,7 +278,8 @@ internal class DiaryDataSource(
      * @param offset 取得を開始するオフセット位置 (0以上である必要がある)。
      * @param searchWord 検索する単語。
      * @return 単語検索結果リストアイテムデータのリスト。対象の日記が存在しない場合は空のリストを返す。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      * @throws IllegalArgumentException numまたはoffsetの引数が不正な場合。
      */
     suspend fun selectWordSearchResultListOrderByDateDesc(
@@ -271,7 +291,7 @@ internal class DiaryDataSource(
         require(offset >= 0)
 
         return withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbReadOperation {
                 diaryDao.selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
             }
         }
@@ -287,7 +307,8 @@ internal class DiaryDataSource(
      * @param num 取得する履歴の件数 (1以上である必要がある)。
      * @param offset 取得を開始するオフセット位置 (0以上である必要がある)。
      * @return 日記項目タイトル選択履歴データのリストをFlowでラップしたもの。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合 (Flowのcatch内で発生)。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。([Flow] 内部で発生)
+     * @throws DatabaseStateException データベースの状態が不正だった場合。([Flow] 内部で発生)
      * @throws IllegalArgumentException numまたはoffsetの引数が不正な場合。
      */
     fun selectHistoryListOrderByLogDesc(
@@ -305,11 +326,12 @@ internal class DiaryDataSource(
      * 指定されたタイトルの履歴項目をデータベースから削除する。
      *
      * @param title 削除する履歴のタイトル。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordDeleteException データベースからのレコードの書き込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun deleteHistoryItem(title: String) {
         withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbDeleteOperation {
                 diaryItemTitleSelectionHistoryDao.deleteHistory(title)
             }
         }
@@ -322,11 +344,12 @@ internal class DiaryDataSource(
      *
      * この操作はトランザクションとして実行される。
      *
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordDeleteException データベースからのレコードの書き込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
     suspend fun deleteAllData() {
         withContext(dispatcher) {
-            executeSuspendDbOperation {
+            executeSuspendDbInitializationOperation {
                 diaryDatabase.deleteAllData()
             }
         }
@@ -334,45 +357,128 @@ internal class DiaryDataSource(
     //endregion
 
     /**
-     * suspend関数として定義されたデータベース操作を実行し、特定の例外をラップするヘルパーメソッド。
+     * suspend関数として定義されたデータベース読み込み操作を実行し、特定の例外をラップするヘルパーメソッド。
      *
-     * [SQLiteException]、[IllegalStateException] が発生した場合、
-     * それを [DataBaseAccessFailureException] でラップして再スローする。
+     * [SQLiteException] が発生した場合は [RecordReadException]、
+     * [IllegalStateException] が発生した場合は [DatabaseStateException]でラップして再スローする。
+     * その他の例外はそのまま再スローされる。
      *
      * @param R 操作の結果の型。
      * @param operation 実行するsuspend関数形式のデータベース操作。
      * @return データベース操作の結果。
-     * @throws DataBaseAccessFailureException データベースアクセスに失敗した場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    private suspend fun <R> executeSuspendDbOperation(
+    private suspend fun <R> executeSuspendDbReadOperation(
         operation: suspend () -> R
+    ): R {
+        return executeSuspendDbOperation(operation) { RecordReadException(it) }
+    }
+
+    /**
+     * suspend関数として定義されたデータベース更新操作を実行し、特定の例外をラップするヘルパーメソッド。
+     *
+     * [SQLiteException] が発生した場合は [RecordUpdateException]、
+     * [IllegalStateException] が発生した場合は [DatabaseStateException]でラップして再スローする。
+     * その他の例外はそのまま再スローされる。
+     *
+     * @param R 操作の結果の型。
+     * @param operation 実行するsuspend関数形式のデータベース操作。
+     * @return データベース操作の結果。
+     * @throws RecordUpdateException データベースからのレコードの更新に失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
+     */
+    private suspend fun <R> executeSuspendDbUpdateOperation(
+        operation: suspend () -> R
+    ): R {
+        return executeSuspendDbOperation(operation) { RecordUpdateException(it) }
+    }
+
+    /**
+     * suspend関数として定義されたデータベース更新操作を実行し、特定の例外をラップするヘルパーメソッド。
+     *
+     * [SQLiteException] が発生した場合は [RecordDeleteException]、
+     * [IllegalStateException] が発生した場合は [DatabaseStateException]でラップして再スローする。
+     * その他の例外はそのまま再スローされる。
+     *
+     * @param R 操作の結果の型。
+     * @param operation 実行するsuspend関数形式のデータベース操作。
+     * @return データベース操作の結果。
+     * @throws RecordDeleteException データベースからのレコードの書き込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
+     */
+    private suspend fun <R> executeSuspendDbDeleteOperation(
+        operation: suspend () -> R
+    ): R {
+        return executeSuspendDbOperation(operation) { RecordDeleteException(it) }
+    }
+
+    /**
+     * suspend関数として定義されたデータベース、またはテーブルの初期化操作を実行し、特定の例外をラップするヘルパーメソッド。
+     *
+     * [SQLiteException] が発生した場合は [RecordDeleteException]、
+     * [IllegalStateException] が発生した場合は [DatabaseStateException]でラップして再スローする。
+     * その他の例外はそのまま再スローされる。
+     *
+     * @param R 操作の結果の型。
+     * @param operation 実行するsuspend関数形式のデータベース操作。
+     * @return データベース操作の結果。
+     * @throws DatabaseInitializationException データベース、又はテーブルの初期化に失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
+     */
+    private suspend fun <R> executeSuspendDbInitializationOperation(
+        operation: suspend () -> R
+    ): R {
+        return executeSuspendDbOperation(operation) { DatabaseInitializationException(it) }
+    }
+
+    /**
+     * suspend関数として定義されたデータベース操作を実行し、特定の例外をラップする共通ヘルパーメソッド。
+     *
+     * [IllegalStateException] が発生した場合は [DatabaseStateException] でラップして再スローする。
+     * [SQLiteException] は、指定されたマッピング関数 [sqliteExceptionMapper] を用いて
+     * [DatabaseException] の特定のサブタイプに変換されて再スローされる。
+     * その他の例外はそのまま再スローされる。
+     *
+     * @param R 操作の結果の型。
+     * @param E [SQLiteException] から変換される例外の型。これは [DatabaseException] のサブタイプである必要がある。
+     * @param operation 実行するsuspend関数形式のデータベース操作。
+     * @param sqliteExceptionMapper [SQLiteException] を特定の [DatabaseException] サブタイプに変換する関数。
+     * @return データベース操作の結果。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
+     * @throws E [SQLiteException] が発生し、[sqliteExceptionMapper] によって変換された場合。
+     */
+    private suspend fun <R, E : DatabaseException> executeSuspendDbOperation(
+        operation: suspend () -> R,
+        sqliteExceptionMapper: (SQLiteException) -> E
     ): R {
         return try {
             operation()
         } catch (e: SQLiteException) {
-            throw DataBaseAccessFailureException(e)
+            throw sqliteExceptionMapper(e)
         } catch (e: IllegalStateException) {
-            throw DataBaseAccessFailureException(e)
+            throw DatabaseStateException(e)
         }
     }
 
     /**
      * Flowストリーム内で発生する特定のデータベース関連例外をラップする拡張関数。
      *
-     * [SQLiteException]、[IllegalStateException] が発生した場合、
-     * それを [DataBaseAccessFailureException] でラップして再スローする。
+     * [SQLiteException] が発生した場合は [RecordReadException]、
+     * [IllegalStateException] が発生した場合は [DatabaseStateException]でラップして再スローする。
      * その他の例外はそのまま再スローする。
      *
      * @param T Flowが放出する要素の型。
      * @return 例外処理が追加されたFlow。
-     * @throws Throwable [SQLiteException]、[IllegalStateException]以外の例外。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。([Flow] 内部で発生)
+     * @throws DatabaseStateException データベースの状態が不正だった場合。([Flow] 内部で発生)
      */
     private fun <T> Flow<T>.wrapDatabaseExceptions(): Flow<T> {
         return this.catch { exception -> // 'this' は拡張対象のFlowインスタンスを指す
-            when (exception) {
-                is SQLiteException,
-                is IllegalStateException -> throw DataBaseAccessFailureException(exception)
-                else -> throw exception
+            throw  when (exception) {
+                is SQLiteException -> RecordReadException(exception)
+                is IllegalStateException -> DatabaseStateException(exception)
+                else -> exception
             }
         }
     }

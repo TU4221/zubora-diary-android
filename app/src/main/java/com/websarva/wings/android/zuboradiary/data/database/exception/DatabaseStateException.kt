@@ -1,10 +1,10 @@
 package com.websarva.wings.android.zuboradiary.data.database.exception
 
 /**
- * レコードの挿入に失敗したことを示す例外。
+ * データベースの状態が不正であったことを示す例外。
  *
  * @param cause この例外を引き起こした根本的な原因となった [Throwable]。
  */
-internal class RecordInsertException(
+internal class DatabaseStateException(
     cause: Throwable? = null
-) : DatabaseException("レコードの挿入に失敗しました。", cause)
+) : DatabaseException("データベースの状態が不正です。", cause)
