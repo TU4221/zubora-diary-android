@@ -9,7 +9,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
-// TODO:冗長UseCase廃止後、例外ハンドリング方法見直し
 /**
  * アプリケーションの全データを削除するユースケース。
  *
