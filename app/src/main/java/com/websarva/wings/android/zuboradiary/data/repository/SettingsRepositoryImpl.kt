@@ -7,7 +7,10 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLock
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesException
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataNotFoundException
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreException
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreReadException
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreWriteException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
@@ -26,7 +29,7 @@ internal class SettingsRepositoryImpl(
             .map { preference ->
                 preference.toDomainModel()
             }.catch { cause ->
-                if (cause !is UserPreferencesException) return@catch
+                if (cause !is DataStoreException) return@catch
 
                 throw mapPreferenceExceptionToRepositoryException(cause)
             }
@@ -37,7 +40,7 @@ internal class SettingsRepositoryImpl(
             .map { preference ->
                 preference.toDomainModel()
             }.catch { cause ->
-                if (cause !is UserPreferencesException) return@catch
+                if (cause !is DataStoreException) return@catch
 
                 throw mapPreferenceExceptionToRepositoryException(cause)
             }
@@ -48,7 +51,7 @@ internal class SettingsRepositoryImpl(
             .map { preference ->
                 preference.toDomainModel()
             }.catch { cause ->
-                if (cause !is UserPreferencesException) return@catch
+                if (cause !is DataStoreException) return@catch
 
                 throw mapPreferenceExceptionToRepositoryException(cause)
             }
@@ -59,7 +62,7 @@ internal class SettingsRepositoryImpl(
             .map { preference ->
                 preference.toDomainModel()
             }.catch { cause ->
-                if (cause !is UserPreferencesException) return@catch
+                if (cause !is DataStoreException) return@catch
 
                 throw mapPreferenceExceptionToRepositoryException(cause)
             }
@@ -70,7 +73,7 @@ internal class SettingsRepositoryImpl(
             .map { preference ->
                 preference.toDomainModel()
             }.catch { cause ->
-                if (cause !is UserPreferencesException) return@catch
+                if (cause !is DataStoreException) return@catch
 
                 throw mapPreferenceExceptionToRepositoryException(cause)
             }
@@ -80,8 +83,8 @@ internal class SettingsRepositoryImpl(
         try {
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateThemeColorPreference(preference)
-        } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-            throw DataStorageException(cause = e)
+        } catch (e: DataStoreException) {
+            throw mapPreferenceExceptionToRepositoryException(e)
         }
     }
 
@@ -89,8 +92,8 @@ internal class SettingsRepositoryImpl(
         try {
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateCalendarStartDayOfWeekPreference(preference)
-        } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-            throw DataStorageException(cause = e)
+        } catch (e: DataStoreException) {
+            throw mapPreferenceExceptionToRepositoryException(e)
         }
     }
 
@@ -98,8 +101,8 @@ internal class SettingsRepositoryImpl(
         try {
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateReminderNotificationPreference(preference)
-        } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-            throw DataStorageException(cause = e)
+        } catch (e: DataStoreException) {
+            throw mapPreferenceExceptionToRepositoryException(e)
         }
     }
 
@@ -107,8 +110,8 @@ internal class SettingsRepositoryImpl(
         try {
             val preference = setting.toDataModel()
             userPreferencesDataSource.updatePasscodeLockPreference(preference)
-        } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-            throw DataStorageException(cause = e)
+        } catch (e: DataStoreException) {
+            throw mapPreferenceExceptionToRepositoryException(e)
         }
     }
 
@@ -116,21 +119,23 @@ internal class SettingsRepositoryImpl(
         try {
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateWeatherInfoFetchPreference(preference)
-        } catch (e: UserPreferencesException.DataStoreAccessFailure) {
-            throw DataStorageException(cause = e)
+        } catch (e: DataStoreException) {
+            throw mapPreferenceExceptionToRepositoryException(e)
         }
     }
 
     private fun mapPreferenceExceptionToRepositoryException(
-        preferenceException: UserPreferencesException
+        dataStoreException: DataStoreException
     ): DomainException {
-        return when (preferenceException) {
-            is UserPreferencesException.DataStoreAccessFailure -> {
-                DataStorageException(cause = preferenceException)
+        return when (dataStoreException) {
+            is DataStoreReadException,
+            is DataStoreWriteException -> {
+                DataStorageException(cause = dataStoreException)
             }
-            is UserPreferencesException.DataNotFound -> {
-                ResourceNotFoundException()
+            is DataNotFoundException -> {
+                ResourceNotFoundException(cause = dataStoreException)
             }
+            else -> DataStorageException(cause = dataStoreException)
         }
     }
 }

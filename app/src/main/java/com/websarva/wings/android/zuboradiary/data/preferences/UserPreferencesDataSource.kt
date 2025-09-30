@@ -8,6 +8,9 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataNotFoundException
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreReadException
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreWriteException
 import com.websarva.wings.android.zuboradiary.di.ApplicationScope
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +70,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * 正常に読み込めた場合は [UserPreferencesLoadResult.Success] に [Preferences] を格納して放出する。
      * DataStoreアクセス時に [IOException] が発生した場合は、[UserPreferencesLoadResult.Failure] に
-     * [UserPreferencesException.DataStoreAccessFailure] を格納して放出する。
+     * [DataStoreReadException] を格納して放出する。
      * それ以外の予期せぬ例外はそのまま再スローされ、Flowを失敗させる。
      *
      * @return 最新のユーザー設定の読み込み結果 ([UserPreferencesLoadResult]) を保持し放出する [StateFlow]。
@@ -86,7 +89,7 @@ internal class UserPreferencesDataSource @Inject constructor(
 
                 emit(
                     UserPreferencesLoadResult
-                        .Failure(UserPreferencesException.DataStoreAccessFailure(cause))
+                        .Failure(DataStoreReadException(cause = cause))
                 )
             }.stateIn(
                 appScope,
@@ -100,8 +103,8 @@ internal class UserPreferencesDataSource @Inject constructor(
      * [userPreferencesResultFlow] から取得した [UserPreferencesLoadResult] をもとに設定オブジェクトを生成する。
      *
      * @return テーマカラー設定 ([ThemeColorPreference]) を放出するFlow。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへのアクセスに失敗した場合。([Flow] 内部で発生する可能性がある)
-     * @throws UserPreferencesException.DataNotFound 対応するデータが存在しない場合。([Flow] 内部で発生する可能性がある)
+     * @throws DataStoreReadException データストアへの読み込み(アクセス)に失敗した場合。([Flow] 内部で発生)
+     * @throws DataNotFoundException 対応するデータが存在しない場合。([Flow] 内部で発生)
      */
     fun loadThemeColorPreference(): Flow<ThemeColorPreference> {
         return userPreferencesResultFlow.map { result ->
@@ -117,11 +120,11 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
      * @return 生成された [ThemeColorPreference]。
-     * @throws UserPreferencesException.DataNotFound 対応するキーのデータが存在しない場合。
+     * @throws DataNotFoundException 対応するキーのデータが存在しない場合。
      */
     private fun createThemeColorPreference(preferences: Preferences): ThemeColorPreference {
         val themeColorNumber = preferences[themeColorPreferenceKey]
-            ?: throw UserPreferencesException.DataNotFound("テーマカラー")
+            ?: throw DataNotFoundException("テーマカラー")
         return ThemeColorPreference(themeColorNumber)
     }
 
@@ -131,8 +134,8 @@ internal class UserPreferencesDataSource @Inject constructor(
      * [userPreferencesResultFlow] から取得した [UserPreferencesLoadResult] をもとに設定オブジェクトを生成する。
      *
      * @return カレンダー開始曜日設定 ([CalendarStartDayOfWeekPreference]) を放出するFlow。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへのアクセスに失敗した場合。([Flow] 内部で発生する可能性がある)
-     * @throws UserPreferencesException.DataNotFound 対応するデータが存在しない場合。([Flow] 内部で発生する可能性がある)
+     * @throws DataStoreReadException データストアへの読み込み(アクセス)に失敗した場合。([Flow] 内部で発生)
+     * @throws DataNotFoundException 対応するデータが存在しない場合。([Flow] 内部で発生)
      */
     fun loadCalendarStartDayOfWeekPreference(): Flow<CalendarStartDayOfWeekPreference> {
         return userPreferencesResultFlow.map { result ->
@@ -148,14 +151,14 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
      * @return 生成された [CalendarStartDayOfWeekPreference]。
-     * @throws UserPreferencesException.DataNotFound 対応するキーのデータが存在しない場合。
+     * @throws DataNotFoundException 対応するキーのデータが存在しない場合。
      */
     private fun createCalendarStartDayOfWeekPreference(
         preferences: Preferences
     ): CalendarStartDayOfWeekPreference {
         val dayOfWeekNumber =
             preferences[calendarStartDayOfWeekPreferenceKey]
-                ?: throw UserPreferencesException.DataNotFound("カレンダー開始曜日")
+                ?: throw DataNotFoundException("カレンダー開始曜日")
         return CalendarStartDayOfWeekPreference(dayOfWeekNumber)
     }
 
@@ -165,8 +168,8 @@ internal class UserPreferencesDataSource @Inject constructor(
      * [userPreferencesResultFlow] から取得した [UserPreferencesLoadResult] をもとに設定オブジェクトを生成する。
      *
      * @return リマインダー通知設定 ([ReminderNotificationPreference]) を放出するFlow。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへのアクセスに失敗した場合。([Flow] 内部で発生する可能性がある)
-     * @throws UserPreferencesException.DataNotFound 対応するデータが存在しない場合。([Flow] 内部で発生する可能性がある)
+     * @throws DataStoreReadException データストアへの読み込み(アクセス)に失敗した場合。([Flow] 内部で発生)
+     * @throws DataNotFoundException 対応するデータが存在しない場合。([Flow] 内部で発生)
      */
     fun loadReminderNotificationPreference(): Flow<ReminderNotificationPreference> {
         return userPreferencesResultFlow.map { result ->
@@ -182,7 +185,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
      * @return 生成された [ReminderNotificationPreference]。
-     * @throws UserPreferencesException.DataNotFound 対応するキーのデータが存在しない場合。
+     * @throws DataNotFoundException 対応するキーのデータが存在しない場合。
      */
     private fun createReminderNotificationPreference(
         preferences: Preferences
@@ -192,7 +195,7 @@ internal class UserPreferencesDataSource @Inject constructor(
         val notificationTimeString =
             preferences[reminderNotificationTimePreferenceKey]
         if (isEnabled == null || notificationTimeString == null) {
-            throw UserPreferencesException.DataNotFound("リマインダー通知")
+            throw DataNotFoundException("リマインダー通知")
         }
         return ReminderNotificationPreference(isEnabled, notificationTimeString)
     }
@@ -203,8 +206,8 @@ internal class UserPreferencesDataSource @Inject constructor(
      * [userPreferencesResultFlow] から取得した [UserPreferencesLoadResult] をもとに設定オブジェクトを生成する。
      *
      * @return パスコードロック設定 ([PasscodeLockPreference]) を放出するFlow。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへのアクセスに失敗した場合。([Flow] 内部で発生する可能性がある)
-     * @throws UserPreferencesException.DataNotFound 対応するデータが存在しない場合。([Flow] 内部で発生する可能性がある)
+     * @throws DataStoreReadException データストアへの読み込み(アクセス)に失敗した場合。([Flow] 内部で発生)
+     * @throws DataNotFoundException 対応するデータが存在しない場合。([Flow] 内部で発生)
      */
     fun loadPasscodeLockPreference(): Flow<PasscodeLockPreference> {
         return userPreferencesResultFlow.map { result ->
@@ -220,13 +223,13 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
      * @return 生成された [PasscodeLockPreference]。
-     * @throws UserPreferencesException.DataNotFound 対応するキーのデータが存在しない場合。
+     * @throws DataNotFoundException 対応するキーのデータが存在しない場合。
      */
     private fun createPasscodeLockPreference(preferences: Preferences): PasscodeLockPreference {
         val isEnabled = preferences[isEnabledPasscodeLockPreferenceKey]
         val passCode = preferences[passcodePreferenceKey]
         if (isEnabled == null || passCode == null) {
-            throw UserPreferencesException.DataNotFound("パスコードロック")
+            throw DataNotFoundException("パスコードロック")
         }
         return PasscodeLockPreference(isEnabled, passCode)
     }
@@ -237,8 +240,8 @@ internal class UserPreferencesDataSource @Inject constructor(
      * [userPreferencesResultFlow] から取得した [UserPreferencesLoadResult] をもとに設定オブジェクトを生成する。
      *
      * @return 天気情報取得設定 ([WeatherInfoFetchPreference]) を放出するFlow。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへのアクセスに失敗した場合。([Flow] 内部で発生する可能性がある)
-     * @throws UserPreferencesException.DataNotFound 対応するデータが存在しない場合。([Flow] 内部で発生する可能性がある)
+     * @throws DataStoreReadException データストアへの読み込み(アクセス)に失敗した場合。([Flow] 内部で発生)
+     * @throws DataNotFoundException 対応するデータが存在しない場合。([Flow] 内部で発生)
      */
     fun loadWeatherInfoFetchPreference(): Flow<WeatherInfoFetchPreference> {
         return userPreferencesResultFlow.map { result ->
@@ -254,13 +257,13 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
      * @return 生成された [WeatherInfoFetchPreference]。
-     * @throws UserPreferencesException.DataNotFound 対応するキーのデータが存在しない場合。
+     * @throws DataNotFoundException 対応するキーのデータが存在しない場合。
      */
     private fun createWeatherInfoFetchPreference(
         preferences: Preferences
     ): WeatherInfoFetchPreference {
         val isEnabled = preferences[isEnabledWeatherInfoFetchPreferenceKey]
-            ?: throw UserPreferencesException.DataNotFound("天気情報取得")
+            ?: throw DataNotFoundException("天気情報取得")
         return WeatherInfoFetchPreference(isEnabled)
     }
 
@@ -268,7 +271,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      * テーマカラー設定 ([ThemeColorPreference]) を更新する。
      *
      * @param value 更新するテーマカラー設定。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
      */
     suspend fun updateThemeColorPreference(value: ThemeColorPreference) {
         withContext(dispatcher) {
@@ -282,7 +285,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      * カレンダーの開始曜日設定 ([CalendarStartDayOfWeekPreference]) を更新する。
      *
      * @param value 更新するカレンダー開始曜日設定。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
      */
     suspend fun updateCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
         withContext(dispatcher) {
@@ -296,7 +299,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      * リマインダー通知設定 ([ReminderNotificationPreference]) を更新する。
      *
      * @param value 更新するリマインダー通知設定。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
      */
     suspend fun updateReminderNotificationPreference(value: ReminderNotificationPreference) {
         withContext(dispatcher) {
@@ -311,7 +314,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      * パスコードロック設定 ([PasscodeLockPreference]) を更新する。
      *
      * @param value 更新するパスコードロック設定。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
      */
     suspend fun updatePasscodeLockPreference(value: PasscodeLockPreference) {
         withContext(dispatcher) {
@@ -326,7 +329,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      * 天気情報取得設定 ([WeatherInfoFetchPreference]) を更新する。
      *
      * @param value 更新する天気情報取得設定。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
      */
     suspend fun updateWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
         withContext(dispatcher) {
@@ -341,11 +344,11 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * 指定された [operation] を [DataStore.edit] ブロック内で実行する。
      * [IOException] が発生した場合は、それをキャッチし、
-     * [UserPreferencesException.DataStoreAccessFailure] としてラップして再スローする。
+     * [DataStoreWriteException] でラップして再スローする。
      *
      * @param operation [MutablePreferences] を引数に取り、DataStoreへの書き込み処理を行うsuspend関数。
      * @return DataStoreの編集操作後の [Preferences] オブジェクト。
-     * @throws UserPreferencesException.DataStoreAccessFailure DataStoreへの書き込みに失敗した場合。
+     * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
      */
     private suspend fun executeDataStoreEditOperation(
         operation: suspend (MutablePreferences) -> Unit
@@ -355,7 +358,7 @@ internal class UserPreferencesDataSource @Inject constructor(
                 operation(preferences)
             }
         } catch (e: IOException) {
-            throw UserPreferencesException.DataStoreAccessFailure(e)
+            throw DataStoreWriteException(cause = e)
         }
     }
 }

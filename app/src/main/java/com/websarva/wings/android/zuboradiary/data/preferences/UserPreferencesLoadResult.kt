@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.preferences
 
 import androidx.datastore.preferences.core.Preferences
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreReadException
 
 /**
  * ユーザー設定の読み込み結果を表すシールドクラス。
@@ -21,5 +22,5 @@ internal sealed class UserPreferencesLoadResult {
      *
      * @property exception 発生した例外。
      */
-    data class Failure(val exception: UserPreferencesException.DataStoreAccessFailure) : UserPreferencesLoadResult()
+    data class Failure(val exception: DataStoreReadException) : UserPreferencesLoadResult()
 }
