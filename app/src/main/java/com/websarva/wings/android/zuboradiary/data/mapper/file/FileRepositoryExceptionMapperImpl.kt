@@ -29,7 +29,7 @@ internal object FileRepositoryExceptionMapperImpl : FileRepositoryExceptionMappe
             is FileWriteException -> DataStorageException(cause = e)
             is InsufficientStorageException -> DataStorageException(cause = e) // TODO:ストレージ空き不足時の対応検討
             is InvalidFilePathException -> InvalidParameterException(cause = e)
-            else -> DataStorageException(cause = e) // TODO:FileOperationExceptionをシールドクラスにした方がいいか？
+            else -> DataStorageException(cause = e)
         }
     }
 }
