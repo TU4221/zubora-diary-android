@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryE
 import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.mapper.scheduling.SchedulingRepositoryExceptionMapperImpl
+import com.websarva.wings.android.zuboradiary.data.mapper.settings.SettingsRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherApiRepositoryExceptionMapperImpl
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
@@ -81,7 +82,8 @@ internal object RepositoryModule {
     @Provides
     fun provideSettingsRepository(
         userPreferencesDataSource: UserPreferencesDataSource
-    ): SettingsRepository = SettingsRepositoryImpl(userPreferencesDataSource)
+    ): SettingsRepository =
+        SettingsRepositoryImpl(userPreferencesDataSource, SettingsRepositoryExceptionMapperImpl)
 
     @Singleton
     @Provides

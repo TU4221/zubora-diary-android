@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
+import com.websarva.wings.android.zuboradiary.data.mapper.settings.SettingsRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.settings.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.settings.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
@@ -7,21 +8,16 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLock
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
-import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataNotFoundException
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreException
-import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreReadException
-import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreWriteException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
-import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 
 internal class SettingsRepositoryImpl(
-    private val userPreferencesDataSource: UserPreferencesDataSource
+    private val userPreferencesDataSource: UserPreferencesDataSource,
+    private val settingsRepositoryExceptionMapper: SettingsRepositoryExceptionMapper
 ) : SettingsRepository {
 
     override fun loadThemeColorSetting(): Flow<ThemeColorSetting> {
@@ -31,7 +27,7 @@ internal class SettingsRepositoryImpl(
             }.catch { cause ->
                 if (cause !is DataStoreException) return@catch
 
-                throw mapPreferenceExceptionToRepositoryException(cause)
+                throw settingsRepositoryExceptionMapper.toRepositoryException(cause)
             }
     }
 
@@ -42,7 +38,7 @@ internal class SettingsRepositoryImpl(
             }.catch { cause ->
                 if (cause !is DataStoreException) return@catch
 
-                throw mapPreferenceExceptionToRepositoryException(cause)
+                throw settingsRepositoryExceptionMapper.toRepositoryException(cause)
             }
     }
 
@@ -53,7 +49,7 @@ internal class SettingsRepositoryImpl(
             }.catch { cause ->
                 if (cause !is DataStoreException) return@catch
 
-                throw mapPreferenceExceptionToRepositoryException(cause)
+                throw settingsRepositoryExceptionMapper.toRepositoryException(cause)
             }
     }
 
@@ -64,7 +60,7 @@ internal class SettingsRepositoryImpl(
             }.catch { cause ->
                 if (cause !is DataStoreException) return@catch
 
-                throw mapPreferenceExceptionToRepositoryException(cause)
+                throw settingsRepositoryExceptionMapper.toRepositoryException(cause)
             }
     }
 
@@ -75,7 +71,7 @@ internal class SettingsRepositoryImpl(
             }.catch { cause ->
                 if (cause !is DataStoreException) return@catch
 
-                throw mapPreferenceExceptionToRepositoryException(cause)
+                throw settingsRepositoryExceptionMapper.toRepositoryException(cause)
             }
     }
 
@@ -84,7 +80,7 @@ internal class SettingsRepositoryImpl(
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateThemeColorPreference(preference)
         } catch (e: DataStoreException) {
-            throw mapPreferenceExceptionToRepositoryException(e)
+            throw settingsRepositoryExceptionMapper.toRepositoryException(e)
         }
     }
 
@@ -93,7 +89,7 @@ internal class SettingsRepositoryImpl(
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateCalendarStartDayOfWeekPreference(preference)
         } catch (e: DataStoreException) {
-            throw mapPreferenceExceptionToRepositoryException(e)
+            throw settingsRepositoryExceptionMapper.toRepositoryException(e)
         }
     }
 
@@ -102,7 +98,7 @@ internal class SettingsRepositoryImpl(
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateReminderNotificationPreference(preference)
         } catch (e: DataStoreException) {
-            throw mapPreferenceExceptionToRepositoryException(e)
+            throw settingsRepositoryExceptionMapper.toRepositoryException(e)
         }
     }
 
@@ -111,7 +107,7 @@ internal class SettingsRepositoryImpl(
             val preference = setting.toDataModel()
             userPreferencesDataSource.updatePasscodeLockPreference(preference)
         } catch (e: DataStoreException) {
-            throw mapPreferenceExceptionToRepositoryException(e)
+            throw settingsRepositoryExceptionMapper.toRepositoryException(e)
         }
     }
 
@@ -120,22 +116,7 @@ internal class SettingsRepositoryImpl(
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateWeatherInfoFetchPreference(preference)
         } catch (e: DataStoreException) {
-            throw mapPreferenceExceptionToRepositoryException(e)
-        }
-    }
-
-    private fun mapPreferenceExceptionToRepositoryException(
-        dataStoreException: DataStoreException
-    ): DomainException {
-        return when (dataStoreException) {
-            is DataStoreReadException,
-            is DataStoreWriteException -> {
-                DataStorageException(cause = dataStoreException)
-            }
-            is DataNotFoundException -> {
-                ResourceNotFoundException(cause = dataStoreException)
-            }
-            else -> DataStorageException(cause = dataStoreException)
+            throw settingsRepositoryExceptionMapper.toRepositoryException(e)
         }
     }
 }
