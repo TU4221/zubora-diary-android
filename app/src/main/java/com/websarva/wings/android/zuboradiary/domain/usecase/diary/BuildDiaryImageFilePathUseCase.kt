@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageFilePathBuildingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -40,7 +40,7 @@ internal class BuildDiaryImageFilePathUseCase(
                 } else if (fileRepository.existsImageFileInPermanent(fileName)) {
                     fileRepository.buildImageFileAbsolutePathFromPermanent(fileName)
                 } else {
-                    throw NotFoundException()
+                    throw ResourceNotFoundException()
                 }
             Log.i(logTag, "${logMsg}完了 (ファイルパス: $path)")
             UseCaseResult.Success(path)

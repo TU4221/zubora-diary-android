@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
-import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
 
@@ -69,7 +69,7 @@ internal interface FileRepository {
      * @param uriString キャッシュしたい画像ファイルのUri。
      * @param fileBaseName キャッシュされるファイルのベース名。
      * @return キャッシュストレージへ保存されたファイル名。
-     * @throws NotFoundException 指定されたURI/ファイルパスの画像が見つからない場合。
+     * @throws ResourceNotFoundException 指定されたURI/ファイルパスの画像が見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws DataStorageException ファイルの保存に失敗した場合。
      */
@@ -81,7 +81,7 @@ internal interface FileRepository {
      * @param fileName 移動したいファイル名。
      * @throws DataStorageException ファイルの移動に失敗した場合。
      * @throws InvalidParameterException 指定されたファイル名が無効の場合。
-     * @throws NotFoundException 移動元ファイルが見つからない場合。
+     * @throws ResourceNotFoundException 移動元ファイルが見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
      */
@@ -93,7 +93,7 @@ internal interface FileRepository {
      * @param fileName 移動したいファイル名。
      * @throws DataStorageException ファイルの移動に失敗した場合。
      * @throws InvalidParameterException 指定されたファイル名が無効の場合。
-     * @throws NotFoundException 移動元ファイルが見つからない場合。
+     * @throws ResourceNotFoundException 移動元ファイルが見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
      */
@@ -105,7 +105,7 @@ internal interface FileRepository {
      * @param fileName 復元したいファイル名。
      * @throws DataStorageException ファイルの復元に失敗した場合。
      * @throws InvalidParameterException 指定されたファイル名が無効の場合。
-     * @throws NotFoundException 復元元ファイルが見つからない場合。
+     * @throws ResourceNotFoundException 復元元ファイルが見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException 復元先に同名のファイルが既に存在する場合。
      */
@@ -117,7 +117,7 @@ internal interface FileRepository {
      * @param fileName 復元したいファイル名。
      * @throws DataStorageException ファイルの復元に失敗した場合。
      * @throws InvalidParameterException 指定されたファイル名が無効の場合。
-     * @throws NotFoundException 復元元ファイルが見つからない場合。
+     * @throws ResourceNotFoundException 復元元ファイルが見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException 復元先に同名のファイルが既に存在する場合。
      */
@@ -129,7 +129,7 @@ internal interface FileRepository {
      * @param fileName 削除したいファイル名。
      * @throws DataStorageException ファイルの削除に失敗した場合。
      * @throws InvalidParameterException 指定されたファイル名が無効の場合。
-     * @throws NotFoundException 指定されたファイルが見つからなかった場合。
+     * @throws ResourceNotFoundException 指定されたファイルが見つからなかった場合。
      * @throws PermissionException 指定されたファイルへのアクセス権限がない場合。
      */
     suspend fun deleteImageFileInPermanent(fileName: ImageFileName)
@@ -138,7 +138,7 @@ internal interface FileRepository {
      * バックアップストレージから画像ファイルを削除する。
      *
      * @throws DataStorageException ファイルの削除に失敗した場合。
-     * @throws NotFoundException 削除対象が見つからなかった場合。
+     * @throws ResourceNotFoundException 削除対象が見つからなかった場合。
      * @throws PermissionException バックアップストレージへのアクセス権限がない場合。
      */
     suspend fun clearAllImageFilesInCache()
@@ -147,7 +147,7 @@ internal interface FileRepository {
      * バックアップストレージから画像ファイルを削除する。
      *
      * @throws DataStorageException ファイルの削除に失敗した場合。
-     * @throws NotFoundException 削除対象が見つからなかった場合。
+     * @throws ResourceNotFoundException 削除対象が見つからなかった場合。
      * @throws PermissionException バックアップストレージへのアクセス権限がない場合。
      */
     suspend fun clearAllImageFilesInBackup()

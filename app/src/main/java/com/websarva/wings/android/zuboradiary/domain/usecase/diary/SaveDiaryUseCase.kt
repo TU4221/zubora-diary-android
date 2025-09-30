@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelecti
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
@@ -213,7 +213,7 @@ internal class SaveDiaryUseCase(
      * @param deleteDiaryImageFileName 日付重複により削除される日記の画像ファイル名。該当がない、画像がない場合は `null`。
      * @throws DataStorageException いずれかの画像ファイルの更新処理に失敗した場合。
      * @throws InvalidParameterException いずれかの画像ファイル名が無効の場合。
-     * @throws NotFoundException 保存日記の添付画像ファイルが見つからない場合。
+     * @throws ResourceNotFoundException 保存日記の添付画像ファイルが見つからない場合。
      * @throws PermissionException いずれかの画像ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException いずれかの画像ファイルの移動先に同名のファイルが既に存在する場合。
      */
@@ -225,7 +225,7 @@ internal class SaveDiaryUseCase(
         deleteDiaryImageFileName?.let {
             try {
                 fileRepository.moveImageFileToBackup(it)
-            } catch (e: NotFoundException) {
+            } catch (e: ResourceNotFoundException) {
                 Log.w(logTag, "${logMsg}警告_削除する日記の画像ファイルがみつからない為、削除スキップ", e)
             }
         }
@@ -233,7 +233,7 @@ internal class SaveDiaryUseCase(
         originalDiaryImageFileName?.let {
             try {
                 fileRepository.moveImageFileToBackup(it)
-            } catch (e: NotFoundException) {
+            } catch (e: ResourceNotFoundException) {
                 Log.w(logTag, "${logMsg}警告_編集元の日記の画像ファイルがみつからないため、バックアップ移動スキップ", e)
             }
         }

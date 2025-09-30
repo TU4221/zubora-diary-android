@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSea
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -45,7 +45,7 @@ internal interface DiaryRepository {
      * @param date 読み込み対象の日付。
      * @return 指定された日付の日記データ。日記が存在しない場合は `null`。
      * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
-     * @throws NotFoundException 該当の日記データが見つからなかった場合。
+     * @throws ResourceNotFoundException 該当の日記データが見つからなかった場合。
      */
     suspend fun loadDiary(date: LocalDate): Diary
 
@@ -54,7 +54,7 @@ internal interface DiaryRepository {
      *
      * @return 最新の日記データ。
      * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
-     * @throws NotFoundException 該当の日記データが見つからなかった場合。
+     * @throws ResourceNotFoundException 該当の日記データが見つからなかった場合。
      */
     suspend fun loadNewestDiary(): Diary
 
@@ -63,7 +63,7 @@ internal interface DiaryRepository {
      *
      * @return 最古の日記データ。
      * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
-     * @throws NotFoundException 該当の日記データが見つからなかった場合。
+     * @throws ResourceNotFoundException 該当の日記データが見つからなかった場合。
      */
     suspend fun loadOldestDiary(): Diary
 

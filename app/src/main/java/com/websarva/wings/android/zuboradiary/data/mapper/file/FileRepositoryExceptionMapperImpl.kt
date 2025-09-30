@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.InsufficientSt
 import com.websarva.wings.android.zuboradiary.data.file.exception.InvalidFilePathException
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
-import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
@@ -23,7 +23,7 @@ internal object FileRepositoryExceptionMapperImpl : FileRepositoryExceptionMappe
             is DirectoryDeletionFailedException -> DataStorageException(cause = e)
             is FileAlreadyExistsException -> ResourceAlreadyExistsException(cause = e)
             is FileDeleteException -> DataStorageException(cause = e)
-            is FileNotFoundException -> NotFoundException(cause = e)
+            is FileNotFoundException -> ResourceNotFoundException(cause = e)
             is FilePermissionDeniedException -> PermissionException(cause = e)
             is FileReadException -> DataStorageException(cause = e)
             is FileWriteException -> DataStorageException(cause = e)

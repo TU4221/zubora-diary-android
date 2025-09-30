@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.exception.NotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -51,7 +51,7 @@ internal class LoadWeatherInfoFetchSettingUseCase(
                 val defaultSettingValue = WeatherInfoFetchSetting()
                 val result =
                     when (cause) {
-                        is NotFoundException -> {
+                        is ResourceNotFoundException -> {
                             Log.i(
                                 logTag,
                                 "${logMsg}_データ未発見_" +
