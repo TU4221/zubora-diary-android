@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseEx
 import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseInitializationException
 import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseStateException
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordDeleteException
+import com.websarva.wings.android.zuboradiary.data.database.exception.RecordNotFoundException
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordReadException
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordUpdateException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -80,45 +81,48 @@ internal class DiaryDataSource(
      * 指定された日付の日記データを取得する。
      *
      * @param date 取得する日記の日付。
-     * @return 指定された日付の日記データ。見つからない場合はnull。
+     * @return 指定された日付の日記データ。
+     * @throws RecordNotFoundException 指定された日付の日記データが見つからなかった場合。
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun selectDiary(date: LocalDate): DiaryEntity? {
+    suspend fun selectDiary(date: LocalDate): DiaryEntity {
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
                 diaryDao.selectDiary(date.toString())
-            }
+            } ?: throw RecordNotFoundException()
         }
     }
 
     /**
      * 最新の日記データを1件取得する。
      *
-     * @return 最新の日記データ。日記が存在しない場合はnull。
+     * @return 最新の日記データ。
+     * @throws RecordNotFoundException 日記データが見つからなかった場合。
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun selectNewestDiary(): DiaryEntity? {
+    suspend fun selectNewestDiary(): DiaryEntity {
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
                 diaryDao.selectNewestDiary()
-            }
+            } ?: throw RecordNotFoundException()
         }
     }
 
     /**
      * 最古の日記データを1件取得する。
      *
-     * @return 最古の日記データ。日記が存在しない場合はnull。
+     * @return 最古の日記データ。
+     * @throws RecordNotFoundException 日記データが見つからなかった場合。
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun selectOldestDiary(): DiaryEntity? {
+    suspend fun selectOldestDiary(): DiaryEntity {
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
                 diaryDao.selectOldestDiary()
-            }
+            } ?: throw RecordNotFoundException()
         }
     }
 

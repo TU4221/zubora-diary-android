@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSea
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -45,8 +44,7 @@ internal class DiaryRepositoryImpl (
 
     override suspend fun loadDiary(date: LocalDate): Diary {
         return try {
-            diaryDataSource.selectDiary(date)?.toDomainModel()
-                ?: throw ResourceNotFoundException()
+            diaryDataSource.selectDiary(date).toDomainModel()
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toRepositoryException(e)
         }
@@ -54,8 +52,7 @@ internal class DiaryRepositoryImpl (
 
     override suspend fun loadNewestDiary(): Diary {
         return try {
-            diaryDataSource.selectNewestDiary()?.toDomainModel()
-                ?: throw ResourceNotFoundException()
+            diaryDataSource.selectNewestDiary().toDomainModel()
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toRepositoryException(e)
         }
@@ -63,8 +60,7 @@ internal class DiaryRepositoryImpl (
 
     override suspend fun loadOldestDiary(): Diary {
         return try {
-            diaryDataSource.selectOldestDiary()?.toDomainModel()
-                ?: throw ResourceNotFoundException()
+            diaryDataSource.selectOldestDiary().toDomainModel()
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toRepositoryException(e)
         }
