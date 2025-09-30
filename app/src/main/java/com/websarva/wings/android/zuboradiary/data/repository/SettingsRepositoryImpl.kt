@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
-import com.websarva.wings.android.zuboradiary.data.mapper.preference.toDataModel
-import com.websarva.wings.android.zuboradiary.data.mapper.preference.toDomainModel
+import com.websarva.wings.android.zuboradiary.data.mapper.settings.toDataModel
+import com.websarva.wings.android.zuboradiary.data.mapper.settings.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting

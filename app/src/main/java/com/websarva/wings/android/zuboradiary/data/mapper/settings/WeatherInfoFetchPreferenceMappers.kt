@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.data.mapper.preference
+package com.websarva.wings.android.zuboradiary.data.mapper.settings
 
 import com.websarva.wings.android.zuboradiary.data.preferences.WeatherInfoFetchPreference
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting

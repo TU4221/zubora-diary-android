@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.data.mapper.preference
+package com.websarva.wings.android.zuboradiary.data.mapper.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.preferences.ReminderNotificationPreference
