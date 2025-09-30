@@ -3,12 +3,12 @@ package com.websarva.wings.android.zuboradiary.di.data
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
-import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryExceptionMapperImpl
-import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExceptionMapperImpl
-import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepositoryExceptionMapperImpl
-import com.websarva.wings.android.zuboradiary.data.mapper.scheduling.SchedulingRepositoryExceptionMapperImpl
-import com.websarva.wings.android.zuboradiary.data.mapper.settings.SettingsRepositoryExceptionMapperImpl
-import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherApiRepositoryExceptionMapperImpl
+import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryExceptionMapper
+import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExceptionMapper
+import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepositoryExceptionMapper
+import com.websarva.wings.android.zuboradiary.data.mapper.scheduling.SchedulingRepositoryExceptionMapper
+import com.websarva.wings.android.zuboradiary.data.mapper.settings.SettingsRepositoryExceptionMapper
+import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherApiRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
@@ -47,7 +47,7 @@ internal object RepositoryModule {
     fun provideDiaryRepositoryImpl(
         diaryDataSource: DiaryDataSource
     ): DiaryRepositoryImpl =
-        DiaryRepositoryImpl(diaryDataSource, DiaryRepositoryExceptionMapperImpl)
+        DiaryRepositoryImpl(diaryDataSource, DiaryRepositoryExceptionMapper)
 
     @Singleton
     @Provides
@@ -60,13 +60,13 @@ internal object RepositoryModule {
     fun provideLocationRepository(
         fusedLocationDataSource: FusedLocationDataSource
     ): LocationRepository =
-        LocationRepositoryImpl(fusedLocationDataSource, LocationRepositoryExceptionMapperImpl)
+        LocationRepositoryImpl(fusedLocationDataSource, LocationRepositoryExceptionMapper)
 
     @Singleton
     @Provides
     fun provideFileRepository(
         imageFileDataSource: ImageFileDataSource
-    ): FileRepository = FileRepositoryImpl(imageFileDataSource, FileRepositoryExceptionMapperImpl)
+    ): FileRepository = FileRepositoryImpl(imageFileDataSource, FileRepositoryExceptionMapper)
 
     @Singleton
     @Provides
@@ -75,7 +75,7 @@ internal object RepositoryModule {
     ): SchedulingRepository =
         SchedulingRepositoryImpl(
             workManager,
-            SchedulingRepositoryExceptionMapperImpl
+            SchedulingRepositoryExceptionMapper
             )
 
     @Singleton
@@ -83,12 +83,12 @@ internal object RepositoryModule {
     fun provideSettingsRepository(
         userPreferencesDataSource: UserPreferencesDataSource
     ): SettingsRepository =
-        SettingsRepositoryImpl(userPreferencesDataSource, SettingsRepositoryExceptionMapperImpl)
+        SettingsRepositoryImpl(userPreferencesDataSource, SettingsRepositoryExceptionMapper)
 
     @Singleton
     @Provides
     fun provideWeatherApiRepository(
         weatherApiDataSource: WeatherApiDataSource
     ): WeatherInfoRepository =
-        WeatherInfoRepositoryImpl(weatherApiDataSource, WeatherApiRepositoryExceptionMapperImpl)
+        WeatherInfoRepositoryImpl(weatherApiDataSource, WeatherApiRepositoryExceptionMapper)
 }

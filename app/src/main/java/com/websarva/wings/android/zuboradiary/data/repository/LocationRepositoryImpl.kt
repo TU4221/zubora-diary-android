@@ -16,7 +16,7 @@ internal class LocationRepositoryImpl (
         return try {
             fusedLocationDataSource.fetchCurrentLocation().toDomainModel()
         } catch (e: LocationProviderException) {
-            throw locationRepositoryExceptionMapper.toRepositoryException(e)
+            throw locationRepositoryExceptionMapper.toDomainException(e)
         }
     }
 }

@@ -30,7 +30,7 @@ internal class DiaryRepositoryImpl (
         return try {
             diaryDataSource.countDiaries(date)
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -38,7 +38,7 @@ internal class DiaryRepositoryImpl (
         return try {
             diaryDataSource.existsDiary(date)
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -46,7 +46,7 @@ internal class DiaryRepositoryImpl (
         return try {
             diaryDataSource.selectDiary(date).toDomainModel()
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -54,7 +54,7 @@ internal class DiaryRepositoryImpl (
         return try {
             diaryDataSource.selectNewestDiary().toDomainModel()
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -62,7 +62,7 @@ internal class DiaryRepositoryImpl (
         return try {
             diaryDataSource.selectOldestDiary().toDomainModel()
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -80,7 +80,7 @@ internal class DiaryRepositoryImpl (
                 .selectDiaryListOrderByDateDesc(num, offset, date)
                 .map { it.toDomainModel() }
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -92,7 +92,7 @@ internal class DiaryRepositoryImpl (
                 diary.toDataModel()
             )
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -104,7 +104,7 @@ internal class DiaryRepositoryImpl (
                 diary.toDataModel()
             )
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -112,7 +112,7 @@ internal class DiaryRepositoryImpl (
         try {
             diaryDataSource.deleteDiary(date)
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -120,7 +120,7 @@ internal class DiaryRepositoryImpl (
         try {
             diaryDataSource.deleteAllDiaries()
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
     //endregion
@@ -130,7 +130,7 @@ internal class DiaryRepositoryImpl (
         return try {
             diaryDataSource.countWordSearchResults(searchWord)
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -147,7 +147,7 @@ internal class DiaryRepositoryImpl (
                 .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
                 .map { it.toDomainModel() }
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
     //endregion
@@ -164,7 +164,7 @@ internal class DiaryRepositoryImpl (
             .catch {
                 // Flowストリーム内で発生した例外をDataStorageExceptionにラップ
                 throw if (it is DatabaseException) {
-                    diaryRepositoryExceptionMapper.toRepositoryException(it)
+                    diaryRepositoryExceptionMapper.toDomainException(it)
                 } else {
                     it // その他の予期せぬ例外はそのままスロー
                 }
@@ -182,7 +182,7 @@ internal class DiaryRepositoryImpl (
                 historyItemList.map { it.toDataModel() }
             )
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -190,7 +190,7 @@ internal class DiaryRepositoryImpl (
         try {
             diaryDataSource.deleteHistoryItem(title)
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
     //endregion
@@ -200,7 +200,7 @@ internal class DiaryRepositoryImpl (
         try {
             diaryDataSource.initializeAllData()
         } catch (e: DatabaseException) {
-            throw diaryRepositoryExceptionMapper.toRepositoryException(e)
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
     //endregion

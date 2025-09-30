@@ -15,7 +15,7 @@ internal class SchedulingRepositoryImpl(
         try {
             notificationSchedulingDataSource.registerReminderNotificationWorker(settingTime)
         } catch (e: WorkerOperationException) {
-            throw schedulingRepositoryExceptionMapper.toRepositoryException(e)
+            throw schedulingRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -23,7 +23,7 @@ internal class SchedulingRepositoryImpl(
         try {
             notificationSchedulingDataSource.cancelReminderNotificationWorker()
         } catch (e: WorkerOperationException) {
-            throw schedulingRepositoryExceptionMapper.toRepositoryException(e)
+            throw schedulingRepositoryExceptionMapper.toDomainException(e)
         }
     }
 }

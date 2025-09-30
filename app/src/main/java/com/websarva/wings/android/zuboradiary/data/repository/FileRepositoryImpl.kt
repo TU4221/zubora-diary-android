@@ -23,7 +23,7 @@ internal class FileRepositoryImpl(
         return try {
             imageFileDataSource.existsImageFileInCache(fileName.fullName)
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -31,7 +31,7 @@ internal class FileRepositoryImpl(
         return try {
             imageFileDataSource.existsImageFileInPermanent(fileName.fullName)
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -39,7 +39,7 @@ internal class FileRepositoryImpl(
         return try {
             imageFileDataSource.existsImageFileInBackup(fileName.fullName)
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -52,7 +52,7 @@ internal class FileRepositoryImpl(
                 imageFileDataSource.cacheImageFile(uriString, fileBaseName)
             ImageFileName(savedImageFileName)
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -60,7 +60,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.moveImageFileToPermanent(fileName.fullName)
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -68,7 +68,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.moveImageFileToBackup(fileName.fullName)
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -76,7 +76,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.restoreImageFileFromPermanent(fileName.fullName)
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -84,7 +84,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.restoreImageFileFromBackup(fileName.fullName)
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -92,7 +92,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.deleteImageFileInPermanent(fileName.fullName)
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -100,7 +100,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.deleteAllFilesInCache()
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -108,7 +108,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.deleteAllFilesInBackup()
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -116,7 +116,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.deleteAllFiles()
         } catch (e: FileOperationException) {
-            throw fileRepositoryExceptionMapper.toRepositoryException(e)
+            throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 }
