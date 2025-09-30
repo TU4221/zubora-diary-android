@@ -4,8 +4,8 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseException
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryExceptionMapper
-import com.websarva.wings.android.zuboradiary.data.mapper.toDataModel
-import com.websarva.wings.android.zuboradiary.data.mapper.toDomainModel
+import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDataModel
+import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem

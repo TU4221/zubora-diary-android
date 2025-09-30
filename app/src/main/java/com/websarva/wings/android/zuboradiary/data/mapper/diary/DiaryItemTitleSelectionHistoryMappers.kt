@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.data.mapper
+package com.websarva.wings.android.zuboradiary.data.mapper.diary
 
 import com.websarva.wings.android.zuboradiary.data.database.DiaryItemTitleSelectionHistoryEntity
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory

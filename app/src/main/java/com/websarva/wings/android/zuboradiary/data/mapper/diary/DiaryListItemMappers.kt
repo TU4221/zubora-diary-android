@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.data.mapper
+package com.websarva.wings.android.zuboradiary.data.mapper.diary
 
 import com.websarva.wings.android.zuboradiary.data.database.DiaryListItemData
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
