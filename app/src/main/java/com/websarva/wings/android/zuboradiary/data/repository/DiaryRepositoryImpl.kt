@@ -205,7 +205,7 @@ internal class DiaryRepositoryImpl (
     //region Options
     override suspend fun deleteAllData() {
         try {
-            diaryDataSource.deleteAllData()
+            diaryDataSource.initializeAllData()
         } catch (e: DatabaseException) {
             throw DataStorageException(cause = e)
         }

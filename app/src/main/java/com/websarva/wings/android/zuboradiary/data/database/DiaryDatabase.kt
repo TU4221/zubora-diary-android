@@ -64,13 +64,4 @@ internal abstract class DiaryDatabase : RoomDatabase() {
         createDiaryItemTitleSelectionHistoryDao().insertHistory(historyList)
         createDiaryItemTitleSelectionHistoryDao().deleteOldHistory()
     }
-
-    /**
-     * データベース内の全ての日記データと日記項目タイトル選択履歴データをトランザクション内で削除する。
-     */
-    @Transaction
-    suspend fun deleteAllData() {
-        createDiaryDao().deleteAllDiaries()
-        createDiaryItemTitleSelectionHistoryDao().deleteAllHistory()
-    }
 }

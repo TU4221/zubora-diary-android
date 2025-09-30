@@ -340,17 +340,15 @@ internal class DiaryDataSource(
 
     //region Options
     /**
-     * 全ての日記データと日記項目タイトル選択履歴データをデータベースから削除する。
+     * データベースの全てのデータ(日記データ、日記項目タイトル選択履歴のテーブル) を初期化する。
      *
-     * この操作はトランザクションとして実行される。
-     *
-     * @throws RecordDeleteException データベースからのレコードの書き込みに失敗した場合。
+     * @throws DatabaseInitializationException データベースの初期化に失敗した場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun deleteAllData() {
+    suspend fun initializeAllData() {
         withContext(dispatcher) {
             executeSuspendDbInitializationOperation {
-                diaryDatabase.deleteAllData()
+                diaryDatabase.clearAllTables()
             }
         }
     }

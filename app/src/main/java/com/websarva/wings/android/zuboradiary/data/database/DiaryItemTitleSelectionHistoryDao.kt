@@ -61,10 +61,4 @@ internal interface DiaryItemTitleSelectionHistoryDao {
     @Query("DELETE FROM diary_item_title_selection_history WHERE title " +
             "NOT IN (SELECT title FROM diary_item_title_selection_history ORDER BY log DESC LIMIT 50 OFFSET 0)")
     suspend fun deleteOldHistory()
-
-    /**
-     * 全てのタイトル選択履歴をデータベースから削除する。
-     */
-    @Query("DELETE FROM diary_item_title_selection_history")
-    suspend fun deleteAllHistory()
 }
