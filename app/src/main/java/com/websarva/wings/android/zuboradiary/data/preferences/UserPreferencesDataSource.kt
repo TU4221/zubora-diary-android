@@ -67,11 +67,12 @@ internal class UserPreferencesDataSource @Inject constructor(
      * このFlowは [stateIn] オペレータによって [StateFlow] に変換され、アプリケーションスコープで
      * Eagerlyに共有が開始される。これにより、複数の箇所から参照された場合でも、
      * DataStoreへの実際の読み込み処理は一度となり、最新の設定状態が効率的に共有・保持される。
+     * 例外が発生しても [StateFlow] を継続させるために [UserPreferencesLoadResult] を使用。
      *
      * 正常に読み込めた場合は [UserPreferencesLoadResult.Success] に [Preferences] を格納して放出する。
-     * DataStoreアクセス時に [IOException] が発生した場合は、[UserPreferencesLoadResult.Failure] に
+     * DataStoreアクセス時に例外が発生した場合は、[UserPreferencesLoadResult.Failure] に
      * [DataStoreReadException] を格納して放出する。
-     * それ以外の予期せぬ例外はそのまま再スローされ、Flowを失敗させる。
+     *
      *
      * @return 最新のユーザー設定の読み込み結果 ([UserPreferencesLoadResult]) を保持し放出する [StateFlow]。
      */
@@ -85,11 +86,14 @@ internal class UserPreferencesDataSource @Inject constructor(
                         ) as UserPreferencesLoadResult
                 return@map result
             }.catch { cause ->
-                if (cause !is IOException) throw cause
-
+                val processCause =
+                    if (cause is IOException) {
+                        DataStoreReadException(cause = cause)
+                    } else {
+                        cause
+                    }
                 emit(
-                    UserPreferencesLoadResult
-                        .Failure(DataStoreReadException(cause = cause))
+                    UserPreferencesLoadResult.Failure(processCause)
                 )
             }.stateIn(
                 appScope,
@@ -110,7 +114,7 @@ internal class UserPreferencesDataSource @Inject constructor(
         return userPreferencesResultFlow.map { result ->
             when (result) {
                 is UserPreferencesLoadResult.Success -> createThemeColorPreference(result.preferences)
-                is UserPreferencesLoadResult.Failure -> throw result.exception
+                is UserPreferencesLoadResult.Failure -> throw result.cause
             }
         }
     }
@@ -141,7 +145,7 @@ internal class UserPreferencesDataSource @Inject constructor(
         return userPreferencesResultFlow.map { result ->
             when (result) {
                 is UserPreferencesLoadResult.Success -> createCalendarStartDayOfWeekPreference(result.preferences)
-                is UserPreferencesLoadResult.Failure -> throw result.exception
+                is UserPreferencesLoadResult.Failure -> throw result.cause
             }
         }
     }
@@ -175,7 +179,7 @@ internal class UserPreferencesDataSource @Inject constructor(
         return userPreferencesResultFlow.map { result ->
             when (result) {
                 is UserPreferencesLoadResult.Success -> createReminderNotificationPreference(result.preferences)
-                is UserPreferencesLoadResult.Failure -> throw result.exception
+                is UserPreferencesLoadResult.Failure -> throw result.cause
             }
         }
     }
@@ -213,7 +217,7 @@ internal class UserPreferencesDataSource @Inject constructor(
         return userPreferencesResultFlow.map { result ->
             when (result) {
                 is UserPreferencesLoadResult.Success -> createPasscodeLockPreference(result.preferences)
-                is UserPreferencesLoadResult.Failure -> throw result.exception
+                is UserPreferencesLoadResult.Failure -> throw result.cause
             }
         }
     }
@@ -247,7 +251,7 @@ internal class UserPreferencesDataSource @Inject constructor(
         return userPreferencesResultFlow.map { result ->
             when (result) {
                 is UserPreferencesLoadResult.Success -> createWeatherInfoFetchPreference(result.preferences)
-                is UserPreferencesLoadResult.Failure -> throw result.exception
+                is UserPreferencesLoadResult.Failure -> throw result.cause
             }
         }
     }
