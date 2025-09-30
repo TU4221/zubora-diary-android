@@ -29,11 +29,7 @@ internal class DiaryRepositoryImpl (
     //region Diary
     override suspend fun countDiaries(date: LocalDate?): Int {
         return try {
-            if (date == null) {
-                diaryDataSource.countDiaries()
-            } else {
-                diaryDataSource.countDiaries(date)
-            }
+            diaryDataSource.countDiaries(date)
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toRepositoryException(e)
         }

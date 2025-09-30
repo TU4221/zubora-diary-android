@@ -39,32 +39,23 @@ internal class DiaryDataSource(
 
     //region Diary
     /**
-     * データベースに保存されている日記の総数を取得する。
-     *
-     * @return 日記の総数。
-     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
-     * @throws DatabaseStateException データベースの状態が不正だった場合。
-     */
-    suspend fun countDiaries(): Int {
-        return  withContext(dispatcher) {
-            executeSuspendDbReadOperation {
-                diaryDao.countDiaries()
-            }
-        }
-    }
-
-    /**
      * 指定された日付より前の日記の総数を取得する。
      *
-     * @param date この日付以前の日記をカウントする (この日付を含む)。
+     * 開始日が指定されていない場合は、全ての日記を対象とする。
+     *
+     * @param date この日付以前の日記をカウントする (この日付を含む)。nullの場合は全日記対象。
      * @return 指定された日付より前の日記の総数。
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun countDiaries(date: LocalDate): Int {
+    suspend fun countDiaries(date: LocalDate?): Int {
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
-                diaryDao.countDiaries(date.toString())
+                if (date == null) {
+                    diaryDao.countDiaries()
+                } else {
+                    diaryDao.countDiaries(date.toString())
+                }
             }
         }
     }
