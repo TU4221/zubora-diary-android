@@ -4,11 +4,6 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
 
-// TODO:引数名へんなのがあるので変更、トランザクション内でDaoを再度生成しているので改善
-// MEMO:テーブル構成変更手順
-//      https://qiita.com/kazuma_f/items/8c15e7087623e8f6706b
-/*@Database(entities =  {DiaryEntity.class, DiaryItemTitleSelectionHistoryItemEntity.class}, version = 4, exportSchema = true,
-        autoMigrations = {@AutoMigration(from = 3, to = 4, spec = DiaryDatabase.MyAutoMigration.class)})*/
 /**
  * アプリケーションのRoomデータベースクラス。
  *
@@ -45,14 +40,14 @@ internal abstract class DiaryDatabase : RoomDatabase() {
      *
      * まず保存する日記データと同じ日付の日記を削除し、その後保存する日記を挿入する。
      *
-     * @param createDiaryEntity 新しく保存する日記データ。
+     * @param saveDiary 新しく保存する日記データ。
      */
     @Transaction
     suspend fun deleteAndSaveDiary(
-        createDiaryEntity: DiaryEntity,
+        saveDiary: DiaryEntity,
     ) {
-        createDiaryDao().deleteDiary(createDiaryEntity.date)
-        createDiaryDao().insertDiary(createDiaryEntity)
+        createDiaryDao().deleteDiary(saveDiary.date)
+        createDiaryDao().insertDiary(saveDiary)
     }
 
     /**
