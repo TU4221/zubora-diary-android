@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExc
 import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.scheduling.SchedulingRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.settings.SettingsRepositoryExceptionMapper
-import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherApiRepositoryExceptionMapper
+import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherInfoRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
@@ -90,5 +90,5 @@ internal object RepositoryModule {
     fun provideWeatherApiRepository(
         weatherApiDataSource: WeatherApiDataSource
     ): WeatherInfoRepository =
-        WeatherInfoRepositoryImpl(weatherApiDataSource, WeatherApiRepositoryExceptionMapper)
+        WeatherInfoRepositoryImpl(weatherApiDataSource, WeatherInfoRepositoryExceptionMapper)
 }

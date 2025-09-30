@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.data.network.exception.ResponsePar
 import com.websarva.wings.android.zuboradiary.domain.exception.NetworkConnectionException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 
-internal object WeatherApiRepositoryExceptionMapper
+internal object WeatherInfoRepositoryExceptionMapper
     : RepositoryExceptionMapper<NetworkOperationException> {
     override fun toDomainException(e: NetworkOperationException): DomainException {
         return when (e) {

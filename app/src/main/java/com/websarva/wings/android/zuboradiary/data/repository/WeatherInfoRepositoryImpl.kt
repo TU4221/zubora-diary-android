@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
-import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherApiRepositoryExceptionMapper
+import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherInfoRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.weather.toDomainModel
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOperationException
@@ -12,7 +12,7 @@ import java.time.LocalDate
 
 internal class WeatherInfoRepositoryImpl (
     private val weatherApiDataSource: WeatherApiDataSource,
-    private val weatherApiRepositoryExceptionMapper: WeatherApiRepositoryExceptionMapper
+    private val weatherInfoRepositoryExceptionMapper: WeatherInfoRepositoryExceptionMapper
 ) : WeatherInfoRepository {
 
     override fun canFetchWeatherInfo(date: LocalDate): Boolean {
@@ -28,7 +28,7 @@ internal class WeatherInfoRepositoryImpl (
             // 指定された日付が許容範囲外の場合(位置情報はSimpleLocationで正常値を保障されている)
             throw InvalidParameterException(cause = e)
         } catch (e: NetworkOperationException) {
-            throw weatherApiRepositoryExceptionMapper.toDomainException(e)
+            throw weatherInfoRepositoryExceptionMapper.toDomainException(e)
         }
     }
 }
