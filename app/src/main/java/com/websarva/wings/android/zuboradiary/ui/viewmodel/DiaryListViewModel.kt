@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.SavedDiaryDateRange
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
@@ -351,7 +351,7 @@ internal class DiaryListViewModel @Inject constructor(
             val updateDiaryList =
                 when (val result = processLoad(currentList)) {
                     is UseCaseResult.Success -> {
-                        result.value.toUiModel { fileName: ImageFileName? ->
+                        result.value.toUiModel { fileName: FileName? ->
                             fileName?.let {
                                 when (val buildResult = buildDiaryImageFilePathUseCase(fileName)) {
                                     is UseCaseResult.Success -> ImageFilePathUi(buildResult.value)

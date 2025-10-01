@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
-import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import java.time.LocalDate
@@ -36,7 +36,7 @@ internal sealed class DiaryDeleteException (
      */
     class ImageFileDeleteFailure(
         date: LocalDate,
-        fileName: ImageFileName,
+        fileName: FileName,
         cause: Throwable
     ) : DiaryDeleteException("削除対象である日付 '$date' の日記の画像ファイル '$fileName' の削除に失敗しました。", cause)
 

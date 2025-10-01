@@ -4,16 +4,16 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 日記の添付画像ファイル名を表すバリュークラス。
+ * ファイル名を表すバリュークラス。
  *
  * このクラスは、ファイル名が空ではなく、一般的ファイル形式 (basename.extension) であることを保障する。
  *
- * @property fullName 日記で表示する添付画像のファイル名。拡張子を含む。
+ * @property fullName ファイル名。拡張子を含む。
  * @throws IllegalArgumentException ファイル名が一般的ファイル形式 (basename.extension) でない場合。
  */
 @JvmInline
 @Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
-internal value class ImageFileName(
+internal value class FileName(
     val fullName: String
 ) : Parcelable {
 

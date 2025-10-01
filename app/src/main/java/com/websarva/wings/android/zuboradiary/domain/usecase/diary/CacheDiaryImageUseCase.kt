@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
@@ -30,13 +30,13 @@ internal class CacheDiaryImageUseCase(
      *
      * @param uriString キャッシュされるファイルのもととなる画像URI文字列。
      * @param diaryId 編集中の日記ID。画像ファイル名の一要素となる。
-     * @return 処理に成功した場合は [UseCaseResult.Success] に キャッシュされたファイルのパス ( [ImageFileName] ) を格納して返す。
+     * @return 処理に成功した場合は [UseCaseResult.Success] に キャッシュされたファイルのパス ( [FileName] ) を格納して返す。
      *   失敗した場合は [UseCaseResult.Failure] に [DiaryImageCacheException] を格納して返す。
      */
     suspend operator fun invoke(
         uriString: String,
         diaryId: UUIDString
-    ): UseCaseResult<ImageFileName, DiaryImageCacheException> {
+    ): UseCaseResult<FileName, DiaryImageCacheException> {
         Log.i(logTag, "${logMsg}開始 (画像URI: $uriString、 ファイルベース名: $diaryId)")
 
         return try {

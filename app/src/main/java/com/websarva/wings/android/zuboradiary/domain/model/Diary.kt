@@ -53,7 +53,7 @@ internal data class Diary(
     val item4Comment: String? = null,
     val item5Title: String? = null,
     val item5Comment: String? = null,
-    val imageFileName: ImageFileName? = null
+    val imageFileName: FileName? = null
 ) : Parcelable {
 
     init {

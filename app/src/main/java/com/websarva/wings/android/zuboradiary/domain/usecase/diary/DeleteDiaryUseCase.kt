@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
@@ -39,7 +39,7 @@ internal class DeleteDiaryUseCase(
      */
     suspend operator fun invoke(
         date: LocalDate,
-        imageFileName: ImageFileName?
+        imageFileName: FileName?
     ): UseCaseResult<Unit, DiaryDeleteException> {
         Log.i(logTag, "${logMsg}開始 (日付: $date, 画像ファイル名: ${imageFileName?.let { "\"$it\"" } ?: "なし"})")
 

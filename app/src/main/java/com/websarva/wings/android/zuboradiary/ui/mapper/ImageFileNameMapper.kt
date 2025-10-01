@@ -1,12 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
-import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 
-internal fun ImageFileName.toUiModel(): ImageFileNameUi {
+internal fun FileName.toUiModel(): ImageFileNameUi {
     return ImageFileNameUi(this)
 }
 
-internal fun ImageFileNameUi.toDomainModel(): ImageFileName {
+internal fun ImageFileNameUi.toDomainModel(): FileName {
     return fullName
 }

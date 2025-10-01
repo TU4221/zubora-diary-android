@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiarySaveException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
-import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
@@ -218,9 +218,9 @@ internal class SaveDiaryUseCase(
      * @throws ResourceAlreadyExistsException いずれかの画像ファイルの移動先に同名のファイルが既に存在する場合。
      */
     private suspend fun updateStorageDiaryImageFile(
-        saveDiaryImageFileName: ImageFileName?,
-        originalDiaryImageFileName: ImageFileName?,
-        deleteDiaryImageFileName: ImageFileName?
+        saveDiaryImageFileName: FileName?,
+        originalDiaryImageFileName: FileName?,
+        deleteDiaryImageFileName: FileName?
     ) {
         deleteDiaryImageFileName?.let {
             try {
@@ -321,9 +321,9 @@ internal class SaveDiaryUseCase(
      * @throws RollbackException 画像ファイルのロールバック処理に失敗した場合。
      */
     private suspend fun rollbackImageFiles(
-        savedDiaryImageFileName: ImageFileName?,
-        originalDiaryImageFileName: ImageFileName?,
-        deletedDiaryImageFileName: ImageFileName?
+        savedDiaryImageFileName: FileName?,
+        originalDiaryImageFileName: FileName?,
+        deletedDiaryImageFileName: FileName?
     ) {
         try {
             if (savedDiaryImageFileName != originalDiaryImageFileName) {

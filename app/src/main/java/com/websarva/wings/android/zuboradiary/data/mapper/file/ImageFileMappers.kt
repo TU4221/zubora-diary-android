@@ -1,12 +1,13 @@
 package com.websarva.wings.android.zuboradiary.data.mapper.file
 
 import com.websarva.wings.android.zuboradiary.data.file.ImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.FileName
 
 
-internal fun ImageFileName.toDomainModel(): com.websarva.wings.android.zuboradiary.domain.model.ImageFileName {
-    return com.websarva.wings.android.zuboradiary.domain.model.ImageFileName(fullName)
+internal fun ImageFileName.toDomainModel(): FileName {
+    return FileName(fullName)
 }
 
-internal fun com.websarva.wings.android.zuboradiary.domain.model.ImageFileName.toDataModel(): ImageFileName {
+internal fun FileName.toImageFileNameDataModel(): ImageFileName {
     return ImageFileName(fullName)
 }
