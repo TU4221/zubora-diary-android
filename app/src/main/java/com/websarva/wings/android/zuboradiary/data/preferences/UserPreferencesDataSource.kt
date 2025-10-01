@@ -11,6 +11,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataNotFoundException
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreReadException
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreWriteException
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.InsufficientStorageException
+import com.websarva.wings.android.zuboradiary.data.utils.isInsufficientStorage
 import com.websarva.wings.android.zuboradiary.di.ApplicationScope
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -353,6 +355,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param operation [MutablePreferences] を引数に取り、DataStoreへの書き込み処理を行うsuspend関数。
      * @return DataStoreの編集操作後の [Preferences] オブジェクト。
      * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
+     * @throws InsufficientStorageException ストレージの空き容量が不足した場合。
      */
     private suspend fun executeDataStoreEditOperation(
         operation: suspend (MutablePreferences) -> Unit
@@ -362,7 +365,11 @@ internal class UserPreferencesDataSource @Inject constructor(
                 operation(preferences)
             }
         } catch (e: IOException) {
-            throw DataStoreWriteException(cause = e)
+            throw if (e.isInsufficientStorage()) {
+                InsufficientStorageException(e)
+            } else {
+                DataStoreWriteException(cause = e)
+            }
         }
     }
 }

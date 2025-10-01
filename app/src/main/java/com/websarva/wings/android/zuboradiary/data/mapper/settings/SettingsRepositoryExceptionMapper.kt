@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataNot
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreException
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreReadException
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreWriteException
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
@@ -16,6 +17,7 @@ internal object SettingsRepositoryExceptionMapper
             is DataNotFoundException -> ResourceNotFoundException(cause = e)
             is DataStoreReadException -> DataStorageException(cause = e)
             is DataStoreWriteException -> DataStorageException(cause = e)
+            is InsufficientStorageException -> DataStorageException(cause = e)
             else -> DataStorageException(cause = e)
         }
     }
