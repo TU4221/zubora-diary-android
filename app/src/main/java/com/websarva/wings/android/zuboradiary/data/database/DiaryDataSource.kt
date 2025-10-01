@@ -251,12 +251,15 @@ internal class DiaryDataSource(
     /**
      * 指定された単語がタイトルまたは各項目に含まれる日記の総数を取得する。
      *
-     * @param searchWord 検索する単語。
+     * @param searchWord 検索する単語 (空でない、またはブランクのみでないこと)。
      * @return 検索条件に一致する日記の総数。
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
+     * @throws IllegalArgumentException 引数が不正な場合。
      */
     suspend fun countWordSearchResults(searchWord: String): Int {
+        require(searchWord.isNotBlank()) { "検索する単語が空、またはブランクのみ" }
+
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
                 diaryDao.countWordSearchResults(searchWord)
@@ -271,19 +274,20 @@ internal class DiaryDataSource(
      *
      * @param num 取得する日記の件数 (1以上である必要がある)。
      * @param offset 取得を開始するオフセット位置 (0以上である必要がある)。
-     * @param searchWord 検索する単語。
+     * @param searchWord 検索する単語 (空でない、またはブランクのみでないこと)。
      * @return 単語検索結果リストアイテムデータのリスト。対象の日記が存在しない場合は空のリストを返す。
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
-     * @throws IllegalArgumentException numまたはoffsetの引数が不正な場合。
+     * @throws IllegalArgumentException 引数が不正な場合。
      */
     suspend fun selectWordSearchResultListOrderByDateDesc(
         num: Int,
         offset: Int,
         searchWord: String
     ): List<WordSearchResultListItemData> {
-        require(num >= 1)
-        require(offset >= 0)
+        require(num >= 1) { "取得件数 `$num` が不正値" }
+        require(offset >= 0) { "取得開始位置 `$num` が不正値" }
+        require(searchWord.isNotBlank()) { "検索する単語が空、またはブランクのみ" }
 
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
@@ -304,13 +308,13 @@ internal class DiaryDataSource(
      * @return 日記項目タイトル選択履歴データのリストをFlowでラップしたもの。
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。([Flow] 内部で発生)
      * @throws DatabaseStateException データベースの状態が不正だった場合。([Flow] 内部で発生)
-     * @throws IllegalArgumentException numまたはoffsetの引数が不正な場合。
+     * @throws IllegalArgumentException 引数が不正な場合。
      */
     fun selectHistoryListOrderByLogDesc(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryEntity>> {
-        require(num >= 1)
-        require(offset >= 0)
+        require(num >= 1) { "取得件数 `$num` が不正値" }
+        require(offset >= 0) { "取得開始位置 `$num` が不正値" }
 
         return diaryItemTitleSelectionHistoryDao
             .selectHistoryListOrderByLogDesc(num, offset)
