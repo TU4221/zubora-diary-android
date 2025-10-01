@@ -6,14 +6,12 @@ import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.ImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
-import java.time.LocalDate
-import java.time.LocalDateTime
 
 internal fun DiaryEntity.toDomainModel(): Diary {
     return Diary(
         UUIDString(id),
-        LocalDate.parse(date),
-        LocalDateTime.parse(log),
+        date,
+        log,
         Weather.of(weather1),
         Weather.of(weather2),
         Condition.of(condition),
@@ -35,8 +33,8 @@ internal fun DiaryEntity.toDomainModel(): Diary {
 internal fun Diary.toDataModel(): DiaryEntity {
     return DiaryEntity(
         id.value,
-        date.toString(),
-        log.toString(),
+        date,
+        log,
         weather1.number,
         weather2.number,
         condition.number,

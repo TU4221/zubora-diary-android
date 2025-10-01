@@ -9,8 +9,5 @@ internal fun DiaryItemTitleSelectionHistoryEntity.toDomainModel(): DiaryItemTitl
 }
 
 internal fun DiaryItemTitleSelectionHistory.toDataModel(): DiaryItemTitleSelectionHistoryEntity {
-    return DiaryItemTitleSelectionHistoryEntity(
-        title,
-        log.toString()
-    )
+    return DiaryItemTitleSelectionHistoryEntity(title, log)
 }

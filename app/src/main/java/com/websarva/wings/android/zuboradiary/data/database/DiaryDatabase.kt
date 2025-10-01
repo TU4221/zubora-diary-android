@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.data.database
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.Transaction
+import androidx.room.TypeConverters
 
 /**
  * アプリケーションのRoomデータベースクラス。
@@ -19,6 +20,7 @@ import androidx.room.Transaction
     version = 1,
     exportSchema = false
 )
+@TypeConverters(DiaryDatabaseConverter::class)
 internal abstract class DiaryDatabase : RoomDatabase() {
 
     /**

@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.database
 
 import androidx.room.ColumnInfo
+import java.time.LocalDate
 
 /**
  * 単語検索結果のリストアイテムデータを表すデータクラス。
@@ -21,7 +22,7 @@ import androidx.room.ColumnInfo
  * @property item5Comment 5つ目の項目のコメント (オプショナル)。
  */
 internal data class WordSearchResultListItemData(
-    val date: String,
+    val date: LocalDate,
     val title: String,
 
     @ColumnInfo(name = "item_1_title")

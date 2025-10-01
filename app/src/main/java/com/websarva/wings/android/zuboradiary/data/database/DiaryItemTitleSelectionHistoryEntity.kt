@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.database
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.LocalDateTime
 
 /**
  * 日記項目のタイトル選択履歴を表すRoomエンティティクラス。
@@ -15,5 +16,5 @@ import androidx.room.PrimaryKey
 internal data class DiaryItemTitleSelectionHistoryEntity (
     @PrimaryKey
     val title: String,
-    val log: String
+    val log: LocalDateTime
 )

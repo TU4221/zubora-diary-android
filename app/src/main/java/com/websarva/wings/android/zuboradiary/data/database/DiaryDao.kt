@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import java.time.LocalDate
 
 /**
  * 日記データベースへのアクセスを提供するDAO (Data Access Object) インターフェース。
@@ -30,7 +31,7 @@ internal interface DiaryDao {
      * @return 指定された日付より前の日記の総数。
      */
     @Query("SELECT COUNT(*) FROM diaries WHERE date < :startDate")
-    suspend fun countDiaries(startDate: String): Int
+    suspend fun countDiaries(startDate: LocalDate): Int
 
     /**
      * 指定された日付の日記が存在するかどうかを確認する。
@@ -39,7 +40,7 @@ internal interface DiaryDao {
      * @return 日記が存在すればtrue、しなければfalse。
      */
     @Query("SELECT EXISTS (SELECT 1 FROM diaries WHERE date = :date)")
-    suspend fun existsDiary(date: String): Boolean
+    suspend fun existsDiary(date: LocalDate): Boolean
 
     /**
      * 指定された日付の日記エンティティを取得する。
@@ -48,7 +49,7 @@ internal interface DiaryDao {
      * @return 指定された日付のDiaryEntity。見つからない場合はnull。
      */
     @Query("SELECT * FROM diaries WHERE date = :date")
-    suspend fun selectDiary(date: String): DiaryEntity?
+    suspend fun selectDiary(date: LocalDate): DiaryEntity?
 
     /**
      * 最新の日記エンティティを取得する。
@@ -91,7 +92,7 @@ internal interface DiaryDao {
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int,
-        startDate: String
+        startDate: LocalDate
     ): List<DiaryListItemData>
 
     /**
@@ -172,7 +173,7 @@ internal interface DiaryDao {
      * @param date 削除する日記の日付。
      */
     @Query("DELETE FROM diaries WHERE date = :date")
-    suspend fun deleteDiary(date: String)
+    suspend fun deleteDiary(date: LocalDate)
 
     /**
      * 全ての日記をデータベースから削除する。

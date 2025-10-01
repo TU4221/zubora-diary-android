@@ -55,7 +55,7 @@ internal class DiaryDataSource(
                 if (date == null) {
                     diaryDao.countDiaries()
                 } else {
-                    diaryDao.countDiaries(date.toString())
+                    diaryDao.countDiaries(date)
                 }
             }
         }
@@ -72,7 +72,7 @@ internal class DiaryDataSource(
     suspend fun existsDiary(date: LocalDate): Boolean {
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
-                diaryDao.existsDiary(date.toString())
+                diaryDao.existsDiary(date)
             }
         }
     }
@@ -89,7 +89,7 @@ internal class DiaryDataSource(
     suspend fun selectDiary(date: LocalDate): DiaryEntity {
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
-                diaryDao.selectDiary(date.toString())
+                diaryDao.selectDiary(date)
             } ?: throw RecordNotFoundException()
         }
     }
@@ -153,7 +153,7 @@ internal class DiaryDataSource(
                 if (date == null) {
                     diaryDao.selectDiaryListOrderByDateDesc(num, offset)
                 } else {
-                    diaryDao.selectDiaryListOrderByDateDesc(num, offset, date.toString())
+                    diaryDao.selectDiaryListOrderByDateDesc(num, offset, date)
                 }
             }
         }
@@ -227,7 +227,7 @@ internal class DiaryDataSource(
     suspend fun deleteDiary(date: LocalDate) {
         withContext(dispatcher) {
             executeSuspendDbDeleteOperation {
-                diaryDao.deleteDiary(date.toString())
+                diaryDao.deleteDiary(date)
             }
         }
     }

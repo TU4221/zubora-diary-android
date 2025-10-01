@@ -3,6 +3,8 @@ package com.websarva.wings.android.zuboradiary.data.database
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.time.LocalDate
+import java.time.LocalDateTime
 
 
 /**
@@ -35,9 +37,9 @@ internal data class DiaryEntity(
     @PrimaryKey
     val id: String,
 
-    val date: String,
+    val date: LocalDate,
 
-    val log: String,
+    val log: LocalDateTime,
 
     @ColumnInfo(name = "weather_1")
     val weather1: Int,
