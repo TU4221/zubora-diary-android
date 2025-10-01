@@ -9,10 +9,8 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.FilePermission
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileReadException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileWriteException
 import com.websarva.wings.android.zuboradiary.data.file.exception.InsufficientStorageException
-import com.websarva.wings.android.zuboradiary.data.file.exception.InvalidFilePathException
 import com.websarva.wings.android.zuboradiary.data.mapper.RepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
-import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
@@ -30,7 +28,6 @@ internal object FileRepositoryExceptionMapper
             is FileReadException -> DataStorageException(cause = e)
             is FileWriteException -> DataStorageException(cause = e)
             is InsufficientStorageException -> DataStorageException(cause = e) // TODO:ストレージ空き不足時の対応検討
-            is InvalidFilePathException -> InvalidParameterException(cause = e)
             else -> DataStorageException(cause = e)
         }
     }

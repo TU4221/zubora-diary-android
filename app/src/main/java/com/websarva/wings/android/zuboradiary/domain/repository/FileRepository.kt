@@ -80,7 +80,6 @@ internal interface FileRepository {
      *
      * @param fileName 移動したいファイル名。
      * @throws DataStorageException ファイルの移動に失敗した場合。
-     * @throws InvalidParameterException 指定されたファイル名が無効の場合。
      * @throws ResourceNotFoundException 移動元ファイルが見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
@@ -92,7 +91,6 @@ internal interface FileRepository {
      *
      * @param fileName 移動したいファイル名。
      * @throws DataStorageException ファイルの移動に失敗した場合。
-     * @throws InvalidParameterException 指定されたファイル名が無効の場合。
      * @throws ResourceNotFoundException 移動元ファイルが見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException 移動先に同名のファイルが既に存在する場合。

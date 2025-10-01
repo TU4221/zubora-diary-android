@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.FileAlreadyExi
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileDeleteException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileOperationException
 import com.websarva.wings.android.zuboradiary.data.file.exception.InsufficientStorageException
-import com.websarva.wings.android.zuboradiary.data.file.exception.InvalidFilePathException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FilePermissionDeniedException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileReadException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileWriteException
@@ -49,9 +48,6 @@ class ImageFileDataSource(
 
     private val imageFileExtension = Bitmap.CompressFormat.JPEG
 
-    private val invalidFilePathExceptionReason =
-        "画像ファイル拡張子 (${imageFileExtension.name}) ではありません。"
-
     private val imageDirName = "images"
 
     private val imageCacheDir: File by lazy {
@@ -72,21 +68,23 @@ class ImageFileDataSource(
     /**
      * 指定された画像ファイルから、キャッシュ画像ディレクトリ絶対パスを構築する。
      *
-     * @param fileName 構築対象の画像ファイルの名前。
+     * @param fileName 構築対象の画像ファイルの名前 (空でない、またはブランクのみでないこと)。
      * @return 構築された絶対パス。
+     * @throws IllegalArgumentException 引数が不正な場合。
      */
-    fun buildImageFileAbsolutePathFromCache(fileName: String): String {
-        return File(imageCacheDir, fileName).absolutePath
+    fun buildImageFileAbsolutePathFromCache(fileName: ImageFileName): String {
+        return File(imageCacheDir, fileName.fullName).absolutePath
     }
 
     /**
      * 指定された画像ファイルから、永続画像ディレクトリ絶対パスを構築する。
      *
-     * @param fileName 構築対象の画像ファイルの名前。
+     * @param fileName 構築対象の画像ファイルの名前 (空でない、またはブランクのみでないこと)。
      * @return 構築された絶対パス。
+     * @throws IllegalArgumentException 引数が不正な場合。
      */
-    fun buildImageFileAbsolutePathFromPermanent(fileName: String): String {
-        return File(imagePermanentDir, fileName).absolutePath
+    fun buildImageFileAbsolutePathFromPermanent(fileName: ImageFileName): String {
+        return File(imagePermanentDir, fileName.fullName).absolutePath
     }
 
     /**
@@ -97,8 +95,8 @@ class ImageFileDataSource(
      * @throws FileReadException ファイルの存在確認に失敗した場合。
      * @return 構築された絶対パス。
      */
-    suspend fun existsImageFileInCache(fileName: String): Boolean {
-        val file = File(imageCacheDir, fileName)
+    suspend fun existsImageFileInCache(fileName: ImageFileName): Boolean {
+        val file = File(imageCacheDir, fileName.fullName)
         return withContext(dispatcher) {
             try {
                 file.exists()
@@ -116,8 +114,8 @@ class ImageFileDataSource(
      * @throws FileReadException ファイルの存在確認に失敗した場合。
      * @return 構築された絶対パス。
      */
-    suspend fun existsImageFileInPermanent(fileName: String): Boolean {
-        val file = File(imagePermanentDir, fileName)
+    suspend fun existsImageFileInPermanent(fileName: ImageFileName): Boolean {
+        val file = File(imagePermanentDir, fileName.fullName)
         return withContext(dispatcher) {
             try {
                 file.exists()
@@ -135,8 +133,8 @@ class ImageFileDataSource(
      * @throws FileReadException ファイルの存在確認に失敗した場合。
      * @return 構築された絶対パス。
      */
-    suspend fun existsImageFileInBackup(fileName: String): Boolean {
-        val file = File(imageBackupDir, fileName)
+    suspend fun existsImageFileInBackup(fileName: ImageFileName): Boolean {
+        val file = File(imageBackupDir, fileName.fullName)
         return withContext(dispatcher) {
             try {
                 file.exists()
@@ -150,11 +148,12 @@ class ImageFileDataSource(
      * 指定されたURIの画像ファイルをリサイズ・圧縮し、キャッシュディレクトリにJPEG形式でキャッシュする。
      *
      * @param uriString 画像のURI文字列。
-     * @param fileBaseName 保存するファイル名のベース部分 (拡張子なし)。
+     * @param fileBaseName 保存するファイル名のベース部分 (空でなく、拡張子なしであること)。
      * @param width リサイズ後の目標幅。0の場合は元の幅を維持。
      * @param height リサイズ後の目標高さ。0の場合は元の高さを維持。
      * @param quality JPEG圧縮品質 (0-100)。
      * @return 保存されたファイル名 (拡張子付き)。
+     * @throws IllegalArgumentException ファイルベース名が不正な場合。
      * @throws FileNotFoundException 指定されたURI/ファイルパスの画像が見つからない場合。
      * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
      * @throws FileReadException 画像の読み込みまたはデコードに失敗した場合。
@@ -168,6 +167,8 @@ class ImageFileDataSource(
         height: Int = 0,
         quality: Int = 100
     ): String {
+        require(fileBaseName.isNotBlank()) {"ファイルベース名が空文字列"}
+
         return withContext(dispatcher) {
             val uri = Uri.parse(uriString)
             val outputFileName = "$fileBaseName.${imageFileExtension.name}"
@@ -292,7 +293,7 @@ class ImageFileDataSource(
      *
      * @param fileName 移動する画像ファイル名 (拡張子付き)。
      */
-    suspend fun moveImageFileToPermanent(fileName: String) {
+    suspend fun moveImageFileToPermanent(fileName: ImageFileName) {
         withContext(dispatcher) {
             moveImageFile(fileName, imageCacheDir, imagePermanentDir)
         }
@@ -306,7 +307,7 @@ class ImageFileDataSource(
      *
      * @param fileName 移動する画像ファイル名 (拡張子付き)。
      */
-    suspend fun restoreImageFileFromPermanent(fileName: String) {
+    suspend fun restoreImageFileFromPermanent(fileName: ImageFileName) {
         withContext(dispatcher) {
             moveImageFile(fileName, imagePermanentDir, imageCacheDir)
         }
@@ -320,7 +321,7 @@ class ImageFileDataSource(
      *
      * @param fileName 移動する画像ファイル名 (拡張子付き)。
      */
-    suspend fun moveImageFileToBackup(fileName: String) {
+    suspend fun moveImageFileToBackup(fileName: ImageFileName) {
         withContext(dispatcher) {
             moveImageFile(fileName, imagePermanentDir, imageBackupDir)
         }
@@ -334,7 +335,7 @@ class ImageFileDataSource(
      *
      * @param fileName 移動する画像ファイル名 (拡張子付き)。
      */
-    suspend fun restoreImageFileFromBackup(fileName: String) {
+    suspend fun restoreImageFileFromBackup(fileName: ImageFileName) {
         withContext(dispatcher) {
             moveImageFile(fileName, imageBackupDir, imagePermanentDir)
         }
@@ -346,7 +347,6 @@ class ImageFileDataSource(
      * 移動先に同名のファイルが既に存在する場合は [FileAlreadyExistsException] をスローする。
      *
      * @param fileName 移動する画像ファイル名 (拡張子付き)。
-     * @throws InvalidFilePathException 指定されたファイル名の拡張子が無効の場合。
      * @throws FileNotFoundException 移動元ファイルが見つからない場合。
      * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
      * @throws FileAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
@@ -354,12 +354,9 @@ class ImageFileDataSource(
      * @throws InsufficientStorageException ストレージの空き容量が不足した場合。
      * @throws FileDeleteException 移動元ファイルの削除に失敗した場合。
      */
-    private fun moveImageFile(fileName: String, sourceDir: File, destinationDir: File) {
-        if (!isImageFileExtension(fileName))
-            throw InvalidFilePathException(fileName, invalidFilePathExceptionReason)
-
+    private fun moveImageFile(fileName: ImageFileName, sourceDir: File, destinationDir: File) {
         // 移動元ファイルクラス生成
-        val sourceFile = File(sourceDir, fileName)
+        val sourceFile = File(sourceDir, fileName.fullName)
         try {
             if (!sourceFile.exists()) throw FileNotFoundException(sourceFile.absolutePath)
         } catch (e: SecurityException) {
@@ -441,7 +438,7 @@ class ImageFileDataSource(
      * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
      */
     @Suppress("unused") //MEMO:将来対応用
-    suspend fun deleteImageFileInCache(fileName: String) {
+    suspend fun deleteImageFileInCache(fileName: ImageFileName) {
         withContext(dispatcher) {
             deleteImageFile(fileName, imageCacheDir)
         }
@@ -455,7 +452,7 @@ class ImageFileDataSource(
      *
      * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
      */
-    suspend fun deleteImageFileInPermanent(fileName: String) {
+    suspend fun deleteImageFileInPermanent(fileName: ImageFileName) {
         withContext(dispatcher) {
             deleteImageFile(fileName, imagePermanentDir)
         }
@@ -470,7 +467,7 @@ class ImageFileDataSource(
      * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
      */
     @Suppress("unused") //MEMO:将来対応用
-    suspend fun deleteImageFileInBackup(fileName: String) {
+    suspend fun deleteImageFileInBackup(fileName: ImageFileName) {
         withContext(dispatcher) {
             deleteImageFile(fileName, imageBackupDir)
         }
@@ -481,16 +478,12 @@ class ImageFileDataSource(
      *
      * @param fileName 削除する画像ファイルの名前 (拡張子付き)。
      * @param targetDir 削除する画像ファイルが配置されているディレクトリ。
-     * @throws InvalidFilePathException 指定されたファイル名の拡張子が無効の場合。
      * @throws FileNotFoundException 削除対象ファイルが見つからない場合。
      * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
      * @throws FileDeleteException ファイルの削除に失敗した場合。
      */
-    private fun deleteImageFile(fileName: String, targetDir: File) {
-        if (!isImageFileExtension(fileName))
-            throw InvalidFilePathException(fileName, invalidFilePathExceptionReason)
-
-        val file = File(targetDir, fileName)
+    private fun deleteImageFile(fileName: ImageFileName, targetDir: File) {
+        val file = File(targetDir, fileName.fullName)
         try {
             if (file.exists()) {
                 val isSuccess = file.delete()
@@ -662,17 +655,6 @@ class ImageFileDataSource(
         if (failures.isNotEmpty()) {
             throw DirectoryDeletionFailedException(directory.absolutePath, failures)
         }
-    }
-
-    /**
-     * 指定されたファイル名に画像ファイル拡張子 ( [imageFileExtension] ) が含まれているかを確認する。
-     * 大文字・小文字は区別しない。
-     *
-     * @param fileName 確認するファイル名。
-     * @return 画像ファイル拡張子であれば true、そうでなければ false。
-     */
-    private fun isImageFileExtension(fileName: String): Boolean {
-        return fileName.endsWith(".${imageFileExtension.name}", true)
     }
 
     /**
