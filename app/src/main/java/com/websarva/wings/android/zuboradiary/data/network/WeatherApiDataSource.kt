@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.network
 
 import android.util.Log
-import androidx.annotation.FloatRange
 import androidx.annotation.IntRange
 import androidx.datastore.core.IOException
 import com.websarva.wings.android.zuboradiary.data.network.exception.HttpException
@@ -66,17 +65,9 @@ internal class WeatherApiDataSource(
      */
     suspend fun fetchWeatherInfo(
         date: LocalDate,
-        @FloatRange(from = -90.0, to = 90.0)
         latitude: Double,
-        @FloatRange(from = -180.0, to = 180.0)
         longitude: Double
     ): WeatherApiData {
-        require(latitude >= -90) { "緯度 `$latitude` が不正値" }
-        require(latitude <= 90) { "緯度 `$latitude` が不正値" }
-        require(longitude >= -180) { "経度 `$longitude` が不正値" }
-        require(longitude <= 180) { "経度 `$longitude` が不正値" }
-        if (!canFetchWeatherInfo(date)) throw IllegalArgumentException("日付 `$date` が不正値")
-
         val currentDate = LocalDate.now()
         return withContext(dispatcher) {
             if (date == currentDate) {
@@ -116,18 +107,15 @@ internal class WeatherApiDataSource(
      * @param latitude 天気情報を取得する地点の緯度 (-90.0 から 90.0 の範囲)。
      * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
      * @return 取得した今日の天気情報データ ([WeatherApiData])。
-     * @throws IllegalArgumentException numPastDaysが不正な範囲の場合。
+     * @throws IllegalArgumentException 引数が不正な範囲の場合。
      * @throws NetworkConnectivityException ネットワーク接続に問題がある場合。
      * @throws NetworkOperationException ネットワーク操作中に問題が発生した場合 (タイムアウト、SSLエラー、一般的なI/Oエラーなど)。
      * @throws HttpException HTTPレスポンスがエラーを示している場合。
      * @throws ResponseParsingException レスポンスボディがnullまたはパース不可能な場合。
      */
-    private suspend fun fetchTodayWeatherInfo(
-        @FloatRange(from = -90.0, to = 90.0)
-        latitude: Double,
-        @FloatRange(from = -180.0, to = 180.0)
-        longitude: Double
-    ): WeatherApiData {
+    private suspend fun fetchTodayWeatherInfo(latitude: Double, longitude: Double): WeatherApiData {
+        requireValidLocation(latitude, longitude)
+
         val response =
             executeWebApiOperation {
                 weatherApiService.getWeather(
@@ -149,22 +137,21 @@ internal class WeatherApiDataSource(
      * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
      * @param numPastDays 何日前の天気情報を取得するか ([MIN_PAST_DAYS] から [MAX_PAST_DAYS] の範囲)。
      * @return 取得した過去の天気情報データ。
-     * @throws IllegalArgumentException numPastDaysが不正な範囲の場合。
+     * @throws IllegalArgumentException 引数が不正な範囲の場合。
      * @throws NetworkConnectivityException ネットワーク接続に問題がある場合。
      * @throws NetworkOperationException ネットワーク操作中に問題が発生した場合 (タイムアウト、SSLエラー、一般的なI/Oエラーなど)。
      * @throws HttpException HTTPレスポンスがエラーを示している場合。
      * @throws ResponseParsingException レスポンスボディがnullまたはパース不可能な場合。
      */
     private suspend fun fetchPastDayWeatherInfo(
-        @FloatRange(from = -90.0, to = 90.0)
         latitude: Double,
-        @FloatRange(from = -180.0, to = 180.0)
         longitude: Double,
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong())
         numPastDays: Int
     ): WeatherApiData {
-        require(numPastDays >= MIN_PAST_DAYS)
-        require(numPastDays <= MAX_PAST_DAYS)
+        requireValidLocation(latitude, longitude)
+        require(numPastDays >= MIN_PAST_DAYS) { "過去日数 `$numPastDays` が不正値" }
+        require(numPastDays <= MAX_PAST_DAYS) { "過去日数 `$numPastDays` が不正値" }
 
         val response =
             executeWebApiOperation {
@@ -245,5 +232,22 @@ internal class WeatherApiDataSource(
             // 上記以外の一般的なI/Oエラー (例: 予期せぬ接続切断など)
             throw NetworkOperationException("ネットワークエラー", e)
         }
+    }
+
+    /**
+     * 指定された緯度と経度が、地理座標として有効な範囲内にあることを要求する。
+     *
+     * 緯度は -90.0 から 90.0 の範囲、経度は -180.0 から 180.0 の範囲であること。
+     * いずれかの値がこの範囲外である場合、[IllegalArgumentException] をスローする。
+     *
+     * @param latitude 検証する緯度。-90.0 から 90.0 の範囲であること。
+     * @param longitude 検証する経度。-180.0 から 180.0 の範囲であること。
+     * @throws IllegalArgumentException 緯度または経度が有効な範囲外の場合。
+     */
+    private fun requireValidLocation(latitude: Double, longitude: Double) {
+        require(latitude >= -90.0) { "緯度 `$latitude` が不正値" }
+        require(latitude <= 90.0) { "緯度 `$latitude` が不正値" }
+        require(longitude >= -180.0) { "経度 `$longitude` が不正値" }
+        require(longitude <= 180.0) { "経度 `$longitude` が不正値" }
     }
 }
