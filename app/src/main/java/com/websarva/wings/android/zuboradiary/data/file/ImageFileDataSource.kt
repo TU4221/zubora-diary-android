@@ -4,8 +4,6 @@ import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.system.ErrnoException
-import android.system.OsConstants
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.file.exception.DirectoryDeletionFailedException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileAlreadyExistsException
@@ -16,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.FilePermission
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileReadException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileWriteException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileNotFoundException
+import com.websarva.wings.android.zuboradiary.data.utils.isInsufficientStorage
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -200,7 +199,7 @@ class ImageFileDataSource(
             } catch (e: java.io.FileNotFoundException) {
                 throw FileNotFoundException(outputFile.absolutePath, e)
             } catch (e: IOException) {
-                if (isInsufficientStorageException(e)) {
+                if (e.isInsufficientStorage()) {
                     throw InsufficientStorageException(outputFile.absolutePath, e)
                 } else {
                     throw FileWriteException(outputFile.absolutePath, e)
@@ -401,7 +400,7 @@ class ImageFileDataSource(
                         )
                     }
 
-                    if (isInsufficientStorageException(e)) {
+                    if (e.isInsufficientStorage()) {
                         throw InsufficientStorageException(destinationFile.absolutePath, e)
                     } else {
                         throw FileWriteException(destinationFile.absolutePath, e)
@@ -655,23 +654,5 @@ class ImageFileDataSource(
         if (failures.isNotEmpty()) {
             throw DirectoryDeletionFailedException(directory.absolutePath, failures)
         }
-    }
-
-    /**
-     * 指定された IOException がストレージ容量不足に起因するかどうかを判定する。
-     *
-     * @param exception チェック対象の IOException。
-     * @return ストレージ容量不足が原因の場合は true、そうでない場合は false。
-     */
-    private fun isInsufficientStorageException(exception: IOException): Boolean {
-        var currentCause: Throwable? = exception
-        while (currentCause != null) {
-            if (currentCause is ErrnoException && currentCause.errno == OsConstants.ENOSPC) {
-                return true
-            }
-            currentCause = currentCause.cause
-        }
-
-        return exception.message?.contains("No space left on device", ignoreCase = true) == true
     }
 }
