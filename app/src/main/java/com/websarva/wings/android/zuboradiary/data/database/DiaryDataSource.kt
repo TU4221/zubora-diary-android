@@ -188,7 +188,7 @@ internal class DiaryDataSource(
     suspend fun deleteAndSaveDiary(diary: DiaryEntity) {
         withContext(dispatcher) {
             executeSuspendDbUpdateOperation {
-                diaryDatabase.deleteAndSaveDiary(diary)
+                diaryDao.deleteAndSaveDiary(diary)
             }
         }
     }
@@ -209,7 +209,7 @@ internal class DiaryDataSource(
     ) {
         withContext(dispatcher) {
             executeSuspendDbUpdateOperation {
-                diaryDatabase
+                diaryItemTitleSelectionHistoryDao
                     .updateDiaryItemTitleSelectionHistory(
                         historyItemList
                     )

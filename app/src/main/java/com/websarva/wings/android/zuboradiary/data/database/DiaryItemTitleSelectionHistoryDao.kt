@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -61,4 +62,19 @@ internal interface DiaryItemTitleSelectionHistoryDao {
     @Query("DELETE FROM diary_item_title_selection_history WHERE title " +
             "NOT IN (SELECT title FROM diary_item_title_selection_history ORDER BY log DESC LIMIT 50 OFFSET 0)")
     suspend fun deleteOldHistory()
+
+    /**
+     * 日記項目タイトル選択履歴データをトランザクション内で保存する。
+     *
+     * 選択履歴を更新し、その後、最新の50件を除く最終使用日時が古い順の履歴を削除する。
+     *
+     * @param historyList 更新する日記項目タイトル選択履歴データのリスト。
+     */
+    @Transaction
+    suspend fun updateDiaryItemTitleSelectionHistory(
+        historyList: List<DiaryItemTitleSelectionHistoryEntity>
+    ) {
+        insertHistory(historyList)
+        deleteOldHistory()
+    }
 }

@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import java.time.LocalDate
 
 /**
@@ -174,6 +175,21 @@ internal interface DiaryDao {
      */
     @Query("DELETE FROM diaries WHERE date = :date")
     suspend fun deleteDiary(date: LocalDate)
+
+    /**
+     * 保存する日記データと同じ日付の日記データを削除し、保存する日記データと日記項目タイトル選択履歴データをトランザクション内で保存する。
+     *
+     * まず保存する日記データと同じ日付の日記を削除し、その後保存する日記を挿入する。
+     *
+     * @param saveDiary 新しく保存する日記データ。
+     */
+    @Transaction
+    suspend fun deleteAndSaveDiary(
+        saveDiary: DiaryEntity,
+    ) {
+        deleteDiary(saveDiary.date)
+        insertDiary(saveDiary)
+    }
 
     /**
      * 全ての日記をデータベースから削除する。
