@@ -22,7 +22,7 @@ internal sealed class DiaryImageCacheException(
     class CacheFailure(
         cause: Throwable
     ) : DiaryImageCacheException(
-        "画像ファイルの保存に失敗しました。",
+        "画像ファイルのキャッシュに失敗しました。",
         cause
     )
 
@@ -34,7 +34,7 @@ internal sealed class DiaryImageCacheException(
     class InsufficientStorage(
         cause: Throwable
     ) : DiaryImageCacheException(
-        "ストレージ容量不足により、画像ファイルの保存に失敗しました。",
+        "ストレージ容量不足により、画像ファイルのキャッシュに失敗しました。",
         cause
     )
 
