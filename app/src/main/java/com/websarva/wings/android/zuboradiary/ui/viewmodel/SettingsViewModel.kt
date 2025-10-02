@@ -370,7 +370,7 @@ internal class SettingsViewModel @Inject constructor(
 
         if (!canExecuteSettingsOperation) {
             viewModelScope.launch {
-                emitUiEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch)
+                emitUiEvent(SettingsEvent.TurnReminderNotificationSettingSwitch(false))
             }
             return
         }
@@ -402,7 +402,7 @@ internal class SettingsViewModel @Inject constructor(
 
         if (!canExecuteSettingsOperation) {
             viewModelScope.launch {
-                emitUiEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch)
+                emitUiEvent(SettingsEvent.TurnPasscodeLockSettingSwitch(false))
             }
             return
         }
@@ -420,7 +420,7 @@ internal class SettingsViewModel @Inject constructor(
 
         if (!canExecuteSettingsOperation) {
             viewModelScope.launch {
-                emitUiEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch)
+                emitUiEvent(SettingsEvent.TurnWeatherInfoFetchSettingSwitch(false))
             }
             return
         }
@@ -533,7 +533,7 @@ internal class SettingsViewModel @Inject constructor(
     private fun handleReminderNotificationSettingDialogNegativeResult() {
         viewModelScope.launch {
             emitUiEvent(
-                SettingsEvent.TurnOffReminderNotificationSettingSwitch
+                SettingsEvent.TurnReminderNotificationSettingSwitch(false)
             )
         }
     }
@@ -637,7 +637,7 @@ internal class SettingsViewModel @Inject constructor(
                 )
             } else {
                 emitUiEvent(
-                    SettingsEvent.TurnOffReminderNotificationSettingSwitch
+                    SettingsEvent.TurnReminderNotificationSettingSwitch(false)
                 )
                 emitUiEvent(
                     SettingsEvent.NavigateNotificationPermissionDialog
@@ -655,7 +655,7 @@ internal class SettingsViewModel @Inject constructor(
                 )
             } else {
                 emitUiEvent(
-                    SettingsEvent.TurnOffReminderNotificationSettingSwitch
+                    SettingsEvent.TurnReminderNotificationSettingSwitch(false)
                 )
             }
         }
@@ -681,7 +681,7 @@ internal class SettingsViewModel @Inject constructor(
                 )
             } else {
                 emitUiEvent(
-                    SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch
+                    SettingsEvent.TurnWeatherInfoFetchSettingSwitch(false)
                 )
                 emitUiEvent(
                     SettingsEvent.NavigateLocationPermissionDialog
@@ -696,7 +696,7 @@ internal class SettingsViewModel @Inject constructor(
                 saveWeatherInfoFetch(true)
             } else {
                 emitUiEvent(
-                    SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch
+                    SettingsEvent.TurnWeatherInfoFetchSettingSwitch(false)
                 )
             }
         }
@@ -780,6 +780,7 @@ internal class SettingsViewModel @Inject constructor(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
+                emitUiEvent(SettingsEvent.TurnReminderNotificationSettingSwitch(false))
                 val appMessage =
                     when (result.exception) {
                         is ReminderNotificationSettingUpdateException.SettingUpdateFailure,
@@ -805,7 +806,7 @@ internal class SettingsViewModel @Inject constructor(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                emitUiEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch)
+                emitUiEvent(SettingsEvent.TurnReminderNotificationSettingSwitch(true))
                 val appMessage =
                     when (result.exception) {
                         is ReminderNotificationSettingUpdateException.SettingUpdateFailure,
@@ -840,7 +841,7 @@ internal class SettingsViewModel @Inject constructor(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                emitUiEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch)
+                emitUiEvent(SettingsEvent.TurnPasscodeLockSettingSwitch(!value))
                 val appMessage =
                     when (result.exception) {
                         is PassCodeSettingUpdateException.UpdateFailure,
@@ -866,7 +867,7 @@ internal class SettingsViewModel @Inject constructor(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                emitUiEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch)
+                emitUiEvent(SettingsEvent.TurnWeatherInfoFetchSettingSwitch(!value))
                 val appMessage =
                     when (result.exception) {
                         is WeatherInfoFetchSettingUpdateException.Unknown,

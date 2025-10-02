@@ -243,14 +243,14 @@ class SettingsFragment :
             is SettingsEvent.ShowRequestAccessLocationPermissionRationale -> {
                 showRequestAccessLocationPermissionRationale()
             }
-            is SettingsEvent.TurnOffReminderNotificationSettingSwitch -> {
-                binding.includeReminderNotificationSetting.materialSwitch.isChecked = false
+            is SettingsEvent.TurnReminderNotificationSettingSwitch -> {
+                binding.includeReminderNotificationSetting.materialSwitch.isChecked = event.isChecked
             }
-            is SettingsEvent.TurnOffPasscodeLockSettingSwitch -> {
-                binding.includePasscodeLockSetting.materialSwitch.isChecked = false
+            is SettingsEvent.TurnPasscodeLockSettingSwitch -> {
+                binding.includePasscodeLockSetting.materialSwitch.isChecked = event.isChecked
             }
-            is SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch -> {
-                binding.includeWeatherInfoFetchSetting.materialSwitch.isChecked = false
+            is SettingsEvent.TurnWeatherInfoFetchSettingSwitch -> {
+                binding.includeWeatherInfoFetchSetting.materialSwitch.isChecked = event.isChecked
             }
             is SettingsEvent.ShowApplicationDetailsSettings -> {
                 showApplicationDetailsSettings()

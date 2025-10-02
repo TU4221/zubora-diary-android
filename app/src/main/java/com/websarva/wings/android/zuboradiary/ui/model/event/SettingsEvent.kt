@@ -23,9 +23,9 @@ sealed class SettingsEvent : UiEvent {
     internal data object CheckAccessLocationPermission : SettingsEvent()
     internal data object CheckShouldShowRequestAccessLocationPermissionRationale : SettingsEvent()
     internal data object ShowRequestAccessLocationPermissionRationale : SettingsEvent()
-    internal data object TurnOffReminderNotificationSettingSwitch : SettingsEvent()
-    internal data object TurnOffPasscodeLockSettingSwitch : SettingsEvent()
-    internal data object TurnOffWeatherInfoFetchSettingSwitch : SettingsEvent()
+    internal data class TurnReminderNotificationSettingSwitch(val isChecked: Boolean) : SettingsEvent()
+    internal data class TurnPasscodeLockSettingSwitch(val isChecked: Boolean) : SettingsEvent()
+    internal data class TurnWeatherInfoFetchSettingSwitch(val isChecked: Boolean) : SettingsEvent()
     internal data object ShowApplicationDetailsSettings : SettingsEvent()
 
     internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : SettingsEvent()
