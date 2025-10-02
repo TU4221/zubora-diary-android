@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.SavedDiaryDateRange
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -49,16 +50,16 @@ internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
         } catch (e: ResourceNotFoundException) {
             Log.i(logTag, "${logMsg}完了_保存された日記が存在しない為、今日の日付のみを範囲とする", e)
             UseCaseResult.Success(SavedDiaryDateRange())
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                DiaryListStartYearMonthPickerDateRangeLoadException.Unknown(e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_読込エラー", e)
             UseCaseResult.Failure(
                 DiaryListStartYearMonthPickerDateRangeLoadException
                     .DiaryInfoLoadFailure(e)
-            )
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(
-                DiaryListStartYearMonthPickerDateRangeLoadException.Unknown(e)
             )
         }
     }

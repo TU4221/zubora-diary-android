@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
@@ -48,15 +49,15 @@ internal class DeleteDiaryUseCase(
             diaryRepository.deleteDiary(date)
         } catch (e: ResourceNotFoundException) {
             Log.w(logTag, "${logMsg}警告_削除する日記データがみつからないため、成功とみなす", e)
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            return UseCaseResult.Failure(
+                DiaryDeleteException.Unknown(e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_日記データ削除エラー", e)
             return UseCaseResult.Failure(
                 DiaryDeleteException.DiaryDataDeleteFailure(date, e)
-            )
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            return UseCaseResult.Failure(
-                DiaryDeleteException.Unknown(e)
             )
         }
 
@@ -66,6 +67,11 @@ internal class DeleteDiaryUseCase(
                 fileRepository.deleteImageFileInPermanent(imageFileName)
             } catch (e: ResourceNotFoundException) {
                 Log.w(logTag, "${logMsg}警告_削除する日記の画像ファイルがみつからないため、成功とみなす", e)
+            } catch (e: UnknownException) {
+                Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                return UseCaseResult.Failure(
+                    DiaryDeleteException.Unknown(e)
+                )
             } catch (e: DomainException) {
                 // TODO:下記仕様で問題ないか後で検討。
                 //      現在考えれる問題点
@@ -79,11 +85,6 @@ internal class DeleteDiaryUseCase(
                 Log.e(logTag, "${logMsg}警告_画像ファイル削除エラー", e)
                 return UseCaseResult.Failure(
                     DiaryDeleteException.ImageFileDeleteFailure(date, imageFileName, e)
-                )
-            } catch (e: Exception) {
-                Log.e(logTag, "${logMsg}失敗_原因不明", e)
-                return UseCaseResult.Failure(
-                    DiaryDeleteException.Unknown(e)
                 )
             }
         }

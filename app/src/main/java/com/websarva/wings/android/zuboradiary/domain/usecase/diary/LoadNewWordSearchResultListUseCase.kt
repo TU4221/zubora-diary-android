@@ -73,11 +73,6 @@ internal class LoadNewWordSearchResultListUseCase(
                     )
                 }
             }
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(
-                WordSearchResultListNewLoadException.Unknown(e)
-            )
         }
     }
 

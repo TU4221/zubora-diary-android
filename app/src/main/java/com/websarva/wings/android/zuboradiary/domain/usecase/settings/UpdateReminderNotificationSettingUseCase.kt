@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.domain.exception.SchedulingException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -75,15 +76,15 @@ internal class UpdateReminderNotificationSettingUseCase(
             return UseCaseResult.Failure(
                 ReminderNotificationSettingUpdateException.InsufficientStorage(setting, e)
             )
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                ReminderNotificationSettingUpdateException.Unknown(e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
             UseCaseResult.Failure(
                 ReminderNotificationSettingUpdateException.SettingUpdateFailure(setting, e)
-            )
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(
-                ReminderNotificationSettingUpdateException.Unknown(e)
             )
         }
     }

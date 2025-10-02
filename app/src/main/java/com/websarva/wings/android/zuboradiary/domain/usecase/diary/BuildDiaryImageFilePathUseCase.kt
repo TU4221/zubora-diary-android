@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageFilePathBuildingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -44,16 +45,16 @@ internal class BuildDiaryImageFilePathUseCase(
                 }
             Log.i(logTag, "${logMsg}完了 (ファイルパス: $path)")
             UseCaseResult.Success(path)
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            return UseCaseResult.Failure(
+                DiaryImageFilePathBuildingException.Unknown(e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_ファイルパス構築エラー", e)
             UseCaseResult.Failure(
                 DiaryImageFilePathBuildingException
                     .BuildingFailure(fileName, e)
-            )
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            return UseCaseResult.Failure(
-                DiaryImageFilePathBuildingException.Unknown(e)
             )
         }
     }

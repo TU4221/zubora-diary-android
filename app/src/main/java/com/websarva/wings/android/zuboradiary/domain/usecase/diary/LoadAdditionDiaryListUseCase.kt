@@ -82,11 +82,6 @@ internal class LoadAdditionDiaryListUseCase(
                     )
                 }
             }
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(
-                DiaryListAdditionLoadException.Unknown(e)
-            )
         }
     }
 

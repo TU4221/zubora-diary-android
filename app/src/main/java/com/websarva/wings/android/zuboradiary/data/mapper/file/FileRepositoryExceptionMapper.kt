@@ -4,7 +4,6 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.DirectoryDelet
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileAlreadyExistsException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileDeleteException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileNotFoundException
-import com.websarva.wings.android.zuboradiary.data.file.exception.FileOperationException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FilePermissionDeniedException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileReadException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileWriteException
@@ -16,10 +15,11 @@ import com.websarva.wings.android.zuboradiary.domain.exception.PermissionExcepti
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 
 internal object FileRepositoryExceptionMapper
-    : RepositoryExceptionMapper<FileOperationException> {
-    override fun toDomainException(e: FileOperationException): DomainException {
+    : RepositoryExceptionMapper {
+    override fun toDomainException(e: Exception): DomainException {
         return when (e) {
             is DirectoryDeletionFailedException -> DataStorageException(cause = e)
             is FileAlreadyExistsException -> ResourceAlreadyExistsException(cause = e)
@@ -29,7 +29,8 @@ internal object FileRepositoryExceptionMapper
             is FilePermissionDeniedException -> PermissionException(cause = e)
             is FileReadException -> DataStorageException(cause = e)
             is FileWriteException -> DataStorageException(cause = e)
-            else -> DataStorageException(cause = e)
+            is RuntimeException -> throw e
+            else -> UnknownException(cause = e)
         }
     }
 }

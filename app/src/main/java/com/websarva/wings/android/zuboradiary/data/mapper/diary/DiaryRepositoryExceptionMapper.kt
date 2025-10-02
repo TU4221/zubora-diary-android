@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.mapper.diary
 
 import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseCorruptionException
-import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseException
 import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseInitializationException
 import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseStateException
 import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseStorageFullException
@@ -14,10 +13,10 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageExcept
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 
-internal object DiaryRepositoryExceptionMapper
-    : RepositoryExceptionMapper<DatabaseException> {
-    override fun toDomainException(e: DatabaseException): DomainException {
+internal object DiaryRepositoryExceptionMapper : RepositoryExceptionMapper {
+    override fun toDomainException(e: Exception): DomainException {
         return when (e) {
             is DatabaseCorruptionException -> DataStorageException(cause = e)
             is DatabaseInitializationException -> DataStorageException(cause = e)
@@ -27,7 +26,8 @@ internal object DiaryRepositoryExceptionMapper
             is RecordNotFoundException -> ResourceNotFoundException(cause = e)
             is RecordReadException -> DataStorageException(cause = e)
             is RecordUpdateException -> DataStorageException(cause = e)
-            else -> DataStorageException(cause = e)
+            is RuntimeException -> throw e
+            else -> UnknownException(cause = e)
         }
     }
 }

@@ -4,6 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageCacheFileClearException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -36,15 +37,15 @@ internal class ClearDiaryImageCacheFileUseCase(
         } catch (e: ResourceNotFoundException) {
             Log.e(logTag, "${logMsg}失敗_対象ファイルなしのため、成功とみなす", e)
             UseCaseResult.Success(Unit)
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                DiaryImageCacheFileClearException.Unknown(e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_クリアエラー", e)
             UseCaseResult.Failure(
                 DiaryImageCacheFileClearException.ClearFailure(e)
-            )
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(
-                DiaryImageCacheFileClearException.Unknown(e)
             )
         }
     }

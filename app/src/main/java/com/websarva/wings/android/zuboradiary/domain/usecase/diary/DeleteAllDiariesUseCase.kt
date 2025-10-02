@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.AllDiariesDeleteException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -37,15 +38,15 @@ internal class DeleteAllDiariesUseCase(
 
         try {
             diaryRepository.deleteAllDiaries()
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            return UseCaseResult.Failure(
+                AllDiariesDeleteException.Unknown(e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_日記データ削除エラー", e)
             return UseCaseResult.Failure(
                 AllDiariesDeleteException.DeleteFailure(e)
-            )
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            return UseCaseResult.Failure(
-                AllDiariesDeleteException.Unknown(e)
             )
         }
 
@@ -53,15 +54,15 @@ internal class DeleteAllDiariesUseCase(
             fileRepository.clearAllImageFiles()
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                AllDiariesDeleteException.Unknown(e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_画像ファイル削除エラー", e)
             UseCaseResult.Failure(
                 AllDiariesDeleteException.ImageFileDeleteFailure(e)
-            )
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(
-                AllDiariesDeleteException.Unknown(e)
             )
         }
     }

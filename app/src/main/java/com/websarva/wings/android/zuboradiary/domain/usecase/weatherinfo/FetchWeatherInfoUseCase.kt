@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterE
 import com.websarva.wings.android.zuboradiary.domain.exception.LocationException
 import com.websarva.wings.android.zuboradiary.domain.exception.NetworkConnectionException
 import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -67,7 +68,7 @@ internal class FetchWeatherInfoUseCase(
             UseCaseResult.Failure(
                 WeatherInfoFetchException.FetchFailure(date, e)
             )
-        } catch (e: Exception) {
+        } catch (e: UnknownException) {
             Log.e(logTag, "${logMsg}失敗_原因不明", e)
             UseCaseResult.Failure(
                 WeatherInfoFetchException.Unknown(e)

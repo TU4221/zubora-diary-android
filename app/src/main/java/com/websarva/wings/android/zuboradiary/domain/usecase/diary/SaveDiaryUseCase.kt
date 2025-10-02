@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterE
 import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
 import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -72,12 +73,12 @@ internal class SaveDiaryUseCase(
         } catch (e: InsufficientStorageException) {
             Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
             return UseCaseResult.Failure(DiarySaveException.InsufficientStorage(saveDate, e))
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            return UseCaseResult.Failure(DiarySaveException.Unknown(e))
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_日記データ保存エラー", e)
             return UseCaseResult.Failure(DiarySaveException.SaveFailure(saveDate, e))
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            return UseCaseResult.Failure(DiarySaveException.Unknown(e))
         }
 
         // 画像ファイル処理、日記項目選択履歴データ処理
@@ -109,14 +110,15 @@ internal class SaveDiaryUseCase(
                         Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
                         DiarySaveException.InsufficientStorage(saveDate, e)
                     }
+                    is UnknownException -> {
+                        Log.e(logTag, "${logMsg}失敗_原因不明", e)
+                        DiarySaveException.Unknown(e)
+                    }
                     is DomainException -> {
                         Log.e(logTag, "${logMsg}失敗_日記保存エラー", e)
                         DiarySaveException.SaveFailure(saveDate, e)
                     }
-                    else -> {
-                        Log.e(logTag, "${logMsg}失敗_原因不明", e)
-                        DiarySaveException.Unknown(e)
-                    }
+                    else -> throw e
                 }
             return UseCaseResult.Failure(wrappedException)
         }
@@ -124,7 +126,7 @@ internal class SaveDiaryUseCase(
         // バックアップ画像ファイル削除
         try {
             fileRepository.clearAllImageFilesInBackup()
-        } catch (e: Exception) {
+        } catch (e: DomainException) {
             Log.w(logTag, "${logMsg}警告_バックアップ画像ファイル削除エラー", e)
             // 日記保存は成功している為、成功とみなす。
         }

@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -39,12 +40,12 @@ internal class LoadDiaryUseCase(
             val diary = diaryRepository.loadDiary(date)
             Log.i(logTag, "${logMsg}完了 (取得日記: $diary)")
             UseCaseResult.Success(diary)
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明")
+            UseCaseResult.Failure(DiaryLoadException.Unknown(e))
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_読込処理エラー (日付: $date)", e)
             UseCaseResult.Failure(DiaryLoadException.LoadFailure(date, e))
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明")
-            UseCaseResult.Failure(DiaryLoadException.Unknown(e))
         }
     }
 }

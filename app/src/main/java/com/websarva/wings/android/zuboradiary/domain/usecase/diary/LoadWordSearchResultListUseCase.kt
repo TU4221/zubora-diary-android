@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayLi
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -69,14 +70,14 @@ internal class LoadWordSearchResultListUseCase(
             val convertedList = convertWordSearchResultList(wordSearchResultList, searchWord)
             Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${convertedList.countDiaries()})")
             UseCaseResult.Success(convertedList)
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(WordSearchResultListLoadException.Unknown(e))
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_読込エラー", e)
             UseCaseResult.Failure(
                 WordSearchResultListLoadException.LoadFailure(searchWord, e)
             )
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(WordSearchResultListLoadException.Unknown(e))
         }
     }
 

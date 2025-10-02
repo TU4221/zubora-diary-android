@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -60,6 +61,18 @@ internal class LoadReminderNotificationSettingUseCase(
                             )
                             UseCaseResult.Success(defaultSettingValue)
                         }
+                        is UnknownException -> {
+                            Log.w(
+                                logTag,
+                                "${logMsg}失敗_原因不明、" +
+                                        "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
+                                cause
+                            )
+                            UseCaseResult.Failure(
+                                ReminderNotificationSettingLoadException
+                                    .Unknown(defaultSettingValue, cause),
+                            )
+                        }
                         is DomainException -> {
                             Log.w(
                                 logTag,
@@ -72,18 +85,7 @@ internal class LoadReminderNotificationSettingUseCase(
                                     .LoadFailure(defaultSettingValue, cause),
                             )
                         }
-                        else -> {
-                            Log.w(
-                                logTag,
-                                "${logMsg}失敗_原因不明、" +
-                                        "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
-                                cause
-                            )
-                            UseCaseResult.Failure(
-                                ReminderNotificationSettingLoadException
-                                    .Unknown(defaultSettingValue, cause),
-                            )
-                        }
+                        else -> throw cause
                     }
                 emit(result)
             }

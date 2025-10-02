@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryList
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -50,12 +51,16 @@ internal class LoadDiaryItemTitleSelectionHistoryListUseCase(
             }
             .catch {
                 val wrappedException =
-                    if (it is DomainException) {
-                        Log.d(logTag, "${logMsg}失敗_読込エラー")
-                        DiaryItemTitleSelectionHistoryLoadException.LoadFailure(it)
-                    } else {
-                        Log.d(logTag, "${logMsg}読込失敗_原因不明")
-                        DiaryItemTitleSelectionHistoryLoadException.Unknown(it)
+                    when (it) {
+                        is UnknownException -> {
+                            Log.d(logTag, "${logMsg}読込失敗_原因不明")
+                            DiaryItemTitleSelectionHistoryLoadException.Unknown(it)
+                        }
+                        is DomainException -> {
+                            Log.d(logTag, "${logMsg}失敗_読込エラー")
+                            DiaryItemTitleSelectionHistoryLoadException.LoadFailure(it)
+                        }
+                        else -> throw it
                     }
                 UseCaseResult.Failure(wrappedException)
             }

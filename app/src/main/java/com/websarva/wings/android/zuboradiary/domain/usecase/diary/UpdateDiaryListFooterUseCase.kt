@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearM
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import java.time.LocalDate
 
@@ -53,12 +54,12 @@ internal class UpdateDiaryListFooterUseCase(
                     list.replaceFooterWithNoDiaryMessage()
                 }
             UseCaseResult.Success(replacedDiaryList)
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(DiaryListFooterUpdateException.Unknown(e))
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_未読込の日記存在確認エラー", e)
             UseCaseResult.Failure(DiaryListFooterUpdateException.UpdateFailure(e))
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(DiaryListFooterUpdateException.Unknown(e))
         }
     }
 

@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryDeleteException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -35,15 +36,15 @@ internal class DeleteDiaryItemTitleSelectionHistoryUseCase(
             diaryRepository.deleteDiaryItemTitleSelectionHistory(deleteTitle)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                DiaryItemTitleSelectionHistoryDeleteException.Unknown(e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_削除エラー", e)
             UseCaseResult.Failure(
                 DiaryItemTitleSelectionHistoryDeleteException.DeleteFailure(deleteTitle, e)
-            )
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(
-                DiaryItemTitleSelectionHistoryDeleteException.Unknown(e)
             )
         }
     }

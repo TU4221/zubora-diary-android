@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.SettingsReposito
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -42,15 +43,15 @@ internal class UpdateWeatherInfoFetchSettingUseCase(
             return UseCaseResult.Failure(
                 WeatherInfoFetchSettingUpdateException.InsufficientStorage(setting, e)
             )
+        } catch (e: UnknownException) {
+            Log.e(logTag, "${logMsg}失敗_原因不明", e)
+            UseCaseResult.Failure(
+                WeatherInfoFetchSettingUpdateException.Unknown(e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
             UseCaseResult.Failure(
                 WeatherInfoFetchSettingUpdateException.UpdateFailure(setting, e)
-            )
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(
-                WeatherInfoFetchSettingUpdateException.Unknown(e)
             )
         }
     }

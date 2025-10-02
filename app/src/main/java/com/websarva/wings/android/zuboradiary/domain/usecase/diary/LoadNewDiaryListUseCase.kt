@@ -41,7 +41,7 @@ internal class LoadNewDiaryListUseCase(
 
         return try {
             val loadedDiaryList = loadDiaryList(startDate)
-            val resultList =updateDiaryListFooter(loadedDiaryList, startDate)
+            val resultList = updateDiaryListFooter(loadedDiaryList, startDate)
             Log.i(logTag, "${logMsg}完了 (結果リスト件数: ${resultList.countDiaries()})")
             UseCaseResult.Success(resultList)
         } catch (e: DiaryListLoadException) {
@@ -66,9 +66,6 @@ internal class LoadNewDiaryListUseCase(
                     UseCaseResult.Failure(DiaryListNewLoadException.Unknown(e))
                 }
             }
-        } catch (e: Exception) {
-            Log.e(logTag, "${logMsg}失敗_原因不明", e)
-            UseCaseResult.Failure(DiaryListNewLoadException.Unknown(e))
         }
     }
 
