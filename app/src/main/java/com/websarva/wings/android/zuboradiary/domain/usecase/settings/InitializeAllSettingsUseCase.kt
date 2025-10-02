@@ -53,11 +53,11 @@ internal class InitializeAllSettingsUseCase(
         Log.i(logTag, "${logMsg}開始")
 
         return try {
-            updateThemeColorSettingUseCase(ThemeColorSetting())
-            updateCalendarStartDayOfWeekSettingUseCase(CalendarStartDayOfWeekSetting())
-            updateReminderNotificationSettingUseCase(ReminderNotificationSetting.Disabled)
-            updatePasscodeLockSettingUseCase(PasscodeLockSetting.Disabled)
-            updateWeatherInfoFetchSettingUseCase(WeatherInfoFetchSetting())
+            initializeThemeColorSetting()
+            initializeCalendarStartDayOfWeekSetting()
+            initializeReminderNotificationSetting()
+            initializePasscodeLockSetting()
+            initializeWeatherInfoFetchSetting()
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
         } catch (e: ThemeColorSettingUpdateException) {
@@ -170,6 +170,66 @@ internal class InitializeAllSettingsUseCase(
             UseCaseResult.Failure(
                 AllSettingsInitializationException.Unknown(e)
             )
+        }
+    }
+
+    /**
+     * テーマカラー設定を初期化する。
+     *
+     * @throws ThemeColorSettingUpdateException テーマカラー設定の初期化に失敗した場合。
+     */
+    private suspend fun initializeThemeColorSetting() {
+        when (val result = updateThemeColorSettingUseCase(ThemeColorSetting())) {
+            is UseCaseResult.Success -> { /*処理なし*/ }
+            is UseCaseResult.Failure -> throw result.exception
+        }
+    }
+
+    /**
+     * カレンダーの週の開始曜日設定を初期化する。
+     *
+     * @throws CalendarStartDayOfWeekSettingUpdateException カレンダーの週の開始曜日設定の初期化に失敗した場合。
+     */
+    private suspend fun initializeCalendarStartDayOfWeekSetting() {
+        when (val result = updateCalendarStartDayOfWeekSettingUseCase(CalendarStartDayOfWeekSetting())) {
+            is UseCaseResult.Success -> { /*処理なし*/ }
+            is UseCaseResult.Failure -> throw result.exception
+        }
+    }
+
+    /**
+     * リマインダー通知設定を初期化する。
+     *
+     * @throws ReminderNotificationSettingUpdateException リマインダー通知設定の初期化に失敗した場合。
+     */
+    private suspend fun initializeReminderNotificationSetting() {
+        when (val result = updateReminderNotificationSettingUseCase(ReminderNotificationSetting.Disabled)) {
+            is UseCaseResult.Success -> { /*処理なし*/ }
+            is UseCaseResult.Failure -> throw result.exception
+        }
+    }
+
+    /**
+     * パスコードロック設定を初期化する。
+     *
+     * @throws PassCodeSettingUpdateException パスコードロック設定の初期化に失敗した場合。
+     */
+    private suspend fun initializePasscodeLockSetting() {
+        when (val result = updatePasscodeLockSettingUseCase(PasscodeLockSetting.Disabled)) {
+            is UseCaseResult.Success -> { /*処理なし*/ }
+            is UseCaseResult.Failure -> throw result.exception
+        }
+    }
+
+    /**
+     * 天気情報取得設定を初期化する。
+     *
+     * @throws WeatherInfoFetchSettingUpdateException 天気情報取得設定の初期化に失敗した場合。
+     */
+    private suspend fun initializeWeatherInfoFetchSetting() {
+        when (val result = updateWeatherInfoFetchSettingUseCase(WeatherInfoFetchSetting())) {
+            is UseCaseResult.Success -> { /*処理なし*/ }
+            is UseCaseResult.Failure -> throw result.exception
         }
     }
 }
