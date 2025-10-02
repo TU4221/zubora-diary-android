@@ -25,14 +25,22 @@ internal sealed class PassCodeSettingUpdateException(
         setting: PasscodeLockSetting,
         cause: Throwable
     ) : PassCodeSettingUpdateException(
-        "パスコード設定 '${
-            if (setting.isEnabled) {
-                "有効"
-            } else {
-                "無効"
-            }
-        }' の更新に失敗しました。"
-        , cause
+        createExceptionBaseMessage(setting),
+        cause
+    )
+
+    /**
+     * ストレージ容量不足により、パスコード設定の更新に失敗した場合にスローされる例外。
+     *
+     * @param setting 更新しようとした設定 [PasscodeLockSetting] 。
+     * @param cause 発生した根本的な原因となった[Throwable]。
+     */
+    class InsufficientStorage(
+        setting: PasscodeLockSetting,
+        cause: Throwable
+    ) : PassCodeSettingUpdateException(
+        "ストレージ容量不足により、" + createExceptionBaseMessage(setting),
+        cause
     )
 
     /**
@@ -46,4 +54,20 @@ internal sealed class PassCodeSettingUpdateException(
         "予期せぬエラーが発生しました。",
         cause
     )
+
+    companion object {
+        /**
+         * 指定された設定に基づき、パスコード設定の更新失敗エラーメッセージの共通部分を生成する。
+         *
+         * 具体的なエラー原因は含めず、どの設定の更新に失敗したかを識別するための基本メッセージとなる。
+         *
+         * @param setting 更新に失敗した [PasscodeLockSetting]。
+         * @return 更新対象の設定値を含む、基本的なエラーメッセージ文字列。
+         *         例: "パスコード設定 '有効' の更新に失敗しました。"
+         */
+        private fun createExceptionBaseMessage(setting: PasscodeLockSetting): String {
+            val status = if (setting.isEnabled) "有効" else "無効"
+            return "パスコード設定 '$status' の更新に失敗しました。"
+        }
+    }
 }

@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.SettingsReposito
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.domain.exception.SchedulingException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -69,6 +70,11 @@ internal class UpdateReminderNotificationSettingUseCase(
                     }
                 }
             UseCaseResult.Failure(wrappedException)
+        } catch (e: InsufficientStorageException) {
+            Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
+            return UseCaseResult.Failure(
+                ReminderNotificationSettingUpdateException.InsufficientStorage(setting, e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_設定更新エラー", e)
             UseCaseResult.Failure(

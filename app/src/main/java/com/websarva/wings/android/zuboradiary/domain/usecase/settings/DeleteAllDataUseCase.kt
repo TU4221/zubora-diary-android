@@ -78,6 +78,10 @@ internal class DeleteAllDataUseCase(
                         Log.e(logTag, "${logMsg}失敗_設定初期化エラー", e)
                         AllDataDeleteException.SettingsInitializationFailure(e)
                     }
+                    is AllSettingsInitializationException.InsufficientStorage -> {
+                        Log.e(logTag, "${logMsg}失敗_ストレージ容量不足による設定初期化エラー", e)
+                        AllDataDeleteException.SettingsInitializationInsufficientStorageFailure(e)
+                    }
                     is AllSettingsInitializationException.Unknown -> {
                         Log.e(logTag, "${logMsg}失敗_原因不明", e)
                         AllDataDeleteException.Unknown(e)

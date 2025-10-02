@@ -11,7 +11,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataNotFoundException
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreReadException
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreWriteException
-import com.websarva.wings.android.zuboradiary.data.preferences.exception.InsufficientStorageException
+import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreInsufficientStorageException
 import com.websarva.wings.android.zuboradiary.data.utils.isInsufficientStorage
 import com.websarva.wings.android.zuboradiary.di.ApplicationScope
 import kotlinx.coroutines.CoroutineDispatcher
@@ -278,6 +278,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param value 更新するテーマカラー設定。
      * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
+     * @throws DataStoreInsufficientStorageException ストレージの空き容量が不足した場合。
      */
     suspend fun updateThemeColorPreference(value: ThemeColorPreference) {
         withContext(dispatcher) {
@@ -292,6 +293,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param value 更新するカレンダー開始曜日設定。
      * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
+     * @throws DataStoreInsufficientStorageException ストレージの空き容量が不足した場合。
      */
     suspend fun updateCalendarStartDayOfWeekPreference(value: CalendarStartDayOfWeekPreference) {
         withContext(dispatcher) {
@@ -306,6 +308,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param value 更新するリマインダー通知設定。
      * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
+     * @throws DataStoreInsufficientStorageException ストレージの空き容量が不足した場合。
      */
     suspend fun updateReminderNotificationPreference(value: ReminderNotificationPreference) {
         withContext(dispatcher) {
@@ -321,6 +324,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param value 更新するパスコードロック設定。
      * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
+     * @throws DataStoreInsufficientStorageException ストレージの空き容量が不足した場合。
      */
     suspend fun updatePasscodeLockPreference(value: PasscodeLockPreference) {
         withContext(dispatcher) {
@@ -336,6 +340,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      *
      * @param value 更新する天気情報取得設定。
      * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
+     * @throws DataStoreInsufficientStorageException ストレージの空き容量が不足した場合。
      */
     suspend fun updateWeatherInfoFetchPreference(value: WeatherInfoFetchPreference) {
         withContext(dispatcher) {
@@ -355,7 +360,7 @@ internal class UserPreferencesDataSource @Inject constructor(
      * @param operation [MutablePreferences] を引数に取り、DataStoreへの書き込み処理を行うsuspend関数。
      * @return DataStoreの編集操作後の [Preferences] オブジェクト。
      * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
-     * @throws InsufficientStorageException ストレージの空き容量が不足した場合。
+     * @throws DataStoreInsufficientStorageException ストレージの空き容量が不足した場合。
      */
     private suspend fun executeDataStoreEditOperation(
         operation: suspend (MutablePreferences) -> Unit
@@ -366,7 +371,7 @@ internal class UserPreferencesDataSource @Inject constructor(
             }
         } catch (e: IOException) {
             throw if (e.isInsufficientStorage()) {
-                InsufficientStorageException(e)
+                DataStoreInsufficientStorageException(e)
             } else {
                 DataStoreWriteException(cause = e)
             }

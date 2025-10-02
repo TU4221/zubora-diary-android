@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.repository
 import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
@@ -72,6 +73,7 @@ internal interface FileRepository {
      * @throws ResourceNotFoundException 指定されたURI/ファイルパスの画像が見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws DataStorageException ファイルの保存に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun cacheImageFile(uriString: String, fileBaseName: String): FileName
 
@@ -83,6 +85,7 @@ internal interface FileRepository {
      * @throws ResourceNotFoundException 移動元ファイルが見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun moveImageFileToPermanent(fileName: FileName)
 
@@ -94,6 +97,7 @@ internal interface FileRepository {
      * @throws ResourceNotFoundException 移動元ファイルが見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun moveImageFileToBackup(fileName: FileName)
 
@@ -106,6 +110,7 @@ internal interface FileRepository {
      * @throws ResourceNotFoundException 復元元ファイルが見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException 復元先に同名のファイルが既に存在する場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun restoreImageFileFromPermanent(fileName: FileName)
 
@@ -118,6 +123,7 @@ internal interface FileRepository {
      * @throws ResourceNotFoundException 復元元ファイルが見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException 復元先に同名のファイルが既に存在する場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun restoreImageFileFromBackup(fileName: FileName)
 

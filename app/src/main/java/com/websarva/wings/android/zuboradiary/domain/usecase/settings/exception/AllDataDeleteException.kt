@@ -51,6 +51,18 @@ internal sealed class AllDataDeleteException(
     )
 
     /**
+     * ストレージ容量不足により、全ての設定の初期化に失敗した場合の例外。
+     *
+     * @param cause 発生した根本的な原因となった[Throwable]。
+     */
+    class SettingsInitializationInsufficientStorageFailure(
+        cause: Throwable
+    ) : AllDataDeleteException(
+        "ストレージ容量不足により、全ての設定の初期化に失敗しました。",
+        cause
+    )
+
+    /**
      * 予期せぬエラーが発生した場合の例外。
      *
      * @param cause 発生した根本的な原因となった [Throwable]。

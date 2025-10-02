@@ -23,6 +23,14 @@ internal sealed class DiaryEditAppMessage(
         private fun readResolve(): Any = DiarySaveFailure
     }
 
+    data object DiarySaveInsufficientStorageFailure :  DiaryEditAppMessage(
+        R.string.dialog_app_message_title_storage_error,
+        R.string.dialog_diary_edit_app_message_diary_save_insufficient_storage_failure
+    ) {
+        // デシリアライズ時のシングルトン性を維持
+        private fun readResolve(): Any = DiarySaveFailure
+    }
+
     data object DiaryDeleteFailure :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_edit_app_message_diary_delete_failure
@@ -74,6 +82,14 @@ internal sealed class DiaryEditAppMessage(
     data object ImageLoadFailure :  DiaryEditAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_diary_edit_app_message_image_load_failure
+    ) {
+        // デシリアライズ時のシングルトン性を維持
+        private fun readResolve(): Any = ImageLoadFailure
+    }
+
+    data object ImageLoadInsufficientStorageFailure :  DiaryEditAppMessage(
+        R.string.dialog_app_message_title_storage_error,
+        R.string.dialog_diary_edit_app_message_image_load_insufficient_storage_failure
     ) {
         // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = ImageLoadFailure

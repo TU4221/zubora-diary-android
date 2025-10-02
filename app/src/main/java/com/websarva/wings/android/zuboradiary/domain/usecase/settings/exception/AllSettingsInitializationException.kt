@@ -27,6 +27,18 @@ internal sealed class AllSettingsInitializationException(
     )
 
     /**
+     * ストレージ容量不足により、設定の初期化に失敗した場合にスローされる例外。
+     *
+     * @param cause 発生した根本的な原因となった[Throwable]。
+     */
+    class InsufficientStorage(
+        cause: Throwable
+    ) : AllSettingsInitializationException(
+        "ストレージ容量不足により、設定の初期化に失敗しました。",
+        cause
+    )
+
+    /**
      * 予期せぬエラーが発生した場合の例外。
      *
      * @param cause 発生した根本的な原因となった [Throwable]。

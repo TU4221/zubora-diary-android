@@ -68,6 +68,12 @@ internal class InitializeAllSettingsUseCase(
                         AllSettingsInitializationException.InitializationFailure(e)
                     )
                 }
+                is ThemeColorSettingUpdateException.InsufficientStorage -> {
+                    Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.InsufficientStorage(e)
+                    )
+                }
                 is ThemeColorSettingUpdateException.Unknown -> {
                     Log.e(logTag, "${logMsg}失敗_原因不明", e)
                     UseCaseResult.Failure(
@@ -81,6 +87,12 @@ internal class InitializeAllSettingsUseCase(
                     Log.e(logTag, "${logMsg}失敗_カレンダー開始曜日設定保存エラー", e)
                     UseCaseResult.Failure(
                         AllSettingsInitializationException.InitializationFailure(e)
+                    )
+                }
+                is CalendarStartDayOfWeekSettingUpdateException.InsufficientStorage -> {
+                    Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.InsufficientStorage(e)
                     )
                 }
                 is CalendarStartDayOfWeekSettingUpdateException.Unknown -> {
@@ -98,6 +110,12 @@ internal class InitializeAllSettingsUseCase(
                         AllSettingsInitializationException.InitializationFailure(e)
                     )
                 }
+                is ReminderNotificationSettingUpdateException.InsufficientStorage -> {
+                    Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.InsufficientStorage(e)
+                    )
+                }
                 is ReminderNotificationSettingUpdateException.Unknown -> {
                     Log.e(logTag, "${logMsg}失敗_原因不明", e)
                     UseCaseResult.Failure(
@@ -113,6 +131,12 @@ internal class InitializeAllSettingsUseCase(
                         AllSettingsInitializationException.InitializationFailure(e)
                     )
                 }
+                is PassCodeSettingUpdateException.InsufficientStorage -> {
+                    Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.InsufficientStorage(e)
+                    )
+                }
                 is PassCodeSettingUpdateException.Unknown -> {
                     Log.e(logTag, "${logMsg}失敗_原因不明", e)
                     UseCaseResult.Failure(
@@ -126,6 +150,12 @@ internal class InitializeAllSettingsUseCase(
                     Log.e(logTag, "${logMsg}失敗_天気情報取得設定保存エラー", e)
                     UseCaseResult.Failure(
                         AllSettingsInitializationException.InitializationFailure(e)
+                    )
+                }
+                is WeatherInfoFetchSettingUpdateException.InsufficientStorage -> {
+                    Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
+                    UseCaseResult.Failure(
+                        AllSettingsInitializationException.InsufficientStorage(e)
                     )
                 }
                 is WeatherInfoFetchSettingUpdateException.Unknown -> {

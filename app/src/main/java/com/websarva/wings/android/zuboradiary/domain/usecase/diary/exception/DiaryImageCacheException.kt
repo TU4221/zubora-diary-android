@@ -27,6 +27,18 @@ internal sealed class DiaryImageCacheException(
     )
 
     /**
+     * ストレージ容量不足により、日記用の画像のキャッシュに失敗した場合の例外。
+     *
+     * @param cause 発生した根本的な原因となった [Throwable]。
+     */
+    class InsufficientStorage(
+        cause: Throwable
+    ) : DiaryImageCacheException(
+        "ストレージ容量不足により、画像ファイルの保存に失敗しました。",
+        cause
+    )
+
+    /**
      * 予期せぬエラーが発生した場合の例外。
      *
      * @param cause 発生した根本的な原因となった [Throwable]。

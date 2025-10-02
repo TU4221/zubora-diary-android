@@ -26,6 +26,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ClearDiaryIma
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CacheDiaryImageUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageCacheException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiarySaveException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.CheckWeatherInfoFetchEnabledUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
@@ -815,7 +817,15 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}失敗")
                 updateUiState(DiaryEditState.Editing)
-                emitAppMessageEvent(DiaryEditAppMessage.DiarySaveFailure)
+                val appMessage =
+                    when (result.exception) {
+                        is DiarySaveException.SaveFailure,
+                        is DiarySaveException.Unknown -> DiaryEditAppMessage.DiarySaveFailure
+                        is DiarySaveException.InsufficientStorage -> {
+                            DiaryEditAppMessage.DiarySaveInsufficientStorageFailure
+                        }
+                    }
+                emitAppMessageEvent(appMessage)
             }
         }
     }
@@ -1067,7 +1077,15 @@ internal class DiaryEditViewModel @Inject constructor(
                     updateImageFileName(result.value.toUiModel())
                 }
                 is UseCaseResult.Failure -> {
-                    emitAppMessageEvent(DiaryEditAppMessage.ImageLoadFailure)
+                    val appMessage =
+                        when (result.exception) {
+                            is DiaryImageCacheException.CacheFailure,
+                            is DiaryImageCacheException.Unknown -> DiaryEditAppMessage.ImageLoadFailure
+                            is DiaryImageCacheException.InsufficientStorage -> {
+                                DiaryEditAppMessage.ImageLoadInsufficientStorageFailure
+                            }
+                        }
+                    emitAppMessageEvent(appMessage)
                 }
             }
         }

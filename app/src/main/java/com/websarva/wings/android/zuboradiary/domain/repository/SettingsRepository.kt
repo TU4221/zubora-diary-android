@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNoti
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import kotlinx.coroutines.flow.Flow
 
@@ -68,6 +69,7 @@ internal interface SettingsRepository {
      *
      * @param setting 更新するテーマカラー設定。
      * @throws DataStorageException テーマカラー設定の更新に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun updateThemeColorSetting(setting: ThemeColorSetting)
 
@@ -76,6 +78,7 @@ internal interface SettingsRepository {
      *
      * @param setting 更新するカレンダー開始曜日設定。
      * @throws DataStorageException カレンダー開始曜日設定の更新に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun updateCalendarStartDayOfWeekSetting(setting: CalendarStartDayOfWeekSetting)
 
@@ -84,6 +87,7 @@ internal interface SettingsRepository {
      *
      * @param setting 更新するリマインダー通知設定。
      * @throws DataStorageException リマインダー通知設定の更新に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun updateReminderNotificationSetting(setting: ReminderNotificationSetting)
 
@@ -92,6 +96,7 @@ internal interface SettingsRepository {
      *
      * @param setting 更新するパスコードロック設定。
      * @throws DataStorageException パスコードロック設定の更新に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun updatePasscodeLockSetting(setting: PasscodeLockSetting)
 
@@ -100,6 +105,7 @@ internal interface SettingsRepository {
      *
      * @param setting 更新する天気情報取得設定。
      * @throws DataStorageException 天気情報取得設定の更新に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun updateWeatherInfoFetchSetting(setting: WeatherInfoFetchSetting)
 }

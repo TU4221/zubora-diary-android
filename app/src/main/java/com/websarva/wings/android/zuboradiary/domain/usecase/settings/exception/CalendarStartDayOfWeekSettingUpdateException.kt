@@ -25,7 +25,21 @@ internal sealed class CalendarStartDayOfWeekSettingUpdateException(
         setting: CalendarStartDayOfWeekSetting,
         cause: Throwable
     ) : CalendarStartDayOfWeekSettingUpdateException(
-        "カレンダー開始曜日設定 '${setting.dayOfWeek}' の更新に失敗しました。",
+        createExceptionBaseMessage(setting),
+        cause
+    )
+
+    /**
+     * ストレージ容量不足により、カレンダーの開始曜日設定の更新に失敗した場合にスローされる例外。
+     *
+     * @param setting 更新しようとした設定 [CalendarStartDayOfWeekSetting] 。
+     * @param cause 発生した根本的な原因となった[Throwable]。
+     */
+    class InsufficientStorage(
+        setting: CalendarStartDayOfWeekSetting,
+        cause: Throwable
+    ) : CalendarStartDayOfWeekSettingUpdateException(
+        "ストレージ容量不足により、" + createExceptionBaseMessage(setting),
         cause
     )
 
@@ -40,4 +54,19 @@ internal sealed class CalendarStartDayOfWeekSettingUpdateException(
         "予期せぬエラーが発生しました。",
         cause
     )
+
+    companion object {
+        /**
+         * 指定された設定値に基づき、カレンダー開始曜日設定の更新失敗エラーメッセージの共通部分を生成する。
+         *
+         * 具体的なエラー原因は含めず、どの設定の更新に失敗したかを識別するための基本メッセージとなる。
+         *
+         * @param setting 更新に失敗した [CalendarStartDayOfWeekSetting]。
+         * @return 更新対象の設定値を含む、基本的なエラーメッセージ文字列。
+         *         例: "カレンダー開始曜日設定 '月曜日' の更新に失敗しました。"
+         */
+        private fun createExceptionBaseMessage(setting: CalendarStartDayOfWeekSetting): String {
+            return "カレンダー開始曜日設定 '${setting.dayOfWeek}' の更新に失敗しました。"
+        }
+    }
 }

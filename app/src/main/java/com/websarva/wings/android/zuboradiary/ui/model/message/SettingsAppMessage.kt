@@ -31,6 +31,14 @@ internal sealed class SettingsAppMessage(
         private fun readResolve(): Any = SettingUpdateFailure
     }
 
+    data object SettingUpdateInsufficientStorageFailure :  SettingsAppMessage(
+        R.string.dialog_app_message_title_storage_error,
+        R.string.dialog_settings_app_message_setting_update_insufficient_storage_failure
+    ) {
+        // デシリアライズ時のシングルトン性を維持
+        private fun readResolve(): Any = SettingUpdateFailure
+    }
+
     data object AllDiaryDeleteFailure :  SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_settings_app_message_all_diary_delete_failure
@@ -50,6 +58,14 @@ internal sealed class SettingsAppMessage(
     data object AllSettingsInitializationFailure :  SettingsAppMessage(
         R.string.dialog_app_message_title_access_error,
         R.string.dialog_settings_app_message_all_settings_initialization_failure
+    ) {
+        // デシリアライズ時のシングルトン性を維持
+        private fun readResolve(): Any = SettingUpdateFailure
+    }
+
+    data object AllSettingsInitializationInsufficientStorageFailure :  SettingsAppMessage(
+        R.string.dialog_app_message_title_storage_error,
+        R.string.dialog_settings_app_message_all_settings_initialization_insufficient_storage_failure
     ) {
         // デシリアライズ時のシングルトン性を維持
         private fun readResolve(): Any = SettingUpdateFailure

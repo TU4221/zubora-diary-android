@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLock
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
-import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllDataDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.AllDiariesDeleteException
@@ -28,6 +27,12 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateRemi
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PassCodeSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingUpdateException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -716,44 +721,104 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun saveThemeColor(value: ThemeColorUi) {
-        executeSettingUpdate(
-            {
-                updateThemeColorSettingUseCase(
-                    ThemeColorSetting(value.toDomainModel())
-                )
+        val result =
+            updateThemeColorSettingUseCase(
+                ThemeColorSetting(value.toDomainModel())
+            )
+        when (result) {
+            is UseCaseResult.Success -> {
+                // 処理なし
             }
-        )
+            is UseCaseResult.Failure -> {
+                val appMessage =
+                    when (result.exception) {
+                        is ThemeColorSettingUpdateException.UpdateFailure,
+                        is ThemeColorSettingUpdateException.Unknown -> {
+                            SettingsAppMessage.SettingUpdateFailure
+                        }
+                        is ThemeColorSettingUpdateException.InsufficientStorage -> {
+                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
+                        }
+                    }
+                emitAppMessageEvent(appMessage)
+            }
+        }
     }
 
     private suspend fun saveCalendarStartDayOfWeek(value: DayOfWeek) {
-        executeSettingUpdate(
-            {
-                updateCalendarStartDayOfWeekSettingUseCase(
-                    CalendarStartDayOfWeekSetting(value)
-                )
+        val result =
+            updateCalendarStartDayOfWeekSettingUseCase(
+                CalendarStartDayOfWeekSetting(value)
+            )
+        when (result) {
+            is UseCaseResult.Success -> {
+                // 処理なし
             }
-        )
+            is UseCaseResult.Failure -> {
+                val appMessage =
+                    when (result.exception) {
+                        is CalendarStartDayOfWeekSettingUpdateException.UpdateFailure,
+                        is CalendarStartDayOfWeekSettingUpdateException.Unknown -> {
+                            SettingsAppMessage.SettingUpdateFailure
+                        }
+                        is CalendarStartDayOfWeekSettingUpdateException.InsufficientStorage -> {
+                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
+                        }
+                    }
+                emitAppMessageEvent(appMessage)
+            }
+        }
     }
 
     private suspend fun saveReminderNotificationValid(value: LocalTime) {
-        executeSettingUpdate (
-            {
-                updateReminderNotificationSettingUseCase(
-                    ReminderNotificationSetting.Enabled(value)
-                )
+        val result =
+            updateReminderNotificationSettingUseCase(
+                ReminderNotificationSetting.Enabled(value)
+            )
+        when (result) {
+            is UseCaseResult.Success -> {
+                // 処理なし
             }
-        )
+            is UseCaseResult.Failure -> {
+                val appMessage =
+                    when (result.exception) {
+                        is ReminderNotificationSettingUpdateException.SettingUpdateFailure,
+                        is ReminderNotificationSettingUpdateException.Unknown -> {
+                            SettingsAppMessage.SettingUpdateFailure
+                        }
+                        is ReminderNotificationSettingUpdateException.InsufficientStorage -> {
+                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
+                        }
+                    }
+                emitAppMessageEvent(appMessage)
+            }
+        }
     }
 
     private suspend fun saveReminderNotificationInvalid() {
-        executeSettingUpdate(
-            {
-                updateReminderNotificationSettingUseCase(
+        val result =
+            updateReminderNotificationSettingUseCase(
                 ReminderNotificationSetting.Disabled
-                )
-            },
-            { emitUiEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch) }
-        )
+            )
+        when (result) {
+            is UseCaseResult.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                emitUiEvent(SettingsEvent.TurnOffReminderNotificationSettingSwitch)
+                val appMessage =
+                    when (result.exception) {
+                        is ReminderNotificationSettingUpdateException.SettingUpdateFailure,
+                        is ReminderNotificationSettingUpdateException.Unknown -> {
+                            SettingsAppMessage.SettingUpdateFailure
+                        }
+                        is ReminderNotificationSettingUpdateException.InsufficientStorage -> {
+                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
+                        }
+                    }
+                emitAppMessageEvent(appMessage)
+            }
+        }
     }
 
     private suspend fun savePasscodeLock(value: Boolean) {
@@ -763,43 +828,56 @@ internal class SettingsViewModel @Inject constructor(
             ""
         }
 
-        executeSettingUpdate (
-            {
-                val setting =
-                    if (value) {
-                        PasscodeLockSetting.Enabled(passcode)
-                    } else {
-                        PasscodeLockSetting.Disabled
-                    }
-                updatePasscodeLockSettingUseCase(setting)
-            },
-            { emitUiEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch) }
-        )
-    }
-
-    private suspend fun saveWeatherInfoFetch(value: Boolean) {
-        executeSettingUpdate(
-            {
-                updateWeatherInfoFetchSettingUseCase(
-                    WeatherInfoFetchSetting(value)
-                )
-            },
-            { emitUiEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch) }
-        )
-    }
-
-    private suspend fun executeSettingUpdate(
-        process: suspend () -> UseCaseResult<Unit, UseCaseException>,
-        onFailure: (suspend () -> Unit)? = null
-    ) {
-        when (val result = process()) {
+        val setting =
+            if (value) {
+                PasscodeLockSetting.Enabled(passcode)
+            } else {
+                PasscodeLockSetting.Disabled
+            }
+        val result = updatePasscodeLockSettingUseCase(setting)
+        when (result) {
             is UseCaseResult.Success -> {
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                Log.e(logTag, "アプリ設定値更新_失敗", result.exception)
-                if (onFailure != null) onFailure()
-                emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
+                emitUiEvent(SettingsEvent.TurnOffPasscodeLockSettingSwitch)
+                val appMessage =
+                    when (result.exception) {
+                        is PassCodeSettingUpdateException.UpdateFailure,
+                        is PassCodeSettingUpdateException.Unknown -> {
+                            SettingsAppMessage.SettingUpdateFailure
+                        }
+                        is PassCodeSettingUpdateException.InsufficientStorage -> {
+                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
+                        }
+                    }
+                emitAppMessageEvent(appMessage)
+            }
+        }
+    }
+
+    private suspend fun saveWeatherInfoFetch(value: Boolean) {
+        val result =
+            updateWeatherInfoFetchSettingUseCase(
+                WeatherInfoFetchSetting(value)
+            )
+        when (result) {
+            is UseCaseResult.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                emitUiEvent(SettingsEvent.TurnOffWeatherInfoFetchSettingSwitch)
+                val appMessage =
+                    when (result.exception) {
+                        is WeatherInfoFetchSettingUpdateException.Unknown,
+                        is WeatherInfoFetchSettingUpdateException.UpdateFailure -> {
+                            SettingsAppMessage.SettingUpdateFailure
+                        }
+                        is WeatherInfoFetchSettingUpdateException.InsufficientStorage -> {
+                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
+                        }
+                    }
+                emitAppMessageEvent(appMessage)
             }
         }
     }
@@ -833,7 +911,17 @@ internal class SettingsViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "全設定初期化_失敗", result.exception)
-                emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)
+                val appMessage =
+                    when (result.exception) {
+                        is AllSettingsInitializationException.InitializationFailure,
+                        is AllSettingsInitializationException.Unknown -> {
+                            SettingsAppMessage.AllSettingsInitializationFailure
+                        }
+                        is AllSettingsInitializationException.InsufficientStorage -> {
+                            SettingsAppMessage.AllSettingsInitializationInsufficientStorageFailure
+                        }
+                    }
+                emitAppMessageEvent(appMessage)
             }
         }
     }
@@ -847,18 +935,23 @@ internal class SettingsViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "アプリ全データ削除_失敗", result.exception)
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
-                when (result.exception) {
-                    is AllDataDeleteException.DiariesDeleteFailure,
-                    is AllDataDeleteException.Unknown -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
+                val appMessage =
+                    when (result.exception) {
+                        is AllDataDeleteException.DiariesDeleteFailure,
+                        is AllDataDeleteException.Unknown -> {
+                            SettingsAppMessage.AllDataDeleteFailure
+                        }
+                        is AllDataDeleteException.ImageFileDeleteFailure -> {
+                            SettingsAppMessage.AllDiaryImagesDeleteFailure
+                        }
+                        is AllDataDeleteException.SettingsInitializationFailure -> {
+                            SettingsAppMessage.AllSettingsInitializationFailure
+                        }
+                        is AllDataDeleteException.SettingsInitializationInsufficientStorageFailure -> {
+                            SettingsAppMessage.AllSettingsInitializationInsufficientStorageFailure
+                        }
                     }
-                    is AllDataDeleteException.ImageFileDeleteFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllDiaryImagesDeleteFailure)
-                    }
-                    is AllDataDeleteException.SettingsInitializationFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)
-                    }
-                }
+                emitAppMessageEvent(appMessage)
             }
         }
     }

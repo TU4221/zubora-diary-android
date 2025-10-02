@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
@@ -68,6 +69,9 @@ internal class SaveDiaryUseCase(
             } else {
                 Log.i(logTag, "${logMsg}同じ日付の日記削除と保存実行 (日付: $saveDate)")
             }
+        } catch (e: InsufficientStorageException) {
+            Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
+            return UseCaseResult.Failure(DiarySaveException.InsufficientStorage(saveDate, e))
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_日記データ保存エラー", e)
             return UseCaseResult.Failure(DiarySaveException.SaveFailure(saveDate, e))
@@ -101,6 +105,10 @@ internal class SaveDiaryUseCase(
             }
             val wrappedException =
                 when (e) {
+                    is InsufficientStorageException -> {
+                        Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
+                        DiarySaveException.InsufficientStorage(saveDate, e)
+                    }
                     is DomainException -> {
                         Log.e(logTag, "${logMsg}失敗_日記保存エラー", e)
                         DiarySaveException.SaveFailure(saveDate, e)
@@ -136,6 +144,7 @@ internal class SaveDiaryUseCase(
      * @param originalDiary 編集前の日記。
      * @return 保存する日記データと同じ日付の既存日記データを削除した場合、削除した日記データを返す。削除しなかった場合は `null` を返す。
      * @throws DataStorageException 保存に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     private suspend fun saveDiary(
         isNewDiary: Boolean,
@@ -216,6 +225,7 @@ internal class SaveDiaryUseCase(
      * @throws ResourceNotFoundException 保存日記の添付画像ファイルが見つからない場合。
      * @throws PermissionException いずれかの画像ファイルへのアクセス権限がない場合。
      * @throws ResourceAlreadyExistsException いずれかの画像ファイルの移動先に同名のファイルが既に存在する場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     private suspend fun updateStorageDiaryImageFile(
         saveDiaryImageFileName: FileName?,

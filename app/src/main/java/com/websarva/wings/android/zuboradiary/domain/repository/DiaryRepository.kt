@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSea
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -91,6 +92,7 @@ internal interface DiaryRepository {
      *
      * @param diary 保存する日記データ。
      * @throws DataStorageException 日記データの保存に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun saveDiary(diary: Diary)
 
@@ -101,6 +103,7 @@ internal interface DiaryRepository {
      *
      * @param diary 保存する日記データ。
      * @throws DataStorageException 日記の削除または新しい日記の保存に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun deleteAndSaveDiary(diary: Diary)
 
@@ -169,6 +172,7 @@ internal interface DiaryRepository {
      *
      * @param historyItemList 更新する日記アイテムのタイトル選択履歴リスト。
      * @throws DataStorageException 履歴の更新に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun updateDiaryItemTitleSelectionHistory(
         historyItemList: List<DiaryItemTitleSelectionHistory>

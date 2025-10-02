@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.DirectoryDelet
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileAlreadyExistsException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileDeleteException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileOperationException
-import com.websarva.wings.android.zuboradiary.data.file.exception.InsufficientStorageException
+import com.websarva.wings.android.zuboradiary.data.file.exception.FileInsufficientStorageException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FilePermissionDeniedException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileReadException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileWriteException
@@ -157,7 +157,7 @@ class ImageFileDataSource(
      * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
      * @throws FileReadException 画像の読み込みまたはデコードに失敗した場合。
      * @throws FileWriteException 画像の書き込みに失敗した場合。
-     * @throws InsufficientStorageException ストレージの空き容量が不足した場合。
+     * @throws FileInsufficientStorageException ストレージの空き容量が不足した場合。
      */
     suspend fun cacheImageFile(
         uriString: String,
@@ -200,7 +200,7 @@ class ImageFileDataSource(
                 throw FileNotFoundException(outputFile.absolutePath, e)
             } catch (e: IOException) {
                 if (e.isInsufficientStorage()) {
-                    throw InsufficientStorageException(outputFile.absolutePath, e)
+                    throw FileInsufficientStorageException(outputFile.absolutePath, e)
                 } else {
                     throw FileWriteException(outputFile.absolutePath, e)
                 }
@@ -350,7 +350,7 @@ class ImageFileDataSource(
      * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
      * @throws FileAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
      * @throws FileWriteException 移動先への書き込みに失敗した場合。
-     * @throws InsufficientStorageException ストレージの空き容量が不足した場合。
+     * @throws FileInsufficientStorageException ストレージの空き容量が不足した場合。
      * @throws FileDeleteException 移動元ファイルの削除に失敗した場合。
      */
     private fun moveImageFile(fileName: ImageFileName, sourceDir: File, destinationDir: File) {
@@ -401,7 +401,7 @@ class ImageFileDataSource(
                     }
 
                     if (e.isInsufficientStorage()) {
-                        throw InsufficientStorageException(destinationFile.absolutePath, e)
+                        throw FileInsufficientStorageException(destinationFile.absolutePath, e)
                     } else {
                         throw FileWriteException(destinationFile.absolutePath, e)
                     }

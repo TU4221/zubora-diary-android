@@ -7,7 +7,7 @@ package com.websarva.wings.android.zuboradiary.domain.exception
  *                デフォルトは「データストレージの操作に問題が発生。」
  * @param cause この例外の根本原因となった[Throwable]。データ層で発生したデータストレージ関連例外を含む。
  */
-internal class DataStorageException(
+internal open class DataStorageException(
     message: String = "データストレージの操作に問題が発生。",
     cause: Throwable? = null
 ) : DomainException(message, cause)

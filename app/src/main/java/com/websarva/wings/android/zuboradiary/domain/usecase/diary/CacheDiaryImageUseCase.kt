@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageCacheException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -47,6 +48,11 @@ internal class CacheDiaryImageUseCase(
             val fileName = fileRepository.cacheImageFile(uriString, fileBaseName)
             Log.i(logTag, "${logMsg}完了 (ファイル名: $fileName)")
             UseCaseResult.Success(fileName)
+        } catch (e: InsufficientStorageException) {
+            Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
+            UseCaseResult.Failure(
+                DiaryImageCacheException.InsufficientStorage(e)
+            )
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_キャッシュエラー", e)
             UseCaseResult.Failure(

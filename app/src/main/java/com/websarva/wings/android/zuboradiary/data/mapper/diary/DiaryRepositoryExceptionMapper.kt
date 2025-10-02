@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.data.database.exception.RecordUpda
 import com.websarva.wings.android.zuboradiary.data.mapper.RepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
+import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 
 internal object DiaryRepositoryExceptionMapper
@@ -21,7 +22,7 @@ internal object DiaryRepositoryExceptionMapper
             is DatabaseCorruptionException -> DataStorageException(cause = e)
             is DatabaseInitializationException -> DataStorageException(cause = e)
             is DatabaseStateException -> DataStorageException(cause = e)
-            is DatabaseStorageFullException -> DataStorageException(cause = e)
+            is DatabaseStorageFullException -> InsufficientStorageException(cause = e)
             is RecordDeleteException -> DataStorageException(cause = e)
             is RecordNotFoundException -> ResourceNotFoundException(cause = e)
             is RecordReadException -> DataStorageException(cause = e)
