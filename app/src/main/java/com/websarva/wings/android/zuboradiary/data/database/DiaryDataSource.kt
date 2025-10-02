@@ -207,32 +207,6 @@ internal class DiaryDataSource(
     }
 
     /**
-     * 日記項目タイトル選択履歴データをデータベースに保存する。
-     *
-     * 日記項目タイトル選択履歴データを保存後、最新の50件を除く最終使用日時が古い順の履歴を削除する。
-     *
-     * この操作はトランザクションとして実行される。
-     *
-     * @param historyItemList 更新する日記項目タイトル選択履歴データのリスト。
-     * @throws RecordUpdateException データベースからのレコードの更新に失敗した場合。
-     * @throws DatabaseStorageFullException ストレージ容量が不足している場合。
-     * @throws DatabaseCorruptionException データベースが破損している場合。
-     * @throws DatabaseStateException データベースの状態が不正だった場合。
-     */
-    suspend fun updateDiaryItemTitleSelectionHistory(
-        historyItemList: List<DiaryItemTitleSelectionHistoryEntity>
-    ) {
-        withContext(dispatcher) {
-            executeSuspendDbUpdateOperation {
-                diaryItemTitleSelectionHistoryDao
-                    .updateDiaryItemTitleSelectionHistory(
-                        historyItemList
-                    )
-            }
-        }
-    }
-
-    /**
      * 指定された日付の日記をデータベースから削除する。
      *
      * @param date 削除する日記の日付。
@@ -339,6 +313,32 @@ internal class DiaryDataSource(
         return diaryItemTitleSelectionHistoryDao
             .selectHistoryListOrderByLogDesc(num, offset)
             .wrapDatabaseExceptions()
+    }
+
+    /**
+     * 日記項目タイトル選択履歴データをデータベースに保存する。
+     *
+     * 日記項目タイトル選択履歴データを保存後、最新の50件を除く最終使用日時が古い順の履歴を削除する。
+     *
+     * この操作はトランザクションとして実行される。
+     *
+     * @param historyItemList 更新する日記項目タイトル選択履歴データのリスト。
+     * @throws RecordUpdateException データベースからのレコードの更新に失敗した場合。
+     * @throws DatabaseStorageFullException ストレージ容量が不足している場合。
+     * @throws DatabaseCorruptionException データベースが破損している場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
+     */
+    suspend fun updateDiaryItemTitleSelectionHistory(
+        historyItemList: List<DiaryItemTitleSelectionHistoryEntity>
+    ) {
+        withContext(dispatcher) {
+            executeSuspendDbUpdateOperation {
+                diaryItemTitleSelectionHistoryDao
+                    .updateDiaryItemTitleSelectionHistory(
+                        historyItemList
+                    )
+            }
+        }
     }
 
     /**
