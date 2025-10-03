@@ -538,11 +538,11 @@ internal class DiaryEditViewModel @Inject constructor(
                 // 処理なし
             }
         }
+        clearPendingDiaryUpdateParameters()
     }
 
     private fun handleDiaryUpdateDialogPositiveResult() {
         val parameters = pendingDiaryUpdateParameters  ?: return
-        clearPendingDiaryUpdateParameters()
         val diary = parameters.diary
         val diaryItemTitleSelectionHistoryList = parameters.diaryItemTitleSelectionHistoryList
         val originalDiary = parameters.originalDiary
