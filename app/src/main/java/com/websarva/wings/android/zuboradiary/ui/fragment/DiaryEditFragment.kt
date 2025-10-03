@@ -42,7 +42,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
@@ -241,7 +240,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 navigateDiaryItemTitleEditFragment(event.diaryItemTitle)
             }
             is DiaryEditEvent.NavigateDiaryLoadDialog -> {
-                navigateDiaryLoadDialog(event.parameters)
+                navigateDiaryLoadDialog(event.date)
             }
             is DiaryEditEvent.NavigateDiaryLoadFailureDialog -> {
                 navigateDiaryLoadFailureDialog(event.date)
@@ -765,9 +764,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryLoadDialog(parameters: DiaryLoadParameters) {
+    private fun navigateDiaryLoadDialog(date: LocalDate) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadDialog(parameters)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 

@@ -36,7 +36,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessa
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -304,6 +303,11 @@ internal class DiaryEditViewModel @Inject constructor(
         )
 
     // キャッシュパラメータ
+    private data class DiaryLoadParameters(
+        val date: LocalDate
+    )
+    private var pendingDiaryLoadParameters: DiaryLoadParameters? = null
+
     private data class DiaryUpdateParameters(
         val diary: Diary,
         val diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
@@ -500,20 +504,21 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // Fragmentからの結果受取処理
-    fun onDiaryLoadDialogResultReceived(result: DialogResult<DiaryLoadParameters>) {
+    fun onDiaryLoadDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
-            is DialogResult.Positive<DiaryLoadParameters> -> {
-                handleDiaryLoadDialogPositiveResult(result.data)
+            is DialogResult.Positive -> {
+                handleDiaryLoadDialogPositiveResult()
             }
             is DialogResult.Negative,
             is DialogResult.Cancel -> {
                 handleDiaryLoadDialogNegativeResult()
             }
         }
+        clearPendingDiaryLoadParameters()
     }
 
-    private fun handleDiaryLoadDialogPositiveResult(parameters: DiaryLoadParameters) {
-        val date = parameters.date
+    private fun handleDiaryLoadDialogPositiveResult() {
+        val date = pendingDiaryLoadParameters?.date ?: return
         viewModelScope.launch {
             loadDiary(date)
         }
@@ -890,11 +895,9 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)
                 if (result.value) {
-                    val parameters = DiaryLoadParameters(date)
+                    updatePendingDiaryLoadParameters(date)
                     emitUiEvent(
-                        DiaryEditEvent.NavigateDiaryLoadDialog(
-                            parameters
-                        )
+                        DiaryEditEvent.NavigateDiaryLoadDialog(date)
                     )
                 } else {
                     processWeatherInfoFetch(date, previousDate)
@@ -1237,6 +1240,16 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun updateEditingDiaryDateString(dateString: String?) {
         _editingDiaryDateString.value = dateString
+    }
+
+    private fun updatePendingDiaryLoadParameters(date: LocalDate) {
+        pendingDiaryLoadParameters = DiaryLoadParameters(
+            date
+        )
+    }
+
+    private fun clearPendingDiaryLoadParameters() {
+        pendingDiaryLoadParameters = null
     }
 
     private fun updatePendingDiaryUpdateParameters(

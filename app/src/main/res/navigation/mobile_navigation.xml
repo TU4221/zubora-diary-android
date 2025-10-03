@@ -381,8 +381,8 @@
             android:id="@+id/navigation_diary_load_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadDialogFragment">
             <argument
-                android:name="parameters"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadParameters" />
+                android:name="date"
+                app:argType="java.time.LocalDate" />
         </dialog>
 
         <dialog

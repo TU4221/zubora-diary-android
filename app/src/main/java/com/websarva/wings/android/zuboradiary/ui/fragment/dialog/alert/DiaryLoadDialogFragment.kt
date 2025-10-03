@@ -19,15 +19,13 @@ class DiaryLoadDialogFragment : BaseAlertDialogFragment() {
 
     override fun createMessage(): String {
         val diaryDate =
-            DiaryLoadDialogFragmentArgs.fromBundle(requireArguments()).parameters.date
+            DiaryLoadDialogFragmentArgs.fromBundle(requireArguments()).date
         val diaryDateString = diaryDate.toJapaneseDateString(requireContext())
         return diaryDateString + getString(R.string.dialog_diary_load_message)
     }
 
     override fun handleOnPositiveButtonClick() {
-        val parameters =
-            DiaryLoadDialogFragmentArgs.fromBundle(requireArguments()).parameters
-        setResult(KEY_RESULT, DialogResult.Positive(parameters))
+        setResult(KEY_RESULT, DialogResult.Positive(Unit))
     }
 
     override fun handleOnNegativeButtonClick() {
