@@ -7,7 +7,6 @@ import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
-import com.websarva.wings.android.zuboradiary.data.common.PermissionChecker
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationAccessException
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationProviderException
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationUnavailableException
@@ -27,12 +26,10 @@ import java.util.concurrent.TimeoutException
  * 位置情報に関するエラーは、定義されたカスタム例外 ([LocationProviderException] のサブクラスなど) をスローする。
  *
  * @property fusedLocationProviderClient デバイスの位置情報を取得するために使用される。
- * @property permissionChecker 位置情報アクセスパーミッションなど、必要な権限が付与されているかを確認する機能を提供。
  * @property dispatcher 位置情報の取得を実行するスレッドプール。
  */
 internal class FusedLocationDataSource(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
-    private val permissionChecker: PermissionChecker,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
@@ -63,10 +60,6 @@ internal class FusedLocationDataSource(
             Log.i(logTag, "${logMsg}_開始")
             val cancellationTokenSource = CancellationTokenSource()
             try {
-                if (!permissionChecker.isAccessLocationGranted) {
-                    Log.i(logTag, "${logMsg}_権限未許可")
-                    throw SecurityException()
-                }
                 return@withContext withTimeoutOrNull(timeoutMillis) {
                     val locationRequest =
                         CurrentLocationRequest.Builder()

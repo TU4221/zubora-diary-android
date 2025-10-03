@@ -1,14 +1,11 @@
 package com.websarva.wings.android.zuboradiary.di.data.common
 
 import android.app.Application
-import android.content.Context
 import com.websarva.wings.android.zuboradiary.ZuboraDiaryApplication
 import com.websarva.wings.android.zuboradiary.data.common.AppForegroundStateProvider
-import com.websarva.wings.android.zuboradiary.data.common.PermissionChecker
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
@@ -32,10 +29,4 @@ internal object CommonModule {
         application: Application
     ): AppForegroundStateProvider =
         AppForegroundStateProviderImpl(application as ZuboraDiaryApplication)
-
-    @Singleton
-    @Provides
-    fun providePermissionChecker(
-        @ApplicationContext context: Context
-    ): PermissionChecker = PermissionCheckerImpl(context)
 }
