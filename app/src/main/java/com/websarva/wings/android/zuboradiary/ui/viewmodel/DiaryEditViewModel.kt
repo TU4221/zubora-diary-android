@@ -37,7 +37,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParametersForDiaryEdit
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -305,6 +304,16 @@ internal class DiaryEditViewModel @Inject constructor(
             false
         )
 
+    // キャッシュパラメータ
+
+    private data class DiaryUpdateParameters(
+        val diary: Diary,
+        val diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
+        val originalDiary: Diary,
+        val isNewDiary: Boolean
+    )
+    private var pendingDiaryUpdateParameters: DiaryUpdateParameters? = null
+
     // TODO:テスト用の為、最終的に削除
     var isTesting = false
 
@@ -516,10 +525,10 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryUpdateDialogResultReceived(result: DialogResult<DiaryUpdateParameters>) {
+    fun onDiaryUpdateDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
-            is DialogResult.Positive<DiaryUpdateParameters> -> {
-                handleDiaryUpdateDialogPositiveResult(result.data)
+            is DialogResult.Positive -> {
+                handleDiaryUpdateDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -528,10 +537,11 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun handleDiaryUpdateDialogPositiveResult(parameters: DiaryUpdateParameters) {
+    private fun handleDiaryUpdateDialogPositiveResult() {
+        val parameters = pendingDiaryUpdateParameters  ?: return
+        clearPendingDiaryUpdateParameters()
         val diary = parameters.diary
-        val diaryItemTitleSelectionHistoryList =
-            parameters.diaryItemTitleSelectionHistoryList
+        val diaryItemTitleSelectionHistoryList = parameters.diaryItemTitleSelectionHistoryList
         val originalDiary = parameters.originalDiary
         val isNewDiary = parameters.isNewDiary
         viewModelScope.launch {
@@ -907,14 +917,14 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)
                 if (result.value) {
-                    val parameters = DiaryUpdateParameters(
+                    updatePendingDiaryUpdateParameters(
                         diary,
                         diaryItemTitleSelectionHistoryList,
                         originalDiary,
                         isNewDiary
                     )
                     emitUiEvent(
-                        DiaryEditEvent.NavigateDiaryUpdateDialog(parameters)
+                        DiaryEditEvent.NavigateDiaryUpdateDialog(diary.date)
                     )
                 } else {
                     saveDiary(
@@ -1225,6 +1235,24 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun updateEditingDiaryDateString(dateString: String?) {
         _editingDiaryDateString.value = dateString
+    }
+
+    private fun updatePendingDiaryUpdateParameters(
+        diary: Diary,
+        diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
+        originalDiary: Diary,
+        isNewDiary: Boolean
+    ) {
+        pendingDiaryUpdateParameters = DiaryUpdateParameters(
+            diary,
+            diaryItemTitleSelectionHistoryList,
+            originalDiary,
+            isNewDiary
+        )
+    }
+
+    private fun clearPendingDiaryUpdateParameters() {
+        pendingDiaryUpdateParameters = null
     }
 
     // TODO:テスト用の為、最終的に削除

@@ -397,8 +397,8 @@
             android:id="@+id/navigation_diary_update_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryUpdateDialogFragment">
             <argument
-                android:name="parameters"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryUpdateParameters" />
+                android:name="date"
+                app:argType="java.time.LocalDate" />
         </dialog>
 
         <dialog
