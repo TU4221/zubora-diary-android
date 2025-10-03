@@ -441,9 +441,6 @@
         <dialog
             android:id="@+id/navigation_exit_without_diary_save_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ExitWithoutDiarySaveDialogFragment">
-            <argument
-                android:name="parameters"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParametersForDiaryEdit" />
         </dialog>
 
         <dialog

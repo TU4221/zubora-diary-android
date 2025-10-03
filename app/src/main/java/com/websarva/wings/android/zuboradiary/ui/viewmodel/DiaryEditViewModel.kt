@@ -37,7 +37,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryLoadParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.NavigatePreviousParametersForDiaryEdit
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -305,7 +304,6 @@ internal class DiaryEditViewModel @Inject constructor(
         )
 
     // キャッシュパラメータ
-
     private data class DiaryUpdateParameters(
         val diary: Diary,
         val diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
@@ -313,6 +311,11 @@ internal class DiaryEditViewModel @Inject constructor(
         val isNewDiary: Boolean
     )
     private var pendingDiaryUpdateParameters: DiaryUpdateParameters? = null
+
+    private data class PreviousNavigationParameters(
+        val originalDiaryDate: LocalDate?
+    )
+    private var pendingPreviousNavigationParameters: PreviousNavigationParameters? = null
 
     // TODO:テスト用の為、最終的に削除
     var isTesting = false
@@ -665,15 +668,14 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onExitWithoutDiarySaveDialogResultReceived(
-        result: DialogResult<NavigatePreviousParametersForDiaryEdit>
-    ) {
+    fun onExitWithoutDiarySaveDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
-            is DialogResult.Positive<NavigatePreviousParametersForDiaryEdit> -> {
-                val originalDiary = result.data.originalDiary
+            is DialogResult.Positive -> {
+                val originalDiaryDate =
+                    pendingPreviousNavigationParameters?.originalDiaryDate ?: return
                 viewModelScope.launch {
                     clearDiaryImageCacheFileUseCase()
-                    navigatePreviousFragment(originalDiary)
+                    navigatePreviousFragment(originalDiaryDate)
                 }
             }
             DialogResult.Negative,
@@ -681,6 +683,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 // 処理なし
             }
         }
+        clearPendingPreviousNavigationParameters()
     }
 
     fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitle>) {
@@ -1126,23 +1129,22 @@ internal class DiaryEditViewModel @Inject constructor(
         val shouldRequest =
             shouldRequestExitWithoutDiarySaveConfirmationUseCase(diary, originalDiary).value
         if (shouldRequest) {
-            val parameters = NavigatePreviousParametersForDiaryEdit(originalDiary)
+            updatePendingDiaryUpdateParameters(originalDiary.date)
             emitUiEvent(
-                DiaryEditEvent
-                    .NavigateExitWithoutDiarySaveConfirmationDialog(parameters)
+                DiaryEditEvent.NavigateExitWithoutDiarySaveConfirmationDialog
             )
         } else {
             clearDiaryImageCacheFileUseCase()
-            navigatePreviousFragment(originalDiary)
+            navigatePreviousFragment(originalDiary.date)
         }
     }
 
-    private suspend fun navigatePreviousFragment(originalDiary: Diary?) {
+    private suspend fun navigatePreviousFragment(originalDiaryDate: LocalDate?) {
         val result =
-            if (originalDiary == null) {
+            if (originalDiaryDate == null) {
                 FragmentResult.None
             } else {
-                FragmentResult.Some(originalDiary.date)
+                FragmentResult.Some(originalDiaryDate)
             }
         emitNavigatePreviousFragmentEvent(result)
     }
@@ -1255,6 +1257,16 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryUpdateParameters = null
     }
 
+    private fun updatePendingDiaryUpdateParameters(originalDiaryDate: LocalDate) {
+        pendingPreviousNavigationParameters = PreviousNavigationParameters(
+            originalDiaryDate
+        )
+    }
+
+    private fun clearPendingPreviousNavigationParameters() {
+        pendingPreviousNavigationParameters = null
+    }
+
     // TODO:テスト用の為、最終的に削除
     // TODO:上手く保存されない。保存ユースケースの条件を変えたため？
     fun test() {
@@ -1322,7 +1334,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 }
             }
             clearDiaryImageCacheFileUseCase()
-            navigatePreviousFragment(_originalDiary.value)
+            navigatePreviousFragment(_originalDiary.value?.date)
             isTesting = false
         }
     }

@@ -21,9 +21,7 @@ class ExitWithoutDiarySaveDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick() {
-        val parameters =
-            ExitWithoutDiarySaveDialogFragmentArgs.fromBundle(requireArguments()).parameters
-        setResult(KEY_RESULT, DialogResult.Positive(parameters))
+        setResult(KEY_RESULT, DialogResult.Positive(Unit))
     }
 
     override fun handleOnNegativeButtonClick() {
