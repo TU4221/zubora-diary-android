@@ -149,11 +149,7 @@ internal class DiaryEditViewModel @Inject constructor(
     val isNewDiary = _isNewDiary.asStateFlow()
 
     private val _originalDiary = MutableStateFlow<Diary?>(null)
-
-    val editingDiaryDate =
-        combine(_isNewDiary, _originalDiary) { isNewDiary, originalDiary ->
-            return@combine if (isNewDiary) null else originalDiary?.date
-        }.stateInWhileSubscribed(null)
+    val originalDiaryDate = _originalDiary.map { it?.date }.stateInWhileSubscribed(null)
 
     private val _editingDiaryDateString = MutableStateFlow<String?>(null)
     val editingDiaryDateString = _editingDiaryDateString.asStateFlow()

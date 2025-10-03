@@ -78,7 +78,7 @@
                             android:text="@{String.format(@string/fragment_diary_edit_editing_diary, viewModel.editingDiaryDateString)}"
                             android:textAppearance="@style/AppTextViewTextAppearance"
                             android:textSize="@dimen/fragment_diary_edit_small_text_size"
-                            android:visibility="@{viewModel.editingDiaryDateString == null ? View.INVISIBLE : View.VISIBLE}"
+                            android:visibility="@{viewModel.isNewDiary() ? View.INVISIBLE : View.VISIBLE}"
                             tools:text="編集日記：2025年6月19日(木)"/>
 
                         <!-- 注意

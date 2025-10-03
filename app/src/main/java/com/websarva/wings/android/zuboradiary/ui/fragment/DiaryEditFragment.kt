@@ -362,7 +362,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.editingDiaryDate
+            mainViewModel.originalDiaryDate
                 .collectLatest { value: LocalDate? ->
                     val dateString = value?.toJapaneseDateString(requireContext())
                     mainViewModel.onOriginalDiaryDateChanged(dateString)
