@@ -132,7 +132,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             emitUiEvent(
                 DiaryItemTitleEditEvent.CompleteEdit(
                     DiaryItemTitle(
-                        itemNumber,
+                        itemNumber.value,
                         itemTitle
                     )
                 )
@@ -154,7 +154,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     // Fragmentからの結果受取処理
     fun onDiaryItemTitleDataReceived(diaryItemTitle: DiaryItemTitle) {
-        val itemNumber = diaryItemTitle.itemNumber
+        val itemNumber = ItemNumber(diaryItemTitle.itemNumber)
         updateItemNumber(itemNumber)
 
         val itemTitle = diaryItemTitle.title
@@ -230,7 +230,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private suspend fun completeItemTitleEdit(itemNumber: ItemNumber, itemTitle: String) {
         when (val result = validateInputTextUseCase(itemTitle).value) {
             InputTextValidationResult.Valid -> {
-                val diaryItemTitle = DiaryItemTitle(itemNumber, itemTitle)
+                val diaryItemTitle = DiaryItemTitle(itemNumber.value, itemTitle)
                 emitUiEvent(
                     DiaryItemTitleEditEvent.CompleteEdit(
                         diaryItemTitle

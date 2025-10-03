@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
 import com.websarva.wings.android.zuboradiary.domain.model.FileName
+import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
@@ -22,7 +23,7 @@ internal fun DiaryDayListItem.WordSearchResult.toUiModel(): DiaryDayListItemUi.W
     return DiaryDayListItemUi.WordSearchResult(
         date,
         title,
-        itemNumber,
+        itemNumber.value,
         itemTitle,
         itemComment,
         searchWord
@@ -43,7 +44,7 @@ internal fun DiaryDayListItemUi.WordSearchResult.toDomainModel(): DiaryDayListIt
     return DiaryDayListItem.WordSearchResult(
         date,
         title,
-        itemNumber,
+        ItemNumber(itemNumber),
         itemTitle,
         itemComment,
         searchWord

@@ -27,13 +27,6 @@ internal value class ItemNumber(val value: Int) : Serializable, Comparable<ItemN
      */
     val isMinNumber get() = value == MIN_NUMBER
 
-    /**
-     * 項目番号が [MAX_NUMBER] かどうかを示す。
-     *
-     * @return 項目番号が [MAX_NUMBER] の場合は `true`、異なる場合は `false`。
-     */
-    val isMaxNumber get() = value == MAX_NUMBER
-
     init {
         require(value in MIN_NUMBER..MAX_NUMBER) {
             "項目番号は${MIN_NUMBER}以上、${MAX_NUMBER}以下の値にすること。(value: ${value})"

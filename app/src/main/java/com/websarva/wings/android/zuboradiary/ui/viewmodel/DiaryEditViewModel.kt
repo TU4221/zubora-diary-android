@@ -435,11 +435,11 @@ internal class DiaryEditViewModel @Inject constructor(
         updateCondition(condition)
     }
 
-    fun onItemTitleInputFieldClick(itemNumber: ItemNumber) {
+    fun onItemTitleInputFieldClick(itemNumber: Int) {
         if (uiState.value == DiaryEditState.AddingItem) return
         if (uiState.value == DiaryEditState.DeletingItem) return
 
-        val itemTitle = getItemTitle(itemNumber).requireValue()
+        val itemTitle = getItemTitle(ItemNumber(itemNumber)).requireValue()
 
         viewModelScope.launch {
             emitUiEvent(
@@ -458,7 +458,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onItemDeleteButtonClick(itemNumber: ItemNumber) {
+    fun onItemDeleteButtonClick(itemNumber: Int) {
         if (!canExecuteOperationWithUiUpdate) return
 
         viewModelScope.launch {
@@ -631,7 +631,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun handleDiaryItemDeleteDialogPositiveResult(parameters: DiaryItemDeleteParameters) {
-        val itemNumber = parameters.itemNumber
+        val itemNumber = ItemNumber(parameters.itemNumber)
         viewModelScope.launch {
             requestDiaryItemDeleteTransition(itemNumber)
         }
@@ -677,7 +677,7 @@ internal class DiaryEditViewModel @Inject constructor(
         when (result) {
             is FragmentResult.Some -> {
                 updateItemTitle(
-                    result.data.itemNumber,
+                    ItemNumber(result.data.itemNumber),
                     result.data.title
                 )
             }
@@ -707,10 +707,10 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // MotionLayout変更時処理
-    fun onDiaryItemInvisibleStateTransitionCompleted(itemNumber: ItemNumber) {
+    fun onDiaryItemInvisibleStateTransitionCompleted(itemNumber: Int) {
         check(uiState.value == DiaryEditState.DeletingItem)
 
-        deleteItem(itemNumber)
+        deleteItem(ItemNumber(itemNumber))
     }
 
     fun onDiaryItemVisibleStateTransitionCompleted() {
@@ -1047,7 +1047,7 @@ internal class DiaryEditViewModel @Inject constructor(
             deleteItem(itemNumber)
         } else {
             emitUiEvent(
-                DiaryEditEvent.TransitionDiaryItemToInvisibleState(itemNumber)
+                DiaryEditEvent.TransitionDiaryItemToInvisibleState(itemNumber.value)
             )
         }
     }
