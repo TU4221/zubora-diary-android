@@ -42,7 +42,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinnerAdapter
@@ -255,7 +254,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 navigateDatePickerDialog(event.date)
             }
             is DiaryEditEvent.NavigateWeatherInfoFetchDialog -> {
-                navigateWeatherInfoFetchDialog(event.parameters)
+                navigateWeatherInfoFetchDialog(event.date)
             }
             is DiaryEditEvent.NavigateDiaryItemDeleteDialog -> {
                 navigateDiaryItemDeleteDialog(event.parameters)
@@ -276,7 +275,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 transitionDiaryItemToInvisible(event.itemNumber, false)
             }
             is DiaryEditEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch -> {
-                checkAccessLocationPermissionBeforeWeatherInfoFetch(event.parameters)
+                checkAccessLocationPermissionBeforeWeatherInfoFetch()
             }
             is DiaryEditEvent.ItemAddition -> {
                 shouldTransitionItemMotionLayout = true
@@ -794,10 +793,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    private fun navigateWeatherInfoFetchDialog(parameters: WeatherInfoFetchParameters) {
+    private fun navigateWeatherInfoFetchDialog(date: LocalDate) {
         val directions =
             DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToWeatherInfoFetchDialog(parameters)
+                .actionDiaryEditFragmentToWeatherInfoFetchDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
@@ -844,12 +843,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         )
     }
 
-    private fun checkAccessLocationPermissionBeforeWeatherInfoFetch(
-        parameters: WeatherInfoFetchParameters
-    ) {
+    private fun checkAccessLocationPermissionBeforeWeatherInfoFetch() {
         mainViewModel.onAccessLocationPermissionChecked(
-            requireContext().isAccessLocationGranted(),
-            parameters
+            requireContext().isAccessLocationGranted()
         )
     }
 

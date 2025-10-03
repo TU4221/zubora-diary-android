@@ -421,8 +421,8 @@
             android:id="@+id/navigation_weather_info_fetch_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.WeatherInfoFetchDialogFragment">
             <argument
-                android:name="parameters"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters" />
+                android:name="date"
+                app:argType="java.time.LocalDate" />
         </dialog>
 
         <dialog

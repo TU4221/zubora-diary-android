@@ -36,7 +36,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessa
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.WeatherInfoFetchParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
@@ -315,6 +314,11 @@ internal class DiaryEditViewModel @Inject constructor(
         val isNewDiary: Boolean
     )
     private var pendingDiaryUpdateParameters: DiaryUpdateParameters? = null
+
+    private data class WeatherInfoFetchParameters(
+        val date: LocalDate
+    )
+    private var pendingWeatherInfoFetchParameters: WeatherInfoFetchParameters? = null
 
     private data class PreviousNavigationParameters(
         val originalDiaryDate: LocalDate?
@@ -616,23 +620,22 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onWeatherInfoFetchDialogResultReceived(result: DialogResult<WeatherInfoFetchParameters>) {
+    fun onWeatherInfoFetchDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
-            is DialogResult.Positive<WeatherInfoFetchParameters> -> {
-                handleWeatherInfoFetchDialogPositiveResult(result.data)
+            is DialogResult.Positive -> {
+                handleWeatherInfoFetchDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
                 // 処理なし
             }
         }
+        clearPendingWeatherInfoFetchParameters()
     }
 
-    private fun handleWeatherInfoFetchDialogPositiveResult(
-        parameters: WeatherInfoFetchParameters
-    ) {
+    private fun handleWeatherInfoFetchDialogPositiveResult() {
         viewModelScope.launch {
-            checkPermissionBeforeWeatherInfoFetch(parameters)
+            checkPermissionBeforeWeatherInfoFetch()
         }
     }
 
@@ -739,10 +742,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // 権限確認後処理
     fun onAccessLocationPermissionChecked(
-        isGranted: Boolean,
-        parameters: WeatherInfoFetchParameters
+        isGranted: Boolean
     ) {
-        val date = parameters.date
+        val date = pendingWeatherInfoFetchParameters?.date ?: return
 
         viewModelScope.launch {
             fetchWeatherInfo(isGranted, date)
@@ -968,24 +970,22 @@ internal class DiaryEditViewModel @Inject constructor(
     ) {
         val result = shouldRequestWeatherInfoConfirmationUseCase(date, previousDate)
         if (result.value) {
-            val parameters = WeatherInfoFetchParameters(date)
+            updatePendingWeatherInfoFetchParameters(date)
             emitUiEvent(
-                DiaryEditEvent.NavigateWeatherInfoFetchDialog(parameters)
+                DiaryEditEvent.NavigateWeatherInfoFetchDialog(date)
             )
         } else {
             val shouldLoad = shouldFetchWeatherInfoUseCase(date, previousDate).value
             if (!shouldLoad) return
 
-            val parameters = WeatherInfoFetchParameters(date)
-            checkPermissionBeforeWeatherInfoFetch(parameters)
+            updatePendingWeatherInfoFetchParameters(date)
+            checkPermissionBeforeWeatherInfoFetch()
         }
     }
 
-    private suspend fun checkPermissionBeforeWeatherInfoFetch(
-        parameters: WeatherInfoFetchParameters
-    ) {
+    private suspend fun checkPermissionBeforeWeatherInfoFetch() {
         emitUiEvent(
-            DiaryEditEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch(parameters)
+            DiaryEditEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch
         )
     }
 
@@ -1278,6 +1278,16 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun clearPendingPreviousNavigationParameters() {
         pendingPreviousNavigationParameters = null
+    }
+
+    private fun updatePendingWeatherInfoFetchParameters(date: LocalDate) {
+        pendingWeatherInfoFetchParameters = WeatherInfoFetchParameters(
+            date
+        )
+    }
+
+    private fun clearPendingWeatherInfoFetchParameters() {
+        pendingWeatherInfoFetchParameters = null
     }
 
     // TODO:テスト用の為、最終的に削除
