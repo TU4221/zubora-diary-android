@@ -148,7 +148,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val _isNewDiary = MutableStateFlow(handle[SAVED_IS_NEW_DIARY_KEY] ?: false)
     val isNewDiary = _isNewDiary.asStateFlow()
 
-    private val _originalDiary = MutableStateFlow<Diary?>(handle[SAVED_ORIGINAL_DIARY_KEY])
+    private val _originalDiary = MutableStateFlow<Diary?>(null)
 
     val editingDiaryDate =
         combine(_isNewDiary, _originalDiary) { isNewDiary, originalDiary ->
@@ -321,7 +321,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private var pendingWeatherInfoFetchParameters: WeatherInfoFetchParameters? = null
 
     private data class PreviousNavigationParameters(
-        val originalDiaryDate: LocalDate?
+        val originalDiaryDate: LocalDate
     )
     private var pendingPreviousNavigationParameters: PreviousNavigationParameters? = null
 
@@ -766,7 +766,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private suspend fun prepareNewDiaryEntry(date: LocalDate) {
         updateIsNewDiary(true)
         updateDate(date)
-        updateOriginalDiary(diaryStateFlow.createDiary())
+        updateOriginalDiary(handle[SAVED_ORIGINAL_DIARY_KEY] ?: diaryStateFlow.createDiary())
         val previousDate = previousDate
         val originalDate = _originalDiary.requireValue().date
         val isNewDiary = isNewDiary.value
@@ -1142,14 +1142,10 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun navigatePreviousFragment(originalDiaryDate: LocalDate?) {
-        val result =
-            if (originalDiaryDate == null) {
-                FragmentResult.None
-            } else {
-                FragmentResult.Some(originalDiaryDate)
-            }
-        emitNavigatePreviousFragmentEvent(result)
+    private suspend fun navigatePreviousFragment(originalDiaryDate: LocalDate) {
+        emitNavigatePreviousFragmentEvent(
+            FragmentResult.Some(originalDiaryDate)
+        )
     }
 
     // SavedStateHandle対応State更新
@@ -1230,7 +1226,7 @@ internal class DiaryEditViewModel @Inject constructor(
         _isNewDiary.value = isNew
     }
 
-    private fun updateOriginalDiary(diary: Diary?) {
+    private fun updateOriginalDiary(diary: Diary) {
         _originalDiary.value = diary
     }
 
@@ -1357,7 +1353,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 }
             }
             clearDiaryImageCacheFileUseCase()
-            navigatePreviousFragment(_originalDiary.value?.date)
+            navigatePreviousFragment(_originalDiary.requireValue().date)
             isTesting = false
         }
     }
