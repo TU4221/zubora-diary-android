@@ -40,7 +40,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.WeatherIn
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinnerAdapter
@@ -247,7 +246,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 navigateDiaryUpdateDialog(event.date)
             }
             is DiaryEditEvent.NavigateDiaryDeleteDialog -> {
-                navigateDiaryDeleteDialog(event.parameters)
+                navigateDiaryDeleteDialog(event.date)
             }
             is DiaryEditEvent.NavigateDatePickerDialog -> {
                 navigateDatePickerDialog(event.date)
@@ -780,9 +779,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryDeleteDialog(parameters: DiaryDeleteParameters) {
+    private fun navigateDiaryDeleteDialog(date: LocalDate) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryDeleteDialog(parameters)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryDeleteDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 

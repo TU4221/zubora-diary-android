@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import java.time.LocalDate
 import java.time.Year
 
@@ -12,7 +11,7 @@ sealed class DiaryListEvent : UiEvent {
         val newestYear: Year,
         val oldestYear: Year
     ) : DiaryListEvent()
-    internal data class NavigateDiaryDeleteDialog(val parameters: DiaryDeleteParameters) : DiaryListEvent()
+    internal data class NavigateDiaryDeleteDialog(val date: LocalDate) : DiaryListEvent()
 
     internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : DiaryListEvent()
 }

@@ -19,15 +19,13 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
 
     override fun createMessage(): String {
         val diaryDate =
-            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters.date
+            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
         val diaryDateString = diaryDate.toJapaneseDateString(requireContext())
         return diaryDateString + getString(R.string.dialog_diary_delete_message)
     }
 
     override fun handleOnPositiveButtonClick() {
-        val parameters =
-            DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).parameters
-        setResult(KEY_RESULT, DialogResult.Positive(parameters))
+        setResult(KEY_RESULT, DialogResult.Positive(Unit))
     }
 
     override fun handleOnNegativeButtonClick() {

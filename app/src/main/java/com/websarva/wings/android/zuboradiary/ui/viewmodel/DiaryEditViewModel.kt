@@ -34,7 +34,6 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
@@ -310,6 +309,12 @@ internal class DiaryEditViewModel @Inject constructor(
     )
     private var pendingDiaryUpdateParameters: DiaryUpdateParameters? = null
 
+    private data class DiaryDeleteParameters(
+        val date: LocalDate,
+        val imageFileName: ImageFileNameUi? // TODO:IDを持たせるように変更する
+    )
+    private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
+
     private data class DiaryItemDeleteParameters(
         val itemNumber: ItemNumber
     )
@@ -414,11 +419,10 @@ internal class DiaryEditViewModel @Inject constructor(
         val originalDate = originalDiary.date
         val originalImageFileName = originalDiary.imageFileName?.toUiModel()
 
-        val parameters = DiaryDeleteParameters(originalDate, originalImageFileName)
-
         viewModelScope.launch {
+            updatePendingDiaryDeleteParameters(originalDate, originalImageFileName)
             emitUiEvent(
-                DiaryEditEvent.NavigateDiaryDeleteDialog(parameters)
+                DiaryEditEvent.NavigateDiaryDeleteDialog(originalDate)
             )
         }
 
@@ -566,21 +570,24 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryDeleteDialogResultReceived(result: DialogResult<DiaryDeleteParameters>) {
+    fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
-            is DialogResult.Positive<DiaryDeleteParameters> -> {
-                handleDiaryDeleteDialogPositiveResult(result.data)
+            is DialogResult.Positive -> {
+                handleDiaryDeleteDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
                 // 処理なし
             }
         }
+        clearPendingDiaryDeleteParameters()
     }
 
-    private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters) {
+    private fun handleDiaryDeleteDialogPositiveResult() {
+        val parameters = pendingDiaryDeleteParameters ?: return
         val date = parameters.date
         val imageFileName = parameters.imageFileName
+
         viewModelScope.launch {
             deleteDiary(date, imageFileName)
         }
@@ -1265,6 +1272,17 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun clearPendingDiaryUpdateParameters() {
         pendingDiaryUpdateParameters = null
+    }
+
+    private fun updatePendingDiaryDeleteParameters(date: LocalDate, imageFileName: ImageFileNameUi?) {
+        pendingDiaryDeleteParameters = DiaryDeleteParameters(
+            date,
+            imageFileName
+        )
+    }
+
+    private fun clearPendingDiaryDeleteParameters() {
+        pendingDiaryDeleteParameters = null
     }
 
     private fun updatePendingDiaryUpdateParameters(originalDiaryDate: LocalDate) {

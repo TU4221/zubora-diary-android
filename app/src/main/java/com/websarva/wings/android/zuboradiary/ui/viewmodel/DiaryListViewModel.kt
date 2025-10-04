@@ -27,7 +27,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
@@ -89,6 +88,13 @@ internal class DiaryListViewModel @Inject constructor(
     private var sortConditionDate: LocalDate? = null
 
     private var isLoadingOnScrolled = false
+
+    // キャッシュパラメータ
+    private data class DiaryDeleteParameters(
+        val date: LocalDate,
+        val imageFileName: ImageFileNameUi?
+    )
+    private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
 
     init {
         initializeDiaryListData()
@@ -179,10 +185,9 @@ internal class DiaryListViewModel @Inject constructor(
         val date = item.date
         val imageFileName = item.imageFileName
         viewModelScope.launch {
+            updatePendingDiaryDeleteParameters(date, imageFileName)
             emitUiEvent(
-                DiaryListEvent.NavigateDiaryDeleteDialog(
-                    DiaryDeleteParameters(date, imageFileName)
-                )
+                DiaryListEvent.NavigateDiaryDeleteDialog(date)
             )
         }
     }
@@ -262,23 +267,26 @@ internal class DiaryListViewModel @Inject constructor(
             }
     }
 
-    fun onDiaryDeleteDialogResultReceived(result: DialogResult<DiaryDeleteParameters>) {
+    fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
+        Log.d("20251004", "onDiaryDeleteDialogResultReceived")
         when (result) {
-            is DialogResult.Positive<DiaryDeleteParameters> -> {
-                handleDiaryDeleteDialogPositiveResult(
-                    result.data.date,
-                    result.data.imageFileName
-                )
+            is DialogResult.Positive -> {
+                handleDiaryDeleteDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
                 // 処理なし
             }
         }
+        clearPendingDiaryDeleteParameters()
     }
 
-    private fun handleDiaryDeleteDialogPositiveResult(date: LocalDate, fileName: ImageFileNameUi?) {
+    private fun handleDiaryDeleteDialogPositiveResult() {
+        val parameters = pendingDiaryDeleteParameters ?: return
+        val date = parameters.date
+        val fileName = parameters.imageFileName
         val currentList = _diaryList.value
+
         viewModelScope.launch {
             deleteDiary(date, fileName, currentList)
         }
@@ -457,5 +465,16 @@ internal class DiaryListViewModel @Inject constructor(
 
     private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
         isLoadingOnScrolled = isLoading
+    }
+
+    private fun updatePendingDiaryDeleteParameters(date: LocalDate, imageFileName: ImageFileNameUi?) {
+        pendingDiaryDeleteParameters = DiaryDeleteParameters(
+            date,
+            imageFileName
+        )
+    }
+
+    private fun clearPendingDiaryDeleteParameters() {
+        pendingDiaryDeleteParameters = null
     }
 }
