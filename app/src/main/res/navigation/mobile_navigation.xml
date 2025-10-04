@@ -429,8 +429,8 @@
             android:id="@+id/navigation_diary_item_delete_dialog"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemDeleteDialogFragment">
             <argument
-                android:name="parameters"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters" />
+                android:name="itemNumber"
+                app:argType="integer" />
         </dialog>
 
         <dialog

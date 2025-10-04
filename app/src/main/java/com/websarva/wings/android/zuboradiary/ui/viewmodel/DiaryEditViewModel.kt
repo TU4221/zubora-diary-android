@@ -35,7 +35,6 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
@@ -311,6 +310,11 @@ internal class DiaryEditViewModel @Inject constructor(
     )
     private var pendingDiaryUpdateParameters: DiaryUpdateParameters? = null
 
+    private data class DiaryItemDeleteParameters(
+        val itemNumber: ItemNumber
+    )
+    private var pendingDiaryItemDeleteParameters: DiaryItemDeleteParameters? = null
+
     private data class WeatherInfoFetchParameters(
         val date: LocalDate
     )
@@ -478,9 +482,9 @@ internal class DiaryEditViewModel @Inject constructor(
         if (!canExecuteOperationWithUiUpdate) return
 
         viewModelScope.launch {
-            val parameters = DiaryItemDeleteParameters(itemNumber)
+            updatePendingDiaryItemDeleteParameters(ItemNumber(itemNumber))
             emitUiEvent(
-                DiaryEditEvent.NavigateDiaryItemDeleteDialog(parameters)
+                DiaryEditEvent.NavigateDiaryItemDeleteDialog(itemNumber)
             )
         }
     }
@@ -635,20 +639,21 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemDeleteDialogResultReceived(result: DialogResult<DiaryItemDeleteParameters>) {
+    fun onDiaryItemDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
-            is DialogResult.Positive<DiaryItemDeleteParameters> -> {
-                handleDiaryItemDeleteDialogPositiveResult(result.data)
+            is DialogResult.Positive -> {
+                handleDiaryItemDeleteDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
                 // 処理なし
             }
         }
+        clearPendingDiaryItemDeleteParameters()
     }
 
-    private fun handleDiaryItemDeleteDialogPositiveResult(parameters: DiaryItemDeleteParameters) {
-        val itemNumber = ItemNumber(parameters.itemNumber)
+    private fun handleDiaryItemDeleteDialogPositiveResult() {
+        val itemNumber = pendingDiaryItemDeleteParameters?.itemNumber ?: return
         viewModelScope.launch {
             requestDiaryItemDeleteTransition(itemNumber)
         }
@@ -1280,6 +1285,16 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun clearPendingWeatherInfoFetchParameters() {
         pendingWeatherInfoFetchParameters = null
+    }
+
+    private fun updatePendingDiaryItemDeleteParameters(itemNumber: ItemNumber) {
+        pendingDiaryItemDeleteParameters = DiaryItemDeleteParameters(
+            itemNumber
+        )
+    }
+
+    private fun clearPendingDiaryItemDeleteParameters() {
+        pendingDiaryItemDeleteParameters = null
     }
 
     // TODO:テスト用の為、最終的に削除

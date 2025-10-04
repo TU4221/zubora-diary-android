@@ -41,7 +41,6 @@ import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryDeleteParameters
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinnerAdapter
@@ -257,7 +256,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 navigateWeatherInfoFetchDialog(event.date)
             }
             is DiaryEditEvent.NavigateDiaryItemDeleteDialog -> {
-                navigateDiaryItemDeleteDialog(event.parameters)
+                navigateDiaryItemDeleteDialog(event.itemNumber)
             }
             DiaryEditEvent.NavigateDiaryImageDeleteDialog -> {
                 navigateDiaryImageDeleteDialog()
@@ -800,9 +799,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryItemDeleteDialog(parameters: DiaryItemDeleteParameters) {
+    private fun navigateDiaryItemDeleteDialog(itemNumber: Int) {
         val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemDeleteDialog(parameters)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
