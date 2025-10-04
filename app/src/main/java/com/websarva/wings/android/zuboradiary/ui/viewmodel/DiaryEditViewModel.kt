@@ -671,7 +671,7 @@ internal class DiaryEditViewModel @Inject constructor(
         parameters: PreviousNavigationParameters?
     ) {
         viewModelScope.launch {
-            clearDiaryImageCacheFileUseCase()
+            clearDiaryImageCacheFile()
             parameters?.let {
                 navigatePreviousFragment(it.originalDiaryDate)
             } ?: throw IllegalStateException()
@@ -813,7 +813,7 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 updateUiState(DiaryEditState.Editing)
-                clearDiaryImageCacheFileUseCase()
+                clearDiaryImageCacheFile()
                 emitUiEvent(
                     DiaryEditEvent
                         .NavigateDiaryShowFragment(diary.date)
@@ -846,7 +846,7 @@ internal class DiaryEditViewModel @Inject constructor(
         when (val result = deleteDiaryUseCase(date, imageFileName?.toDomainModel())) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
-                clearDiaryImageCacheFileUseCase()
+                clearDiaryImageCacheFile()
                 updateUiState(DiaryEditState.Editing)
                 emitUiEvent(
                     DiaryEditEvent
@@ -1068,7 +1068,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun deleteImageUri() {
         updateImageFileName(null)
-        clearDiaryImageCacheFileUseCase()
+        clearDiaryImageCacheFile()
     }
 
     private suspend fun cacheDiaryImage(uri: Uri?, diaryId: UUIDString) {
@@ -1091,6 +1091,18 @@ internal class DiaryEditViewModel @Inject constructor(
             }
         }
         updateUiState(DiaryEditState.Editing)
+    }
+
+    private suspend fun clearDiaryImageCacheFile() {
+        when (val result = clearDiaryImageCacheFileUseCase()) {
+            is UseCaseResult.Success -> {
+                // 処理なし
+            }
+            is UseCaseResult.Failure -> {
+                Log.e(logTag, "画像キャッシュファイルクリア失敗", result.exception)
+                // ユーザーには直接関わらない処理の為、通知不要
+            }
+        }
     }
 
     private suspend fun buildImageFilePath(fileName: ImageFileNameUi?) {
@@ -1122,7 +1134,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 DiaryEditEvent.NavigateExitWithoutDiarySaveConfirmationDialog
             )
         } else {
-            clearDiaryImageCacheFileUseCase()
+            clearDiaryImageCacheFile()
             navigatePreviousFragment(originalDiary.date)
         }
     }
@@ -1376,7 +1388,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     }
                 }
             }
-            clearDiaryImageCacheFileUseCase()
+            clearDiaryImageCacheFile()
             navigatePreviousFragment(_originalDiary.requireValue().date)
             isTesting = false
         }
