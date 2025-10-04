@@ -1140,7 +1140,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val shouldRequest =
             shouldRequestExitWithoutDiarySaveConfirmationUseCase(diary, originalDiary).value
         if (shouldRequest) {
-            updatePendingDiaryUpdateParameters(originalDiary.date)
+            updatePendingPreviousNavigationParameter(originalDiary.date)
             emitUiEvent(
                 DiaryEditEvent.NavigateExitWithoutDiarySaveConfirmationDialog
             )
@@ -1285,7 +1285,7 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryDeleteParameters = null
     }
 
-    private fun updatePendingDiaryUpdateParameters(originalDiaryDate: LocalDate) {
+    private fun updatePendingPreviousNavigationParameter(originalDiaryDate: LocalDate) {
         pendingPreviousNavigationParameters = PreviousNavigationParameters(
             originalDiaryDate
         )
