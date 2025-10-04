@@ -17,7 +17,6 @@ import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemTitleDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
@@ -91,9 +90,7 @@ class DiaryItemTitleEditDialog :
                 )
             }
             is DiaryItemTitleEditEvent.NavigateSelectionHistoryItemDeleteDialog -> {
-                navigateDiaryItemTitleDeleteDialog(
-                    event.parameters
-                )
+                navigateDiaryItemTitleDeleteDialog(event.itemTitle)
             }
             is DiaryItemTitleEditEvent.CommonEvent -> {
                 when(event.wrappedEvent) {
@@ -190,13 +187,10 @@ class DiaryItemTitleEditDialog :
         navigatePreviousFragment()
     }
 
-    private fun navigateDiaryItemTitleDeleteDialog(
-        parameters: DiaryItemTitleSelectionHistoryItemDeleteParameters
-    ) {
+    private fun navigateDiaryItemTitleDeleteDialog(itemTitle: String) {
         val directions =
-            DiaryItemTitleEditDialogDirections.actionDiaryItemTitleEditDialogToDiaryItemTitleDeleteDialog(
-                parameters
-            )
+            DiaryItemTitleEditDialogDirections
+                .actionDiaryItemTitleEditDialogToDiaryItemTitleDeleteDialog(itemTitle)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 

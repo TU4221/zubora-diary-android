@@ -16,7 +16,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
-import com.websarva.wings.android.zuboradiary.ui.model.parameters.DiaryItemTitleSelectionHistoryItemDeleteParameters
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryItemTitleEditState
@@ -78,6 +77,12 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     private val initialItemTitleSelectionHistoryList = DiaryItemTitleSelectionHistoryListUi(emptyList())
     lateinit var itemTitleSelectionHistoryList: StateFlow<DiaryItemTitleSelectionHistoryListUi>
+
+    // キャッシュパラメータ
+    private data class HistoryItemDeleteParameters(
+        val itemTitle: String
+    )
+    private var pendingHistoryItemDeleteParameters: HistoryItemDeleteParameters? = null
 
     init {
         setUpItemTitleSelectionHistoryList()
@@ -143,10 +148,11 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     fun onDiaryItemTitleSelectionHistoryListItemSwipe(item: DiaryItemTitleSelectionHistoryListItemUi) {
         val itemTitle = item.title
         viewModelScope.launch {
+            updatePendingHistoryItemDeleteParameters(itemTitle)
             emitUiEvent(
                 DiaryItemTitleEditEvent
                     .NavigateSelectionHistoryItemDeleteDialog(
-                        DiaryItemTitleSelectionHistoryItemDeleteParameters(itemTitle)
+                        itemTitle
                     )
             )
         }
@@ -162,23 +168,22 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(
-        result: DialogResult<DiaryItemTitleSelectionHistoryItemDeleteParameters>
+        result: DialogResult<Unit>
     ) {
         when (result) {
             is DialogResult.Positive -> {
-                handleDiaryItemTitleSelectionHistoryDeleteDialogPositiveResult(result.data)
+                handleDiaryItemTitleSelectionHistoryDeleteDialogPositiveResult()
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
                 handleDiaryItemTitleSelectionHistoryDeleteDialogNegativeResult()
             }
         }
+        clearPendingHistoryItemDeleteParameters()
     }
 
-    private fun handleDiaryItemTitleSelectionHistoryDeleteDialogPositiveResult(
-        parameters: DiaryItemTitleSelectionHistoryItemDeleteParameters
-    ) {
-        val deleteTitle = parameters.itemTitle
+    private fun handleDiaryItemTitleSelectionHistoryDeleteDialogPositiveResult() {
+        val deleteTitle = pendingHistoryItemDeleteParameters?.itemTitle ?: return
         viewModelScope.launch {
             deleteDiaryItemTitleSelectionHistory(deleteTitle)
         }
@@ -281,5 +286,15 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     private fun updateItemTitleInputTextValidationResult(result: InputTextValidationResult) {
         _itemTitleInputTextValidationResult.value = result
+    }
+
+    private fun updatePendingHistoryItemDeleteParameters(itemTitle: String) {
+        pendingHistoryItemDeleteParameters = HistoryItemDeleteParameters(
+            itemTitle
+        )
+    }
+
+    private fun clearPendingHistoryItemDeleteParameters() {
+        pendingHistoryItemDeleteParameters = null
     }
 }
