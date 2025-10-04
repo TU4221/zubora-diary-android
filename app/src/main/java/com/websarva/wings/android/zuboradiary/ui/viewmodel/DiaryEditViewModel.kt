@@ -296,38 +296,11 @@ internal class DiaryEditViewModel @Inject constructor(
         )
 
     // キャッシュパラメータ
-    private data class DiaryLoadParameters(
-        val date: LocalDate
-    )
     private var pendingDiaryLoadParameters: DiaryLoadParameters? = null
-
-    private data class DiaryUpdateParameters(
-        val diary: Diary,
-        val diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
-        val originalDiary: Diary,
-        val isNewDiary: Boolean
-    )
     private var pendingDiaryUpdateParameters: DiaryUpdateParameters? = null
-
-    private data class DiaryDeleteParameters(
-        val date: LocalDate,
-        val imageFileName: ImageFileNameUi? // TODO:IDを持たせるように変更する
-    )
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
-
-    private data class DiaryItemDeleteParameters(
-        val itemNumber: ItemNumber
-    )
     private var pendingDiaryItemDeleteParameters: DiaryItemDeleteParameters? = null
-
-    private data class WeatherInfoFetchParameters(
-        val date: LocalDate
-    )
     private var pendingWeatherInfoFetchParameters: WeatherInfoFetchParameters? = null
-
-    private data class PreviousNavigationParameters(
-        val originalDiaryDate: LocalDate
-    )
     private var pendingPreviousNavigationParameters: PreviousNavigationParameters? = null
 
     // TODO:テスト用の為、最終的に削除
@@ -515,7 +488,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onDiaryLoadDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
-                handleDiaryLoadDialogPositiveResult()
+                handleDiaryLoadDialogPositiveResult(pendingDiaryLoadParameters)
             }
             is DialogResult.Negative,
             is DialogResult.Cancel -> {
@@ -525,10 +498,11 @@ internal class DiaryEditViewModel @Inject constructor(
         clearPendingDiaryLoadParameters()
     }
 
-    private fun handleDiaryLoadDialogPositiveResult() {
-        val date = pendingDiaryLoadParameters?.date ?: return
+    private fun handleDiaryLoadDialogPositiveResult(parameters: DiaryLoadParameters?) {
         viewModelScope.launch {
-            loadDiary(date)
+            parameters?.let {
+                loadDiary(it.date)
+            } ?: throw IllegalStateException()
         }
     }
 
@@ -544,7 +518,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onDiaryUpdateDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
-                handleDiaryUpdateDialogPositiveResult()
+                handleDiaryUpdateDialogPositiveResult(pendingDiaryUpdateParameters)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -554,26 +528,23 @@ internal class DiaryEditViewModel @Inject constructor(
         clearPendingDiaryUpdateParameters()
     }
 
-    private fun handleDiaryUpdateDialogPositiveResult() {
-        val parameters = pendingDiaryUpdateParameters  ?: return
-        val diary = parameters.diary
-        val diaryItemTitleSelectionHistoryList = parameters.diaryItemTitleSelectionHistoryList
-        val originalDiary = parameters.originalDiary
-        val isNewDiary = parameters.isNewDiary
+    private fun handleDiaryUpdateDialogPositiveResult(parameters: DiaryUpdateParameters?) {
         viewModelScope.launch {
-            saveDiary(
-                diary,
-                diaryItemTitleSelectionHistoryList,
-                originalDiary,
-                isNewDiary
-            )
+            parameters?.let {
+                saveDiary(
+                    it.diary,
+                    it.diaryItemTitleSelectionHistoryList,
+                    it.originalDiary,
+                    it.isNewDiary
+                )
+            } ?: throw IllegalStateException()
         }
     }
 
     fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
-                handleDiaryDeleteDialogPositiveResult()
+                handleDiaryDeleteDialogPositiveResult(pendingDiaryDeleteParameters)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -583,13 +554,11 @@ internal class DiaryEditViewModel @Inject constructor(
         clearPendingDiaryDeleteParameters()
     }
 
-    private fun handleDiaryDeleteDialogPositiveResult() {
-        val parameters = pendingDiaryDeleteParameters ?: return
-        val date = parameters.date
-        val imageFileName = parameters.imageFileName
-
+    private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters?) {
         viewModelScope.launch {
-            deleteDiary(date, imageFileName)
+            parameters?.let {
+                deleteDiary(it.date, it.imageFileName)
+            } ?: throw IllegalStateException()
         }
     }
 
@@ -649,7 +618,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onDiaryItemDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
-                handleDiaryItemDeleteDialogPositiveResult()
+                handleDiaryItemDeleteDialogPositiveResult(pendingDiaryItemDeleteParameters)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -659,10 +628,11 @@ internal class DiaryEditViewModel @Inject constructor(
         clearPendingDiaryItemDeleteParameters()
     }
 
-    private fun handleDiaryItemDeleteDialogPositiveResult() {
-        val itemNumber = pendingDiaryItemDeleteParameters?.itemNumber ?: return
+    private fun handleDiaryItemDeleteDialogPositiveResult(parameters: DiaryItemDeleteParameters?) {
         viewModelScope.launch {
-            requestDiaryItemDeleteTransition(itemNumber)
+            parameters?.let {
+                requestDiaryItemDeleteTransition(it.itemNumber)
+            } ?: throw IllegalStateException()
         }
     }
 
@@ -687,12 +657,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onExitWithoutDiarySaveDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
-                val originalDiaryDate =
-                    pendingPreviousNavigationParameters?.originalDiaryDate ?: return
-                viewModelScope.launch {
-                    clearDiaryImageCacheFileUseCase()
-                    navigatePreviousFragment(originalDiaryDate)
-                }
+                handleExitWithoutDiarySaveDialogPositiveResult(pendingPreviousNavigationParameters)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -700,6 +665,17 @@ internal class DiaryEditViewModel @Inject constructor(
             }
         }
         clearPendingPreviousNavigationParameters()
+    }
+
+    private fun handleExitWithoutDiarySaveDialogPositiveResult(
+        parameters: PreviousNavigationParameters?
+    ) {
+        viewModelScope.launch {
+            clearDiaryImageCacheFileUseCase()
+            parameters?.let {
+                navigatePreviousFragment(it.originalDiaryDate)
+            } ?: throw IllegalStateException()
+        }
     }
 
     fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitle>) {
@@ -752,10 +728,11 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onAccessLocationPermissionChecked(
         isGranted: Boolean
     ) {
-        val date = pendingWeatherInfoFetchParameters?.date ?: return
-
+        val parameters = pendingWeatherInfoFetchParameters
         viewModelScope.launch {
-            fetchWeatherInfo(isGranted, date)
+            parameters?.let {
+                fetchWeatherInfo(isGranted, it.date)
+            } ?: throw IllegalStateException()
         }
     }
 
@@ -1247,9 +1224,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun updatePendingDiaryLoadParameters(date: LocalDate) {
-        pendingDiaryLoadParameters = DiaryLoadParameters(
-            date
-        )
+        pendingDiaryLoadParameters = DiaryLoadParameters(date)
     }
 
     private fun clearPendingDiaryLoadParameters() {
@@ -1262,12 +1237,13 @@ internal class DiaryEditViewModel @Inject constructor(
         originalDiary: Diary,
         isNewDiary: Boolean
     ) {
-        pendingDiaryUpdateParameters = DiaryUpdateParameters(
-            diary,
-            diaryItemTitleSelectionHistoryList,
-            originalDiary,
-            isNewDiary
-        )
+        pendingDiaryUpdateParameters =
+            DiaryUpdateParameters(
+                diary,
+                diaryItemTitleSelectionHistoryList,
+                originalDiary,
+                isNewDiary
+            )
     }
 
     private fun clearPendingDiaryUpdateParameters() {
@@ -1275,10 +1251,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun updatePendingDiaryDeleteParameters(date: LocalDate, imageFileName: ImageFileNameUi?) {
-        pendingDiaryDeleteParameters = DiaryDeleteParameters(
-            date,
-            imageFileName
-        )
+        pendingDiaryDeleteParameters = DiaryDeleteParameters(date, imageFileName)
     }
 
     private fun clearPendingDiaryDeleteParameters() {
@@ -1286,9 +1259,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun updatePendingPreviousNavigationParameter(originalDiaryDate: LocalDate) {
-        pendingPreviousNavigationParameters = PreviousNavigationParameters(
-            originalDiaryDate
-        )
+        pendingPreviousNavigationParameters = PreviousNavigationParameters(originalDiaryDate)
     }
 
     private fun clearPendingPreviousNavigationParameters() {
@@ -1296,9 +1267,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun updatePendingWeatherInfoFetchParameters(date: LocalDate) {
-        pendingWeatherInfoFetchParameters = WeatherInfoFetchParameters(
-            date
-        )
+        pendingWeatherInfoFetchParameters = WeatherInfoFetchParameters(date)
     }
 
     private fun clearPendingWeatherInfoFetchParameters() {
@@ -1306,14 +1275,40 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun updatePendingDiaryItemDeleteParameters(itemNumber: ItemNumber) {
-        pendingDiaryItemDeleteParameters = DiaryItemDeleteParameters(
-            itemNumber
-        )
+        pendingDiaryItemDeleteParameters = DiaryItemDeleteParameters(itemNumber)
     }
 
     private fun clearPendingDiaryItemDeleteParameters() {
         pendingDiaryItemDeleteParameters = null
     }
+
+    private data class DiaryLoadParameters(
+        val date: LocalDate
+    )
+
+    private data class DiaryUpdateParameters(
+        val diary: Diary,
+        val diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
+        val originalDiary: Diary,
+        val isNewDiary: Boolean
+    )
+
+    private data class DiaryDeleteParameters(
+        val date: LocalDate,
+        val imageFileName: ImageFileNameUi? // TODO:IDを持たせるように変更する
+    )
+
+    private data class DiaryItemDeleteParameters(
+        val itemNumber: ItemNumber
+    )
+
+    private data class WeatherInfoFetchParameters(
+        val date: LocalDate
+    )
+
+    private data class PreviousNavigationParameters(
+        val originalDiaryDate: LocalDate
+    )
 
     // TODO:テスト用の為、最終的に削除
     // TODO:上手く保存されない。保存ユースケースの条件を変えたため？

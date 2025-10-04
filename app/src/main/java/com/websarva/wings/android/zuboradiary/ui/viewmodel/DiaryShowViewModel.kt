@@ -60,10 +60,6 @@ internal class DiaryShowViewModel @Inject constructor(
             )
 
     // キャッシュパラメータ
-    private data class DiaryDeleteParameters(
-        val date: LocalDate,
-        val imageFileName: ImageFileNameUi?
-    )
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
 
     init {
@@ -152,7 +148,7 @@ internal class DiaryShowViewModel @Inject constructor(
     fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
-                handleDiaryDeleteDialogPositiveResult()
+                handleDiaryDeleteDialogPositiveResult(pendingDiaryDeleteParameters)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -162,13 +158,11 @@ internal class DiaryShowViewModel @Inject constructor(
         clearPendingDiaryDeleteParameters()
     }
 
-    private fun handleDiaryDeleteDialogPositiveResult() {
-        val parameters = pendingDiaryDeleteParameters ?: return
-        val date = parameters.date
-        val imageFileName = parameters.imageFileName
-
+    private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters?) {
         viewModelScope.launch {
-            deleteDiary(date, imageFileName)
+            parameters?.let {
+                deleteDiary(it.date, it.imageFileName)
+            } ?: throw IllegalStateException()
         }
     }
 
@@ -240,4 +234,9 @@ internal class DiaryShowViewModel @Inject constructor(
     private fun clearPendingDiaryDeleteParameters() {
         pendingDiaryDeleteParameters = null
     }
+
+    private data class DiaryDeleteParameters(
+        val date: LocalDate,
+        val imageFileName: ImageFileNameUi?
+    )
 }
