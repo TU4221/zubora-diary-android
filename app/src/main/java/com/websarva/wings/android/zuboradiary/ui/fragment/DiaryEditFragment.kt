@@ -231,7 +231,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     override fun onMainUiEventReceived(event: DiaryEditEvent) {
         when (event) {
             is DiaryEditEvent.NavigateDiaryShowFragment -> {
-                navigateDiaryShowFragment(event.date)
+                navigateDiaryShowFragment(event.id, event.date)
             }
             is DiaryEditEvent.NavigateDiaryItemTitleEditFragment -> {
                 navigateDiaryItemTitleEditFragment(event.diaryItemTitle)
@@ -735,7 +735,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
     }
 
-    private fun navigateDiaryShowFragment(date: LocalDate) {
+    private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
         // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
         val containsDiaryShowFragment =
             try {
@@ -746,9 +746,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             }
 
         val directions = if (containsDiaryShowFragment) {
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryShow(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryShow(id, date)
         } else {
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryEdit(date)
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryEdit(id, date)
         }
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }

@@ -171,9 +171,12 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onWordSearchResultListItemClick(item: DiaryDayListItemUi.WordSearchResult) {
+        val id = item.id
         val date = item.date
         viewModelScope.launch {
-            emitUiEvent(WordSearchEvent.NavigateDiaryShowFragment(date))
+            emitUiEvent(
+                WordSearchEvent.NavigateDiaryShowFragment(id, date)
+            )
         }
     }
 

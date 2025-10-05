@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.list.diary
 
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import java.time.LocalDate
 
 /**
@@ -9,6 +10,7 @@ import java.time.LocalDate
  * アプリケーションのドメイン層で運用される[DiaryDayListItem.WordSearchResult]に変換される。
  * 最大5つの日記項目タイトルとコメントのペアを保持できる構造になっている。
  *
+ * @property id 日記のID。
  * @property date 日記の日付。
  * @property title 日記全体のタイトル。
  * @property item1Title 1番目のアイテムのタイトル。
@@ -23,6 +25,7 @@ import java.time.LocalDate
  * @property item5Comment 5番目のアイテムのコメント。未記述の場合null。
  */
 internal data class RawWordSearchResultListItem(
+    val id: UUIDString,
     val date: LocalDate,
     val title: String,
     val item1Title: String,

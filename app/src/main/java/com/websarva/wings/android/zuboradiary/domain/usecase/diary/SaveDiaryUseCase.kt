@@ -32,7 +32,7 @@ import java.time.LocalDate
  */
 internal class SaveDiaryUseCase(
     private val diaryRepository: DiaryRepository,
-    private val fileRepository: FileRepository
+    private val fileRepository: FileRepository,
 ) {
 
     private val logTag = createLogTag()
@@ -160,7 +160,8 @@ internal class SaveDiaryUseCase(
                 originalDiary.date
             )
         return if (shouldDeleteSameDateDiary) {
-            val deleteDiary = diaryRepository.loadDiary(saveDiary.date)
+            val deleteDiaryId = diaryRepository.loadDiaryId(saveDiary.date)
+            val deleteDiary = diaryRepository.loadDiary(deleteDiaryId)
             diaryRepository.deleteAndSaveDiary(saveDiary)
             deleteDiary
         } else {

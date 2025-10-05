@@ -23,7 +23,10 @@
                 android:id="@+id/action_navigation_diary_list_fragment_to_diary_show_fragment"
                 app:destination="@id/nested_navigation_diary_show">
                 <argument
-                    android:name="date"
+                    android:name="load_diary_id"
+                    app:argType="string" />
+                <argument
+                    android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />
             </action>
 
@@ -31,10 +34,11 @@
                 android:id="@+id/action_navigation_diary_list_fragment_to_diary_edit_fragment"
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
-                    android:name="should_load_diary"
-                    app:argType="boolean" />
+                    android:name="load_diary_id"
+                    app:argType="string"
+                    app:nullable="true" />
                 <argument
-                    android:name="diary_date"
+                    android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />
             </action>
 
@@ -84,7 +88,10 @@
                 android:id="@+id/action_navigation_word_search_fragment_to_diary_show_fragment"
                 app:destination="@id/nested_navigation_diary_show">
                 <argument
-                    android:name="date"
+                    android:name="load_diary_id"
+                    app:argType="string" />
+                <argument
+                    android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />
             </action>
 
@@ -114,10 +121,11 @@
                 android:id="@+id/action_navigation_calendar_fragment_to_diary_edit_fragment"
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
-                    android:name="should_load_diary"
-                    app:argType="boolean" />
+                    android:name="load_diary_id"
+                    app:argType="string"
+                    app:nullable="true" />
                 <argument
-                    android:name="diary_date"
+                    android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />
             </action>
 
@@ -241,17 +249,21 @@
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment"
             tools:layout="@layout/fragment_diary_show" >
             <argument
-                android:name="date"
+                android:name="load_diary_id"
+                app:argType="string" />
+            <argument
+                android:name="load_diary_date"
                 app:argType="java.time.LocalDate" />
 
             <action
                 android:id="@+id/action_navigation_diary_show_fragment_to_diary_edit_fragment"
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
-                    android:name="should_load_diary"
-                    app:argType="boolean" />
+                    android:name="load_diary_id"
+                    app:argType="string"
+                    app:nullable="true" />
                 <argument
-                    android:name="diary_date"
+                    android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />
             </action>
 
@@ -301,10 +313,11 @@
             tools:layout="@layout/fragment_diary_edit"
             android:label="@string/title_settings" >
             <argument
-                android:name="should_load_diary"
-                app:argType="boolean" />
+                android:name="load_diary_id"
+                app:argType="string"
+                app:nullable="true" />
             <argument
-                android:name="diary_date"
+                android:name="load_diary_date"
                 app:argType="java.time.LocalDate" />
 
             <action
@@ -317,7 +330,10 @@
                 app:popUpTo="@id/navigation_diary_show_fragment"
                 app:popUpToInclusive="true">
                 <argument
-                    android:name="date"
+                    android:name="load_diary_id"
+                    app:argType="string" />
+                <argument
+                    android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />
             </action>
 
@@ -327,7 +343,10 @@
                 app:popUpTo="@id/navigation_diary_edit_fragment"
                 app:popUpToInclusive="true">
                 <argument
-                    android:name="date"
+                    android:name="load_diary_id"
+                    app:argType="string" />
+                <argument
+                    android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />
             </action>
 

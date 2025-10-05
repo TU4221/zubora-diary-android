@@ -6,8 +6,10 @@ import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseEx
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDomainModel
+import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
@@ -42,9 +44,20 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    override suspend fun loadDiary(date: LocalDate): Diary {
+    override suspend fun loadDiaryId(date: LocalDate): UUIDString {
         return try {
-            diaryDataSource.selectDiary(date).toDomainModel()
+            val idList = diaryDataSource.selectDiaryId(date)
+            if (idList.isEmpty()) throw ResourceNotFoundException()
+            if (idList.size > 1) throw IllegalStateException()
+            UUIDString(idList.first())
+        } catch (e: DatabaseException) {
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
+        }
+    }
+
+    override suspend fun loadDiary(id: UUIDString): Diary {
+        return try {
+            diaryDataSource.selectDiary(id.value).toDomainModel()
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }

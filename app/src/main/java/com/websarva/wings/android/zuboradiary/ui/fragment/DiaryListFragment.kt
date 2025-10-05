@@ -87,10 +87,10 @@ class DiaryListFragment :
     override fun onMainUiEventReceived(event: DiaryListEvent) {
         when (event) {
             is DiaryListEvent.NavigateDiaryShowFragment -> {
-                navigateDiaryShowFragment(event.date)
+                navigateDiaryShowFragment(event.id, event.date)
             }
             is DiaryListEvent.NavigateDiaryEditFragment -> {
-                navigateDiaryEditFragment()
+                navigateDiaryEditFragment(event.id, event.date)
             }
             is DiaryListEvent.NavigateWordSearchFragment -> {
                 navigateWordSearchFragment()
@@ -171,20 +171,20 @@ class DiaryListFragment :
         }
     }
 
-    private fun navigateDiaryEditFragment() {
+    private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {
         Log.d("20250714", "navigateDiaryEditFragment()")
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryEditFragment(
-                false,
-                LocalDate.now()
+                id,
+                date
             )
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryShowFragment(date: LocalDate) {
+    private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
         Log.d("20250714", "navigateDiaryShowFragment()")
         val directions =
-            DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryShowFragment(date)
+            DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryShowFragment(id, date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 

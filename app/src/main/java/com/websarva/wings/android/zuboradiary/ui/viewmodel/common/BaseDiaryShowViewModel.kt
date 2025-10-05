@@ -15,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 
 internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : UiState> (
     initialViewUiState: S,
@@ -79,8 +78,6 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
     protected fun initializeDiary() {
         diaryStateFlow.initialize()
     }
-
-    protected abstract suspend fun loadSavedDiary(date: LocalDate)
 
     protected fun updateDiary(diary: Diary) {
         diaryStateFlow.update(diary)

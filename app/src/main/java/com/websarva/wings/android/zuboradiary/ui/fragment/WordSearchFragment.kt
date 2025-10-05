@@ -60,7 +60,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
     override fun onMainUiEventReceived(event: WordSearchEvent) {
         when (event) {
             is WordSearchEvent.NavigateDiaryShowFragment -> {
-                navigateDiaryShowFragment(event.date)
+                navigateDiaryShowFragment(event.id, event.date)
             }
             WordSearchEvent.ShowKeyboard -> {
                 showKeyboard()
@@ -149,9 +149,10 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         listAdapter.scrollToTop()
     }
 
-    private fun navigateDiaryShowFragment(date: LocalDate) {
+    private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
         val directions =
-            WordSearchFragmentDirections.actionNavigationWordSearchFragmentToDiaryShowFragment(date)
+            WordSearchFragmentDirections
+                .actionNavigationWordSearchFragmentToDiaryShowFragment(id, date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 

@@ -11,10 +11,11 @@ import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.FetchWeatherInfoUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
@@ -25,6 +26,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequest
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ClearDiaryImageCacheFileUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CacheDiaryImageUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByIdUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageCacheException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiarySaveException
@@ -64,7 +66,8 @@ internal class DiaryEditViewModel @Inject constructor(
     private val shouldRequestDiaryLoadConfirmationUseCase: ShouldRequestDiaryLoadConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
     private val shouldRequestWeatherInfoConfirmationUseCase: ShouldRequestWeatherInfoConfirmationUseCase,
-    private val loadDiaryUseCase: LoadDiaryUseCase,
+    private val loadDiaryByIdUseCase: LoadDiaryByIdUseCase,
+    private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase,
     private val saveDiaryUseCase: SaveDiaryUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
     private val checkWeatherInfoFetchEnabledUseCase: CheckWeatherInfoFetchEnabledUseCase,
@@ -80,8 +83,8 @@ internal class DiaryEditViewModel @Inject constructor(
 
     companion object {
         // 呼び出し元のFragmentから受け取る引数のキー
-        private const val DIARY_DATE_ARGUMENT_KEY = "diary_date"
-        private const val SHOULD_LOAD_DIARY_ARGUMENT_KEY = "should_load_diary"
+        private const val DIARY_ID_ARGUMENT_KEY = "load_diary_id"
+        private const val DIARY_DATE_ARGUMENT_KEY = "load_diary_date"
 
         // ViewModel状態保存キー
         // MEMO:システムの初期化によるプロセスの終了から(アプリ設定変更からのアプリ再起動時)の復元用
@@ -315,12 +318,12 @@ internal class DiaryEditViewModel @Inject constructor(
         // MEMO:下記条件はアプリ設定変更時のアプリ再起動時の不要初期化対策
         if (uiState.value != DiaryEditState.Idle) return
 
+        val id =
+            handle.get<String>(DIARY_ID_ARGUMENT_KEY)?.let { UUIDString(it) }
         val date =
             handle.get<LocalDate>(DIARY_DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
-        val shouldLoadDiary =
-            handle.get<Boolean>(SHOULD_LOAD_DIARY_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         viewModelScope.launch {
-            prepareDiaryEntry(date, shouldLoadDiary)
+            prepareDiaryEntry(id, date)
         }
     }
 
@@ -501,7 +504,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun handleDiaryLoadDialogPositiveResult(parameters: DiaryLoadParameters?) {
         viewModelScope.launch {
             parameters?.let {
-                loadDiary(it.date)
+                loadDiaryByDate(it.date)
             } ?: throw IllegalStateException()
         }
     }
@@ -738,13 +741,13 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // データ処理
     private suspend fun prepareDiaryEntry(
-        date: LocalDate,
-        shouldLoadDiary: Boolean
+        id: UUIDString? = null,
+        date: LocalDate
     ) {
-        if (shouldLoadDiary) {
-            loadDiary(date)
-        } else {
+        if (id == null) {
             prepareNewDiaryEntry(date)
+        } else {
+            loadDiaryById(id, date)
         }
     }
 
@@ -763,13 +766,30 @@ internal class DiaryEditViewModel @Inject constructor(
         )
     }
 
-    private suspend fun loadDiary(date: LocalDate) {
+    private suspend fun loadDiaryById(id: UUIDString, date: LocalDate) {
+        executeDiaryLoad(id, date) { id, _ ->
+            id ?: throw IllegalArgumentException()
+            loadDiaryByIdUseCase(id)
+        }
+    }
+
+    private suspend fun loadDiaryByDate(date: LocalDate) {
+        executeDiaryLoad(date = date) { _, date ->
+            loadDiaryByDateUseCase(date)
+        }
+    }
+
+    private suspend fun <E : UseCaseException> executeDiaryLoad(
+        id: UUIDString? = null,
+        date: LocalDate,
+        processDiaryLoad: suspend (UUIDString?, LocalDate) -> UseCaseResult<Diary, E>
+    ) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
         val previousState = uiState.value
         updateUiState(DiaryEditState.Loading)
-        when (val result = loadDiaryUseCase(date)) {
+        when (val result = processDiaryLoad(id, date)) {
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)
                 val diary = result.value
@@ -816,7 +836,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 clearDiaryImageCacheFile()
                 emitUiEvent(
                     DiaryEditEvent
-                        .NavigateDiaryShowFragment(diary.date)
+                        .NavigateDiaryShowFragment(diary.id.value, diary.date)
                 )
             }
             is UseCaseResult.Failure -> {

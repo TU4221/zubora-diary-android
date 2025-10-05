@@ -3,10 +3,11 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByIdUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
@@ -28,7 +29,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
-    private val loadDiaryUseCase: LoadDiaryUseCase,
+    private val loadDiaryByIdUseCase: LoadDiaryByIdUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
     buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
 ) : BaseDiaryShowViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>(
@@ -38,7 +39,8 @@ internal class DiaryShowViewModel @Inject constructor(
 
     companion object {
         // 呼び出し元のFragmentから受け取る引数のキー
-        private const val DATE_ARGUMENT_KEY = "date"
+        private const val ID_ARGUMENT_KEY = "load_diary_id"
+        private const val DATE_ARGUMENT_KEY = "load_diary_date"
     }
 
     private val logTag = createLogTag()
@@ -67,9 +69,11 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private fun initializeDiaryData(handle: SavedStateHandle) {
+        val id = handle.get<String>(ID_ARGUMENT_KEY) ?: throw IllegalArgumentException()
+        val uuidString = UUIDString(id)
         val date = handle.get<LocalDate>(DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         viewModelScope.launch {
-            loadSavedDiary(date)
+            loadSavedDiary(uuidString, date)
         }
     }
 
@@ -103,10 +107,11 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // Viewクリック処理
     fun onDiaryEditMenuClick() {
+        val id = diaryStateFlow.id.requireValue()
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
             emitUiEvent(
-                DiaryShowEvent.NavigateDiaryEditFragment(date)
+                DiaryShowEvent.NavigateDiaryEditFragment(id.value, date)
             )
         }
     }
@@ -167,12 +172,12 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // データ処理
-    override suspend fun loadSavedDiary(date: LocalDate) {
+    private suspend fun loadSavedDiary(id: UUIDString, date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryShowState.Loading)
-        when (val result = loadDiaryUseCase(date)) {
+        when (val result = loadDiaryByIdUseCase(id)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(DiaryShowState.LoadSuccess)

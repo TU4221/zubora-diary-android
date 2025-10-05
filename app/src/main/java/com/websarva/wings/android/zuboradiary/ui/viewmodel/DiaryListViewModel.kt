@@ -169,9 +169,10 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     fun onDiaryListItemClick(item: DiaryDayListItemUi.Standard) {
+        val id = item.id
         val date = item.date
         viewModelScope.launch {
-            emitUiEvent(DiaryListEvent.NavigateDiaryShowFragment(date))
+            emitUiEvent(DiaryListEvent.NavigateDiaryShowFragment(id, date))
         }
     }
 
@@ -191,7 +192,7 @@ internal class DiaryListViewModel @Inject constructor(
     fun onDiaryEditButtonClick() {
         viewModelScope.launch {
             val today = LocalDate.now()
-            emitUiEvent(DiaryListEvent.NavigateDiaryEditFragment(today))
+            emitUiEvent(DiaryListEvent.NavigateDiaryEditFragment(date = today))
         }
     }
 

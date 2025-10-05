@@ -97,7 +97,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
     override fun onMainUiEventReceived(event: DiaryShowEvent) {
         when (event) {
             is DiaryShowEvent.NavigateDiaryEditFragment -> {
-                navigateDiaryEditFragment(event.date)
+                navigateDiaryEditFragment(event.id, event.date)
             }
             is DiaryShowEvent.NavigateDiaryLoadFailureDialog -> {
                 navigateDiaryLoadFailureDialog(event.date)
@@ -255,10 +255,10 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         }
     }
 
-    private fun navigateDiaryEditFragment(date: LocalDate) {
+    private fun navigateDiaryEditFragment(id: String, date: LocalDate) {
         val directions =
             DiaryShowFragmentDirections.actionNavigationDiaryShowFragmentToDiaryEditFragment(
-                true,
+                id,
                 date
             )
         navigateFragmentOnce(NavigationCommand.To(directions))

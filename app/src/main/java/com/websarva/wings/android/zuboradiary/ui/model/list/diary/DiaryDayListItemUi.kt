@@ -5,22 +5,25 @@ import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import java.time.LocalDate
 
 internal sealed class DiaryDayListItemUi(
+    open val id: String,
     open val date: LocalDate
 ) {
 
     data class Standard(
+        override val id: String,
         override val date: LocalDate,
         val title: String,
         val imageFileName: ImageFileNameUi?,
         val imageFilePath: ImageFilePathUi?
-    ) : DiaryDayListItemUi(date)
+    ) : DiaryDayListItemUi(id, date)
 
     data class WordSearchResult(
+        override val id: String,
         override val date: LocalDate,
         val title: String,
         val itemNumber: Int,
         val itemTitle: String,
         val itemComment: String,
         val searchWord: String,
-    ) : DiaryDayListItemUi(date)
+    ) : DiaryDayListItemUi(id, date)
 }

@@ -44,13 +44,22 @@ internal interface DiaryDao {
     suspend fun existsDiary(date: LocalDate): Boolean
 
     /**
-     * 指定された日付の日記エンティティを取得する。
+     * 指定された日付の日記エンティティのIDを取得する。
      *
-     * @param date 取得する日記の日付。
+     * @param date 取得する日記IDの日付。
      * @return 指定された日付のDiaryEntity。見つからない場合はnull。
      */
-    @Query("SELECT * FROM diaries WHERE date = :date")
-    suspend fun selectDiary(date: LocalDate): DiaryEntity?
+    @Query("SELECT id FROM diaries WHERE date = :date")
+    suspend fun selectDiaryId(date: LocalDate): List<String>
+
+    /**
+     * 指定されたIDの日記エンティティを取得する。
+     *
+     * @param id 取得する日記のID。
+     * @return 指定された日付のDiaryEntity。見つからない場合はnull。
+     */
+    @Query("SELECT * FROM diaries WHERE id = :id")
+    suspend fun selectDiary(id: String): DiaryEntity?
 
     /**
      * 最新の日記エンティティを取得する。
@@ -75,7 +84,7 @@ internal interface DiaryDao {
      * @param offset 取得を開始するオフセット位置。
      * @return 日記リストアイテムデータのリスト。対象の日記が存在しない場合は空のリストを返す。
      */
-    @Query("SELECT date, title, image_file_name FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
+    @Query("SELECT id, date, title, image_file_name FROM diaries ORDER BY date DESC LIMIT :num OFFSET :offset")
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int
@@ -89,7 +98,7 @@ internal interface DiaryDao {
      * @param startDate この日付以前の日記を取得する (この日付を含む)。
      * @return 日記リストアイテムデータのリスト。対象の日記が存在しない場合は空のリストを返す。
      */
-    @Query("SELECT date, title, image_file_name FROM diaries WHERE date <= :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
+    @Query("SELECT id, date, title, image_file_name FROM diaries WHERE date <= :startDate ORDER BY date DESC LIMIT :num OFFSET :offset")
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
         offset: Int,
@@ -133,7 +142,7 @@ internal interface DiaryDao {
      * @return 単語検索結果リストアイテムデータのリスト。対象の日記が存在しない場合は空のリストを返す。
      */
     @Query(
-        ("SELECT date, title, item_1_title, item_1_comment, " +
+        ("SELECT id, date, title, item_1_title, item_1_comment, " +
                 "item_2_title, item_2_comment, " +
                 "item_3_title, item_3_comment, " +
                 "item_4_title, item_4_comment, " +

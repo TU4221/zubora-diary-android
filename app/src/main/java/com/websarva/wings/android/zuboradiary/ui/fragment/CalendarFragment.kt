@@ -110,7 +110,7 @@ class CalendarFragment :
     override fun onMainUiEventReceived(event: CalendarEvent) {
         when (event) {
             is CalendarEvent.NavigateDiaryEditFragment -> {
-                navigateDiaryEditFragment(event.date, !event.isNewDiary)
+                navigateDiaryEditFragment(event.id, event.date)
             }
             is CalendarEvent.ScrollCalendar -> {
                 scrollCalendar(event.date)
@@ -580,10 +580,10 @@ class CalendarFragment :
         binding.calendar.notifyDateChanged(date)
     }
 
-    private fun navigateDiaryEditFragment(date: LocalDate, shouldLoadDiary: Boolean) {
+    private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {
         val directions =
             CalendarFragmentDirections.actionNavigationCalendarFragmentToDiaryEditFragment(
-                shouldLoadDiary,
+                id,
                 date
             )
         navigateFragmentOnce(NavigationCommand.To(directions))

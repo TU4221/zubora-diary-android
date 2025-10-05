@@ -10,10 +10,11 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSear
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.ShouldRequestDiaryUpdateConfirmationUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByIdUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListStartYearMonthPickerDateRangeUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewDiaryListUseCase
@@ -132,9 +133,15 @@ internal object DiaryUseCaseModule {
 
     @Singleton
     @Provides
-    fun provideLoadDiaryUseCase(
+    fun provideLoadDiaryByDateUseCase(
         diaryRepository: DiaryRepository
-    ): LoadDiaryUseCase = LoadDiaryUseCase(diaryRepository)
+    ): LoadDiaryByDateUseCase = LoadDiaryByDateUseCase(diaryRepository)
+
+    @Singleton
+    @Provides
+    fun provideLoadDiaryByIdUseCase(
+        diaryRepository: DiaryRepository
+    ): LoadDiaryByIdUseCase = LoadDiaryByIdUseCase(diaryRepository)
 
     @Singleton
     @Provides

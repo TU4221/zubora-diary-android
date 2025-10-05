@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByDateException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
@@ -17,7 +17,7 @@ import java.time.LocalDate
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class LoadDiaryUseCase(
+internal class LoadDiaryByDateUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
@@ -29,23 +29,24 @@ internal class LoadDiaryUseCase(
      *
      * @param date 読み込む日記の日付。
      * @return 処理に成功した場合は [UseCaseResult.Success] に日記データ( [Diary] )を格納して返す。
-     *   失敗した場合、または該当する日記が存在しない場合は [UseCaseResult.Failure] に [DiaryLoadException] を格納して返す。
+     *   失敗した場合、または該当する日記が存在しない場合は [UseCaseResult.Failure] に [DiaryLoadByDateException] を格納して返す。
      */
     suspend operator fun invoke(
         date: LocalDate
-    ): UseCaseResult<Diary, DiaryLoadException> {
+    ): UseCaseResult<Diary, DiaryLoadByDateException> {
         Log.i(logTag, "${logMsg}開始 (日付: $date)")
 
         return try {
-            val diary = diaryRepository.loadDiary(date)
+            val id = diaryRepository.loadDiaryId(date)
+            val diary = diaryRepository.loadDiary(id)
             Log.i(logTag, "${logMsg}完了 (取得日記: $diary)")
             UseCaseResult.Success(diary)
         } catch (e: UnknownException) {
             Log.e(logTag, "${logMsg}失敗_原因不明")
-            UseCaseResult.Failure(DiaryLoadException.Unknown(e))
+            UseCaseResult.Failure(DiaryLoadByDateException.Unknown(e))
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_読込処理エラー (日付: $date)", e)
-            UseCaseResult.Failure(DiaryLoadException.LoadFailure(date, e))
+            UseCaseResult.Failure(DiaryLoadByDateException.LoadFailure(date, e))
         }
     }
 }

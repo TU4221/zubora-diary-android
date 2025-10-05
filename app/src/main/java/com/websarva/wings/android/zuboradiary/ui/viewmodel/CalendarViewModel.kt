@@ -2,9 +2,10 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.message.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
@@ -24,7 +25,7 @@ import javax.inject.Inject
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
-    private val loadDiaryUseCase: LoadDiaryUseCase,
+    private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase,
     buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
 ) : BaseDiaryShowViewModel<CalendarEvent, CalendarAppMessage, CalendarState>(
     CalendarState.Idle,
@@ -90,10 +91,16 @@ internal class CalendarViewModel @Inject constructor(
         updateSelectedDate(date)
     }
 
+    // TODO:DiaryStateFlowクラスのID、DateをnavigateDiaryEditFragment()に代入したいが、
+    //      IDのデフォルト値がnullでないためnavigateDiaryEditFragment()でselectedDateを元に
+    //      保存された日記が存在するか確認してEvent引数値を設定している。
+    //      IDのデフォルト値がnullでない理由はDiaryEditViewModelで新規作成時の時点でIDを用意したい為。
+    //      (新規作成時にIDを用意する必要があるか確認)
     fun onDiaryEditButtonClick() {
+        val id = diaryStateFlow.id.value
         val date = _selectedDate.value
         viewModelScope.launch {
-            navigateDiaryEditFragment(date)
+            navigateDiaryEditFragment(id, date)
         }
     }
 
@@ -167,12 +174,12 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    override suspend fun loadSavedDiary(date: LocalDate) {
+    private suspend fun loadSavedDiary(date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(CalendarState.LoadingDiary)
-        when (val result = loadDiaryUseCase(date)) {
+        when (val result = loadDiaryByDateUseCase(date)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(CalendarState.LoadDiarySuccess)
@@ -205,11 +212,11 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    private suspend fun navigateDiaryEditFragment(date: LocalDate) {
+    private suspend fun navigateDiaryEditFragment(id: UUIDString, date: LocalDate) {
         val exists = existsSavedDiary(date)
-        val isNewDiary = !exists
+        val _id = if (exists) id else null
         emitUiEvent(
-            CalendarEvent.NavigateDiaryEditFragment(date, isNewDiary)
+            CalendarEvent.NavigateDiaryEditFragment(_id?.value, date)
         )
     }
 

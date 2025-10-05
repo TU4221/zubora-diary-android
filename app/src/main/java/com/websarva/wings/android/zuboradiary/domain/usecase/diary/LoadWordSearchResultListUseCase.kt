@@ -117,6 +117,7 @@ internal class LoadWordSearchResultListUseCase(
         val diaryItem = extractWordSearchResultTargetItem(item, searchWord)
         val itemNumberInt = diaryItem[itemNumberKey] as Int
         return DiaryDayListItem.WordSearchResult(
+            item.id,
             item.date,
             item.title,
             ItemNumber(itemNumberInt),

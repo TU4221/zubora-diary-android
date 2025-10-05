@@ -1,16 +1,16 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryUseCase
-import java.time.LocalDate
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByIdUseCase
 
 /**
- * [LoadDiaryUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
+ * [LoadDiaryByIdUseCase]の処理中に発生しうる、より具体的な例外を示すシールドクラス。
  *
  * @param message 例外メッセージ。
  * @param cause 発生した根本的な原因となった[Throwable]。nullの場合もある。
  */
-internal sealed class DiaryLoadException (
+internal sealed class DiaryLoadByIdException (
     message: String,
     cause: Throwable
 ) : UseCaseException(message, cause) {
@@ -18,13 +18,13 @@ internal sealed class DiaryLoadException (
     /**
      * 日記の読み込みに失敗した場合にスローされる例外。
      *
-     * @param date 読み込みに失敗した日記の日付。
+     * @param id 読み込みに失敗した日記のID。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class LoadFailure(
-        date: LocalDate,
+        id: UUIDString,
         cause: Throwable
-    ) : DiaryLoadException("指定された日付 '$date' の日記の読込に失敗しました。", cause)
+    ) : DiaryLoadByIdException("指定されたID '${id.value}' の日記の読込に失敗しました。", cause)
 
     /**
      * 予期せぬエラーが発生した場合の例外。
@@ -33,7 +33,7 @@ internal sealed class DiaryLoadException (
      */
     class Unknown(
         cause: Throwable
-    ) : DiaryLoadException(
+    ) : DiaryLoadByIdException(
         "予期せぬエラーが発生しました。",
         cause
     )

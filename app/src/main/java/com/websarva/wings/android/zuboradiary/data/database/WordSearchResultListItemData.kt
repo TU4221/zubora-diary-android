@@ -8,6 +8,7 @@ import java.time.LocalDate
  *
  * このクラスは、検索結果一覧リストの各アイテムとして表示する情報を保持する。
  *
+ * @property id 日記のID。
  * @property date 日記の日付。
  * @property title 日記のタイトル。
  * @property item1Title 1つ目の項目のタイトル。
@@ -22,6 +23,7 @@ import java.time.LocalDate
  * @property item5Comment 5つ目の項目のコメント (オプショナル)。
  */
 internal data class WordSearchResultListItemData(
+    val id: String,
     val date: LocalDate,
     val title: String,
 

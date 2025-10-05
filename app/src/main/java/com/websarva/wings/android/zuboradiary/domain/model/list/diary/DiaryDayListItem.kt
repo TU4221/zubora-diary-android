@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.model.list.diary
 
 import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import java.time.LocalDate
 
 /**
@@ -11,9 +12,11 @@ import java.time.LocalDate
  * 具体的なアイテムの種類（例: 通常の日記表示、検索結果表示）に応じて、
  * このクラスを継承したサブクラスが定義される。
  *
+ * @property id このリストアイテムが表す日記ID。
  * @property date このリストアイテムが表す日付。
  */
 internal sealed class DiaryDayListItem(
+    open val id: UUIDString,
     open val date: LocalDate
 ) {
 
@@ -21,21 +24,24 @@ internal sealed class DiaryDayListItem(
      * 標準的な日記リストアイテム。
      * 日付、タイトル、画像URIを持つ。
      *
+     * @property id 日記のID。
      * @property date 日記の日付。
      * @property title 日記のタイトル。
      * @property imageFileName 日記に関連付けられた画像ファイル名。画像がない場合はnull。
      */
     data class Standard(
+        override val id: UUIDString,
         override val date: LocalDate,
         val title: String,
         val imageFileName: FileName?
-    ) : DiaryDayListItem(date)
+    ) : DiaryDayListItem(id, date)
 
     /**
      * 単語検索結果として表示される日記リストアイテム。
      * 日付、日記タイトル、日記項目番号、日記項目タイトル、日記項目コメント、および検索語を持つ。
      * (検索単語が日記タイトルのみに含まれる場合は保持する日記項目は項目1となる)
      *
+     * @property id 検索にヒットした日記のID。
      * @property date 検索にヒットした日記の日付。
      * @property title 検索にヒットした日記のタイトル。
      * @property itemNumber 検索にヒットした日記項目の番号。
@@ -47,11 +53,12 @@ internal sealed class DiaryDayListItem(
      * @property searchWord このアイテムがヒットした検索単語。
      */
     data class WordSearchResult(
+        override val id: UUIDString,
         override val date: LocalDate,
         val title: String,
         val itemNumber: ItemNumber,
         val itemTitle: String,
         val itemComment: String,
         val searchWord: String,
-    ) : DiaryDayListItem(date)
+    ) : DiaryDayListItem(id, date)
 }

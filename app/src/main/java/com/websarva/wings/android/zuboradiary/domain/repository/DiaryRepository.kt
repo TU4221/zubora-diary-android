@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.D
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -41,14 +42,24 @@ internal interface DiaryRepository {
     suspend fun existsDiary(date: LocalDate): Boolean
 
     /**
-     * 指定された日付の日記データを読み込む。
+     * 指定された日付の日記データIDを読み込む。
      *
      * @param date 読み込み対象の日付。
-     * @return 指定された日付の日記データ。日記が存在しない場合は `null`。
+     * @return 指定された日付の日記データID。
      * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
      * @throws ResourceNotFoundException 該当の日記データが見つからなかった場合。
      */
-    suspend fun loadDiary(date: LocalDate): Diary
+    suspend fun loadDiaryId(date: LocalDate): UUIDString
+
+    /**
+     * 指定されたIDの日記データを読み込む。
+     *
+     * @param id 読み込み対象のID。
+     * @return 指定された日付の日記データ。
+     * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
+     * @throws ResourceNotFoundException 該当の日記データが見つからなかった場合。
+     */
+    suspend fun loadDiary(id: UUIDString): Diary
 
     /**
      * 保存されている日記の中で、最も新しい日付の日記データを読み込む。
