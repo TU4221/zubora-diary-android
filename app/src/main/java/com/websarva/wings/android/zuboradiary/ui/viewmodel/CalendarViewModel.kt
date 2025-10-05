@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
@@ -91,16 +90,13 @@ internal class CalendarViewModel @Inject constructor(
         updateSelectedDate(date)
     }
 
-    // TODO:DiaryStateFlowクラスのID、DateをnavigateDiaryEditFragment()に代入したいが、
-    //      IDのデフォルト値がnullでないためnavigateDiaryEditFragment()でselectedDateを元に
-    //      保存された日記が存在するか確認してEvent引数値を設定している。
-    //      IDのデフォルト値がnullでない理由はDiaryEditViewModelで新規作成時の時点でIDを用意したい為。
-    //      (新規作成時にIDを用意する必要があるか確認)
     fun onDiaryEditButtonClick() {
         val id = diaryStateFlow.id.value
         val date = _selectedDate.value
         viewModelScope.launch {
-            navigateDiaryEditFragment(id, date)
+            emitUiEvent(
+                CalendarEvent.NavigateDiaryEditFragment(id?.value, date)
+            )
         }
     }
 
@@ -210,14 +206,6 @@ internal class CalendarViewModel @Inject constructor(
                 return false
             }
         }
-    }
-
-    private suspend fun navigateDiaryEditFragment(id: UUIDString, date: LocalDate) {
-        val exists = existsSavedDiary(date)
-        val _id = if (exists) id else null
-        emitUiEvent(
-            CalendarEvent.NavigateDiaryEditFragment(_id?.value, date)
-        )
     }
 
     private fun updateSelectedDate(date: LocalDate) {

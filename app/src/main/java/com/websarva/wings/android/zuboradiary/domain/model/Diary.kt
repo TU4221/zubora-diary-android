@@ -4,7 +4,6 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.util.UUID
 
 /**
  * 日記を表すデータクラス。
@@ -36,7 +35,7 @@ import java.util.UUID
  */
 @Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
 internal data class Diary(
-    val id: UUIDString = UUIDString(UUID.randomUUID().toString()),
+    val id: UUIDString = UUIDString(),
     val date: LocalDate = LocalDate.now(),
     val log: LocalDateTime = LocalDateTime.now(),
     val weather1: Weather = Weather.UNKNOWN,

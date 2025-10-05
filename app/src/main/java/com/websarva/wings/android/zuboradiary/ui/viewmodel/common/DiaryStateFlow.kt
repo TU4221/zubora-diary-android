@@ -20,8 +20,8 @@ internal open class DiaryStateFlow {
 
     protected val initialDiary = Diary()
 
-    protected val initialId = initialDiary.id
-    open val id = MutableStateFlow(initialId)
+    protected val initialId = null
+    open val id = MutableStateFlow<UUIDString?>(initialId) // MEMO:初期化時IDが未定の為、null許容型とする。
 
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
     //      StateFlow変数を用意しても意味がないので作成しない。
@@ -63,6 +63,7 @@ internal open class DiaryStateFlow {
         MutableStateFlow<LocalDateTime?>(initialLog) // MEMO:初期化時日付有無が未定の為、null許容型とする。
 
     fun initialize() {
+        updateId(initialId)
         updateDate(initialDate)
         updateWeather1(initialWeather)
         updateWeather2(initialWeather)
@@ -112,7 +113,7 @@ internal open class DiaryStateFlow {
         }
     }
 
-    private fun updateId(id: UUIDString) {
+    private fun updateId(id: UUIDString?) {
         this.id.value = id
     }
 

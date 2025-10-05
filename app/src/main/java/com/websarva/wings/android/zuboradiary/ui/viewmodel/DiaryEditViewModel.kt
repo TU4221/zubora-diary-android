@@ -699,7 +699,9 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onOpenDocumentResultImageUriReceived(uri: Uri?) {
         val diaryId = diaryStateFlow.id.value
         viewModelScope.launch {
-            cacheDiaryImage(uri, diaryId)
+            diaryId?.let {
+                cacheDiaryImage(uri, diaryId)
+            } ?: throw IllegalStateException()
         }
     }
 
@@ -741,7 +743,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // データ処理
     private suspend fun prepareDiaryEntry(
-        id: UUIDString? = null,
+        id: UUIDString?,
         date: LocalDate
     ) {
         if (id == null) {
@@ -753,6 +755,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun prepareNewDiaryEntry(date: LocalDate) {
         updateIsNewDiary(true)
+        updateId(UUIDString())
         updateDate(date)
         updateOriginalDiary(handle[SAVED_ORIGINAL_DIARY_KEY] ?: diaryStateFlow.createDiary())
         val previousDate = previousDate
@@ -1193,6 +1196,10 @@ internal class DiaryEditViewModel @Inject constructor(
                 //      UIを不適切な状態でロックする可能性があるため保存しない。
             }
         }
+    }
+
+    private fun updateId(id: UUIDString) {
+        diaryStateFlow.id.value = id
     }
 
     private fun updateDate(date: LocalDate) {

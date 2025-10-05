@@ -14,7 +14,7 @@ import java.util.UUID
  */
 @Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
 @JvmInline
-internal value class UUIDString(val value: String) : Parcelable {
+internal value class UUIDString(val value: String = UUID.randomUUID().toString()) : Parcelable {
     init {
         // 形式を検証
         UUID.fromString(value)
