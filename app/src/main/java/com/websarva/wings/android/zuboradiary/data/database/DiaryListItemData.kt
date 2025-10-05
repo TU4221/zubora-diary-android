@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.database
 
 import androidx.room.ColumnInfo
+import java.time.LocalDate
 
 /**
  * 日記リストのアイテムデータを表すデータクラス。
@@ -14,8 +15,8 @@ import androidx.room.ColumnInfo
  */
 internal data class DiaryListItemData(
     val id: String,
-    var date: String,
-    var title: String,
+    val date: LocalDate,
+    val title: String,
     @ColumnInfo(name = "image_file_name")
     val imageFileName: String?
 )
