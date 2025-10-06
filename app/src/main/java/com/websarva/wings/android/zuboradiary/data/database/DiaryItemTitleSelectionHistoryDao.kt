@@ -45,12 +45,13 @@ internal interface DiaryItemTitleSelectionHistoryDao {
     /**
      * 新しいタイトル選択履歴のリストをデータベースに挿入する。
      *
-     * もし同じID、又はタイトルの履歴が既に存在する場合は、置き換える。
+     * 渡されたタイトル選択履歴の主キー(id)がデータベースに存在しない場合は、新しい履歴として挿入する。
+     * 既に存在する場合は、その履歴のデータを更新する。
      *
      * @param diaryItemTitleSelectionHistoryEntityList 挿入するタイトル選択履歴エンティティのリスト。
      */
     @Upsert
-    suspend fun insertHistory(
+    suspend fun insertHistories(
         diaryItemTitleSelectionHistoryEntityList: List<DiaryItemTitleSelectionHistoryEntity>
     )
 
@@ -84,7 +85,7 @@ internal interface DiaryItemTitleSelectionHistoryDao {
     suspend fun updateDiaryItemTitleSelectionHistory(
         historyList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
-        insertHistory(historyList)
+        insertHistories(historyList)
         deleteOldHistory()
     }
 }
