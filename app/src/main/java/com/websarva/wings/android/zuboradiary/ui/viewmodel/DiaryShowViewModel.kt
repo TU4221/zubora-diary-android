@@ -9,8 +9,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUs
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByIdUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
-import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -119,10 +117,10 @@ internal class DiaryShowViewModel @Inject constructor(
     fun onDiaryDeleteMenuClick() {
         if (uiState.value != DiaryShowState.LoadSuccess) return
 
+        val id = diaryStateFlow.id.requireValue()
         val date = diaryStateFlow.date.requireValue()
-        val imageFileName = diaryStateFlow.imageFileName.value
         viewModelScope.launch {
-            updatePendingDiaryDeleteParameters(date, imageFileName)
+            updatePendingDiaryDeleteParameters(id, date)
             emitUiEvent(
                 DiaryShowEvent.NavigateDiaryDeleteDialog(date)
             )
@@ -166,7 +164,7 @@ internal class DiaryShowViewModel @Inject constructor(
     private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters?) {
         viewModelScope.launch {
             parameters?.let {
-                deleteDiary(it.date, it.imageFileName)
+                deleteDiary(it.id, it.date)
             } ?: throw IllegalStateException()
         }
     }
@@ -194,12 +192,12 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    private suspend fun deleteDiary(date: LocalDate, imageFileName: ImageFileNameUi?) {
+    private suspend fun deleteDiary(id: UUIDString, date: LocalDate) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryShowState.Deleting)
-        when (val result = deleteDiaryUseCase(date, imageFileName?.toDomainModel())) {
+        when (val result = deleteDiaryUseCase(id, date)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 emitUiEvent(
@@ -229,11 +227,8 @@ internal class DiaryShowViewModel @Inject constructor(
         )
     }
 
-    private fun updatePendingDiaryDeleteParameters(date: LocalDate, imageFileName: ImageFileNameUi?) {
-        pendingDiaryDeleteParameters = DiaryDeleteParameters(
-            date,
-            imageFileName
-        )
+    private fun updatePendingDiaryDeleteParameters(id: UUIDString, date: LocalDate) {
+        pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
 
     private fun clearPendingDiaryDeleteParameters() {
@@ -241,7 +236,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private data class DiaryDeleteParameters(
-        val date: LocalDate,
-        val imageFileName: ImageFileNameUi?
+        val id: UUIDString,
+        val date: LocalDate
     )
 }

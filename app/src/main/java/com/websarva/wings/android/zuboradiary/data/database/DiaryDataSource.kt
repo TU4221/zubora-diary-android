@@ -210,15 +210,16 @@ internal class DiaryDataSource(
      *
      * この操作はトランザクションとして実行される。
      *
+     * @param deleteDiaryId 削除する日記のID。
      * @param diary 新しく保存する日記データ。
      * @throws RecordUpdateException データベースからのレコードの更新に失敗した場合。
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun deleteAndSaveDiary(diary: DiaryEntity) {
+    suspend fun deleteAndSaveDiary(deleteDiaryId:String, diary: DiaryEntity) {
         withContext(dispatcher) {
             executeSuspendDbUpdateOperation {
-                diaryDao.deleteAndSaveDiary(diary)
+                diaryDao.deleteAndSaveDiary(deleteDiaryId, diary)
             }
         }
     }
@@ -226,15 +227,15 @@ internal class DiaryDataSource(
     /**
      * 指定された日付の日記をデータベースから削除する。
      *
-     * @param date 削除する日記の日付。
+     * @param id 削除する日記のID。
      * @throws RecordDeleteException データベースからのレコードの書き込みに失敗した場合。
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun deleteDiary(date: LocalDate) {
+    suspend fun deleteDiary(id: String) {
         withContext(dispatcher) {
             executeSuspendDbDeleteOperation {
-                diaryDao.deleteDiary(date)
+                diaryDao.deleteDiary(id)
             }
         }
     }

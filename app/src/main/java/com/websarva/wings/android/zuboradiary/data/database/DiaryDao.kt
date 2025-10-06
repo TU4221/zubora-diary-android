@@ -178,25 +178,27 @@ internal interface DiaryDao {
     suspend fun insertDiary(diaryEntity: DiaryEntity)
 
     /**
-     * 指定された日付の日記をデータベースから削除する。
+     * 指定されたIDの日記をデータベースから削除する。
      *
-     * @param date 削除する日記の日付。
+     * @param id 削除する日記のID。
      */
-    @Query("DELETE FROM diaries WHERE date = :date")
-    suspend fun deleteDiary(date: LocalDate)
+    @Query("DELETE FROM diaries WHERE id = :id")
+    suspend fun deleteDiary(id: String)
 
     /**
      * 保存する日記データと同じ日付の日記データを削除し、保存する日記データと日記項目タイトル選択履歴データをトランザクション内で保存する。
      *
      * まず保存する日記データと同じ日付の日記を削除し、その後保存する日記を挿入する。
      *
+     * @param deleteDiaryId 削除する日記のID。
      * @param saveDiary 新しく保存する日記データ。
      */
     @Transaction
     suspend fun deleteAndSaveDiary(
+        deleteDiaryId: String,
         saveDiary: DiaryEntity,
     ) {
-        deleteDiary(saveDiary.date)
+        deleteDiary(deleteDiaryId)
         insertDiary(saveDiary)
     }
 

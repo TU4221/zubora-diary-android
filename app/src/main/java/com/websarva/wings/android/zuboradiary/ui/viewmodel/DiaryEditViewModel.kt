@@ -392,11 +392,11 @@ internal class DiaryEditViewModel @Inject constructor(
         if (isNewDiary) return
 
         val originalDiary = _originalDiary.requireValue()
+        val originalId = originalDiary.id
         val originalDate = originalDiary.date
-        val originalImageFileName = originalDiary.imageFileName?.toUiModel()
 
         viewModelScope.launch {
-            updatePendingDiaryDeleteParameters(originalDate, originalImageFileName)
+            updatePendingDiaryDeleteParameters(originalId, originalDate)
             emitUiEvent(
                 DiaryEditEvent.NavigateDiaryDeleteDialog(originalDate)
             )
@@ -561,7 +561,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters?) {
         viewModelScope.launch {
             parameters?.let {
-                deleteDiary(it.date, it.imageFileName)
+                deleteDiary(it.id, it.date)
             } ?: throw IllegalStateException()
         }
     }
@@ -865,14 +865,14 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun deleteDiary(
-        date: LocalDate,
-        imageFileName: ImageFileNameUi?
+        id: UUIDString,
+        date: LocalDate
     ) {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
         updateUiState(DiaryEditState.Deleting)
-        when (val result = deleteDiaryUseCase(date, imageFileName?.toDomainModel())) {
+        when (val result = deleteDiaryUseCase(id, date)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 clearDiaryImageCacheFile()
@@ -1299,8 +1299,8 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryUpdateParameters = null
     }
 
-    private fun updatePendingDiaryDeleteParameters(date: LocalDate, imageFileName: ImageFileNameUi?) {
-        pendingDiaryDeleteParameters = DiaryDeleteParameters(date, imageFileName)
+    private fun updatePendingDiaryDeleteParameters(id: UUIDString, date: LocalDate) {
+        pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
 
     private fun clearPendingDiaryDeleteParameters() {
@@ -1343,8 +1343,8 @@ internal class DiaryEditViewModel @Inject constructor(
     )
 
     private data class DiaryDeleteParameters(
-        val date: LocalDate,
-        val imageFileName: ImageFileNameUi? // TODO:IDを持たせるように変更する
+        val id: UUIDString,
+        val date: LocalDate
     )
 
     private data class DiaryItemDeleteParameters(

@@ -112,19 +112,20 @@ internal interface DiaryRepository {
      *
      * この操作はトランザクションで処理されることを期待。
      *
-     * @param diary 保存する日記データ。
+     * @param deleteDiaryId 削除する日記のID。
+     * @param saveDiary 保存する日記データ。
      * @throws DataStorageException 日記の削除または新しい日記の保存に失敗した場合。
      * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
-    suspend fun deleteAndSaveDiary(diary: Diary)
+    suspend fun deleteAndSaveDiary(deleteDiaryId: UUIDString, saveDiary: Diary)
 
     /**
      * 指定された日付の日記データを削除する。
      *
-     * @param date 削除対象の日記の日付。
+     * @param id 削除対象の日記のID。
      * @throws DataStorageException 日記データの削除に失敗した場合。
      */
-    suspend fun deleteDiary(date: LocalDate)
+    suspend fun deleteDiary(id: UUIDString)
 
     /**
      * 保存されているすべての日記データを削除する。

@@ -110,20 +110,22 @@ internal class DiaryRepositoryImpl (
     }
 
     override suspend fun deleteAndSaveDiary(
-        diary: Diary
+        deleteDiaryId: UUIDString,
+        saveDiary: Diary
     ) {
         try {
             diaryDataSource.deleteAndSaveDiary(
-                diary.toDataModel()
+                deleteDiaryId.value,
+                saveDiary.toDataModel()
             )
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
-    override suspend fun deleteDiary(date: LocalDate) {
+    override suspend fun deleteDiary(id: UUIDString) {
         try {
-            diaryDataSource.deleteDiary(date)
+            diaryDataSource.deleteDiary(id.value)
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }

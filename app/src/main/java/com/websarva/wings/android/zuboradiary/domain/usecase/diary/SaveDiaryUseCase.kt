@@ -161,7 +161,7 @@ internal class SaveDiaryUseCase(
         return if (shouldDeleteSameDateDiary) {
             val deleteDiaryId = diaryRepository.loadDiaryId(saveDiary.date)
             val deleteDiary = diaryRepository.loadDiary(deleteDiaryId)
-            diaryRepository.deleteAndSaveDiary(saveDiary)
+            diaryRepository.deleteAndSaveDiary(deleteDiaryId, saveDiary)
             deleteDiary
         } else {
             diaryRepository.saveDiary(saveDiary)
@@ -345,15 +345,15 @@ internal class SaveDiaryUseCase(
             if (isNewDiary) {
                 if (deletedDiary == null) {
                     Log.d(logTag, "新規ロールバック_保存日記削除 (保存日記日付: ${savedDiary.date})")
-                    diaryRepository.deleteDiary(savedDiary.date)
+                    diaryRepository.deleteDiary(savedDiary.id)
                 } else {
                     Log.d(logTag, "新規ロールバック_保存日記削除、削除日記復元 (保存日記日付: ${savedDiary.date}、削除日記日付: ${deletedDiary.date})")
-                    diaryRepository.deleteAndSaveDiary(deletedDiary)
+                    diaryRepository.deleteAndSaveDiary(savedDiary.id, deletedDiary)
                 }
             } else {
                 if (deletedDiary != null) {
                     Log.d(logTag, "編集ロールバック_保存日記削除、削除日記復元 (保存日記日付: ${savedDiary.date}、削除日記日付: ${deletedDiary.date})")
-                    diaryRepository.deleteAndSaveDiary(deletedDiary)
+                    diaryRepository.deleteAndSaveDiary(savedDiary.id, deletedDiary)
                 }
                 Log.d(logTag, "編集ロールバック_編集元日記復元 (編集元日記日付: ${originalDiary.date})")
                 diaryRepository.saveDiary(originalDiary)
