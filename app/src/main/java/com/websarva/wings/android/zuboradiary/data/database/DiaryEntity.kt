@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.data.database
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -10,8 +11,8 @@ import java.time.LocalDateTime
 /**
  * 日記の単一のエントリを表すRoomエンティティクラス。
  *
- * このクラスは、データベースの "diaries" テーブルの各行に対応する。
- * 日記内容を保持する。
+ * このクラスは、日記内容を保持する。
+ * [date] カラムにはユニーク制約が設定されており、同じ日付が複数保存されることはない。
  *
  * @property id 日記の識別番号。このエンティティの主キー。
  * @property date 日記の日付。
@@ -32,7 +33,10 @@ import java.time.LocalDateTime
  * @property item5Comment 5つ目の項目のコメント。未入力の場合 `null`。
  * @property imageFileName 日記に添付した画像ファイル名。未添付の場合 `null`。
  */
-@Entity(tableName = "diaries")
+@Entity(
+    tableName = "diaries",
+    indices = [Index(value = ["date"], unique = true)]
+)
 internal data class DiaryEntity(
     @PrimaryKey
     val id: String,

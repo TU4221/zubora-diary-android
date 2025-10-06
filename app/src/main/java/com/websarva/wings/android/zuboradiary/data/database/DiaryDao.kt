@@ -1,10 +1,9 @@
 package com.websarva.wings.android.zuboradiary.data.database
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import java.time.LocalDate
 
 /**
@@ -168,13 +167,14 @@ internal interface DiaryDao {
     ): List<WordSearchResultListItemData>
 
     /**
-     * 新しい日記エンティティをデータベースに挿入する。
+     * 新しい日記をデータベースに挿入、または既存の日記を更新する。
      *
-     * もし同じプライマリキーの日記が既に存在する場合は、置き換える 。
+     * 渡された日記の主キー(id)がデータベースに存在しない場合は、新しい日記として挿入する。
+     * 既に存在する場合は、その日記のデータを更新する。
      *
      * @param diaryEntity 挿入する日記エンティティ。
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insertDiary(diaryEntity: DiaryEntity)
 
     /**
