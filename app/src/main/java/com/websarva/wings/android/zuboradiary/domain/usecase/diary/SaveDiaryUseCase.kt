@@ -88,10 +88,9 @@ internal class SaveDiaryUseCase(
                 originalDiary.imageFileName,
                 deleteDiary?.imageFileName
             )
-            diaryRepository
-                .updateDiaryItemTitleSelectionHistory(
-                    diaryItemTitleSelectionHistoryItemList
-                )
+            updateDiaryItemTitleSelectionHistory(
+                diaryItemTitleSelectionHistoryItemList
+            )
         } catch (e: Exception) {
             try {
                 rollbackDiaryImageFileAndData(
@@ -253,6 +252,47 @@ internal class SaveDiaryUseCase(
         saveDiaryImageFileName?.let {
             fileRepository.moveImageFileToPermanent(saveDiaryImageFileName)
         }
+    }
+
+    /**
+     * 日記項目のタイトル選択履歴をデータベースに保存または更新する。
+     *
+     * 渡されたタイトル選択リスト( [selectionList] )を元に、以下の処理を行う。
+     * 1. リスト内で同じ`title`を持つ項目が複数ある場合、`log`(日時)が最も新しいものだけを残す。
+     * 2. データベース内に同じ`title`の履歴が既に存在するかを確認する。
+     *    - 存在する場合：既存レコードのIDを引き継いで更新する。
+     *    - 存在しない場合：新しいIDで新規履歴として保存する。
+     *
+     * @param selectionList 更新または作成する日記項目タイトル選択履歴のリスト。
+     * @throws DataStorageException 履歴の確認、更新に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
+     */
+    private suspend fun updateDiaryItemTitleSelectionHistory(
+        selectionList: List<DiaryItemTitleSelectionHistory>
+    ) {
+        if (selectionList.isEmpty()) return
+
+        val latestUniqueList =
+            selectionList
+                .sortedByDescending { it.log }
+                .distinctBy { it.title }
+
+        val titles = latestUniqueList.map { it.title }
+        val existingHistoriesList =
+            diaryRepository.findDiaryItemTitleSelectionHistoriesByTitles(titles)
+        val existingHistoryMap = existingHistoriesList.associateBy { it.title }
+
+        val updateHistoryList =
+            latestUniqueList.map { currentItem ->
+                val existingItem = existingHistoryMap[currentItem.title]
+                if (existingItem != null) {
+                    currentItem.copy(id = existingItem.id)
+                } else {
+                    currentItem
+                }
+            }
+
+        diaryRepository.updateDiaryItemTitleSelectionHistory(updateHistoryList)
     }
 
     /**

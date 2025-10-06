@@ -91,11 +91,11 @@ internal open class DiaryStateFlow {
             updateCondition(condition.toUiModel())
             updateTitle(title)
 
-            updateItem(ItemNumber(1), item1Title, item1Comment)
-            updateItem(ItemNumber(2), item2Title, item2Comment)
-            updateItem(ItemNumber(3), item3Title, item3Comment)
-            updateItem(ItemNumber(4), item4Title, item4Comment)
-            updateItem(ItemNumber(5), item5Title, item5Comment)
+            setUpItemTitleAndComment(ItemNumber(1), item1Title, item1Comment)
+            setUpItemTitleAndComment(ItemNumber(2), item2Title, item2Comment)
+            setUpItemTitleAndComment(ItemNumber(3), item3Title, item3Comment)
+            setUpItemTitleAndComment(ItemNumber(4), item4Title, item4Comment)
+            setUpItemTitleAndComment(ItemNumber(5), item5Title, item5Comment)
 
             var numVisibleItems = items.size
             val maxArrayNumber = numVisibleItems - 1
@@ -137,24 +137,30 @@ internal open class DiaryStateFlow {
         this.title.value = title
     }
 
+    protected fun initializeItemForEdit(itemNumber: ItemNumber) {
+        getItemStateFlow(itemNumber).updateTitleAndCommentFromDiary("", "")
+    }
+
+    protected fun setUpItemTitleAndComment(itemNumber: ItemNumber, title: String?, comment: String?) {
+        getItemStateFlow(itemNumber).updateTitleAndCommentFromDiary(title, comment)
+    }
+
     protected fun updateItem(
         itemNumber: ItemNumber,
+        id: UUIDString?,
         title: String?,
         comment: String?,
-        titleUpdateLog: LocalDateTime? = null
+        titleUpdateLog: LocalDateTime?
     ) {
-        if (titleUpdateLog == null) {
-            getItemStateFlow(itemNumber).update(title, comment)
-        } else {
-            getItemStateFlow(itemNumber).update(title, comment, titleUpdateLog)
-        }
+        getItemStateFlow(itemNumber).updateAllFromOtherItem(id, title, comment, titleUpdateLog)
     }
 
     protected fun updateItemTitleWithTimestamp(
         itemNumber: ItemNumber,
+        id: UUIDString,
         title: String
     ) {
-        getItemStateFlow(itemNumber).updateTitleWithTimestamp(title)
+        getItemStateFlow(itemNumber).updateTitleWithTimestamp(id, title)
     }
 
     protected fun updateNumVisibleItems(count: Int) {
@@ -175,6 +181,9 @@ internal open class DiaryStateFlow {
             private const val MIN_ITEM_NUMBER = ItemNumber.MIN_NUMBER
             private const val MAX_ITEM_NUMBER = ItemNumber.MAX_NUMBER
         }
+
+        protected val initialTitleId = null
+        open val titleId = MutableStateFlow<UUIDString?>(initialTitleId)
 
         // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
         //      StateFlow変数を用意しても意味がないので作成しない。
@@ -203,6 +212,7 @@ internal open class DiaryStateFlow {
         }
 
         fun initialize() {
+            updateTitleId(initialTitleId)
             updateTitle(initialTitle)
             updateComment(initialComment)
             updateTitleUpdateLog(initialTitleUpdateLog)
@@ -223,9 +233,34 @@ internal open class DiaryStateFlow {
             updateTitleUpdateLog(titleUpdateLog)
         }
 
-        fun updateTitleWithTimestamp(title: String) {
-            this.title.value = title
-            this.titleUpdateLog.value = LocalDateTime.now()
+        fun updateTitleAndCommentFromDiary(
+            title: String?,
+            comment: String?,
+        ) {
+            updateTitle(title)
+            updateComment(comment)
+        }
+
+        fun updateAllFromOtherItem(
+            id: UUIDString?,
+            title: String?,
+            comment: String?,
+            titleUpdateLog: LocalDateTime?
+        ) {
+            updateTitleId(id)
+            updateTitle(title)
+            updateComment(comment)
+            updateTitleUpdateLog(titleUpdateLog)
+        }
+
+        fun updateTitleWithTimestamp(id: UUIDString, title: String) {
+            updateTitleId(id)
+            updateTitle(title)
+            updateTitleUpdateLog(LocalDateTime.now())
+        }
+
+        private fun updateTitleId(id: UUIDString?) {
+            this.titleId.value = id
         }
 
         private fun updateTitle(title: String?) {

@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryDeleteException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -23,17 +24,19 @@ internal class DeleteDiaryItemTitleSelectionHistoryUseCase(
     /**
      * ユースケースを実行し、指定されたタイトルを選択履歴から削除する。
      *
-     * @param deleteTitle 削除するタイトル文字列。
+     * @param id 削除するタイトルのID。
+     * @param title 削除するタイトル文字列。
      * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
      *   失敗した場合は [UseCaseResult.Failure] に [DiaryItemTitleSelectionHistoryDeleteException] を格納して返す。
      */
     suspend operator fun invoke(
-        deleteTitle: String
+        id: UUIDString,
+        title: String
     ): UseCaseResult<Unit, DiaryItemTitleSelectionHistoryDeleteException> {
-        Log.i(logTag, "${logMsg}開始 (削除タイトル: \"$deleteTitle\")")
+        Log.i(logTag, "${logMsg}開始 (ID: $id、タイトル: $title)")
 
         return try {
-            diaryRepository.deleteDiaryItemTitleSelectionHistory(deleteTitle)
+            diaryRepository.deleteDiaryItemTitleSelectionHistory(id)
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
         } catch (e: UnknownException) {
@@ -44,7 +47,7 @@ internal class DeleteDiaryItemTitleSelectionHistoryUseCase(
         } catch (e: DomainException) {
             Log.e(logTag, "${logMsg}失敗_削除エラー", e)
             UseCaseResult.Failure(
-                DiaryItemTitleSelectionHistoryDeleteException.DeleteFailure(deleteTitle, e)
+                DiaryItemTitleSelectionHistoryDeleteException.DeleteFailure(title, e)
             )
         }
     }

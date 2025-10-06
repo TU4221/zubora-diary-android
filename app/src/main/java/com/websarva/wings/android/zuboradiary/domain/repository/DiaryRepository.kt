@@ -162,6 +162,17 @@ internal interface DiaryRepository {
 
     //region DiaryItemTitleSelectionHistory
     /**
+     * 指定されたタイトルのリストに一致する選択履歴をすべて取得する。
+     *
+     * @param titleList 検索する履歴のタイトルのリスト。
+     * @return 指定されたタイトルに一致した履歴のリスト。一致する履歴がない場合は空のリストを返す。
+     * @throws DataStorageException 検索結果リストの読み込みに失敗した場合。
+     */
+    suspend fun findDiaryItemTitleSelectionHistoriesByTitles(
+        titleList: List<String>
+    ): List<DiaryItemTitleSelectionHistoryListItem>
+
+    /**
      * 日記アイテムのタイトル選択履歴リストを読み込む。
      *
      * このメソッドは Flow を返し、履歴データの変更を継続的に監視することができます。
@@ -190,12 +201,12 @@ internal interface DiaryRepository {
     )
 
     /**
-     * 指定されたタイトルの日記アイテム選択履歴を削除する。
+     * 指定されたIDの日記アイテム選択履歴を削除する。
      *
-     * @param title 削除対象の履歴のタイトル。
+     * @param id 削除対象の履歴のタイトルのID。
      * @throws DataStorageException 履歴アイテムの削除に失敗した場合。
      */
-    suspend fun deleteDiaryItemTitleSelectionHistory(title: String)
+    suspend fun deleteDiaryItemTitleSelectionHistory(id: UUIDString)
     //endregion
 
     //region Options

@@ -125,20 +125,21 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
     }
 
     fun createDiaryItemTitleSelectionHistoryList(): List<DiaryItemTitleSelectionHistory> {
-        val list: MutableList<DiaryItemTitleSelectionHistory> = ArrayList()
-        for (i in 0 until MAX_ITEMS) {
-            val itemTitle = items[i].title.value ?: continue
-            val itemTitleUpdateLog = items[i].titleUpdateLog.value ?: continue
-            if (itemTitle.matches("\\S+.*".toRegex())) {
-                val item =
-                    DiaryItemTitleSelectionHistory(
-                        itemTitle,
-                        itemTitleUpdateLog
-                    )
-                list.add(item)
+        return items.mapNotNull { item ->
+            val title = item.title.value?.trim()
+            val titleId = item.titleId.value
+            val titleUpdateLog = item.titleUpdateLog.value
+
+            if (title.isNullOrBlank() || titleId == null || titleUpdateLog == null) {
+                null
+            } else {
+                DiaryItemTitleSelectionHistory(
+                    titleId,
+                    title,
+                    titleUpdateLog
+                )
             }
         }
-        return list
     }
 
     fun incrementVisibleItemsCount() {
@@ -146,7 +147,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         val incrementedNumVisibleItems = numVisibleItems + 1
         Log.d("20250729", "incrementVisibleItemsCount()_$incrementedNumVisibleItems")
         updateNumVisibleItems(incrementedNumVisibleItems)
-        updateItem(ItemNumber(incrementedNumVisibleItems), "", "")
+        initializeItemForEdit(ItemNumber(incrementedNumVisibleItems))
     }
 
     fun deleteItem(itemNumber: ItemNumber) {
@@ -160,6 +161,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
                 updateItem(
                     targetItemNumber,
+                    getItemStateFlow(nextItemNumber).titleId.value,
                     getItemStateFlow(nextItemNumber).title.value,
                     getItemStateFlow(nextItemNumber).comment.value,
                     getItemStateFlow(nextItemNumber).titleUpdateLog.value
@@ -174,8 +176,8 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         }
     }
 
-    fun updateItemTitle(itemNumber: ItemNumber, title: String) {
-        updateItemTitleWithTimestamp(itemNumber, title)
+    fun updateItemTitle(itemNumber: ItemNumber, titleId: UUIDString, title: String) {
+        updateItemTitleWithTimestamp(itemNumber, titleId, title)
     }
 
     class DiaryItemStateFlow(

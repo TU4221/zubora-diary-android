@@ -309,6 +309,23 @@ internal class DiaryDataSource(
 
     //region DiaryItemTitleSelectionHistory
     /**
+     * 指定されたタイトルのリストに一致する選択履歴をすべて取得する。
+     *
+     * @param titleList 検索する履歴のタイトルのリスト。
+     * @return 指定されたタイトルに一致した履歴のリスト。一致する履歴がない場合は空のリストを返す。
+     * @throws DatabaseCorruptionException データベースが破損している場合。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
+     */
+    suspend fun selectDiaryItemTitleSelectionHistoriesByTitles(
+        titleList: List<String>
+    ): List<DiaryItemTitleSelectionHistoryEntity> {
+        return executeSuspendDbReadOperation {
+            diaryItemTitleSelectionHistoryDao.selectHistoriesByTitles(titleList)
+        }
+    }
+
+    /**
      * 日記項目タイトル選択履歴を指定された件数・オフセットで、最終使用日時の降順で取得する。
      *
      * 結果はFlowとして監視可能であり、データベース関連の例外はラップされる。
@@ -359,17 +376,17 @@ internal class DiaryDataSource(
     }
 
     /**
-     * 指定されたタイトルの履歴項目をデータベースから削除する。
+     * 指定されたIDのタイトル選択履歴項目をデータベースから削除する。
      *
-     * @param title 削除する履歴のタイトル。
+     * @param id 削除する履歴のタイトルのID。
      * @throws RecordDeleteException データベースからのレコードの書き込みに失敗した場合。
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun deleteHistoryItem(title: String) {
+    suspend fun deleteHistoryItem(id: String) {
         withContext(dispatcher) {
             executeSuspendDbDeleteOperation {
-                diaryItemTitleSelectionHistoryDao.deleteHistory(title)
+                diaryItemTitleSelectionHistoryDao.deleteHistory(id)
             }
         }
     }

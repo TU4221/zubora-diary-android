@@ -439,12 +439,13 @@ internal class DiaryEditViewModel @Inject constructor(
         if (uiState.value == DiaryEditState.AddingItem) return
         if (uiState.value == DiaryEditState.DeletingItem) return
 
+        val itemTitleId = getItemTitleId(ItemNumber(itemNumber)).value
         val itemTitle = getItemTitle(ItemNumber(itemNumber)).requireValue()
 
         viewModelScope.launch {
             emitUiEvent(
                 DiaryEditEvent.NavigateDiaryItemTitleEditFragment(
-                    DiaryItemTitle(itemNumber, itemTitle)
+                    DiaryItemTitle(itemNumber, itemTitleId?.value, itemTitle)
                 )
             )
         }
@@ -684,8 +685,13 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitle>) {
         when (result) {
             is FragmentResult.Some -> {
+                val titleId =
+                    result.data.id?.let {
+                        UUIDString(it)
+                    } ?: throw IllegalArgumentException()
                 updateItemTitle(
                     ItemNumber(result.data.itemNumber),
+                    titleId,
                     result.data.title
                 )
             }
@@ -1051,6 +1057,10 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 項目関係
+    private fun getItemTitleId(itemNumber: ItemNumber): StateFlow<UUIDString?> {
+        return diaryStateFlow.getItemStateFlow(itemNumber).titleId
+    }
+
     private fun getItemTitle(itemNumber: ItemNumber): StateFlow<String?> {
         return diaryStateFlow.getItemStateFlow(itemNumber).title
     }
@@ -1230,8 +1240,8 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.numVisibleItems.value = num
     }
 
-    private fun updateItemTitle(itemNumber: ItemNumber, title: String) {
-        diaryStateFlow.updateItemTitle(itemNumber, title)
+    private fun updateItemTitle(itemNumber: ItemNumber, titleId: UUIDString, title: String) {
+        diaryStateFlow.updateItemTitle(itemNumber, titleId, title)
     }
 
     private fun updateItemComment(itemNumber: ItemNumber, comment: String) {
@@ -1384,7 +1394,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     for (j in 1..numItems) {
                         val itemTitle = generateRandomAlphanumericString(15)
                         val itemComment = generateRandomAlphanumericString(50)
-                        updateItemTitle(ItemNumber(j), itemTitle)
+                        updateItemTitle(ItemNumber(j), UUIDString(), itemTitle)
                         updateItemComment(ItemNumber(j), itemComment)
                         diaryStateFlow.getItemStateFlow(ItemNumber(j)).title.value = itemTitle
                         diaryStateFlow.getItemStateFlow(ItemNumber(j)).comment.value = itemComment

@@ -166,6 +166,19 @@ internal class DiaryRepositoryImpl (
     //endregion
 
     //region DiaryItemTitleSelectionHistory
+    override suspend fun findDiaryItemTitleSelectionHistoriesByTitles(
+        titleList: List<String>
+    ): List<DiaryItemTitleSelectionHistoryListItem> {
+        return try {
+            diaryDataSource
+                .selectDiaryItemTitleSelectionHistoriesByTitles(titleList).map {
+                    it.toDomainModel()
+                }
+        } catch (e: DatabaseException) {
+            throw diaryRepositoryExceptionMapper.toDomainException(e)
+        }
+    }
+
     override fun loadDiaryItemTitleSelectionHistoryList(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryListItem>> {
@@ -199,9 +212,9 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    override suspend fun deleteDiaryItemTitleSelectionHistory(title: String) {
+    override suspend fun deleteDiaryItemTitleSelectionHistory(id: UUIDString) {
         try {
-            diaryDataSource.deleteHistoryItem(title)
+            diaryDataSource.deleteHistoryItem(id.value)
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }

@@ -1,10 +1,9 @@
 package com.websarva.wings.android.zuboradiary.data.database
 
 import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -16,6 +15,17 @@ import kotlinx.coroutines.flow.Flow
 internal interface DiaryItemTitleSelectionHistoryDao {
     // @Query使用方法下記参照
     // https://developer.android.com/reference/kotlin/androidx/room/Query
+
+    /**
+     * 指定されたタイトルのリストに一致する選択履歴をすべて取得する。
+     *
+     * @param titleList 検索する履歴のタイトルのリスト。
+     * @return 指定されたタイトルに一致した履歴のリスト。一致する履歴がない場合は空のリストを返す。
+     */
+    @Query("SELECT * FROM diary_item_title_selection_history where title IN (:titleList) ")
+    suspend fun selectHistoriesByTitles(
+        titleList: List<String>
+    ): List<DiaryItemTitleSelectionHistoryEntity>
 
     /**
      * タイトル選択履歴を指定された件数・オフセットで、最終使用日時の降順で取得する。
@@ -35,22 +45,22 @@ internal interface DiaryItemTitleSelectionHistoryDao {
     /**
      * 新しいタイトル選択履歴のリストをデータベースに挿入する。
      *
-     * もし同じタイトルの履歴が既に存在する場合は、置き換える。
+     * もし同じID、又はタイトルの履歴が既に存在する場合は、置き換える。
      *
      * @param diaryItemTitleSelectionHistoryEntityList 挿入するタイトル選択履歴エンティティのリスト。
      */
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Upsert
     suspend fun insertHistory(
         diaryItemTitleSelectionHistoryEntityList: List<DiaryItemTitleSelectionHistoryEntity>
     )
 
     /**
-     * 指定されたタイトルの履歴をデータベースから削除する。
+     * 指定されたIDのタイトル選択履歴をデータベースから削除する。
      *
-     * @param title 削除する履歴のタイトル。
+     * @param id 削除する履歴のID。
      */
-    @Query("DELETE FROM diary_item_title_selection_history WHERE title = :title")
-    suspend fun deleteHistory(title: String)
+    @Query("DELETE FROM diary_item_title_selection_history WHERE id = :id")
+    suspend fun deleteHistory(id: String)
 
     // MEMO:SQLITEはDELETE ORDER BYが使用できない。
     /*@Query("DELETE FROM diary_item_title_history ORDER BY log DESC LIMIT ((SELECT COUNT(*) FROM diary_item_title_history) - 50) OFFSET 50")*/
