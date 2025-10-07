@@ -1,13 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import java.time.LocalDate
 
 sealed class DiaryEditEvent : UiEvent {
     internal data class NavigateDiaryShowFragment(val id: DiaryIdUi, val date: LocalDate) : DiaryEditEvent()
-    internal data class NavigateDiaryItemTitleEditFragment(val diaryItemTitle: DiaryItemTitle) : DiaryEditEvent()
+    internal data class NavigateDiaryItemTitleEditFragment(val diaryItemTitleSelection: DiaryItemTitleSelection) : DiaryEditEvent()
     internal data class NavigateDiaryLoadDialog(val date: LocalDate) : DiaryEditEvent()
     internal data class NavigateDiaryLoadFailureDialog(val date: LocalDate) : DiaryEditEvent()
     internal data class NavigateDiaryUpdateDialog(val date: LocalDate) : DiaryEditEvent()

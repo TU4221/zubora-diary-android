@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageExcept
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -213,7 +213,7 @@ internal interface DiaryRepository {
      * @param id 削除対象の履歴のタイトルのID。
      * @throws DataStorageException 履歴アイテムの削除に失敗した場合。
      */
-    suspend fun deleteDiaryItemTitleSelectionHistory(id: UUIDString)
+    suspend fun deleteDiaryItemTitleSelectionHistory(id: DiaryItemTitleSelectionHistoryId)
     //endregion
 
     //region Options

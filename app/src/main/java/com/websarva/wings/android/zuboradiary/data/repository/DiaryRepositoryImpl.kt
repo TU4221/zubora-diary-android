@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
@@ -212,7 +212,7 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    override suspend fun deleteDiaryItemTitleSelectionHistory(id: UUIDString) {
+    override suspend fun deleteDiaryItemTitleSelectionHistory(id: DiaryItemTitleSelectionHistoryId) {
         try {
             diaryDataSource.deleteHistoryItem(id.value)
         } catch (e: DatabaseException) {

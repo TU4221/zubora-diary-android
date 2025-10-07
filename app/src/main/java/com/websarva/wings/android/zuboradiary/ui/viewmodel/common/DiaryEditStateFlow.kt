@@ -4,8 +4,9 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionHistoryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import kotlinx.coroutines.CoroutineScope
@@ -134,7 +135,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
                 null
             } else {
                 DiaryItemTitleSelectionHistory(
-                    titleId,
+                    titleId.toDomainModel(),
                     title,
                     titleUpdateLog
                 )
@@ -176,7 +177,11 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         }
     }
 
-    fun updateItemTitle(itemNumber: ItemNumber, titleId: UUIDString, title: String) {
+    fun updateItemTitle(
+        itemNumber: ItemNumber,
+        titleId: DiaryItemTitleSelectionHistoryIdUi,
+        title: String
+    ) {
         updateItemTitleWithTimestamp(itemNumber, titleId, title)
     }
 

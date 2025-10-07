@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItem
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -86,7 +86,7 @@ class DiaryItemTitleEditDialog :
             }
             is DiaryItemTitleEditEvent.CompleteEdit -> {
                 completeItemTitleEdit(
-                    event.diaryItemTitle
+                    event.diaryItemTitleSelection
                 )
             }
             is DiaryItemTitleEditEvent.NavigateSelectionHistoryItemDeleteDialog -> {
@@ -180,10 +180,10 @@ class DiaryItemTitleEditDialog :
     }
 
     // DiaryItemTitleEditDialogを閉じる
-    private fun completeItemTitleEdit(diaryItemTitle: DiaryItemTitle) {
+    private fun completeItemTitleEdit(diaryItemTitleSelection: DiaryItemTitleSelection) {
         val navBackStackEntry = checkNotNull(findNavController().previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
-        savedStateHandle[KEY_RESULT] = FragmentResult.Some(diaryItemTitle)
+        savedStateHandle[KEY_RESULT] = FragmentResult.Some(diaryItemTitleSelection)
         navigatePreviousFragment()
     }
 

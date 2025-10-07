@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle
 
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
 
 /**
  * 日記項目のタイトル選択履歴の各アイテムを表すデータクラス。
@@ -11,6 +11,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
  * @property title 選択された、または入力された日記項目のタイトル。
  */
 internal data class DiaryItemTitleSelectionHistoryListItem(
-    val id: UUIDString,
+    val id: DiaryItemTitleSelectionHistoryId,
     val title: String
 )

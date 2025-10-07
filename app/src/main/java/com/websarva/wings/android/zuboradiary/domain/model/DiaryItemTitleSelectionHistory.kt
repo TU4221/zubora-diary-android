@@ -13,7 +13,7 @@ import java.time.LocalDateTime
  * @property log そのタイトルが選択または入力された日時。
  */
 internal data class DiaryItemTitleSelectionHistory (
-    val id: UUIDString,
+    val id: DiaryItemTitleSelectionHistoryId,
     val title: String,
     val log: LocalDateTime
 )

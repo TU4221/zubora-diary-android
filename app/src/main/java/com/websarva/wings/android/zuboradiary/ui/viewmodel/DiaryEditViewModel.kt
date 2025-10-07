@@ -11,7 +11,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
@@ -40,7 +40,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessa
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionHistoryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
@@ -447,7 +448,7 @@ internal class DiaryEditViewModel @Inject constructor(
         viewModelScope.launch {
             emitUiEvent(
                 DiaryEditEvent.NavigateDiaryItemTitleEditFragment(
-                    DiaryItemTitle(itemNumber, itemTitleId?.value, itemTitle)
+                    DiaryItemTitleSelection(itemNumber, itemTitleId, itemTitle)
                 )
             )
         }
@@ -684,13 +685,10 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitle>) {
+    fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitleSelection>) {
         when (result) {
             is FragmentResult.Some -> {
-                val titleId =
-                    result.data.id?.let {
-                        UUIDString(it)
-                    } ?: throw IllegalArgumentException()
+                val titleId = result.data.id ?: throw IllegalArgumentException()
                 updateItemTitle(
                     ItemNumber(result.data.itemNumber),
                     titleId,
@@ -1059,7 +1057,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 項目関係
-    private fun getItemTitleId(itemNumber: ItemNumber): StateFlow<UUIDString?> {
+    private fun getItemTitleId(itemNumber: ItemNumber): StateFlow<DiaryItemTitleSelectionHistoryIdUi?> {
         return diaryStateFlow.getItemStateFlow(itemNumber).titleId
     }
 
@@ -1247,7 +1245,11 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.numVisibleItems.value = num
     }
 
-    private fun updateItemTitle(itemNumber: ItemNumber, titleId: UUIDString, title: String) {
+    private fun updateItemTitle(
+        itemNumber: ItemNumber,
+        titleId: DiaryItemTitleSelectionHistoryIdUi,
+        title: String
+    ) {
         diaryStateFlow.updateItemTitle(itemNumber, titleId, title)
     }
 
@@ -1401,7 +1403,11 @@ internal class DiaryEditViewModel @Inject constructor(
                     for (j in 1..numItems) {
                         val itemTitle = generateRandomAlphanumericString(15)
                         val itemComment = generateRandomAlphanumericString(50)
-                        updateItemTitle(ItemNumber(j), UUIDString(), itemTitle)
+                        updateItemTitle(
+                            ItemNumber(j),
+                            DiaryItemTitleSelectionHistoryId().toUiModel(),
+                            itemTitle
+                        )
                         updateItemComment(ItemNumber(j), itemComment)
                         diaryStateFlow.getItemStateFlow(ItemNumber(j)).title.value = itemTitle
                         diaryStateFlow.getItemStateFlow(ItemNumber(j)).comment.value = itemComment
