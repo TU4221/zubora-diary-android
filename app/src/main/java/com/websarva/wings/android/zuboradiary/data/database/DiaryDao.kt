@@ -186,9 +186,7 @@ internal interface DiaryDao {
     suspend fun deleteDiary(id: String)
 
     /**
-     * 保存する日記データと同じ日付の日記データを削除し、保存する日記データと日記項目タイトル選択履歴データをトランザクション内で保存する。
-     *
-     * まず保存する日記データと同じ日付の日記を削除し、その後保存する日記を挿入する。
+     * 指定されたIDの日記を削除し、新しい日記データを保存する。
      *
      * @param deleteDiaryId 削除する日記のID。
      * @param saveDiary 新しく保存する日記データ。
