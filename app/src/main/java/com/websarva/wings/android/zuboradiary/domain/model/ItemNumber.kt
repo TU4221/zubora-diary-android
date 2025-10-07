@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model
 
-import java.io.Serializable
-
 /**
  * 日記の項目番号を表すバリュークラス。
  *
@@ -10,7 +8,7 @@ import java.io.Serializable
  * @property value 項目番号を表す整数値。1から5の範囲でなければならない。
  */
 @JvmInline
-internal value class ItemNumber(val value: Int) : Serializable, Comparable<ItemNumber> {
+internal value class ItemNumber(val value: Int) : Comparable<ItemNumber> {
 
     companion object {
         /** 項目番号の最小値。 */
