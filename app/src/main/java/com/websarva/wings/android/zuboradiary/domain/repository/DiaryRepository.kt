@@ -193,7 +193,10 @@ internal interface DiaryRepository {
     ): Flow<List<DiaryItemTitleSelectionHistoryListItem>>
 
     /**
-     * 日記アイテムのタイトル選択履歴を更新する。
+     * 日記項目タイトル選択履歴を更新する。
+     * 同時に 最新の50件を除く最終使用日時が古い履歴を削除する。
+     *
+     * この操作はトランザクションで処理される。
      *
      * @param historyItemList 更新する日記アイテムのタイトル選択履歴リスト。
      * @throws DataStorageException 履歴の更新に失敗した場合。

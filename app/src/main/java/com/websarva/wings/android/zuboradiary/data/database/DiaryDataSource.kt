@@ -187,7 +187,7 @@ internal class DiaryDataSource(
     }
 
     /**
-     * 日記データと日記項目タイトル選択履歴データをデータベースに保存する。
+     * 新しい日記をデータベースに挿入、または既存の日記を更新する。
      *
      * この操作はトランザクションとして実行される。
      *
@@ -197,16 +197,16 @@ internal class DiaryDataSource(
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun saveDiary(diary: DiaryEntity) {
+    suspend fun upsertDiary(diary: DiaryEntity) {
         withContext(dispatcher) {
             executeSuspendDbUpdateOperation {
-                diaryDao.insertDiary(diary)
+                diaryDao.upsertDiary(diary)
             }
         }
     }
 
     /**
-     * 指定されたIDの日記を削除し、新しい日記データを保存する。
+     * 指定されたIDの日記を削除し、新しい日記をデータベースに挿入、または既存の日記を更新する。
      *
      * この操作はトランザクションとして実行される。
      *
@@ -216,10 +216,10 @@ internal class DiaryDataSource(
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun deleteAndSaveDiary(deleteDiaryId:String, diary: DiaryEntity) {
+    suspend fun deleteAndUpsertDiary(deleteDiaryId:String, diary: DiaryEntity) {
         withContext(dispatcher) {
             executeSuspendDbUpdateOperation {
-                diaryDao.deleteAndSaveDiary(deleteDiaryId, diary)
+                diaryDao.deleteAndUpsertDiary(deleteDiaryId, diary)
             }
         }
     }
@@ -351,9 +351,8 @@ internal class DiaryDataSource(
     }
 
     /**
-     * 日記項目タイトル選択履歴データをデータベースに保存する。
-     *
-     * 日記項目タイトル選択履歴データを保存後、最新の50件を除く最終使用日時が古い順の履歴を削除する。
+     * 新しいタイトル選択履歴のリストをデータベースに挿入、または既存の履歴を更新する。
+     * その後、最新の50件を除く最終使用日時が古い履歴を削除する。
      *
      * この操作はトランザクションとして実行される。
      *
@@ -363,13 +362,13 @@ internal class DiaryDataSource(
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun updateDiaryItemTitleSelectionHistory(
+    suspend fun upsertAndPruneDiaryItemTitleSelectionHistory(
         historyItemList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
         withContext(dispatcher) {
             executeSuspendDbUpdateOperation {
                 diaryItemTitleSelectionHistoryDao
-                    .updateDiaryItemTitleSelectionHistory(
+                    .upsertAndPruneHistories(
                         historyItemList
                     )
             }

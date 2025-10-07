@@ -101,7 +101,7 @@ internal class DiaryRepositoryImpl (
         diary: Diary
     ) {
         try {
-            diaryDataSource.saveDiary(
+            diaryDataSource.upsertDiary(
                 diary.toDataModel()
             )
         } catch (e: DatabaseException) {
@@ -114,7 +114,7 @@ internal class DiaryRepositoryImpl (
         saveDiary: Diary
     ) {
         try {
-            diaryDataSource.deleteAndSaveDiary(
+            diaryDataSource.deleteAndUpsertDiary(
                 deleteDiaryId.value,
                 saveDiary.toDataModel()
             )
@@ -206,7 +206,7 @@ internal class DiaryRepositoryImpl (
         historyItemList: List<DiaryItemTitleSelectionHistory>
     ) {
         try {
-            diaryDataSource.updateDiaryItemTitleSelectionHistory(
+            diaryDataSource.upsertAndPruneDiaryItemTitleSelectionHistory(
                 historyItemList.map { it.toDataModel() }
             )
         } catch (e: DatabaseException) {

@@ -43,7 +43,7 @@ internal interface DiaryItemTitleSelectionHistoryDao {
     ): Flow<List<DiaryItemTitleSelectionHistoryEntity>>
 
     /**
-     * 新しいタイトル選択履歴のリストをデータベースに挿入する。
+     * 新しいタイトル選択履歴のリストをデータベースに挿入、または既存の履歴を更新する。
      *
      * 渡されたタイトル選択履歴の主キー(id)がデータベースに存在しない場合は、新しい履歴として挿入する。
      * 既に存在する場合は、その履歴のデータを更新する。
@@ -51,7 +51,7 @@ internal interface DiaryItemTitleSelectionHistoryDao {
      * @param diaryItemTitleSelectionHistoryEntityList 挿入するタイトル選択履歴エンティティのリスト。
      */
     @Upsert
-    suspend fun insertHistories(
+    suspend fun upsertHistories(
         diaryItemTitleSelectionHistoryEntityList: List<DiaryItemTitleSelectionHistoryEntity>
     )
 
@@ -68,24 +68,25 @@ internal interface DiaryItemTitleSelectionHistoryDao {
     /**
      * 古いタイトル選択履歴を削除する。
      *
-     * 最新の50件を除く、最終使用日時が古い順の履歴を削除する。
+     * 最新の50件を除く、最終使用日時が古い履歴を削除する。
      */
     @Query("DELETE FROM diary_item_title_selection_history WHERE title " +
             "NOT IN (SELECT title FROM diary_item_title_selection_history ORDER BY log DESC LIMIT 50 OFFSET 0)")
-    suspend fun deleteOldHistory()
+    suspend fun deleteOldHistories()
 
     /**
-     * 日記項目タイトル選択履歴データをトランザクション内で保存する。
+     * 新しいタイトル選択履歴のリストをデータベースに挿入、または既存の履歴を更新する。
+     * その後、最新の50件を除く最終使用日時が古い履歴を削除する。
      *
-     * 選択履歴を更新し、その後、最新の50件を除く最終使用日時が古い順の履歴を削除する。
+     * 内部で [upsertHistories] と [deleteOldHistories] をトランザクションで処理する。
      *
      * @param historyList 更新する日記項目タイトル選択履歴データのリスト。
      */
     @Transaction
-    suspend fun updateDiaryItemTitleSelectionHistory(
+    suspend fun upsertAndPruneHistories(
         historyList: List<DiaryItemTitleSelectionHistoryEntity>
     ) {
-        insertHistories(historyList)
-        deleteOldHistory()
+        upsertHistories(historyList)
+        deleteOldHistories()
     }
 }

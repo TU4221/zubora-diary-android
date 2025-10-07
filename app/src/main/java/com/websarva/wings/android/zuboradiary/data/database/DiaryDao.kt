@@ -175,7 +175,7 @@ internal interface DiaryDao {
      * @param diaryEntity 挿入する日記エンティティ。
      */
     @Upsert
-    suspend fun insertDiary(diaryEntity: DiaryEntity)
+    suspend fun upsertDiary(diaryEntity: DiaryEntity)
 
     /**
      * 指定されたIDの日記をデータベースから削除する。
@@ -186,18 +186,20 @@ internal interface DiaryDao {
     suspend fun deleteDiary(id: String)
 
     /**
-     * 指定されたIDの日記を削除し、新しい日記データを保存する。
+     * 指定されたIDの日記を削除し、新しい日記をデータベースに挿入、または既存の日記を更新する。
+     *
+     * 内部で [deleteDiary] と [upsertDiary] をトランザクションで処理する。
      *
      * @param deleteDiaryId 削除する日記のID。
      * @param saveDiary 新しく保存する日記データ。
      */
     @Transaction
-    suspend fun deleteAndSaveDiary(
+    suspend fun deleteAndUpsertDiary(
         deleteDiaryId: String,
         saveDiary: DiaryEntity,
     ) {
         deleteDiary(deleteDiaryId)
-        insertDiary(saveDiary)
+        upsertDiary(saveDiary)
     }
 
     /**
