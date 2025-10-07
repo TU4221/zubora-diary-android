@@ -872,7 +872,7 @@ internal class DiaryEditViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}開始")
 
         updateUiState(DiaryEditState.Deleting)
-        when (val result = deleteDiaryUseCase(id, date)) {
+        when (val result = deleteDiaryUseCase(id)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 clearDiaryImageCacheFile()

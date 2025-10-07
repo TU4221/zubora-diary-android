@@ -197,7 +197,7 @@ internal class DiaryShowViewModel @Inject constructor(
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryShowState.Deleting)
-        when (val result = deleteDiaryUseCase(id, date)) {
+        when (val result = deleteDiaryUseCase(id)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 emitUiEvent(

@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import java.time.LocalDate
 
 /**
  * 特定の日付の日記を削除するユースケース。
@@ -33,15 +32,13 @@ internal class DeleteDiaryUseCase(
      * ユースケースを実行し、指定された日付の日記を削除し、関連する画像ファイルを削除する。
      *
      * @param id 削除する日記のID。
-     * @param date 削除する日記の日付。
      * @return 処理に成功した場合は [UseCaseResult.Success] に `Unit` を格納して返す。
      *   日記の削除、または画像ファイルの削除に失敗した場合は [UseCaseResult.Failure] に [DiaryDeleteException] を格納して返す。
      */
     suspend operator fun invoke(
-        id: UUIDString,
-        date: LocalDate
+        id: UUIDString
     ): UseCaseResult<Unit, DiaryDeleteException> {
-        Log.i(logTag, "${logMsg}開始 (ID: ${id.value}, 日付: $date)")
+        Log.i(logTag, "${logMsg}開始 (ID: ${id.value})")
 
         var deleteDiary: Diary? = null
             // 日記データ削除
@@ -59,7 +56,8 @@ internal class DeleteDiaryUseCase(
             Log.e(logTag, "${logMsg}失敗_日記データ削除エラー", e)
             return UseCaseResult.Failure(
                 DiaryDeleteException.DiaryDataDeleteFailure(
-                    deleteDiary?.date ?:date,
+                    id,
+                    deleteDiary?.date,
                     e
                 )
             )
@@ -97,7 +95,9 @@ internal class DeleteDiaryUseCase(
             }
         }
 
-        Log.i(logTag, "${logMsg}完了")
+        val dateInfo = "日付:" + (deleteDiary?.date?.let { "$it" } ?: "不明（データなし）")
+        val imageFileInfo = "画像ファイル名: " + (deleteDiary?.imageFileName?.let { "$it" } ?: "なし")
+        Log.i(logTag, "${logMsg}完了 (ID: ${id.value}, $dateInfo, $imageFileInfo)")
         return UseCaseResult.Success(Unit)
     }
 }

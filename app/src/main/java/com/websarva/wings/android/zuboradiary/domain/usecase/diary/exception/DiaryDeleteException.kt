@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
 import com.websarva.wings.android.zuboradiary.domain.model.FileName
+import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import java.time.LocalDate
@@ -19,13 +20,19 @@ internal sealed class DiaryDeleteException (
     /**
      * 特定の日付の日記データの削除に失敗した場合にスローされる例外。
      *
+     * @param id 削除しようとした日記のID。
      * @param date 削除しようとした日記の日付。
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class DiaryDataDeleteFailure (
-        date: LocalDate,
+        id: UUIDString,
+        date: LocalDate?,
         cause: Throwable
-    ) : DiaryDeleteException("日付 '$date' の日記データの削除に失敗しました。", cause)
+    ) : DiaryDeleteException(
+        "ID '$id' "
+                + (date?.let { "、日付 '$it' " } ?: "")
+                + "の日記データの削除に失敗しました。", cause
+    )
 
     /**
      * 日記に添付された画像ファイルの削除に失敗した場合にスローされる例外。

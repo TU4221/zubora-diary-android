@@ -182,7 +182,7 @@ internal class DiaryListViewModel @Inject constructor(
         val id = item.id
         val date = item.date
         viewModelScope.launch {
-            updatePendingDiaryDeleteParameters(UUIDString(id), date)
+            updatePendingDiaryDeleteParameters(UUIDString(id))
             emitUiEvent(
                 DiaryListEvent.NavigateDiaryDeleteDialog(date)
             )
@@ -282,7 +282,7 @@ internal class DiaryListViewModel @Inject constructor(
         val currentList = _diaryList.value
         viewModelScope.launch {
             parameters?.let {
-                deleteDiary(it.id, it.date, currentList)
+                deleteDiary(it.id, currentList)
             } ?: throw IllegalStateException()
         }
     }
@@ -391,14 +391,13 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun deleteDiary(
         id: UUIDString,
-        date: LocalDate,
         currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
     ) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryListState.DeletingDiary)
-        when (val result = deleteDiaryUseCase(id, date)) {
+        when (val result = deleteDiaryUseCase(id)) {
             is UseCaseResult.Success -> {
                 refreshDiaryList(currentList)
                 Log.i(logTag, "${logMsg}_完了")
@@ -462,8 +461,8 @@ internal class DiaryListViewModel @Inject constructor(
         isLoadingOnScrolled = isLoading
     }
 
-    private fun updatePendingDiaryDeleteParameters(id: UUIDString, date: LocalDate) {
-        pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
+    private fun updatePendingDiaryDeleteParameters(id: UUIDString) {
+        pendingDiaryDeleteParameters = DiaryDeleteParameters(id)
     }
 
     private fun clearPendingDiaryDeleteParameters() {
@@ -471,7 +470,6 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private data class DiaryDeleteParameters(
-        val id: UUIDString,
-        val date: LocalDate
+        val id: UUIDString
     )
 }
