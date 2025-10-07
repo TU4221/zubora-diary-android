@@ -84,19 +84,20 @@ internal class DiaryDataSource(
     }
 
     /**
-     * 指定された日付の日記データIDを取得する。
+     * 指定された日付の日記のIDを取得する。
      *
      * @param date 取得する日記の日付。
-     * @return 指定された日付の日記データ。
+     * @return 指定された日付の日記のID。
+     * @throws RecordNotFoundException 指定された日付の日記データが見つからなかった場合。
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
      */
-    suspend fun selectDiaryId(date: LocalDate): List<String> {
+    suspend fun selectDiaryId(date: LocalDate): String {
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
                 diaryDao.selectDiaryId(date)
-            }
+            } ?: throw RecordNotFoundException()
         }
     }
 
@@ -104,8 +105,8 @@ internal class DiaryDataSource(
      * 指定されたIDの日記データを取得する。
      *
      * @param id 取得する日記のID。
-     * @return 指定された日付の日記データ。
-     * @throws RecordNotFoundException 指定された日付の日記データが見つからなかった場合。
+     * @return 指定されたIDの日記データ。
+     * @throws RecordNotFoundException 指定されたIDの日記データが見つからなかった場合。
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。

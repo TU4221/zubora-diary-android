@@ -49,7 +49,7 @@ internal interface DiaryDao {
      * @return 指定された日付のDiaryEntity。見つからない場合はnull。
      */
     @Query("SELECT id FROM diaries WHERE date = :date")
-    suspend fun selectDiaryId(date: LocalDate): List<String>
+    suspend fun selectDiaryId(date: LocalDate): String?
 
     /**
      * 指定されたIDの日記エンティティを取得する。
