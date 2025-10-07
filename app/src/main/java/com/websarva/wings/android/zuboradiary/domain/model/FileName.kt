@@ -1,8 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
-
 /**
  * ファイル名を表すバリュークラス。
  *
@@ -12,10 +9,9 @@ import kotlinx.parcelize.Parcelize
  * @throws IllegalArgumentException ファイル名が一般的ファイル形式 (basename.extension) でない場合。
  */
 @JvmInline
-@Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
 internal value class FileName(
     val fullName: String
-) : Parcelable {
+) {
 
     init {
         // 1. 空でないこと

@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryE
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
@@ -43,16 +44,16 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    override suspend fun loadDiaryId(date: LocalDate): UUIDString {
+    override suspend fun loadDiaryId(date: LocalDate): DiaryId {
         return try {
             val id = diaryDataSource.selectDiaryId(date)
-            UUIDString(id)
+            DiaryId(id)
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
-    override suspend fun loadDiary(id: UUIDString): Diary {
+    override suspend fun loadDiary(id: DiaryId): Diary {
         return try {
             diaryDataSource.selectDiary(id.value).toDomainModel()
         } catch (e: DatabaseException) {
@@ -107,7 +108,7 @@ internal class DiaryRepositoryImpl (
     }
 
     override suspend fun deleteAndSaveDiary(
-        deleteDiaryId: UUIDString,
+        deleteDiaryId: DiaryId,
         saveDiary: Diary
     ) {
         try {
@@ -120,7 +121,7 @@ internal class DiaryRepositoryImpl (
         }
     }
 
-    override suspend fun deleteDiary(id: UUIDString) {
+    override suspend fun deleteDiary(id: DiaryId) {
         try {
             diaryDataSource.deleteDiary(id.value)
         } catch (e: DatabaseException) {

@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -33,9 +31,8 @@ import java.time.LocalDateTime
  * @property imageFileName 日記に添付した画像ファイル名。未添付の場合 `null`。
  * @throws IllegalArgumentException 日記項目のタイトルとコメントのnull整合性、または日記項目の順序整合性に違反する場合。
  */
-@Parcelize // MEMO:"@Parcelize"でSavedStateHandle対応
 internal data class Diary(
-    val id: UUIDString = UUIDString(),
+    val id: DiaryId = DiaryId(),
     val date: LocalDate = LocalDate.now(),
     val log: LocalDateTime = LocalDateTime.now(),
     val weather1: Weather = Weather.UNKNOWN,
@@ -53,7 +50,7 @@ internal data class Diary(
     val item5Title: String? = null,
     val item5Comment: String? = null,
     val imageFileName: FileName? = null
-) : Parcelable {
+) {
 
     init {
         val items = listOf(

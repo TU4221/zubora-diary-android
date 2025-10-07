@@ -24,7 +24,7 @@
                 app:destination="@id/nested_navigation_diary_show">
                 <argument
                     android:name="load_diary_id"
-                    app:argType="string" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi" />
                 <argument
                     android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />
@@ -35,7 +35,7 @@
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
                     android:name="load_diary_id"
-                    app:argType="string"
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi"
                     app:nullable="true" />
                 <argument
                     android:name="load_diary_date"
@@ -89,7 +89,7 @@
                 app:destination="@id/nested_navigation_diary_show">
                 <argument
                     android:name="load_diary_id"
-                    app:argType="string" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi" />
                 <argument
                     android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />
@@ -122,7 +122,7 @@
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
                     android:name="load_diary_id"
-                    app:argType="string"
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi"
                     app:nullable="true" />
                 <argument
                     android:name="load_diary_date"
@@ -250,7 +250,7 @@
             tools:layout="@layout/fragment_diary_show" >
             <argument
                 android:name="load_diary_id"
-                app:argType="string" />
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi" />
             <argument
                 android:name="load_diary_date"
                 app:argType="java.time.LocalDate" />
@@ -260,7 +260,7 @@
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
                     android:name="load_diary_id"
-                    app:argType="string"
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi"
                     app:nullable="true" />
                 <argument
                     android:name="load_diary_date"
@@ -314,7 +314,7 @@
             android:label="@string/title_settings" >
             <argument
                 android:name="load_diary_id"
-                app:argType="string"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi"
                 app:nullable="true" />
             <argument
                 android:name="load_diary_date"
@@ -331,7 +331,7 @@
                 app:popUpToInclusive="true">
                 <argument
                     android:name="load_diary_id"
-                    app:argType="string" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi" />
                 <argument
                     android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />
@@ -344,7 +344,7 @@
                 app:popUpToInclusive="true">
                 <argument
                     android:name="load_diary_id"
-                    app:argType="string" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi" />
                 <argument
                     android:name="load_diary_date"
                     app:argType="java.time.LocalDate" />

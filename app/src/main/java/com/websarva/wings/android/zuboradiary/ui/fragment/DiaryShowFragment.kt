@@ -19,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpd
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -255,7 +256,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         }
     }
 
-    private fun navigateDiaryEditFragment(id: String, date: LocalDate) {
+    private fun navigateDiaryEditFragment(id: DiaryIdUi, date: LocalDate) {
         val directions =
             DiaryShowFragmentDirections.actionNavigationDiaryShowFragmentToDiaryEditFragment(
                 id,

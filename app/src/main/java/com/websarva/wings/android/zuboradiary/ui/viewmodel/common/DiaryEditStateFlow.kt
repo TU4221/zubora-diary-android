@@ -3,10 +3,10 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
-import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +32,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         private const val SAVED_LOG_STATE_KEY = "log"
     }
 
-    override val id = MutableStateFlow<UUIDString?>(handle[SAVED_ID_STATE_KEY] ?: initialId)
+    override val id = MutableStateFlow<DiaryIdUi?>(handle[SAVED_ID_STATE_KEY] ?: initialId)
 
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
     //      StateFlow変数を用意しても意味がないので作成しない。
@@ -99,14 +99,14 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         }.launchIn(scope)
     }
 
-    fun createDiary(): Diary {
-        return Diary(
+    fun createDiary(): DiaryUi {
+        return DiaryUi(
             id.value ?:throw IllegalStateException("IDなし(null)"),
             date.value ?:throw IllegalStateException("日付なし(null)"),
             LocalDateTime.now(),
-            weather1.value.toDomainModel(),
-            weather2.value.toDomainModel(),
-            condition.value.toDomainModel(),
+            weather1.value,
+            weather2.value,
+            condition.value,
             title.value.trim(),
             items[0].title.value?.trim()
                 ?: throw IllegalStateException("項目1タイトルなし(null)"),
@@ -120,7 +120,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             items[3].comment.value?.trim(),
             items[4].title.value?.trim(),
             items[4].comment.value?.trim(),
-            imageFileName.value?.toDomainModel()
+            imageFileName.value
             )
     }
 

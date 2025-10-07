@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByIdException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -33,7 +33,7 @@ internal class LoadDiaryByIdUseCase(
      *   失敗した場合、または該当する日記が存在しない場合は [UseCaseResult.Failure] に [DiaryLoadByDateException] を格納して返す。
      */
     suspend operator fun invoke(
-        id: UUIDString
+        id: DiaryId
     ): UseCaseResult<Diary, DiaryLoadByIdException> {
         Log.i(logTag, "${logMsg}開始 (ID: $id)")
 

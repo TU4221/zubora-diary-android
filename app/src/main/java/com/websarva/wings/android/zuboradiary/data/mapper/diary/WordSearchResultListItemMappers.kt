@@ -1,12 +1,12 @@
 package com.websarva.wings.android.zuboradiary.data.mapper.diary
 
 import com.websarva.wings.android.zuboradiary.data.database.WordSearchResultListItemData
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
 
 internal fun WordSearchResultListItemData.toDomainModel(): RawWordSearchResultListItem {
     return RawWordSearchResultListItem(
-        UUIDString(id),
+        DiaryId(id),
         date,
         title,
         item1Title,

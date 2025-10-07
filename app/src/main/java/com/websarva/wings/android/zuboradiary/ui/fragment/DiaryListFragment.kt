@@ -17,6 +17,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.Di
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
@@ -171,7 +172,7 @@ class DiaryListFragment :
         }
     }
 
-    private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {
+    private fun navigateDiaryEditFragment(id: DiaryIdUi?, date: LocalDate) {
         Log.d("20250714", "navigateDiaryEditFragment()")
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryEditFragment(
@@ -181,7 +182,7 @@ class DiaryListFragment :
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
+    private fun navigateDiaryShowFragment(id: DiaryIdUi, date: LocalDate) {
         Log.d("20250714", "navigateDiaryShowFragment()")
         val directions =
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryShowFragment(id, date)

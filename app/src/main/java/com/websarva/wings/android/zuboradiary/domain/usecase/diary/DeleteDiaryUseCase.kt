@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -36,7 +36,7 @@ internal class DeleteDiaryUseCase(
      *   日記の削除、または画像ファイルの削除に失敗した場合は [UseCaseResult.Failure] に [DiaryDeleteException] を格納して返す。
      */
     suspend operator fun invoke(
-        id: UUIDString
+        id: DiaryId
     ): UseCaseResult<Unit, DiaryDeleteException> {
         Log.i(logTag, "${logMsg}開始 (ID: ${id.value})")
 

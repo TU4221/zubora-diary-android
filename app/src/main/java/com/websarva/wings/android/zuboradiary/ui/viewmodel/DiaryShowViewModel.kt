@@ -3,12 +3,14 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByIdUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
+import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -67,11 +69,10 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private fun initializeDiaryData(handle: SavedStateHandle) {
-        val id = handle.get<String>(ID_ARGUMENT_KEY) ?: throw IllegalArgumentException()
-        val uuidString = UUIDString(id)
+        val id = handle.get<DiaryIdUi>(ID_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         val date = handle.get<LocalDate>(DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         viewModelScope.launch {
-            loadSavedDiary(uuidString, date)
+            loadSavedDiary(id, date)
         }
     }
 
@@ -109,7 +110,7 @@ internal class DiaryShowViewModel @Inject constructor(
         val date = diaryStateFlow.date.requireValue()
         viewModelScope.launch {
             emitUiEvent(
-                DiaryShowEvent.NavigateDiaryEditFragment(id.value, date)
+                DiaryShowEvent.NavigateDiaryEditFragment(id, date)
             )
         }
     }
@@ -170,17 +171,17 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // データ処理
-    private suspend fun loadSavedDiary(id: UUIDString, date: LocalDate) {
+    private suspend fun loadSavedDiary(id: DiaryIdUi, date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryShowState.Loading)
-        when (val result = loadDiaryByIdUseCase(id)) {
+        when (val result = loadDiaryByIdUseCase(id.toDomainModel())) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(DiaryShowState.LoadSuccess)
                 val diary = result.value
-                updateDiary(diary)
+                updateDiary(diary.toUiModel())
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
@@ -192,12 +193,12 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    private suspend fun deleteDiary(id: UUIDString, date: LocalDate) {
+    private suspend fun deleteDiary(id: DiaryIdUi, date: LocalDate) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryShowState.Deleting)
-        when (val result = deleteDiaryUseCase(id)) {
+        when (val result = deleteDiaryUseCase(id.toDomainModel())) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 emitUiEvent(
@@ -227,7 +228,7 @@ internal class DiaryShowViewModel @Inject constructor(
         )
     }
 
-    private fun updatePendingDiaryDeleteParameters(id: UUIDString, date: LocalDate) {
+    private fun updatePendingDiaryDeleteParameters(id: DiaryIdUi, date: LocalDate) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
 
@@ -236,7 +237,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private data class DiaryDeleteParameters(
-        val id: UUIDString,
+        val id: DiaryIdUi,
         val date: LocalDate
     )
 }

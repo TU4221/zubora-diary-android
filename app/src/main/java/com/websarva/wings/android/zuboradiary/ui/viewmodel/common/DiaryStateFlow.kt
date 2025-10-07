@@ -6,6 +6,8 @@ import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,10 +20,10 @@ internal open class DiaryStateFlow {
         const val MAX_ITEMS: Int = ItemNumber.MAX_NUMBER
     }
 
-    protected val initialDiary = Diary()
+    protected val initialDiary = Diary().toUiModel()
 
     protected val initialId = null
-    open val id = MutableStateFlow<UUIDString?>(initialId) // MEMO:初期化時IDが未定の為、null許容型とする。
+    open val id = MutableStateFlow<DiaryIdUi?>(initialId) // MEMO:初期化時IDが未定の為、null許容型とする。
 
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
     //      StateFlow変数を用意しても意味がないので作成しない。
@@ -29,11 +31,11 @@ internal open class DiaryStateFlow {
     open val date =
         MutableStateFlow<LocalDate?>(initialDate) // MEMO:初期化時日付が未定の為、null許容型とする。
 
-    protected val initialWeather = initialDiary.weather1.toUiModel()
+    protected val initialWeather = initialDiary.weather1
     open val weather1 = MutableStateFlow(initialWeather)
     open val weather2 = MutableStateFlow(initialWeather)
 
-    protected val initialCondition = initialDiary.condition.toUiModel()
+    protected val initialCondition = initialDiary.condition
     open val condition = MutableStateFlow(initialCondition)
 
     protected val initialTitle = initialDiary.title
@@ -52,7 +54,7 @@ internal open class DiaryStateFlow {
     protected open val items: Array<out DiaryItemStateFlow> =
         Array(MAX_ITEMS) { i -> DiaryItemStateFlow(i + 1) }
 
-    protected val initialImageFileName = initialDiary.imageFileName?.toUiModel()
+    protected val initialImageFileName = initialDiary.imageFileName
     open val imageFileName = MutableStateFlow(initialImageFileName)
 
     private val initialImageFilePath: ImageFilePathUi? = null
@@ -82,13 +84,13 @@ internal open class DiaryStateFlow {
         return items[arrayNumber]
     }
 
-    fun update(diary: Diary) {
+    fun update(diary: DiaryUi) {
         diary.run {
             updateId(id)
             updateDate(date)
-            updateWeather1(weather1.toUiModel())
-            updateWeather2(weather2.toUiModel())
-            updateCondition(condition.toUiModel())
+            updateWeather1(weather1)
+            updateWeather2(weather2)
+            updateCondition(condition)
             updateTitle(title)
 
             setUpItemTitleAndComment(ItemNumber(1), item1Title, item1Comment)
@@ -108,12 +110,12 @@ internal open class DiaryStateFlow {
             }
             updateNumVisibleItems(numVisibleItems)
 
-            updateImageFileName(imageFileName?.toUiModel())
+            updateImageFileName(imageFileName)
             updateLog(log)
         }
     }
 
-    private fun updateId(id: UUIDString?) {
+    private fun updateId(id: DiaryIdUi?) {
         this.id.value = id
     }
 

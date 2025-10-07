@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.list.diary
 
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import java.time.LocalDate
 
 /**
@@ -25,7 +25,7 @@ import java.time.LocalDate
  * @property item5Comment 5番目のアイテムのコメント。未記述の場合null。
  */
 internal data class RawWordSearchResultListItem(
-    val id: UUIDString,
+    val id: DiaryId,
     val date: LocalDate,
     val title: String,
     val item1Title: String,

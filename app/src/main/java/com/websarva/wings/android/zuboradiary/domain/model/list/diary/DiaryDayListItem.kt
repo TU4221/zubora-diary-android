@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.domain.model.list.diary
 
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.FileName
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import java.time.LocalDate
 
 /**
@@ -16,7 +16,7 @@ import java.time.LocalDate
  * @property date このリストアイテムが表す日付。
  */
 internal sealed class DiaryDayListItem(
-    open val id: UUIDString,
+    open val id: DiaryId,
     open val date: LocalDate
 ) {
 
@@ -30,7 +30,7 @@ internal sealed class DiaryDayListItem(
      * @property imageFileName 日記に関連付けられた画像ファイル名。画像がない場合はnull。
      */
     data class Standard(
-        override val id: UUIDString,
+        override val id: DiaryId,
         override val date: LocalDate,
         val title: String,
         val imageFileName: FileName?
@@ -53,7 +53,7 @@ internal sealed class DiaryDayListItem(
      * @property searchWord このアイテムがヒットした検索単語。
      */
     data class WordSearchResult(
-        override val id: UUIDString,
+        override val id: DiaryId,
         override val date: LocalDate,
         val title: String,
         val itemNumber: ItemNumber,

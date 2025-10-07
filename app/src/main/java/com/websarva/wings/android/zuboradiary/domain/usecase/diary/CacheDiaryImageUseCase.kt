@@ -2,11 +2,11 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.model.FileName
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageCacheException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -37,9 +37,9 @@ internal class CacheDiaryImageUseCase(
      */
     suspend operator fun invoke(
         uriString: String,
-        diaryId: UUIDString
+        diaryId: DiaryId
     ): UseCaseResult<FileName, DiaryImageCacheException> {
-        Log.i(logTag, "${logMsg}開始 (画像URI: $uriString、 ファイルベース名: $diaryId)")
+        Log.i(logTag, "${logMsg}開始 (画像URI: $uriString、 ファイルベース名: ${diaryId.value})")
 
         return try {
             val currentDateTime = LocalDateTime.now()

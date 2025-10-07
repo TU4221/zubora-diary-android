@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -95,7 +96,7 @@ internal class CalendarViewModel @Inject constructor(
         val date = _selectedDate.value
         viewModelScope.launch {
             emitUiEvent(
-                CalendarEvent.NavigateDiaryEditFragment(id?.value, date)
+                CalendarEvent.NavigateDiaryEditFragment(id, date)
             )
         }
     }
@@ -180,7 +181,7 @@ internal class CalendarViewModel @Inject constructor(
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(CalendarState.LoadDiarySuccess)
                 val diary = result.value
-                updateDiary(diary)
+                updateDiary(diary.toUiModel())
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)

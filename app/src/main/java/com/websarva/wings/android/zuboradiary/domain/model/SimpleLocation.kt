@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model
 
-import androidx.annotation.FloatRange
-
 /**
  * 緯度、経度の位置情報を表すデータクラス。
  *
@@ -10,9 +8,7 @@ import androidx.annotation.FloatRange
  * @throws IllegalArgumentException 緯度、経度が許容された範囲外の場合にスローされる。
  */
 internal data class SimpleLocation(
-    @FloatRange(from = -90.0, to = 90.0)
     val latitude: Double,
-    @FloatRange(from = -180.0, to = 180.0)
     val longitude: Double
 ) {
     init {

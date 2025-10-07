@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByIdUseCase
 
@@ -22,7 +22,7 @@ internal sealed class DiaryLoadByIdException (
      * @param cause 発生した根本的な原因となった[Throwable]。
      */
     class LoadFailure(
-        id: UUIDString,
+        id: DiaryId,
         cause: Throwable
     ) : DiaryLoadByIdException("指定されたID '${id.value}' の日記の読込に失敗しました。", cause)
 

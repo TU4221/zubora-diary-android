@@ -5,4 +5,4 @@ import kotlinx.parcelize.Parcelize
 
 @JvmInline
 @Parcelize
-internal value class ImageFileNameUi(val fullName: String) : Parcelable
+internal value class DiaryIdUi(val value: String) : Parcelable

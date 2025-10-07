@@ -3,13 +3,13 @@ package com.websarva.wings.android.zuboradiary.data.mapper.diary
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
 import com.websarva.wings.android.zuboradiary.domain.model.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.FileName
-import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import com.websarva.wings.android.zuboradiary.domain.model.Weather
 
 internal fun DiaryEntity.toDomainModel(): Diary {
     return Diary(
-        UUIDString(id),
+        DiaryId(id),
         date,
         log,
         Weather.of(weather1),

@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.D
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.UUIDString
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -49,7 +50,7 @@ internal interface DiaryRepository {
      * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
      * @throws ResourceNotFoundException 該当の日記データが見つからなかった場合。
      */
-    suspend fun loadDiaryId(date: LocalDate): UUIDString
+    suspend fun loadDiaryId(date: LocalDate): DiaryId
 
     /**
      * 指定されたIDの日記データを読み込む。
@@ -59,7 +60,7 @@ internal interface DiaryRepository {
      * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。
      * @throws ResourceNotFoundException 該当の日記データが見つからなかった場合。
      */
-    suspend fun loadDiary(id: UUIDString): Diary
+    suspend fun loadDiary(id: DiaryId): Diary
 
     /**
      * 保存されている日記の中で、最も新しい日付の日記データを読み込む。
@@ -119,7 +120,7 @@ internal interface DiaryRepository {
      * @throws DataStorageException 日記の削除または保存に失敗した場合。
      * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
-    suspend fun deleteAndSaveDiary(deleteDiaryId: UUIDString, saveDiary: Diary)
+    suspend fun deleteAndSaveDiary(deleteDiaryId: DiaryId, saveDiary: Diary)
 
     /**
      * 指定されたIDの日記データを削除する。
@@ -127,7 +128,7 @@ internal interface DiaryRepository {
      * @param id 削除対象の日記のID。
      * @throws DataStorageException 日記データの削除に失敗した場合。
      */
-    suspend fun deleteDiary(id: UUIDString)
+    suspend fun deleteDiary(id: DiaryId)
 
     /**
      * 保存されているすべての日記データを削除する。
