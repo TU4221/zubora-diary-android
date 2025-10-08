@@ -54,7 +54,7 @@ internal class LoadCalendarStartDayOfWeekSettingUseCase(
                 > = UseCaseResult.Success(setting)
                 result
             }.catch { cause: Throwable ->
-                val defaultSettingValue = CalendarStartDayOfWeekSetting()
+                val defaultSettingValue = CalendarStartDayOfWeekSetting.default()
                 val result =
                     when (cause) {
                         is ResourceNotFoundException -> {

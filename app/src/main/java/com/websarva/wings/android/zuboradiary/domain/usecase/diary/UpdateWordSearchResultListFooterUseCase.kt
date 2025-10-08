@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchListFooterUpdateException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
@@ -34,7 +35,7 @@ internal class UpdateWordSearchResultListFooterUseCase(
      */
     suspend operator fun invoke(
         list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
-        searchWord: String
+        searchWord: SearchWord
     ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, WordSearchListFooterUpdateException> {
         Log.i(logTag, "${logMsg}開始 (リスト件数: ${list.countDiaries()}, 検索ワード: \"$searchWord\")")
 
@@ -77,7 +78,7 @@ internal class UpdateWordSearchResultListFooterUseCase(
      * @throws WordSearchResultCountException 検索ワードに一致する日記の総数の取得に失敗した場合。
      */
     private suspend fun checkUnloadedWordSearchResultsExist(
-        searchWord: String,
+        searchWord: SearchWord,
         numLoadedDiaries: Int
     ): Boolean {
             return when (val result = countWordSearchResultsUseCase(searchWord)) {

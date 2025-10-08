@@ -1,8 +1,12 @@
 package com.websarva.wings.android.zuboradiary.domain.model.list.diary
 
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
-import com.websarva.wings.android.zuboradiary.domain.model.FileName
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemComment
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryTitle
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
 import java.time.LocalDate
 
 /**
@@ -32,8 +36,8 @@ internal sealed class DiaryDayListItem(
     data class Standard(
         override val id: DiaryId,
         override val date: LocalDate,
-        val title: String,
-        val imageFileName: FileName?
+        val title: DiaryTitle,
+        val imageFileName: DiaryImageFileName?
     ) : DiaryDayListItem(id, date)
 
     /**
@@ -55,10 +59,10 @@ internal sealed class DiaryDayListItem(
     data class WordSearchResult(
         override val id: DiaryId,
         override val date: LocalDate,
-        val title: String,
+        val title: DiaryTitle,
         val itemNumber: ItemNumber,
-        val itemTitle: String,
-        val itemComment: String,
-        val searchWord: String,
+        val itemTitle: DiaryItemTitle,
+        val itemComment: DiaryItemComment,
+        val searchWord: SearchWord,
     ) : DiaryDayListItem(id, date)
 }

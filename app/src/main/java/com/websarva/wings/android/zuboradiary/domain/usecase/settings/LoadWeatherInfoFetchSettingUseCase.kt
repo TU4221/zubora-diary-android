@@ -49,7 +49,7 @@ internal class LoadWeatherInfoFetchSettingUseCase(
                     UseCaseResult.Success(setting)
                 result
             }.catch { cause: Throwable ->
-                val defaultSettingValue = WeatherInfoFetchSetting()
+                val defaultSettingValue = WeatherInfoFetchSetting.default()
                 val result =
                     when (cause) {
                         is ResourceNotFoundException -> {

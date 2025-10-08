@@ -24,4 +24,15 @@ internal sealed class ReminderNotificationSetting(
      * リマインダー通知が無効な状態を表すデータオブジェクト。
      */
     data object Disabled : ReminderNotificationSetting(false)
+
+    companion object {
+        /**
+         * デフォルトのリマインダー通知設定（無効）を返す。
+         *
+         * @return デフォルトのリマインダー通知設定。
+         */
+        fun default(): ReminderNotificationSetting {
+            return Disabled
+        }
+    }
 }

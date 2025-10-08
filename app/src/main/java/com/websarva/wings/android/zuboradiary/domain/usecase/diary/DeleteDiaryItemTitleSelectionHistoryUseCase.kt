@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryDeleteException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -31,7 +32,7 @@ internal class DeleteDiaryItemTitleSelectionHistoryUseCase(
      */
     suspend operator fun invoke(
         id: DiaryItemTitleSelectionHistoryId,
-        title: String
+        title: DiaryItemTitle
     ): UseCaseResult<Unit, DiaryItemTitleSelectionHistoryDeleteException> {
         Log.i(logTag, "${logMsg}開始 (ID: $id、タイトル: $title)")
 

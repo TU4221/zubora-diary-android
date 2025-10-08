@@ -11,15 +11,15 @@ import java.time.LocalDateTime
  * アイテムは最大5つまで設定でき、itemXTitle と itemXComment はペアでnullまたは非nullである必要がある。
  * また、item(N)が設定されている場合、item(N-1)も設定されている必要がある。
  *
- * @property id 日記の識別番号。デフォルトはUUIDランダム生成値。
- * @property date 日記の日付。デフォルトは現在の日付。
- * @property log 最終更新日時。デフォルトは現在のローカル日時。
- * @property weather1 その日の天気（1つ目）。デフォルトは [Weather.UNKNOWN]。
- * @property weather2 その日の天気（2つ目、任意）。デフォルトは [Weather.UNKNOWN]。
- * @property condition その日の体調。デフォルトは [Condition.UNKNOWN]。
- * @property title 日記のタイトル。デフォルトは空文字列。
- * @property item1Title 1番目の日記項目のタイトル。デフォルトは空文字列。
- * @property item1Comment 1番目の日記項目のコメント。デフォルトは空文字列。
+ * @property id 日記の識別番号。
+ * @property date 日記の日付。
+ * @property log 最終更新日時。
+ * @property weather1 その日の天気（1つ目）。
+ * @property weather2 その日の天気（2つ目、任意）。
+ * @property condition その日の体調。
+ * @property title 日記のタイトル。
+ * @property item1Title 1番目の日記項目のタイトル。
+ * @property item1Comment 1番目の日記項目のコメント。
  * @property item2Title 2つ目の項目のタイトル。未入力の場合 `null`。
  * @property item2Comment 2つ目の項目のコメント。未入力の場合 `null`。
  * @property item3Title 3つ目の項目のタイトル。未入力の場合 `null`。
@@ -32,24 +32,24 @@ import java.time.LocalDateTime
  * @throws IllegalArgumentException 日記項目のタイトルとコメントのnull整合性、または日記項目の順序整合性に違反する場合。
  */
 internal data class Diary(
-    val id: DiaryId = DiaryId(),
-    val date: LocalDate = LocalDate.now(),
-    val log: LocalDateTime = LocalDateTime.now(),
-    val weather1: Weather = Weather.UNKNOWN,
-    val weather2: Weather = Weather.UNKNOWN,
-    val condition: Condition = Condition.UNKNOWN,
-    val title: String = "",
-    val item1Title: String = "",
-    val item1Comment: String = "",
-    val item2Title: String? = null,
-    val item2Comment: String? = null,
-    val item3Title: String? = null,
-    val item3Comment: String? = null,
-    val item4Title: String? = null,
-    val item4Comment: String? = null,
-    val item5Title: String? = null,
-    val item5Comment: String? = null,
-    val imageFileName: FileName? = null
+    val id: DiaryId,
+    val date: LocalDate,
+    val log: LocalDateTime,
+    val weather1: Weather,
+    val weather2: Weather,
+    val condition: Condition,
+    val title: DiaryTitle,
+    val item1Title: DiaryItemTitle,
+    val item1Comment: DiaryItemComment,
+    val item2Title: DiaryItemTitle?,
+    val item2Comment: DiaryItemComment?,
+    val item3Title: DiaryItemTitle?,
+    val item3Comment: DiaryItemComment?,
+    val item4Title: DiaryItemTitle?,
+    val item4Comment: DiaryItemComment?,
+    val item5Title: DiaryItemTitle?,
+    val item5Comment: DiaryItemComment?,
+    val imageFileName: DiaryImageFileName?
 ) {
 
     init {
@@ -116,5 +116,44 @@ internal data class Diary(
                 this.item5Title == other.item5Title &&
                 this.item5Comment == other.item5Comment &&
                 this.imageFileName == other.imageFileName
+    }
+
+    companion object {
+        /**
+         * 新しい [Diary] を生成する。
+         *
+         * 生成されるDiaryは以下の初期値を持つ:
+         * - `id`: ランダムな [DiaryId]
+         * - `date`: 現在の日付 ([LocalDate.now])
+         * - `log`: 現在の日時 ([LocalDateTime.now])
+         * - `weather1`, `weather2`: [Weather.UNKNOWN]
+         * - `condition`: [Condition.UNKNOWN]
+         * - `title`: 空のタイトル
+         * - `item1Title`, `item1Comment`: 空の項目
+         * - `item2` から `item5`: `null`
+         * - `imageFileName`: `null`
+         *
+         */
+        fun generate() =
+            Diary(
+                DiaryId.generate(),
+                LocalDate.now(),
+                LocalDateTime.now(),
+                Weather.UNKNOWN,
+                Weather.UNKNOWN,
+                Condition.UNKNOWN,
+                DiaryTitle(""),
+                DiaryItemTitle.empty(),
+                DiaryItemComment.empty(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+            )
     }
 }

@@ -1,6 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemComment
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryTitle
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
 
 internal fun Diary.toUiModel(): DiaryUi {
@@ -11,17 +14,17 @@ internal fun Diary.toUiModel(): DiaryUi {
         weather1.toUiModel(),
         weather2.toUiModel(),
         condition.toUiModel(),
-        title,
-        item1Title,
-        item1Comment,
-        item2Title,
-        item2Comment,
-        item3Title,
-        item3Comment,
-        item4Title,
-        item4Comment,
-        item5Title,
-        item5Comment,
+        title.value,
+        item1Title.value,
+        item1Comment.value,
+        item2Title?.value,
+        item2Comment?.value,
+        item3Title?.value,
+        item3Comment?.value,
+        item4Title?.value,
+        item4Comment?.value,
+        item5Title?.value,
+        item5Comment?.value,
         imageFileName?.toUiModel()
     )
 }
@@ -34,17 +37,17 @@ internal fun DiaryUi.toDomainModel(): Diary {
         weather1.toDomainModel(),
         weather2.toDomainModel(),
         condition.toDomainModel(),
-        title,
-        item1Title,
-        item1Comment,
-        item2Title,
-        item2Comment,
-        item3Title,
-        item3Comment,
-        item4Title,
-        item4Comment,
-        item5Title,
-        item5Comment,
+        DiaryTitle(title),
+        DiaryItemTitle(item1Title),
+        DiaryItemComment(item1Comment),
+        item2Title?.let { DiaryItemTitle(it) },
+        item2Comment?.let { DiaryItemComment(it) },
+        item3Title?.let { DiaryItemTitle(it) },
+        item3Comment?.let { DiaryItemComment(it) },
+        item4Title?.let { DiaryItemTitle(it) },
+        item4Comment?.let { DiaryItemComment(it) },
+        item5Title?.let { DiaryItemTitle(it) },
+        item5Comment?.let { DiaryItemComment(it) },
         imageFileName?.toDomainModel()
     )
 }

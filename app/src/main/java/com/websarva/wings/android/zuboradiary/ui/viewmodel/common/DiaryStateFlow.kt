@@ -20,7 +20,7 @@ internal open class DiaryStateFlow {
         const val MAX_ITEMS: Int = ItemNumber.MAX_NUMBER
     }
 
-    protected val initialDiary = Diary().toUiModel()
+    protected val initialDiary = Diary.generate().toUiModel()
 
     protected val initialId = null
     open val id = MutableStateFlow<DiaryIdUi?>(initialId) // MEMO:初期化時IDが未定の為、null許容型とする。

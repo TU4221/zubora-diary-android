@@ -1,19 +1,28 @@
 package com.websarva.wings.android.zuboradiary.domain.model
 
 /**
- * ファイル名を表すバリュークラス。
+ * ファイル名を表す抽象クラス。
  *
- * このクラスは、ファイル名が空ではなく、一般的ファイル形式 (basename.extension) であることを保障する。
+ * このクラスは、ファイル名が有効なファイル名であるかを検証する機能を有する。
+ *
+ * **【重要】** このクラスを継承するサブクラスは、自身の`init`ブロック内で必ず [validate] を呼び出すこと。
  *
  * @property fullName ファイル名。拡張子を含む。
- * @throws IllegalArgumentException ファイル名が一般的ファイル形式 (basename.extension) でない場合。
  */
-@JvmInline
-internal value class FileName(
-    val fullName: String
+internal abstract class FileName(
+    open val fullName: String
 ) {
 
-    init {
+    /**
+     * [fullName] プロパティが有効なファイル名であるかを検証。
+     * - ファイル名が空ではないこと。
+     * - 一般的ファイル形式 (basename.extension) であること。
+     *
+     * このメソッドは、必ずサブクラスの`init`ブロックから呼び出すこと。
+     *
+     * @throws IllegalArgumentException `value`が有効なUUID形式でない場合。
+     */
+    protected fun validate() {
         // 1. 空でないこと
         require(fullName.isNotBlank()) { "ファイル名が空です。" }
 

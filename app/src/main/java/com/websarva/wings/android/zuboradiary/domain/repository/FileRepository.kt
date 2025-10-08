@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
-import com.websarva.wings.android.zuboradiary.domain.model.FileName
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
@@ -24,7 +24,7 @@ internal interface FileRepository {
      * @param fileName 相対パスを構築する対象のファイル名。
      * @return 構築されたファイルパス。
      */
-    fun buildImageFileAbsolutePathFromCache(fileName: FileName): String
+    fun buildImageFileAbsolutePathFromCache(fileName: DiaryImageFileName): String
 
     /**
      * 指定された画像ファイル名から永続ストレージ相対パスを構築する。
@@ -32,7 +32,7 @@ internal interface FileRepository {
      * @param fileName 相対パスを構築する対象のファイル名。
      * @return 構築されたファイルパス。
      */
-    fun buildImageFileAbsolutePathFromPermanent(fileName: FileName): String
+    fun buildImageFileAbsolutePathFromPermanent(fileName: DiaryImageFileName): String
 
     /**
      * 指定された画像ファイルがキャッシュに存在するか確認する。
@@ -42,7 +42,7 @@ internal interface FileRepository {
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws DataStorageException 存在の確認に失敗した場合。
      */
-    suspend fun existsImageFileInCache(fileName: FileName): Boolean
+    suspend fun existsImageFileInCache(fileName: DiaryImageFileName): Boolean
 
     /**
      * 指定された画像ファイルが永続ストレージに存在するか確認する。
@@ -52,7 +52,7 @@ internal interface FileRepository {
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws DataStorageException 存在の確認に失敗した場合。
      */
-    suspend fun existsImageFileInPermanent(fileName: FileName): Boolean
+    suspend fun existsImageFileInPermanent(fileName: DiaryImageFileName): Boolean
 
     /**
      * 指定された画像ファイルがバックアップストレージに存在するか確認する。
@@ -62,7 +62,7 @@ internal interface FileRepository {
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws DataStorageException 存在の確認に失敗した場合。
      */
-    suspend fun existsImageFileInBackup(fileName: FileName): Boolean
+    suspend fun existsImageFileInBackup(fileName: DiaryImageFileName): Boolean
 
     /**
      * 指定されたUriの画像ファイルをキャッシュストレージへキャッシュする。
@@ -75,7 +75,7 @@ internal interface FileRepository {
      * @throws DataStorageException ファイルの保存に失敗した場合。
      * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
-    suspend fun cacheImageFile(uriString: String, fileBaseName: String): FileName
+    suspend fun cacheImageFile(uriString: String, fileBaseName: String): DiaryImageFileName
 
     /**
      * 指定された画像ファイルをキャッシュストレージから永続ストレージへ移動する。
@@ -87,7 +87,7 @@ internal interface FileRepository {
      * @throws ResourceAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
      * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
-    suspend fun moveImageFileToPermanent(fileName: FileName)
+    suspend fun moveImageFileToPermanent(fileName: DiaryImageFileName)
 
     /**
      * 指定された画像ファイルを永続ストレージからバックアップストレージへ移動する。
@@ -99,7 +99,7 @@ internal interface FileRepository {
      * @throws ResourceAlreadyExistsException 移動先に同名のファイルが既に存在する場合。
      * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
-    suspend fun moveImageFileToBackup(fileName: FileName)
+    suspend fun moveImageFileToBackup(fileName: DiaryImageFileName)
 
     /**
      * 指定された画像ファイルを永続ストレージからキャッシュストレージに復元する。
@@ -112,7 +112,7 @@ internal interface FileRepository {
      * @throws ResourceAlreadyExistsException 復元先に同名のファイルが既に存在する場合。
      * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
-    suspend fun restoreImageFileFromPermanent(fileName: FileName)
+    suspend fun restoreImageFileFromPermanent(fileName: DiaryImageFileName)
 
     /**
      * 指定された画像ファイルをバックアップストレージから永続ストレージに復元する。
@@ -125,7 +125,7 @@ internal interface FileRepository {
      * @throws ResourceAlreadyExistsException 復元先に同名のファイルが既に存在する場合。
      * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
-    suspend fun restoreImageFileFromBackup(fileName: FileName)
+    suspend fun restoreImageFileFromBackup(fileName: DiaryImageFileName)
 
     /**
      * 指定された画像ファイルを永続ストレージから削除する。
@@ -136,7 +136,7 @@ internal interface FileRepository {
      * @throws ResourceNotFoundException 指定されたファイルが見つからなかった場合。
      * @throws PermissionException 指定されたファイルへのアクセス権限がない場合。
      */
-    suspend fun deleteImageFileInPermanent(fileName: FileName)
+    suspend fun deleteImageFileInPermanent(fileName: DiaryImageFileName)
 
     /**
      * バックアップストレージから画像ファイルを削除する。

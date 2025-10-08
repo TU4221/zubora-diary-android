@@ -12,12 +12,23 @@ import java.time.LocalDate
  * @throws IllegalArgumentException [newestDiaryDate] が [oldestDiaryDate] よりも古い場合にスローされる。
  */
 internal data class SavedDiaryDateRange(
-    val newestDiaryDate: LocalDate = LocalDate.now(),
-    val oldestDiaryDate: LocalDate = LocalDate.now()
+    val newestDiaryDate: LocalDate,
+    val oldestDiaryDate: LocalDate
 ) {
     init {
         require(newestDiaryDate >= oldestDiaryDate) {
             "不正引数_最新の日記の日付が最古の日記の日付よりも古い (最新日記日付: ${newestDiaryDate}, 最古日記日付: ${oldestDiaryDate})"
+        }
+    }
+
+    companion object {
+        /**
+         * 日記が一件も存在しない場合のデフォルトの状態を表すインスタンスを返します。
+         * 最新日と最古日が同じ今日の日付になります。
+         */
+        fun empty(): SavedDiaryDateRange {
+            val today = LocalDate.now()
+            return SavedDiaryDateRange(today, today)
         }
     }
 }

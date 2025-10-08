@@ -6,10 +6,21 @@ import java.time.DayOfWeek
  * カレンダーの開始曜日設定を表すデータクラス。
  *
  * このクラスは、ユーザーがカレンダー表示の開始曜日としてどの曜日を選択しているかを保持する。
- * デフォルトの開始曜日は日曜日。
  *
- * @property dayOfWeek 選択されている開始曜日。デフォルトは [DayOfWeek.SUNDAY]。
+ * @property dayOfWeek 選択されている開始曜日。
  */
 internal data class CalendarStartDayOfWeekSetting(
-    val dayOfWeek: DayOfWeek = DayOfWeek.SUNDAY
-) : UserSetting
+    val dayOfWeek: DayOfWeek
+) : UserSetting {
+
+    companion object {
+        /**
+         * デフォルトのカレンダー開始曜日設定（日曜日）を返す。
+         *
+         * @return デフォルトのカレンダー開始曜日設定。
+         */
+        fun default(): CalendarStartDayOfWeekSetting {
+            return CalendarStartDayOfWeekSetting(DayOfWeek.SUNDAY)
+        }
+    }
+}

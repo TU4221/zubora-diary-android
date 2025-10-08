@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.NUM_LOAD_ITEMS
+import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchListFooterUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListLoadException
@@ -37,7 +38,7 @@ internal class RefreshWordSearchResultListUseCase(
      */
     suspend operator fun invoke(
         currentList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
-        searchWord: String
+        searchWord: SearchWord
     ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, WordSearchResultListRefreshException> {
         Log.i(
             logTag,
@@ -111,7 +112,7 @@ internal class RefreshWordSearchResultListUseCase(
      */
     private suspend fun loadDiaryList(
         numLoadItems: Int,
-        searchWord: String
+        searchWord: SearchWord
     ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
         val result =
             loadWordSearchResultListUseCase(
@@ -139,7 +140,7 @@ internal class RefreshWordSearchResultListUseCase(
      */
     private suspend fun updateDiaryListFooter(
         list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
-        searchWord: String
+        searchWord: SearchWord
     ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
         return when (val result = updateWordSearchResultListFooterUseCase(list, searchWord)) {
             is UseCaseResult.Success -> {

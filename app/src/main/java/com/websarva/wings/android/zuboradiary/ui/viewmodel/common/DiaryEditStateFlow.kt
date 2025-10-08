@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
@@ -136,7 +137,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             } else {
                 DiaryItemTitleSelectionHistory(
                     titleId.toDomainModel(),
-                    title,
+                    DiaryItemTitle(title),
                     titleUpdateLog
                 )
             }

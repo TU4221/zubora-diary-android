@@ -1,6 +1,9 @@
 package com.websarva.wings.android.zuboradiary.domain.model.list.diary
 
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemComment
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryTitle
 import java.time.LocalDate
 
 /**
@@ -27,15 +30,15 @@ import java.time.LocalDate
 internal data class RawWordSearchResultListItem(
     val id: DiaryId,
     val date: LocalDate,
-    val title: String,
-    val item1Title: String,
-    val item1Comment: String,
-    val item2Title: String?,
-    val item2Comment: String?,
-    val item3Title: String?,
-    val item3Comment: String?,
-    val item4Title: String?,
-    val item4Comment: String?,
-    val item5Title: String?,
-    val item5Comment: String?
+    val title: DiaryTitle,
+    val item1Title: DiaryItemTitle,
+    val item1Comment: DiaryItemComment,
+    val item2Title: DiaryItemTitle?,
+    val item2Comment: DiaryItemComment?,
+    val item3Title: DiaryItemTitle?,
+    val item3Comment: DiaryItemComment?,
+    val item4Title: DiaryItemTitle?,
+    val item4Comment: DiaryItemComment?,
+    val item5Title: DiaryItemTitle?,
+    val item5Comment: DiaryItemComment?
 )

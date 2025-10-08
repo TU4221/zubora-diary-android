@@ -52,7 +52,7 @@ internal class LoadPasscodeLockSettingUseCase(
                     UseCaseResult.Success(setting)
                 result
             }.catch { cause: Throwable ->
-                val defaultSettingValue = PasscodeLockSetting.Disabled
+                val defaultSettingValue = PasscodeLockSetting.default()
                 val result =
                     when (cause) {
                         is ResourceNotFoundException -> {

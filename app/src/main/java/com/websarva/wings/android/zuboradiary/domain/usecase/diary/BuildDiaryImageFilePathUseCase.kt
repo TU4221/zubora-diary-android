@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.model.FileName
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
@@ -30,7 +30,7 @@ internal class BuildDiaryImageFilePathUseCase(
      *   失敗した場合は [UseCaseResult.Failure] に [DiaryImageFilePathBuildingException] を格納して返す。
      */
     suspend operator fun invoke(
-        fileName: FileName
+        fileName: DiaryImageFileName
     ): UseCaseResult<String, DiaryImageFilePathBuildingException> {
         Log.i(logTag, "${logMsg}開始 (ファイル名: $fileName)")
 

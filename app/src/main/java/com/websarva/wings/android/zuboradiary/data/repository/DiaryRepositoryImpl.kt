@@ -6,10 +6,13 @@ import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseEx
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDomainModel
+import com.websarva.wings.android.zuboradiary.data.mapper.diary.toListItemDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
+import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
@@ -139,9 +142,9 @@ internal class DiaryRepositoryImpl (
     //endregion
 
     //region WordSearchResult
-    override suspend fun countWordSearchResults(searchWord: String): Int {
+    override suspend fun countWordSearchResults(searchWord: SearchWord): Int {
         return try {
-            diaryDataSource.countWordSearchResults(searchWord)
+            diaryDataSource.countWordSearchResults(searchWord.value)
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
@@ -150,14 +153,14 @@ internal class DiaryRepositoryImpl (
     override suspend fun loadWordSearchResultList(
         num: Int,
         offset: Int,
-        searchWord: String
+        searchWord: SearchWord
     ): List<RawWordSearchResultListItem> {
         require(num >= 1)
         require(offset >= 0)
 
         return try {
             diaryDataSource
-                .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord)
+                .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord.value)
                 .map { it.toDomainModel() }
         } catch (e: DatabaseException) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
@@ -167,11 +170,12 @@ internal class DiaryRepositoryImpl (
 
     //region DiaryItemTitleSelectionHistory
     override suspend fun findDiaryItemTitleSelectionHistoriesByTitles(
-        titleList: List<String>
-    ): List<DiaryItemTitleSelectionHistoryListItem> {
+        titleList: List<DiaryItemTitle>
+    ): List<DiaryItemTitleSelectionHistory> {
         return try {
+            val stringList = titleList.map { it.value }
             diaryDataSource
-                .selectDiaryItemTitleSelectionHistoriesByTitles(titleList).map {
+                .selectDiaryItemTitleSelectionHistoriesByTitles(stringList).map {
                     it.toDomainModel()
                 }
         } catch (e: DatabaseException) {
@@ -196,7 +200,7 @@ internal class DiaryRepositoryImpl (
                 }
             }
             .map { list ->
-                list.map { it.toDomainModel() }
+                list.map { it.toListItemDomainModel() }
             }
     }
 

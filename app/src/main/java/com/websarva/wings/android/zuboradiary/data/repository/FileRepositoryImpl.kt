@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileOperationException
 import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.file.toImageFileNameDataModel
-import com.websarva.wings.android.zuboradiary.domain.model.FileName
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 
 internal class FileRepositoryImpl(
@@ -12,15 +12,15 @@ internal class FileRepositoryImpl(
     private val fileRepositoryExceptionMapper: FileRepositoryExceptionMapper
 ) : FileRepository {
 
-    override fun buildImageFileAbsolutePathFromCache(fileName: FileName): String {
+    override fun buildImageFileAbsolutePathFromCache(fileName: DiaryImageFileName): String {
         return imageFileDataSource.buildImageFileAbsolutePathFromCache(fileName.toImageFileNameDataModel())
     }
 
-    override fun buildImageFileAbsolutePathFromPermanent(fileName: FileName): String {
+    override fun buildImageFileAbsolutePathFromPermanent(fileName: DiaryImageFileName): String {
         return imageFileDataSource.buildImageFileAbsolutePathFromPermanent(fileName.toImageFileNameDataModel())
     }
 
-    override suspend fun existsImageFileInCache(fileName: FileName): Boolean {
+    override suspend fun existsImageFileInCache(fileName: DiaryImageFileName): Boolean {
         return try {
             imageFileDataSource.existsImageFileInCache(fileName.toImageFileNameDataModel())
         } catch (e: FileOperationException) {
@@ -28,7 +28,7 @@ internal class FileRepositoryImpl(
         }
     }
 
-    override suspend fun existsImageFileInPermanent(fileName: FileName): Boolean {
+    override suspend fun existsImageFileInPermanent(fileName: DiaryImageFileName): Boolean {
         return try {
             imageFileDataSource.existsImageFileInPermanent(fileName.toImageFileNameDataModel())
         } catch (e: FileOperationException) {
@@ -36,7 +36,7 @@ internal class FileRepositoryImpl(
         }
     }
 
-    override suspend fun existsImageFileInBackup(fileName: FileName): Boolean {
+    override suspend fun existsImageFileInBackup(fileName: DiaryImageFileName): Boolean {
         return try {
             imageFileDataSource.existsImageFileInBackup(fileName.toImageFileNameDataModel())
         } catch (e: FileOperationException) {
@@ -47,17 +47,17 @@ internal class FileRepositoryImpl(
     override suspend fun cacheImageFile(
         uriString: String,
         fileBaseName: String
-    ): FileName {
+    ): DiaryImageFileName {
         return try {
             val savedImageFileName =
                 imageFileDataSource.cacheImageFile(uriString, fileBaseName)
-            FileName(savedImageFileName)
+            DiaryImageFileName(savedImageFileName)
         } catch (e: FileOperationException) {
             throw fileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
-    override suspend fun moveImageFileToPermanent(fileName: FileName) {
+    override suspend fun moveImageFileToPermanent(fileName: DiaryImageFileName) {
         try {
             imageFileDataSource.moveImageFileToPermanent(fileName.toImageFileNameDataModel())
         } catch (e: FileOperationException) {
@@ -65,7 +65,7 @@ internal class FileRepositoryImpl(
         }
     }
 
-    override suspend fun moveImageFileToBackup(fileName: FileName) {
+    override suspend fun moveImageFileToBackup(fileName: DiaryImageFileName) {
         try {
             imageFileDataSource.moveImageFileToBackup(fileName.toImageFileNameDataModel())
         } catch (e: FileOperationException) {
@@ -73,7 +73,7 @@ internal class FileRepositoryImpl(
         }
     }
 
-    override suspend fun restoreImageFileFromPermanent(fileName: FileName) {
+    override suspend fun restoreImageFileFromPermanent(fileName: DiaryImageFileName) {
         try {
             imageFileDataSource.restoreImageFileFromPermanent(fileName.toImageFileNameDataModel())
         } catch (e: FileOperationException) {
@@ -81,7 +81,7 @@ internal class FileRepositoryImpl(
         }
     }
 
-    override suspend fun restoreImageFileFromBackup(fileName: FileName) {
+    override suspend fun restoreImageFileFromBackup(fileName: DiaryImageFileName) {
         try {
             imageFileDataSource.restoreImageFileFromBackup(fileName.toImageFileNameDataModel())
         } catch (e: FileOperationException) {
@@ -89,7 +89,7 @@ internal class FileRepositoryImpl(
         }
     }
 
-    override suspend fun deleteImageFileInPermanent(fileName: FileName) {
+    override suspend fun deleteImageFileInPermanent(fileName: DiaryImageFileName) {
         try {
             imageFileDataSource.deleteImageFileInPermanent(fileName.toImageFileNameDataModel())
         } catch (e: FileOperationException) {

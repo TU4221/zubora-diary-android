@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
@@ -262,7 +263,9 @@ internal class WordSearchViewModel @Inject internal constructor(
             searchWord
         ) { _, lambdaSearchWord ->
             showWordSearchResultListFirstItemProgressIndicator()
-            loadNewWordSearchResultListUseCase(lambdaSearchWord)
+            loadNewWordSearchResultListUseCase(
+                SearchWord(lambdaSearchWord)
+            )
         }
     }
 
@@ -279,7 +282,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
             loadAdditionWordSearchResultListUseCase(
                 lambdaCurrentList.toDomainModel(),
-                lambdaSearchWord
+                SearchWord(lambdaSearchWord)
             )
         }
     }
@@ -293,7 +296,10 @@ internal class WordSearchViewModel @Inject internal constructor(
             currentResultList,
             searchWord
         ) { lambdaCurrentList, lambdaSearchWord ->
-            refreshWordSearchResultListUseCase(lambdaCurrentList.toDomainModel(), lambdaSearchWord)
+            refreshWordSearchResultListUseCase(
+                lambdaCurrentList.toDomainModel(),
+                SearchWord(lambdaSearchWord)
+            )
         }
     }
 
@@ -321,13 +327,15 @@ internal class WordSearchViewModel @Inject internal constructor(
         val logMsg = "ワード検索結果読込($state)"
         Log.i(logTag, "${logMsg}_開始")
 
+        val searchWordNotEmpty = searchWord.ifEmpty { return }
+
         updateUiState(state)
         try {
             updateNumWordSearchResults(
-                countWordSearchResults(searchWord)
+                countWordSearchResults(SearchWord(searchWordNotEmpty))
             )
             val updateResultList =
-                when (val result = processLoad(currentResultList, searchWord)) {
+                when (val result = processLoad(currentResultList, searchWordNotEmpty)) {
                     is UseCaseResult.Success -> result.value.toUiModel()
                     is UseCaseResult.Failure -> throw result.exception
                 }
@@ -368,7 +376,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     @Throws(WordSearchResultCountException::class)
-    private suspend fun countWordSearchResults(searchWord: String): Int {
+    private suspend fun countWordSearchResults(searchWord:SearchWord): Int {
         when (val result = countWordSearchResultsUseCase(searchWord)) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> throw result.exception

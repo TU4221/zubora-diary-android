@@ -761,7 +761,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun prepareNewDiaryEntry(date: LocalDate) {
         updateIsNewDiary(true)
-        updateId(DiaryId().toUiModel())
+        updateId(DiaryId.generate().toUiModel())
         updateDate(date)
         updateOriginalDiary(handle[SAVED_ORIGINAL_DIARY_KEY] ?: diaryStateFlow.createDiary())
         val previousDate = previousDate
@@ -1405,7 +1405,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         val itemComment = generateRandomAlphanumericString(50)
                         updateItemTitle(
                             ItemNumber(j),
-                            DiaryItemTitleSelectionHistoryId().toUiModel(),
+                            DiaryItemTitleSelectionHistoryId.generate().toUiModel(),
                             itemTitle
                         )
                         updateItemComment(ItemNumber(j), itemComment)

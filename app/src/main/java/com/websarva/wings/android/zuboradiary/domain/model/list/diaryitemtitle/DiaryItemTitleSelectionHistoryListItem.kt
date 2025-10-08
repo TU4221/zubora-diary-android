@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle
 
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
 
 /**
@@ -12,5 +13,5 @@ import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelecti
  */
 internal data class DiaryItemTitleSelectionHistoryListItem(
     val id: DiaryItemTitleSelectionHistoryId,
-    val title: String
+    val title: DiaryItemTitle
 )

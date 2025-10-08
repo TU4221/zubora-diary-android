@@ -50,7 +50,7 @@ internal class LoadReminderNotificationSettingUseCase(
                     UseCaseResult.Success(setting)
                 result
             }.catch { cause: Throwable ->
-                val defaultSettingValue = ReminderNotificationSetting.Disabled
+                val defaultSettingValue = ReminderNotificationSetting.default()
                 val result =
                     when (cause) {
                         is ResourceNotFoundException -> {

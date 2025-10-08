@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
-import com.websarva.wings.android.zuboradiary.domain.model.FileName
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListIt
 
 @JvmName("toUiModelStandard")
 internal suspend fun DiaryDayList<DiaryDayListItem.Standard>.toUiModel(
-    processFileNameToPath: suspend (FileName?) -> ImageFilePathUi?
+    processFileNameToPath: suspend (DiaryImageFileName?) -> ImageFilePathUi?
 ): DiaryDayListUi<DiaryDayListItemUi.Standard> {
     return DiaryDayListUi(
         itemList.map { it.toUiModel(processFileNameToPath) }

@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryList
  * @param cause この例外を引き起こした根本的な原因となった [Throwable]。
  */
 internal sealed class DiaryListStartYearMonthPickerDateRangeLoadException(
-    val fallbackDateRange: SavedDiaryDateRange = SavedDiaryDateRange(),
+    val fallbackDateRange: SavedDiaryDateRange = SavedDiaryDateRange.empty(),
     message: String,
     cause: Throwable
 ) : UseCaseException(message, cause) {

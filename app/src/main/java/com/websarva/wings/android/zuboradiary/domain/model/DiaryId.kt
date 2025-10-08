@@ -3,17 +3,23 @@ package com.websarva.wings.android.zuboradiary.domain.model
 import java.util.UUID
 
 /**
- * 日記の識別番号を表すバリュークラス。
+ * 日記の識別番号を表すデータクラス。
  *
  * このクラスは、必ず有効なUUID形式の文字列を保持する。
  *
  * @property value 日記の識別番号。
  * @throws IllegalArgumentException 文字列が有効なUUID形式でない場合。
  */
-@JvmInline
-internal value class DiaryId(val value: String = UUID.randomUUID().toString()) {
+internal data class DiaryId(override val value: String) : UUIDString(value) {
+
     init {
-        // 形式を検証
-        UUID.fromString(value)
+        validate()
+    }
+
+    companion object {
+        /**
+         * 新しい [DiaryId]をランダムに生成する。
+         */
+        fun generate() = DiaryId(UUID.randomUUID().toString())
     }
 }

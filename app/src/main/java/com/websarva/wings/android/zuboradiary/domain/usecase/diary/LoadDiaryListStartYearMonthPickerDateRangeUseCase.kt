@@ -49,7 +49,7 @@ internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
             UseCaseResult.Success(dateRange)
         } catch (e: ResourceNotFoundException) {
             Log.i(logTag, "${logMsg}完了_保存された日記が存在しない為、今日の日付のみを範囲とする", e)
-            UseCaseResult.Success(SavedDiaryDateRange())
+            UseCaseResult.Success(SavedDiaryDateRange.empty())
         } catch (e: UnknownException) {
             Log.e(logTag, "${logMsg}失敗_原因不明", e)
             UseCaseResult.Failure(

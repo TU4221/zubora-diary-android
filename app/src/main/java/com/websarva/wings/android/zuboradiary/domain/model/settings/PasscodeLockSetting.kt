@@ -38,4 +38,15 @@ internal sealed class PasscodeLockSetting(
      * パスコードロックが無効な状態を表すデータオブジェクト。
      */
     data object Disabled : PasscodeLockSetting(false)
+
+    companion object {
+        /**
+         * デフォルトのパスコードロック設定（無効）を返す。
+         *
+         * @return デフォルトのパスコードロック設定。
+         */
+        fun default(): PasscodeLockSetting {
+            return Disabled
+        }
+    }
 }

@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
-import com.websarva.wings.android.zuboradiary.domain.model.FileName
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 
@@ -21,7 +21,7 @@ internal sealed class DiaryImageFilePathBuildingException(
      * @param cause 発生した根本的な原因となった [Throwable]。
      */
     class BuildingFailure(
-        imageFileName: FileName,
+        imageFileName: DiaryImageFileName,
         cause: Throwable
     ) : DiaryImageFilePathBuildingException(
         "日記画像ファイル `$imageFileName` のパスの生成に失敗しました。",

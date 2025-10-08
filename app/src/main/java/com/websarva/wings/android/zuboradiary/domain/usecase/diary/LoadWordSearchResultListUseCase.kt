@@ -12,6 +12,9 @@ import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayLi
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemComment
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -48,7 +51,7 @@ internal class LoadWordSearchResultListUseCase(
     suspend operator fun invoke(
         numLoadItems: Int,
         loadOffset: Int,
-        searchWord: String
+        searchWord: SearchWord
     ): UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, WordSearchResultListLoadException> {
         Log.i(logTag, "${logMsg}開始 (読込件数: $numLoadItems, オフセット: $loadOffset, 検索ワード: \"$searchWord\")")
 
@@ -58,7 +61,6 @@ internal class LoadWordSearchResultListUseCase(
         require(loadOffset >= 0) {
             "${logMsg}不正引数_読み込みオフセットは0以上必須 (オフセット: $loadOffset)"
         }
-        require(searchWord.isNotEmpty()) { "${logMsg}不正引数_検索ワードは空であってはいけない" }
 
         return try {
             val wordSearchResultList =
@@ -90,7 +92,7 @@ internal class LoadWordSearchResultListUseCase(
      */
     private fun convertWordSearchResultList(
         diaryList: List<RawWordSearchResultListItem>,
-        searchWord: String
+        searchWord: SearchWord
     ): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
         if (diaryList.isEmpty()) return DiaryYearMonthList()
 
@@ -112,17 +114,16 @@ internal class LoadWordSearchResultListUseCase(
      */
     private fun convertWordSearchResultListItem(
         item: RawWordSearchResultListItem,
-        searchWord: String
+        searchWord: SearchWord
     ): DiaryDayListItem.WordSearchResult {
         val diaryItem = extractWordSearchResultTargetItem(item, searchWord)
-        val itemNumberInt = diaryItem[itemNumberKey] as Int
         return DiaryDayListItem.WordSearchResult(
             item.id,
             item.date,
             item.title,
-            ItemNumber(itemNumberInt),
-            diaryItem[itemTitleKey] as String,
-            diaryItem[itemCommentKey] as String,
+            diaryItem[itemNumberKey] as ItemNumber,
+            diaryItem[itemTitleKey] as DiaryItemTitle,
+            diaryItem[itemCommentKey] as DiaryItemComment,
             searchWord
         )
     }
@@ -144,7 +145,7 @@ internal class LoadWordSearchResultListUseCase(
     //      ドメイン側で処理する。
     private fun extractWordSearchResultTargetItem(
         item: RawWordSearchResultListItem,
-        searchWord: String
+        searchWord: SearchWord
     ): Map<String, Any> {
         val regex = ".*$searchWord.*"
         val itemTitles = arrayOf(
@@ -162,14 +163,14 @@ internal class LoadWordSearchResultListUseCase(
             item.item5Comment,
         )
         var itemNumber = 0
-        var itemTitle = ""
-        var itemComment = ""
+        var itemTitle = DiaryItemTitle.empty()
+        var itemComment = DiaryItemComment.empty()
         for (i in itemTitles.indices) {
             val targetItemTitle = itemTitles[i] ?: continue
             val targetItemComment = itemComments[i] ?: continue
 
-            if (targetItemTitle.matches(regex.toRegex())
-                || targetItemComment.matches(regex.toRegex())
+            if (targetItemTitle.value.matches(regex.toRegex())
+                || targetItemComment.value.matches(regex.toRegex())
             ) {
                 itemNumber = i + 1
                 itemTitle = targetItemTitle
@@ -194,7 +195,7 @@ internal class LoadWordSearchResultListUseCase(
         }
 
         val result: MutableMap<String, Any> = HashMap()
-        result[itemNumberKey] = itemNumber
+        result[itemNumberKey] = ItemNumber(itemNumber)
         result[itemTitleKey] = itemTitle
         result[itemCommentKey] = itemComment
         return result

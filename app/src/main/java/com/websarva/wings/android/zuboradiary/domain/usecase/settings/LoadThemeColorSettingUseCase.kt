@@ -49,7 +49,7 @@ internal class LoadThemeColorSettingUseCase(
                     UseCaseResult.Success(setting)
                 result
             }.catch { cause: Throwable ->
-                val defaultSettingValue = ThemeColorSetting()
+                val defaultSettingValue = ThemeColorSetting.default()
                 val result =
                     when (cause) {
                         is ResourceNotFoundException -> {

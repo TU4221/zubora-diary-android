@@ -10,7 +10,9 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageExcept
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
+import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
@@ -146,7 +148,7 @@ internal interface DiaryRepository {
      * @return 検索ワードに一致した日記の数。
      * @throws DataStorageException 検索結果数の取得に失敗した場合。
      */
-    suspend fun countWordSearchResults(searchWord: String): Int
+    suspend fun countWordSearchResults(searchWord: SearchWord): Int
 
     /**
      * 指定された検索ワードに一致する日記のリストを読み込む。
@@ -160,7 +162,7 @@ internal interface DiaryRepository {
     suspend fun loadWordSearchResultList(
         num: Int,
         offset: Int,
-        searchWord: String
+        searchWord: SearchWord
     ): List<RawWordSearchResultListItem>
     //endregion
 
@@ -173,8 +175,8 @@ internal interface DiaryRepository {
      * @throws DataStorageException 検索結果リストの読み込みに失敗した場合。
      */
     suspend fun findDiaryItemTitleSelectionHistoriesByTitles(
-        titleList: List<String>
-    ): List<DiaryItemTitleSelectionHistoryListItem>
+        titleList: List<DiaryItemTitle>
+    ): List<DiaryItemTitleSelectionHistory>
 
     /**
      * 日記アイテムのタイトル選択履歴リストを読み込む。

@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
+import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -28,7 +29,7 @@ internal class CountWordSearchResultsUseCase(
      *   失敗した場合は [UseCaseResult.Failure] に [WordSearchResultCountException] を格納して返す。
      */
     suspend operator fun invoke(
-        searchWord: String
+        searchWord: SearchWord
     ): UseCaseResult<Int, WordSearchResultCountException> {
         Log.i(logTag, "${logMsg}開始 (検索ワード: \"$searchWord\")")
 

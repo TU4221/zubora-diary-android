@@ -1,19 +1,23 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
-import com.websarva.wings.android.zuboradiary.domain.model.FileName
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemComment
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.DiaryTitle
 import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 
 @JvmName("toUiModelStandard")
 internal suspend fun DiaryDayListItem.Standard.toUiModel(
-    processFileNameToPath: suspend (FileName?) -> ImageFilePathUi?
+    processFileNameToPath: suspend (DiaryImageFileName?) -> ImageFilePathUi?
 ): DiaryDayListItemUi.Standard {
     return DiaryDayListItemUi.Standard(
         id.toUiModel(),
         date,
-        title,
+        title.value,
         imageFileName?.toUiModel(),
         processFileNameToPath(imageFileName)
     )
@@ -24,11 +28,11 @@ internal fun DiaryDayListItem.WordSearchResult.toUiModel(): DiaryDayListItemUi.W
     return DiaryDayListItemUi.WordSearchResult(
         id.toUiModel(),
         date,
-        title,
+        title.value,
         itemNumber.value,
-        itemTitle,
-        itemComment,
-        searchWord
+        itemTitle.value,
+        itemComment.value,
+        searchWord.value
     )
 }
 
@@ -37,7 +41,7 @@ internal fun DiaryDayListItemUi.Standard.toDomainModel(): DiaryDayListItem.Stand
     return DiaryDayListItem.Standard(
         id.toDomainModel(),
         date,
-        title,
+        DiaryTitle(title),
         imageFileName?.toDomainModel()
     )
 }
@@ -47,10 +51,10 @@ internal fun DiaryDayListItemUi.WordSearchResult.toDomainModel(): DiaryDayListIt
     return DiaryDayListItem.WordSearchResult(
         id.toDomainModel(),
         date,
-        title,
+        DiaryTitle(title),
         ItemNumber(itemNumber),
-        itemTitle,
-        itemComment,
-        searchWord
+        DiaryItemTitle(itemTitle),
+        DiaryItemComment(itemComment),
+        SearchWord(searchWord)
     )
 }

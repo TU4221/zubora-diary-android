@@ -174,7 +174,7 @@ internal class InitializeAllSettingsUseCase(
      * @throws ThemeColorSettingUpdateException テーマカラー設定の初期化に失敗した場合。
      */
     private suspend fun initializeThemeColorSetting() {
-        when (val result = updateThemeColorSettingUseCase(ThemeColorSetting())) {
+        when (val result = updateThemeColorSettingUseCase(ThemeColorSetting.default())) {
             is UseCaseResult.Success -> { /*処理なし*/ }
             is UseCaseResult.Failure -> throw result.exception
         }
@@ -186,7 +186,7 @@ internal class InitializeAllSettingsUseCase(
      * @throws CalendarStartDayOfWeekSettingUpdateException カレンダーの週の開始曜日設定の初期化に失敗した場合。
      */
     private suspend fun initializeCalendarStartDayOfWeekSetting() {
-        when (val result = updateCalendarStartDayOfWeekSettingUseCase(CalendarStartDayOfWeekSetting())) {
+        when (val result = updateCalendarStartDayOfWeekSettingUseCase(CalendarStartDayOfWeekSetting.default())) {
             is UseCaseResult.Success -> { /*処理なし*/ }
             is UseCaseResult.Failure -> throw result.exception
         }
@@ -198,7 +198,7 @@ internal class InitializeAllSettingsUseCase(
      * @throws ReminderNotificationSettingUpdateException リマインダー通知設定の初期化に失敗した場合。
      */
     private suspend fun initializeReminderNotificationSetting() {
-        when (val result = updateReminderNotificationSettingUseCase(ReminderNotificationSetting.Disabled)) {
+        when (val result = updateReminderNotificationSettingUseCase(ReminderNotificationSetting.default())) {
             is UseCaseResult.Success -> { /*処理なし*/ }
             is UseCaseResult.Failure -> throw result.exception
         }
@@ -210,7 +210,7 @@ internal class InitializeAllSettingsUseCase(
      * @throws PassCodeSettingUpdateException パスコードロック設定の初期化に失敗した場合。
      */
     private suspend fun initializePasscodeLockSetting() {
-        when (val result = updatePasscodeLockSettingUseCase(PasscodeLockSetting.Disabled)) {
+        when (val result = updatePasscodeLockSettingUseCase(PasscodeLockSetting.default())) {
             is UseCaseResult.Success -> { /*処理なし*/ }
             is UseCaseResult.Failure -> throw result.exception
         }
@@ -222,7 +222,7 @@ internal class InitializeAllSettingsUseCase(
      * @throws WeatherInfoFetchSettingUpdateException 天気情報取得設定の初期化に失敗した場合。
      */
     private suspend fun initializeWeatherInfoFetchSetting() {
-        when (val result = updateWeatherInfoFetchSettingUseCase(WeatherInfoFetchSetting())) {
+        when (val result = updateWeatherInfoFetchSettingUseCase(WeatherInfoFetchSetting.default())) {
             is UseCaseResult.Success -> { /*処理なし*/ }
             is UseCaseResult.Failure -> throw result.exception
         }

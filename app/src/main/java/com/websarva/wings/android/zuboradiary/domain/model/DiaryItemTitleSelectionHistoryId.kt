@@ -3,17 +3,23 @@ package com.websarva.wings.android.zuboradiary.domain.model
 import java.util.UUID
 
 /**
- * 日記項目タイトル選択履歴の識別番号を表すバリュークラス。
+ * 日記項目タイトル選択履歴の識別番号を表すデータクラス。
  *
  * このクラスは、必ず有効なUUID形式の文字列を保持する。
  *
  * @property value 有効なUUID形式の文字列。
  * @throws IllegalArgumentException 文字列が有効なUUID形式でない場合。
  */
-@JvmInline
-internal value class DiaryItemTitleSelectionHistoryId(val value: String = UUID.randomUUID().toString()) {
+internal data class DiaryItemTitleSelectionHistoryId(override val value: String) : UUIDString(value) {
+
     init {
-        // 形式を検証
-        UUID.fromString(value)
+        validate()
+    }
+
+    companion object {
+        /**
+         * 新しい [DiaryItemTitleSelectionHistoryId] をランダムに生成する。
+         */
+        fun generate() = DiaryItemTitleSelectionHistoryId(UUID.randomUUID().toString())
     }
 }

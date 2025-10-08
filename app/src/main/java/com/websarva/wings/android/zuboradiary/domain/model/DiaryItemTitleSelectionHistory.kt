@@ -14,6 +14,6 @@ import java.time.LocalDateTime
  */
 internal data class DiaryItemTitleSelectionHistory (
     val id: DiaryItemTitleSelectionHistoryId,
-    val title: String,
+    val title: DiaryItemTitle,
     val log: LocalDateTime
 )
