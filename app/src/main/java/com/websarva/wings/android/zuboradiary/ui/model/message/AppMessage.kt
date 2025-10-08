@@ -1,12 +1,17 @@
 package com.websarva.wings.android.zuboradiary.ui.model.message
 
 import android.content.Context
-import java.io.Serializable
+import android.os.Parcelable
+import androidx.annotation.StringRes
 
-internal abstract class AppMessage(
-    private val dialogTitleStringResId: Int,
-    private val dialogMessageStringResId: Int
-) : Serializable {
+internal sealed interface AppMessage : Parcelable {
+
+    @get:StringRes
+    val dialogTitleStringResId: Int
+
+    @get:StringRes
+    val dialogMessageStringResId: Int
+
     fun getDialogTitle(context: Context): String {
         return context.getString(dialogTitleStringResId)
     }

@@ -1,25 +1,27 @@
 package com.websarva.wings.android.zuboradiary.ui.model.message
 
 import com.websarva.wings.android.zuboradiary.R
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
-internal sealed class CalendarAppMessage(
-    dialogTitleStringResId: Int,
-    dialogMessageStringResId: Int
-) : AppMessage(dialogTitleStringResId, dialogMessageStringResId) {
+@Parcelize
+internal sealed class CalendarAppMessage : AppMessage {
 
-    data object DiaryLoadFailure :  CalendarAppMessage(
-        R.string.dialog_app_message_title_access_error,
-        R.string.dialog_calendar_app_message_diary_load_failure
-    ) {
-        // デシリアライズ時のシングルトン性を維持
+    data object DiaryLoadFailure : CalendarAppMessage() {
+        @IgnoredOnParcel
+        override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
+        @IgnoredOnParcel
+        override val dialogMessageStringResId: Int = R.string.dialog_calendar_app_message_diary_load_failure
+
         private fun readResolve(): Any = DiaryLoadFailure
     }
 
-    data object DiaryInfoLoadFailure :  CalendarAppMessage(
-        R.string.dialog_app_message_title_access_error,
-        R.string.dialog_calendar_app_message_diary_info_load_failure
-    ) {
-        // デシリアライズ時のシングルトン性を維持
+    data object DiaryInfoLoadFailure : CalendarAppMessage() {
+        @IgnoredOnParcel
+        override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
+        @IgnoredOnParcel
+        override val dialogMessageStringResId: Int = R.string.dialog_calendar_app_message_diary_info_load_failure
+
         private fun readResolve(): Any = DiaryInfoLoadFailure
     }
 
