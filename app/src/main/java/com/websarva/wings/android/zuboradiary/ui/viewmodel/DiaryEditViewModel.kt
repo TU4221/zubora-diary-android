@@ -610,10 +610,9 @@ internal class DiaryEditViewModel @Inject constructor(
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
-                // 処理なし
+                clearPendingWeatherInfoFetchParameters()
             }
         }
-        clearPendingWeatherInfoFetchParameters()
     }
 
     private fun handleWeatherInfoFetchDialogPositiveResult() {
@@ -740,6 +739,7 @@ internal class DiaryEditViewModel @Inject constructor(
         isGranted: Boolean
     ) {
         val parameters = pendingWeatherInfoFetchParameters
+        clearPendingWeatherInfoFetchParameters()
         viewModelScope.launch {
             parameters?.let {
                 fetchWeatherInfo(isGranted, it.date)
