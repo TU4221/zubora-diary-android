@@ -1155,10 +1155,10 @@ internal class DiaryEditViewModel @Inject constructor(
                     )
                 when (result) {
                     is UseCaseResult.Success -> {
-                        ImageFilePathUi(result.value)
+                        ImageFilePathUi.Available(result.value)
                     }
                     is UseCaseResult.Failure -> {
-                        ImageFilePathUi()
+                        ImageFilePathUi.Unavailable
                     }
                 }
             }

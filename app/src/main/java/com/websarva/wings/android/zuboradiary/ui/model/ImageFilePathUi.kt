@@ -1,6 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.model
 
-@JvmInline
-internal value class ImageFilePathUi(
-    val path: String = ""  // デフォルト値はエラーが発生した場合のダミー値(View側でエラー画像を表示させる)
-)
+internal sealed class ImageFilePathUi {
+
+    abstract val path: String
+
+    data class Available(override val path: String) : ImageFilePathUi()
+
+    object Unavailable : ImageFilePathUi() {
+        override val path: String = ""
+    }
+}

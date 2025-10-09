@@ -359,8 +359,8 @@ internal class DiaryListViewModel @Inject constructor(
                         result.value.toUiModel { fileName: DiaryImageFileName? ->
                             fileName?.let {
                                 when (val buildResult = buildDiaryImageFilePathUseCase(fileName)) {
-                                    is UseCaseResult.Success -> ImageFilePathUi(buildResult.value)
-                                    is UseCaseResult.Failure -> ImageFilePathUi()
+                                    is UseCaseResult.Success -> ImageFilePathUi.Available(buildResult.value)
+                                    is UseCaseResult.Failure -> ImageFilePathUi.Unavailable
                                 }
                             }
                         }

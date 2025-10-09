@@ -93,10 +93,10 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
                     )
                 when (result) {
                     is UseCaseResult.Success -> {
-                        ImageFilePathUi(result.value)
+                        ImageFilePathUi.Available(result.value)
                     }
                     is UseCaseResult.Failure -> {
-                        ImageFilePathUi()
+                        ImageFilePathUi.Unavailable
                     }
                 }
             }
