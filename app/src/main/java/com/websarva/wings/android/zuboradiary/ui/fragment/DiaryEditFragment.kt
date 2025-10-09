@@ -12,7 +12,6 @@ import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.AdapterView
 import android.widget.AdapterView.OnItemClickListener
-import android.widget.ArrayAdapter
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.motion.widget.MotionLayout
@@ -46,7 +45,6 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinne
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.WeatherSpinnerAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.asString
-import com.websarva.wings.android.zuboradiary.ui.mapper.weatherUiFromString
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -384,17 +382,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
     // 天気入力欄。
     private fun setUpWeatherInputField() {
-        binding.autoCompleteTextWeather1
-            .setAdapter(WeatherSpinnerAdapter(requireContext(), themeColor))
-
-        binding.autoCompleteTextWeather1.onItemClickListener =
-            OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                requireNotNull(parent)
-                val arrayAdapter = parent.adapter as ArrayAdapter<*>
-                val weatherString = arrayAdapter.getItem(position) as String
-                val weather = weatherUiFromString(requireContext(), weatherString)
-                mainViewModel.onWeather1InputFieldItemClick(weather)
-            }
+        binding.autoCompleteTextWeather1.apply {
+            setAdapter(WeatherSpinnerAdapter(requireContext(), themeColor))
+            onItemClickListener =
+                OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                    val adapter = parent?.adapter as WeatherSpinnerAdapter
+                    val weather = adapter.getWeatherUiItem(position)
+                    mainViewModel.onWeather1InputFieldItemClick(weather)
+                }
+        }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather1
@@ -409,10 +405,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
         binding.autoCompleteTextWeather2.onItemClickListener =
             OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                requireNotNull(parent)
-                val arrayAdapter = parent.adapter as ArrayAdapter<*>
-                val weatherString = arrayAdapter.getItem(position) as String
-                val weather = weatherUiFromString(requireContext(), weatherString)
+                val adapter = parent?.adapter as WeatherSpinnerAdapter
+                val weather = adapter.getWeatherUiItem(position)
                 mainViewModel.onWeather2InputFieldItemClick(weather)
             }
 

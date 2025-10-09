@@ -25,15 +25,3 @@ internal val WeatherUi.stringResId: Int
 internal fun WeatherUi.asString(context: Context): String {
     return context.getString(this.stringResId)
 }
-
-// TODO:Spinnerを修正してから下記削除
-/**
- * ローカライズされた文字列から対応するWeatherUi enumを取得する。
- *
- * @param context 文字列リソース解決のためのContext。
- * @param strWeather 変換元の文字列。
- * @return 対応するWeatherUi。見つからない場合は例外をスローする。
- */
-internal fun weatherUiFromString(context: Context, strWeather: String): WeatherUi {
-    return WeatherUi.entries.first { it.asString(context) == strWeather }
-}
