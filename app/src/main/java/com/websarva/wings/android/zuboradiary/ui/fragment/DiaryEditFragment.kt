@@ -47,6 +47,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.WeatherSpinnerA
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.asString
 import com.websarva.wings.android.zuboradiary.ui.mapper.weatherUiFromString
+import com.websarva.wings.android.zuboradiary.ui.mapper.conditionUiFromString
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -437,14 +438,14 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 requireNotNull(parent)
                 val arrayAdapter = parent.adapter as ArrayAdapter<*>
                 val conditionString = arrayAdapter.getItem(position) as String
-                val condition = ConditionUi.of(requireContext(), conditionString)
+                val condition = conditionUiFromString(requireContext(), conditionString)
                 mainViewModel.onConditionInputFieldItemClick(condition)
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.condition
                 .collectLatest { value: ConditionUi ->
-                    val strCondition = value.toString(requireContext())
+                    val strCondition = value.asString(requireContext())
                     binding.autoCompleteTextCondition.setText(strCondition, false)
                 }
         }
