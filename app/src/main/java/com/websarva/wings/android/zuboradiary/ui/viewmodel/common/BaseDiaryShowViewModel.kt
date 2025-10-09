@@ -1,12 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
-import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
@@ -69,7 +68,7 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
     val log
         get() = diaryStateFlow.log.asStateFlow()
 
-    fun onDiaryImageFileNameChanged(fileName: ImageFileNameUi?) {
+    fun onDiaryImageFileNameChanged(fileName: String?) {
         viewModelScope.launch {
             buildImageFilePath(fileName)
         }
@@ -83,12 +82,16 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
         diaryStateFlow.update(diary)
     }
 
-    private suspend fun buildImageFilePath(fileName: ImageFileNameUi?) {
+    private suspend fun buildImageFilePath(fileName: String?) {
         val imageFilePathUi =
             if (fileName == null) {
                 null
             } else {
-                when (val result = buildDiaryImageFilePathUseCase(fileName.toDomainModel())) {
+                val result =
+                    buildDiaryImageFilePathUseCase(
+                        DiaryImageFileName(fileName)
+                    )
+                when (result) {
                     is UseCaseResult.Success -> {
                         ImageFilePathUi(result.value)
                     }

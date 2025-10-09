@@ -19,7 +19,7 @@ internal suspend fun DiaryDayListItem.Standard.toUiModel(
         id.value,
         date,
         title.value,
-        imageFileName?.toUiModel(),
+        imageFileName?.fullName,
         processFileNameToPath(imageFileName)
     )
 }
@@ -43,7 +43,7 @@ internal fun DiaryDayListItemUi.Standard.toDomainModel(): DiaryDayListItem.Stand
         DiaryId(id),
         date,
         DiaryTitle(title),
-        imageFileName?.toDomainModel()
+        imageFileName?.let { DiaryImageFileName(it) }
     )
 }
 

@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
@@ -42,7 +43,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionHistoryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
@@ -720,7 +720,7 @@ internal class DiaryEditViewModel @Inject constructor(
         updateEditingDiaryDateString(dateString)
     }
 
-    fun onDiaryImageFileNameChanged(fileName: ImageFileNameUi?) {
+    fun onDiaryImageFileNameChanged(fileName: String?) {
         viewModelScope.launch {
             buildImageFilePath(fileName)
         }
@@ -1115,7 +1115,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 cacheDiaryImageUseCase(uri.toString(), DiaryId(diaryId))
             when (result) {
                 is UseCaseResult.Success -> {
-                    updateImageFileName(result.value.toUiModel())
+                    updateImageFileName(result.value.fullName)
                 }
                 is UseCaseResult.Failure -> {
                     val appMessage =
@@ -1145,12 +1145,16 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun buildImageFilePath(fileName: ImageFileNameUi?) {
+    private suspend fun buildImageFilePath(fileName: String?) {
         val imageFilePathUi =
             if (fileName == null) {
                 null
             } else {
-                when (val result = buildDiaryImageFilePathUseCase(fileName.toDomainModel())) {
+                val result =
+                    buildDiaryImageFilePathUseCase(
+                        DiaryImageFileName(fileName)
+                    )
+                when (result) {
                     is UseCaseResult.Success -> {
                         ImageFilePathUi(result.value)
                     }
@@ -1262,7 +1266,7 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.getItemStateFlow(itemNumber).comment.value = comment
     }
 
-    private fun updateImageFileName(imageFileName: ImageFileNameUi?) {
+    private fun updateImageFileName(imageFileName: String?) {
         diaryStateFlow.imageFileName.value = imageFileName
     }
 

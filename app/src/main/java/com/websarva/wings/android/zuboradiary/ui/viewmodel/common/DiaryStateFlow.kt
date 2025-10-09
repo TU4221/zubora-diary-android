@@ -7,7 +7,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionHistoryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
@@ -168,7 +167,7 @@ internal open class DiaryStateFlow {
         this.numVisibleItems.value = count
     }
 
-    private fun updateImageFileName(imageFileName: ImageFileNameUi?) {
+    private fun updateImageFileName(imageFileName: String?) {
         this.imageFileName.value = imageFileName
     }
 

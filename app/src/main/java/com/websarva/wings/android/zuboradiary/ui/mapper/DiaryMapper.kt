@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.mapper
 
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
@@ -26,7 +27,7 @@ internal fun Diary.toUiModel(): DiaryUi {
         item4Comment?.value,
         item5Title?.value,
         item5Comment?.value,
-        imageFileName?.toUiModel()
+        imageFileName?.fullName
     )
 }
 
@@ -49,6 +50,6 @@ internal fun DiaryUi.toDomainModel(): Diary {
         item4Comment?.let { DiaryItemComment(it) },
         item5Title?.let { DiaryItemTitle(it) },
         item5Comment?.let { DiaryItemComment(it) },
-        imageFileName?.toDomainModel()
+        imageFileName?.let { DiaryImageFileName(it) }
     )
 }

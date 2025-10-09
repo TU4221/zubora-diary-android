@@ -19,7 +19,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpd
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
@@ -219,7 +218,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
     private fun setUpImage() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.imageFileName
-                .collectLatest { value: ImageFileNameUi? ->
+                .collectLatest { value: String? ->
                     mainViewModel.onDiaryImageFileNameChanged(value)
                 }
         }

@@ -44,7 +44,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinnerAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.WeatherSpinnerAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
@@ -723,7 +722,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     private fun setUpImageInputField() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.imageFileName
-                .collectLatest { value: ImageFileNameUi? ->
+                .collectLatest { value: String? ->
                     mainViewModel.onDiaryImageFileNameChanged(value)
                 }
         }

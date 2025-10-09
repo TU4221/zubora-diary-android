@@ -33,7 +33,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpd
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -538,7 +537,7 @@ class CalendarFragment :
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.imageFileName
-                .collectLatest { value: ImageFileNameUi? ->
+                .collectLatest { value: String? ->
                     mainViewModel.onDiaryImageFileNameChanged(value)
                 }
         }
