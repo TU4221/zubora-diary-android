@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileOperationException
 import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.file.toImageFileNameDataModel
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 
 internal class FileRepositoryImpl(

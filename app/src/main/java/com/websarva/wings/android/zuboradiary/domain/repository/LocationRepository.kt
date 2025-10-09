@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
-import com.websarva.wings.android.zuboradiary.domain.model.SimpleLocation
+import com.websarva.wings.android.zuboradiary.domain.model.location.SimpleLocation
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.exception.LocationException
 import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException

@@ -1,7 +1,7 @@
-package com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle
+package com.websarva.wings.android.zuboradiary.domain.model.diary.list.diaryitemtitle
 
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 
 /**
  * 日記項目のタイトル選択履歴の各アイテムを表すデータクラス。

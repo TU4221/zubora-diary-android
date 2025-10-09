@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 

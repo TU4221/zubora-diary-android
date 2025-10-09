@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSou
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationProviderException
 import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.location.toDomainModel
-import com.websarva.wings.android.zuboradiary.domain.model.SimpleLocation
+import com.websarva.wings.android.zuboradiary.domain.model.location.SimpleLocation
 import com.websarva.wings.android.zuboradiary.domain.repository.LocationRepository
 
 internal class LocationRepositoryImpl (

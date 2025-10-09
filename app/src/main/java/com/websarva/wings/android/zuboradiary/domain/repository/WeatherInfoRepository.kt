@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
-import com.websarva.wings.android.zuboradiary.domain.model.SimpleLocation
+import com.websarva.wings.android.zuboradiary.domain.model.location.SimpleLocation
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
 import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import com.websarva.wings.android.zuboradiary.domain.exception.NetworkConnectionException
 import java.time.LocalDate

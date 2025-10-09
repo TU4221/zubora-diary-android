@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.model.list.diary
+package com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary
 
 /**
  * 日記の日単位のリストアイテムを保持する汎用的なリストクラス。

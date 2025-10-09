@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.exception.WeatherInfoFetchException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.LocationRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import com.websarva.wings.android.zuboradiary.domain.exception.LocationException

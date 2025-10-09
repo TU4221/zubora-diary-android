@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthListItem
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi

@@ -6,8 +6,8 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryDeleteException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**

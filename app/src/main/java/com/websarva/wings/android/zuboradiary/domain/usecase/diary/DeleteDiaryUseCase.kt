@@ -7,8 +7,8 @@ import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 

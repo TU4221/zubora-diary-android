@@ -2,11 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
+import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase

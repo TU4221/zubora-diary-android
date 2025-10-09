@@ -1,12 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemComment
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryTitle
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 
@@ -52,7 +52,7 @@ internal fun DiaryDayListItemUi.WordSearchResult.toDomainModel(): DiaryDayListIt
         id.toDomainModel(),
         date,
         DiaryTitle(title),
-        ItemNumber(itemNumber),
+        DiaryItemNumber(itemNumber),
         DiaryItemTitle(itemTitle),
         DiaryItemComment(itemComment),
         SearchWord(searchWord)

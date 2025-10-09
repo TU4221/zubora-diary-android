@@ -4,8 +4,8 @@ import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherInfoRep
 import com.websarva.wings.android.zuboradiary.data.mapper.weather.toDomainModel
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOperationException
-import com.websarva.wings.android.zuboradiary.domain.model.SimpleLocation
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.location.SimpleLocation
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import java.time.LocalDate

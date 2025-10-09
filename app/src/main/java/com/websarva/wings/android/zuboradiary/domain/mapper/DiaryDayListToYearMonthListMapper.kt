@@ -1,9 +1,9 @@
 package com.websarva.wings.android.zuboradiary.domain.mapper
 
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayList
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayList
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthListItem
 import java.time.YearMonth
 
 @JvmName("toDiaryYearMonthListItemListStandard")

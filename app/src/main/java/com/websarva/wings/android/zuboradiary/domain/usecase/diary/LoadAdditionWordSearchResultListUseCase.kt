@@ -2,13 +2,13 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.NUM_LOAD_ITEMS
-import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
+import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchListFooterUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListAdditionLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListLoadException
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 /**
  * 既存のワード検索結果リストに追加の検索結果データを読み込み、結合してフッターを更新するユースケース。

@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
-import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
+import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 

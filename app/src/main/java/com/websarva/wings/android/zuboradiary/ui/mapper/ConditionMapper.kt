@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
-import com.websarva.wings.android.zuboradiary.domain.model.Condition
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Condition
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
 
 internal fun Condition.toUiModel(): ConditionUi {

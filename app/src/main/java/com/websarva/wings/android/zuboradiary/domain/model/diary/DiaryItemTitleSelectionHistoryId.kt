@@ -1,5 +1,6 @@
-package com.websarva.wings.android.zuboradiary.domain.model
+package com.websarva.wings.android.zuboradiary.domain.model.diary
 
+import com.websarva.wings.android.zuboradiary.domain.model.common.UUIDString
 import java.util.UUID
 
 /**

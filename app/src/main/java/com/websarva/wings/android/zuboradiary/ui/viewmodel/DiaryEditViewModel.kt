@@ -6,12 +6,12 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.exception.WeatherInfoFetchException
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
-import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
@@ -194,61 +194,61 @@ internal class DiaryEditViewModel @Inject constructor(
      * LayoutDataBinding用
      * */
     val item1TitleMutable
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(1)).title
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(1)).title
 
     /**
      * LayoutDataBinding用
      * */
     val item2TitleMutable
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(2)).title
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(2)).title
 
     /**
      * LayoutDataBinding用
      * */
     val item3TitleMutable
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(3)).title
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(3)).title
 
     /**
      * LayoutDataBinding用
      * */
     val item4TitleMutable
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).title
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(4)).title
 
     /**
      * LayoutDataBinding用
      * */
     val item5TitleMutable
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).title
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).title
 
     /**
      * LayoutDataBinding用
      * */
     val item1CommentMutable
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(1)).comment
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(1)).comment
 
     /**
      * LayoutDataBinding用
      * */
     val item2CommentMutable
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(2)).comment
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(2)).comment
 
     /**
      * LayoutDataBinding用
      * */
     val item3CommentMutable
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(3)).comment
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(3)).comment
 
     /**
      * LayoutDataBinding用
      * */
     val item4CommentMutable
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).comment
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(4)).comment
 
     /**
      * LayoutDataBinding用
      * */
     val item5CommentMutable
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).comment
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).comment
 
     val isItemAdditionButtonClickable =
         combine(uiState, numVisibleItems) { state, numVisibleItems ->
@@ -442,8 +442,8 @@ internal class DiaryEditViewModel @Inject constructor(
         if (uiState.value == DiaryEditState.AddingItem) return
         if (uiState.value == DiaryEditState.DeletingItem) return
 
-        val itemTitleId = getItemTitleId(ItemNumber(itemNumber)).value
-        val itemTitle = getItemTitle(ItemNumber(itemNumber)).requireValue()
+        val itemTitleId = getItemTitleId(DiaryItemNumber(itemNumber)).value
+        val itemTitle = getItemTitle(DiaryItemNumber(itemNumber)).requireValue()
 
         viewModelScope.launch {
             emitUiEvent(
@@ -466,7 +466,7 @@ internal class DiaryEditViewModel @Inject constructor(
         if (!canExecuteOperationWithUiUpdate) return
 
         viewModelScope.launch {
-            updatePendingDiaryItemDeleteParameters(ItemNumber(itemNumber))
+            updatePendingDiaryItemDeleteParameters(DiaryItemNumber(itemNumber))
             emitUiEvent(
                 DiaryEditEvent.NavigateDiaryItemDeleteDialog(itemNumber)
             )
@@ -689,7 +689,7 @@ internal class DiaryEditViewModel @Inject constructor(
             is FragmentResult.Some -> {
                 val titleId = result.data.id ?: throw IllegalArgumentException()
                 updateItemTitle(
-                    ItemNumber(result.data.itemNumber),
+                    DiaryItemNumber(result.data.itemNumber),
                     titleId,
                     result.data.title
                 )
@@ -725,7 +725,7 @@ internal class DiaryEditViewModel @Inject constructor(
     fun onDiaryItemInvisibleStateTransitionCompleted(itemNumber: Int) {
         check(uiState.value == DiaryEditState.DeletingItem)
 
-        deleteItem(ItemNumber(itemNumber))
+        deleteItem(DiaryItemNumber(itemNumber))
     }
 
     fun onDiaryItemVisibleStateTransitionCompleted() {
@@ -1057,11 +1057,11 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 項目関係
-    private fun getItemTitleId(itemNumber: ItemNumber): StateFlow<DiaryItemTitleSelectionHistoryIdUi?> {
+    private fun getItemTitleId(itemNumber: DiaryItemNumber): StateFlow<DiaryItemTitleSelectionHistoryIdUi?> {
         return diaryStateFlow.getItemStateFlow(itemNumber).titleId
     }
 
-    private fun getItemTitle(itemNumber: ItemNumber): StateFlow<String?> {
+    private fun getItemTitle(itemNumber: DiaryItemNumber): StateFlow<String?> {
         return diaryStateFlow.getItemStateFlow(itemNumber).title
     }
 
@@ -1073,7 +1073,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // MEMO:日記項目削除処理完了時のUi更新(編集中)は日記項目削除メソッドにて処理
-    private suspend fun requestDiaryItemDeleteTransition(itemNumber: ItemNumber) {
+    private suspend fun requestDiaryItemDeleteTransition(itemNumber: DiaryItemNumber) {
         val numVisibleItems = numVisibleItems.requireValue()
 
         updateUiState(DiaryEditState.DeletingItem)
@@ -1087,7 +1087,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // MEMO:日記項目削除処理開始時のUi更新(項目削除中)は日記項目削除トランジション要求メソッドにて処理
-    private fun deleteItem(itemNumber: ItemNumber) {
+    private fun deleteItem(itemNumber: DiaryItemNumber) {
         diaryStateFlow.deleteItem(itemNumber)
         updateUiState(DiaryEditState.Editing)
     }
@@ -1246,14 +1246,14 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun updateItemTitle(
-        itemNumber: ItemNumber,
+        itemNumber: DiaryItemNumber,
         titleId: DiaryItemTitleSelectionHistoryIdUi,
         title: String
     ) {
         diaryStateFlow.updateItemTitle(itemNumber, titleId, title)
     }
 
-    private fun updateItemComment(itemNumber: ItemNumber, comment: String) {
+    private fun updateItemComment(itemNumber: DiaryItemNumber, comment: String) {
         diaryStateFlow.getItemStateFlow(itemNumber).comment.value = comment
     }
 
@@ -1332,7 +1332,7 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingWeatherInfoFetchParameters = null
     }
 
-    private fun updatePendingDiaryItemDeleteParameters(itemNumber: ItemNumber) {
+    private fun updatePendingDiaryItemDeleteParameters(itemNumber: DiaryItemNumber) {
         pendingDiaryItemDeleteParameters = DiaryItemDeleteParameters(itemNumber)
     }
 
@@ -1357,7 +1357,7 @@ internal class DiaryEditViewModel @Inject constructor(
     )
 
     private data class DiaryItemDeleteParameters(
-        val itemNumber: ItemNumber
+        val itemNumber: DiaryItemNumber
     )
 
     private data class WeatherInfoFetchParameters(
@@ -1398,19 +1398,19 @@ internal class DiaryEditViewModel @Inject constructor(
                     updateCondition(ConditionUi.of(conditionInt))
                     val title = generateRandomAlphanumericString(15)
                     updateTitle(title)
-                    val numItems = Random.nextInt(ItemNumber.MIN_NUMBER, ItemNumber.MAX_NUMBER + 1)
+                    val numItems = Random.nextInt(DiaryItemNumber.MIN_NUMBER, DiaryItemNumber.MAX_NUMBER + 1)
                     updateNumVisibleItems(numItems)
                     for (j in 1..numItems) {
                         val itemTitle = generateRandomAlphanumericString(15)
                         val itemComment = generateRandomAlphanumericString(50)
                         updateItemTitle(
-                            ItemNumber(j),
+                            DiaryItemNumber(j),
                             DiaryItemTitleSelectionHistoryId.generate().toUiModel(),
                             itemTitle
                         )
-                        updateItemComment(ItemNumber(j), itemComment)
-                        diaryStateFlow.getItemStateFlow(ItemNumber(j)).title.value = itemTitle
-                        diaryStateFlow.getItemStateFlow(ItemNumber(j)).comment.value = itemComment
+                        updateItemComment(DiaryItemNumber(j), itemComment)
+                        diaryStateFlow.getItemStateFlow(DiaryItemNumber(j)).title.value = itemTitle
+                        diaryStateFlow.getItemStateFlow(DiaryItemNumber(j)).comment.value = itemComment
                     }
 
 

@@ -5,16 +5,16 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListLoadException
 import com.websarva.wings.android.zuboradiary.domain.mapper.toDiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayList
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.RawWordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayList
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemComment
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 /**
@@ -121,7 +121,7 @@ internal class LoadWordSearchResultListUseCase(
             item.id,
             item.date,
             item.title,
-            diaryItem[itemNumberKey] as ItemNumber,
+            diaryItem[itemNumberKey] as DiaryItemNumber,
             diaryItem[itemTitleKey] as DiaryItemTitle,
             diaryItem[itemCommentKey] as DiaryItemComment,
             searchWord
@@ -195,7 +195,7 @@ internal class LoadWordSearchResultListUseCase(
         }
 
         val result: MutableMap<String, Any> = HashMap()
-        result[itemNumberKey] = ItemNumber(itemNumber)
+        result[itemNumberKey] = DiaryItemNumber(itemNumber)
         result[itemTitleKey] = itemTitle
         result[itemCommentKey] = itemComment
         return result

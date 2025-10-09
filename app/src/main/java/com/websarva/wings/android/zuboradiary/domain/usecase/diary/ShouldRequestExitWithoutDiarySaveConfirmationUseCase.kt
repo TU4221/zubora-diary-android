@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 

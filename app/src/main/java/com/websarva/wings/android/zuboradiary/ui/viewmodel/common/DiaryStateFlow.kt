@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
@@ -17,7 +17,7 @@ import java.time.LocalDateTime
 internal open class DiaryStateFlow {
 
     companion object {
-        const val MAX_ITEMS: Int = ItemNumber.MAX_NUMBER
+        const val MAX_ITEMS: Int = DiaryItemNumber.MAX_NUMBER
     }
 
     protected val initialDiary = Diary.generate().toUiModel()
@@ -79,8 +79,8 @@ internal open class DiaryStateFlow {
         updateLog(initialLog)
     }
 
-    fun getItemStateFlow(itemNumber: ItemNumber): DiaryItemStateFlow {
-        val arrayNumber = itemNumber.value - ItemNumber.MIN_NUMBER
+    fun getItemStateFlow(itemNumber: DiaryItemNumber): DiaryItemStateFlow {
+        val arrayNumber = itemNumber.value - DiaryItemNumber.MIN_NUMBER
         return items[arrayNumber]
     }
 
@@ -93,11 +93,11 @@ internal open class DiaryStateFlow {
             updateCondition(condition)
             updateTitle(title)
 
-            setUpItemTitleAndComment(ItemNumber(1), item1Title, item1Comment)
-            setUpItemTitleAndComment(ItemNumber(2), item2Title, item2Comment)
-            setUpItemTitleAndComment(ItemNumber(3), item3Title, item3Comment)
-            setUpItemTitleAndComment(ItemNumber(4), item4Title, item4Comment)
-            setUpItemTitleAndComment(ItemNumber(5), item5Title, item5Comment)
+            setUpItemTitleAndComment(DiaryItemNumber(1), item1Title, item1Comment)
+            setUpItemTitleAndComment(DiaryItemNumber(2), item2Title, item2Comment)
+            setUpItemTitleAndComment(DiaryItemNumber(3), item3Title, item3Comment)
+            setUpItemTitleAndComment(DiaryItemNumber(4), item4Title, item4Comment)
+            setUpItemTitleAndComment(DiaryItemNumber(5), item5Title, item5Comment)
 
             var numVisibleItems = items.size
             val maxArrayNumber = numVisibleItems - 1
@@ -139,16 +139,16 @@ internal open class DiaryStateFlow {
         this.title.value = title
     }
 
-    protected fun initializeItemForEdit(itemNumber: ItemNumber) {
+    protected fun initializeItemForEdit(itemNumber: DiaryItemNumber) {
         getItemStateFlow(itemNumber).updateTitleAndCommentFromDiary("", "")
     }
 
-    protected fun setUpItemTitleAndComment(itemNumber: ItemNumber, title: String?, comment: String?) {
+    protected fun setUpItemTitleAndComment(itemNumber: DiaryItemNumber, title: String?, comment: String?) {
         getItemStateFlow(itemNumber).updateTitleAndCommentFromDiary(title, comment)
     }
 
     protected fun updateItem(
-        itemNumber: ItemNumber,
+        itemNumber: DiaryItemNumber,
         id: DiaryItemTitleSelectionHistoryIdUi?,
         title: String?,
         comment: String?,
@@ -158,7 +158,7 @@ internal open class DiaryStateFlow {
     }
 
     protected fun updateItemTitleWithTimestamp(
-        itemNumber: ItemNumber,
+        itemNumber: DiaryItemNumber,
         id: DiaryItemTitleSelectionHistoryIdUi,
         title: String
     ) {
@@ -180,8 +180,8 @@ internal open class DiaryStateFlow {
     open class DiaryItemStateFlow(val itemNumber: Int) {
 
         companion object {
-            private const val MIN_ITEM_NUMBER = ItemNumber.MIN_NUMBER
-            private const val MAX_ITEM_NUMBER = ItemNumber.MAX_NUMBER
+            private const val MIN_ITEM_NUMBER = DiaryItemNumber.MIN_NUMBER
+            private const val MAX_ITEM_NUMBER = DiaryItemNumber.MAX_NUMBER
         }
 
         protected val initialTitleId = null

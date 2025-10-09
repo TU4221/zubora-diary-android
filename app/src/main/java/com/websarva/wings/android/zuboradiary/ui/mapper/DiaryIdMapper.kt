@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 
 internal fun DiaryId.toUiModel(): DiaryIdUi {

@@ -2,9 +2,9 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionHistoryIdUi
@@ -21,7 +21,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
     DiaryStateFlow() {
 
     companion object {
-        const val MAX_ITEMS: Int = ItemNumber.MAX_NUMBER
+        const val MAX_ITEMS: Int = DiaryItemNumber.MAX_NUMBER
 
         private const val SAVED_ID_STATE_KEY = "id"
         private const val SAVED_DATE_STATE_KEY = "date"
@@ -149,16 +149,16 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         val incrementedNumVisibleItems = numVisibleItems + 1
         Log.d("20250729", "incrementVisibleItemsCount()_$incrementedNumVisibleItems")
         updateNumVisibleItems(incrementedNumVisibleItems)
-        initializeItemForEdit(ItemNumber(incrementedNumVisibleItems))
+        initializeItemForEdit(DiaryItemNumber(incrementedNumVisibleItems))
     }
 
-    fun deleteItem(itemNumber: ItemNumber) {
+    fun deleteItem(itemNumber: DiaryItemNumber) {
         getItemStateFlow(itemNumber).initialize()
         val numVisibleItems = numVisibleItems.value
 
         if (itemNumber.value < numVisibleItems) {
             for (i in itemNumber.value until numVisibleItems) {
-                val targetItemNumber = ItemNumber(i)
+                val targetItemNumber = DiaryItemNumber(i)
                 val nextItemNumber = targetItemNumber.inc()
 
                 updateItem(
@@ -172,14 +172,14 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             }
         }
 
-        if (numVisibleItems > ItemNumber.MIN_NUMBER) {
+        if (numVisibleItems > DiaryItemNumber.MIN_NUMBER) {
             val decrementedNumVisibleItems = numVisibleItems - 1
             updateNumVisibleItems(decrementedNumVisibleItems)
         }
     }
 
     fun updateItemTitle(
-        itemNumber: ItemNumber,
+        itemNumber: DiaryItemNumber,
         titleId: DiaryItemTitleSelectionHistoryIdUi,
         title: String
     ) {

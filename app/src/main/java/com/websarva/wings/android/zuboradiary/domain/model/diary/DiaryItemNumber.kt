@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.model
+package com.websarva.wings.android.zuboradiary.domain.model.diary
 
 /**
  * 日記の項目番号を表すバリュークラス。
@@ -8,7 +8,7 @@ package com.websarva.wings.android.zuboradiary.domain.model
  * @property value 項目番号を表す整数値。1から5の範囲でなければならない。
  */
 @JvmInline
-internal value class ItemNumber(val value: Int) : Comparable<ItemNumber> {
+internal value class DiaryItemNumber(val value: Int) : Comparable<DiaryItemNumber> {
 
     companion object {
         /** 項目番号の最小値。 */
@@ -32,26 +32,26 @@ internal value class ItemNumber(val value: Int) : Comparable<ItemNumber> {
     }
 
     /**
-     * 現在の項目番号をインクリメントした新しい [ItemNumber] を返す。
+     * 現在の項目番号をインクリメントした新しい [DiaryItemNumber] を返す。
      * 結果が [MAX_NUMBER] を超える場合は [IllegalArgumentException] をスローする。
      *
-     * @return インクリメントされた [ItemNumber]。
+     * @return インクリメントされた [DiaryItemNumber]。
      * @throws IllegalArgumentException インクリメント後の値が [MAX_NUMBER] を超える場合。
      */
-    fun inc(): ItemNumber {
+    fun inc(): DiaryItemNumber {
         val value = this.value.inc()
         require(value <= MAX_NUMBER)
 
-        return ItemNumber(value)
+        return DiaryItemNumber(value)
     }
 
     /**
-     * この [ItemNumber] を別の [ItemNumber] と比較します。
+     * この [DiaryItemNumber] を別の [DiaryItemNumber] と比較します。
      *
-     * @param other 比較対象の [ItemNumber]。
+     * @param other 比較対象の [DiaryItemNumber]。
      * @return このオブジェクトが `other` より小さい場合は負の整数、等しい場合はゼロ、大きい場合は正の整数。
      */
-    override fun compareTo(other: ItemNumber): Int {
+    override fun compareTo(other: DiaryItemNumber): Int {
         return this.value.compareTo(other.value)
     }
 }

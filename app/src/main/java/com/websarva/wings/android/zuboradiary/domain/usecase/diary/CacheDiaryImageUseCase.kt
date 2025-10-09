@@ -1,12 +1,12 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageCacheException
 import com.websarva.wings.android.zuboradiary.utils.createLogTag

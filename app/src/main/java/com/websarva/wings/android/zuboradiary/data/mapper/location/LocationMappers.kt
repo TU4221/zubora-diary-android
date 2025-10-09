@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.mapper.location
 
 import android.location.Location
-import com.websarva.wings.android.zuboradiary.domain.model.SimpleLocation
+import com.websarva.wings.android.zuboradiary.domain.model.location.SimpleLocation
 
 internal fun Location.toDomainModel(): SimpleLocation {
     return SimpleLocation(latitude, longitude)

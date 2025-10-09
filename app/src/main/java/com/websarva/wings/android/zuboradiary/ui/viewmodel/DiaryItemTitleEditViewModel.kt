@@ -2,9 +2,9 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
@@ -58,7 +58,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 false
             )
 
-    private val _itemNumber = MutableStateFlow<ItemNumber?>(null)
+    private val _itemNumber = MutableStateFlow<DiaryItemNumber?>(null)
     val itemNumber get() = _itemNumber.asStateFlow()
 
     private val _itemTitle = MutableStateFlow("")
@@ -163,7 +163,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     // Fragmentからの結果受取処理
     fun onDiaryItemTitleDataReceived(diaryItemTitleSelection: DiaryItemTitleSelection) {
-        val itemNumber = ItemNumber(diaryItemTitleSelection.itemNumber)
+        val itemNumber = DiaryItemNumber(diaryItemTitleSelection.itemNumber)
         updateItemNumber(itemNumber)
 
         val itemTitle = diaryItemTitleSelection.title
@@ -241,7 +241,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private suspend fun completeItemTitleEdit(
-        itemNumber: ItemNumber,
+        itemNumber: DiaryItemNumber,
         itemId: DiaryItemTitleSelectionHistoryIdUi = DiaryItemTitleSelectionHistoryId.generate().toUiModel(),
         itemTitle: String
     ) {
@@ -294,7 +294,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    private fun updateItemNumber(itemNumber: ItemNumber?) {
+    private fun updateItemNumber(itemNumber: DiaryItemNumber?) {
         _itemNumber.value = itemNumber
     }
 

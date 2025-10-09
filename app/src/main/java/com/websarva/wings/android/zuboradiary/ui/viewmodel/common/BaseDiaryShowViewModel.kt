@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
@@ -43,25 +43,25 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
     val numVisibleItems
         get() = diaryStateFlow.numVisibleItems.asStateFlow()
     val item1Title
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(1)).title.asStateFlow()
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(1)).title.asStateFlow()
     val item2Title
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(2)).title.asStateFlow()
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(2)).title.asStateFlow()
     val item3Title
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(3)).title.asStateFlow()
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(3)).title.asStateFlow()
     val item4Title
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).title.asStateFlow()
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(4)).title.asStateFlow()
     val item5Title
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).title.asStateFlow()
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).title.asStateFlow()
     val item1Comment
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(1)).comment.asStateFlow()
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(1)).comment.asStateFlow()
     val item2Comment
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(2)).comment.asStateFlow()
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(2)).comment.asStateFlow()
     val item3Comment
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(3)).comment.asStateFlow()
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(3)).comment.asStateFlow()
     val item4Comment
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(4)).comment.asStateFlow()
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(4)).comment.asStateFlow()
     val item5Comment
-        get() = diaryStateFlow.getItemStateFlow(ItemNumber(5)).comment.asStateFlow()
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).comment.asStateFlow()
     val imageFileName
         get() = diaryStateFlow.imageFileName.asStateFlow()
     val imageFilePath

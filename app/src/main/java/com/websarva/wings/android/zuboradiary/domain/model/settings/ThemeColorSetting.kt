@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
-import com.websarva.wings.android.zuboradiary.domain.model.ThemeColor
-
 /**
  * アプリケーションのテーマカラー設定を表すデータクラス。
  *

@@ -4,9 +4,9 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiarySaveException
-import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException

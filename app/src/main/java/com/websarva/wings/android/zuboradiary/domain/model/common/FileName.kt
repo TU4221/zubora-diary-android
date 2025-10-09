@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.model
+package com.websarva.wings.android.zuboradiary.domain.model.common
 
 /**
  * ファイル名を表す抽象クラス。

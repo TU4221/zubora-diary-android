@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException

@@ -1,12 +1,12 @@
-package com.websarva.wings.android.zuboradiary.domain.model.list.diary
+package com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary
 
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemComment
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryTitle
-import com.websarva.wings.android.zuboradiary.domain.model.ItemNumber
-import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import java.time.LocalDate
 
 /**
@@ -60,7 +60,7 @@ internal sealed class DiaryDayListItem(
         override val id: DiaryId,
         override val date: LocalDate,
         val title: DiaryTitle,
-        val itemNumber: ItemNumber,
+        val itemNumber: DiaryItemNumber,
         val itemTitle: DiaryItemTitle,
         val itemComment: DiaryItemComment,
         val searchWord: SearchWord,

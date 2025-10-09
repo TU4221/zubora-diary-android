@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.data.mapper.file
 
 import com.websarva.wings.android.zuboradiary.data.file.ImageFileName
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 
 
 internal fun ImageFileName.toDomainModel(): DiaryImageFileName {

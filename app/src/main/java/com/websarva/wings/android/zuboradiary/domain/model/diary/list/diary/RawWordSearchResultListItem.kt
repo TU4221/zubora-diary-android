@@ -1,9 +1,9 @@
-package com.websarva.wings.android.zuboradiary.domain.model.list.diary
+package com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary
 
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemComment
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
 import java.time.LocalDate
 
 /**

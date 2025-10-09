@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle
+package com.websarva.wings.android.zuboradiary.domain.model.diary.list.diaryitemtitle
 
 /**
  * 日記項目のタイトル選択履歴のリストを保持するデータクラス。

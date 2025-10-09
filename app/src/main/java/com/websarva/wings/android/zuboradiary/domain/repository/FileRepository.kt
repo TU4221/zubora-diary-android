@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException

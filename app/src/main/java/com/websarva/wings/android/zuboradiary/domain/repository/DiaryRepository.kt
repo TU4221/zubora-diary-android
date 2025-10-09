@@ -1,18 +1,18 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
-import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistory
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.RawWordSearchResultListItem
-import com.websarva.wings.android.zuboradiary.domain.model.list.diary.DiaryDayListItem
-import com.websarva.wings.android.zuboradiary.domain.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.RawWordSearchResultListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitleSelectionHistoryId
-import com.websarva.wings.android.zuboradiary.domain.model.SearchWord
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 

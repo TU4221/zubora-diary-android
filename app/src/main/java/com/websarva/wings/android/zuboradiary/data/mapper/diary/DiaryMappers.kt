@@ -1,14 +1,14 @@
 package com.websarva.wings.android.zuboradiary.data.mapper.diary
 
 import com.websarva.wings.android.zuboradiary.data.database.DiaryEntity
-import com.websarva.wings.android.zuboradiary.domain.model.Condition
-import com.websarva.wings.android.zuboradiary.domain.model.Diary
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryId
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryImageFileName
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemComment
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.DiaryTitle
-import com.websarva.wings.android.zuboradiary.domain.model.Weather
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Condition
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
 
 internal fun DiaryEntity.toDomainModel(): Diary {
     return Diary(

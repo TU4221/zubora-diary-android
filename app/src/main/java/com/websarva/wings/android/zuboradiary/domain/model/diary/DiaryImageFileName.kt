@@ -1,4 +1,6 @@
-package com.websarva.wings.android.zuboradiary.domain.model
+package com.websarva.wings.android.zuboradiary.domain.model.diary
+
+import com.websarva.wings.android.zuboradiary.domain.model.common.FileName
 
 /**
  * ファイル名を表すデータクラス。
