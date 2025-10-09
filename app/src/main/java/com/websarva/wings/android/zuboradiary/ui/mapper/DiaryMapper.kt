@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileN
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 
 internal fun Diary.toUiModel(): DiaryUi {
     return DiaryUi(

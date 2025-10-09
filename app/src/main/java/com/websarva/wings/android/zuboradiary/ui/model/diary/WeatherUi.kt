@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model
+package com.websarva.wings.android.zuboradiary.ui.model.diary
 
 import android.content.Context
 import com.websarva.wings.android.zuboradiary.R

@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model
+package com.websarva.wings.android.zuboradiary.ui.model.diary.item
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

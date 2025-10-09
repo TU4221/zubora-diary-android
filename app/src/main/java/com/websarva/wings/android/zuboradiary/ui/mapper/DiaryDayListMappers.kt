@@ -4,8 +4,8 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileN
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayList
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListUi
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 
 @JvmName("toUiModelStandard")
 internal suspend fun DiaryDayList<DiaryDayListItem.Standard>.toUiModel(

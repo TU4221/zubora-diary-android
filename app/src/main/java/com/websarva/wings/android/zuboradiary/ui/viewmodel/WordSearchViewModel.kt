@@ -19,9 +19,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.WordSearchAppMess
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel

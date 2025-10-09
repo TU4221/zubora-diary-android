@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model.list.diary
+package com.websarva.wings.android.zuboradiary.ui.model.diary.list
 
 internal data class DiaryYearMonthListUi<T: DiaryDayListItemUi>(
     val itemList: List<DiaryYearMonthListItemUi<T>> = emptyList()

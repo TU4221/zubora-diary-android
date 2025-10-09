@@ -4,8 +4,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListItemUi
 
 // DiaryFragment、WordSearchFragmentの親RecyclerViewのListAdapter。
 // 親RecyclerViewを同じ構成にする為、一つのクラスで両方の子RecyclerViewに対応できるように作成。

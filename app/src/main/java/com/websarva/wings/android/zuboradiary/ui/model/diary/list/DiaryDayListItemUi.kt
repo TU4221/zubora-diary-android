@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model.list.diary
+package com.websarva.wings.android.zuboradiary.ui.model.diary.list
 
 import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
 import java.time.LocalDate

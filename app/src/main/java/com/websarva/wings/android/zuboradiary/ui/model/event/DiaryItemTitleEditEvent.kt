@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 
 sealed class DiaryItemTitleEditEvent : UiEvent {
     internal data class NavigateSelectionHistoryItemDeleteDialog(val itemTitle: String) : DiaryItemTitleEditEvent()

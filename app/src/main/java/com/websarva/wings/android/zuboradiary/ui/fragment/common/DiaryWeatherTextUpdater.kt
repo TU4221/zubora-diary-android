@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.common
 
 import android.content.Context
 import android.widget.TextView
-import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 
 internal class DiaryWeatherTextUpdater {
 

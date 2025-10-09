@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
-import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 
 internal fun Weather.toUiModel(): WeatherUi {
     return when (this) {

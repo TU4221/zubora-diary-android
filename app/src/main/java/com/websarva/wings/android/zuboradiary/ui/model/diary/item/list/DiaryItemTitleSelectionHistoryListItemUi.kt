@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model.list.diaryitemtitle
+package com.websarva.wings.android.zuboradiary.ui.model.diary.item.list
 
 
 internal data class DiaryItemTitleSelectionHistoryListItemUi(

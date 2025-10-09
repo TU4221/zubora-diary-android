@@ -1,11 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
-import com.websarva.wings.android.zuboradiary.ui.model.ConditionUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
-import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate

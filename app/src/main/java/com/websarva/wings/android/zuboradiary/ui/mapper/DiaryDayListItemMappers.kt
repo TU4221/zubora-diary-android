@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
-import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 
 @JvmName("toUiModelStandard")
 internal suspend fun DiaryDayListItem.Standard.toUiModel(

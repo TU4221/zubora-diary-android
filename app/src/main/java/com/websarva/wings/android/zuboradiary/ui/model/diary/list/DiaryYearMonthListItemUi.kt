@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model.list.diary
+package com.websarva.wings.android.zuboradiary.ui.model.diary.list
 
 import java.time.YearMonth
 
