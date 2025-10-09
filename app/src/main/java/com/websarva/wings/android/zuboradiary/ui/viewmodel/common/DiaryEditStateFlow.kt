@@ -191,10 +191,14 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
     ) : DiaryStateFlow.DiaryItemStateFlow(itemNumber) {
 
         companion object {
+            private const val SAVED_ITEM_TITLE_ID_STATE_KEY = "itemTitleId"
             private const val SAVED_ITEM_TITLE_STATE_KEY = "itemTitle"
             private const val SAVED_ITEM_COMMENT_STATE_KEY = "itemComment"
             private const val SAVED_ITEM_UPDATE_LOG_STATE_KEY = "itemUpdateLog"
         }
+
+        override val titleId =
+            MutableStateFlow<String?>(handle[SAVED_ITEM_TITLE_ID_STATE_KEY + itemNumber] ?: initialTitleId)
 
         // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
         //      StateFlow変数を用意しても意味がないので作成しない。
@@ -211,6 +215,9 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             )
 
         init {
+            titleId.onEach {
+                handle[SAVED_ITEM_TITLE_ID_STATE_KEY + itemNumber] = it
+            }.launchIn(scope)
             title.onEach {
                 handle[SAVED_ITEM_TITLE_STATE_KEY + itemNumber] = it
             }.launchIn(scope)
