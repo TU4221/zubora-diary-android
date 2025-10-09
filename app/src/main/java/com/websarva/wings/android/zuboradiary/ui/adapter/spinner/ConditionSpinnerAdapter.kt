@@ -19,7 +19,7 @@ internal class ConditionSpinnerAdapter(
 ) {
 
     /**
-     * 指定された位置に対応する ConditionUi を返す。
+     * 指定された位置に対応する [ConditionUi] を返す。
      *
      * @param position 取得したいアイテムの位置。
      * @return 指定された位置にある [ConditionUi] 。
