@@ -9,14 +9,12 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputTextUseCase
-import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionHistoryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
@@ -138,7 +136,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         viewModelScope.launch {
             completeItemTitleEdit(
                 itemNumber,
-                itemId,
+                DiaryItemTitleSelectionHistoryId(itemId),
                 itemTitle
             )
         }
@@ -149,7 +147,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val itemTitle = item.title
         viewModelScope.launch {
             updatePendingHistoryItemDeleteParameters(
-                itemId,
+                DiaryItemTitleSelectionHistoryId(itemId),
                 DiaryItemTitle(itemTitle)
             )
             emitUiEvent(
@@ -242,13 +240,13 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     private suspend fun completeItemTitleEdit(
         itemNumber: DiaryItemNumber,
-        itemId: DiaryItemTitleSelectionHistoryIdUi = DiaryItemTitleSelectionHistoryId.generate().toUiModel(),
+        itemId: DiaryItemTitleSelectionHistoryId = DiaryItemTitleSelectionHistoryId.generate(),
         itemTitle: String
     ) {
         when (val result = validateInputTextUseCase(itemTitle).value) {
             InputTextValidationResult.Valid -> {
                 val diaryItemTitleSelection =
-                    DiaryItemTitleSelection(itemNumber.value, itemId, itemTitle)
+                    DiaryItemTitleSelection(itemNumber.value, itemId.value, itemTitle)
                 emitUiEvent(
                     DiaryItemTitleEditEvent.CompleteEdit(diaryItemTitleSelection)
                 )
@@ -271,17 +269,13 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private suspend fun deleteDiaryItemTitleSelectionHistory(
-        id: DiaryItemTitleSelectionHistoryIdUi,
+        id: DiaryItemTitleSelectionHistoryId,
         title: DiaryItemTitle
     ) {
         val logMsg = "日記項目タイトル選択履歴アイテム削除"
         Log.i(logTag, "${logMsg}_開始")
 
-        val result =
-            deleteDiaryItemTitleSelectionHistoryUseCase(
-                id.toDomainModel(),
-                title
-            )
+        val result = deleteDiaryItemTitleSelectionHistoryUseCase(id, title)
         when (result) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
@@ -307,7 +301,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private fun updatePendingHistoryItemDeleteParameters(
-        itemId: DiaryItemTitleSelectionHistoryIdUi,
+        itemId: DiaryItemTitleSelectionHistoryId,
         itemTitle: DiaryItemTitle
     ) {
         pendingHistoryItemDeleteParameters = HistoryItemDeleteParameters(itemId, itemTitle)
@@ -318,7 +312,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private data class HistoryItemDeleteParameters(
-        val itemId: DiaryItemTitleSelectionHistoryIdUi,
+        val itemId: DiaryItemTitleSelectionHistoryId,
         val itemTitle: DiaryItemTitle
     )
 }

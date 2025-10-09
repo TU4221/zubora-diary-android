@@ -41,7 +41,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionHistoryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -1062,7 +1061,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 項目関係
-    private fun getItemTitleId(itemNumber: DiaryItemNumber): StateFlow<DiaryItemTitleSelectionHistoryIdUi?> {
+    private fun getItemTitleId(itemNumber: DiaryItemNumber): StateFlow<String?> {
         return diaryStateFlow.getItemStateFlow(itemNumber).titleId
     }
 
@@ -1256,7 +1255,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun updateItemTitle(
         itemNumber: DiaryItemNumber,
-        titleId: DiaryItemTitleSelectionHistoryIdUi,
+        titleId: String,
         title: String
     ) {
         diaryStateFlow.updateItemTitle(itemNumber, titleId, title)
@@ -1414,7 +1413,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         val itemComment = generateRandomAlphanumericString(50)
                         updateItemTitle(
                             DiaryItemNumber(j),
-                            DiaryItemTitleSelectionHistoryId.generate().toUiModel(),
+                            DiaryItemTitleSelectionHistoryId.generate().value,
                             itemTitle
                         )
                         updateItemComment(DiaryItemNumber(j), itemComment)

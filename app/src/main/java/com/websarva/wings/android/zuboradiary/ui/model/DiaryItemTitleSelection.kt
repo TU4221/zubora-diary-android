@@ -6,6 +6,6 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 internal data class DiaryItemTitleSelection(
     val itemNumber: Int,
-    val id: DiaryItemTitleSelectionHistoryIdUi?,
+    val id: String?,
     val title: String,
 ) : Parcelable

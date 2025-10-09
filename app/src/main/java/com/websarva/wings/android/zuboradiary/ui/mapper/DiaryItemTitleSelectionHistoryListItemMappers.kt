@@ -4,5 +4,5 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diaryitemt
 import com.websarva.wings.android.zuboradiary.ui.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItemUi
 
 internal fun DiaryItemTitleSelectionHistoryListItem.toUiModel(): DiaryItemTitleSelectionHistoryListItemUi {
-    return DiaryItemTitleSelectionHistoryListItemUi(id.toUiModel(), title.value)
+    return DiaryItemTitleSelectionHistoryListItemUi(id.value, title.value)
 }
