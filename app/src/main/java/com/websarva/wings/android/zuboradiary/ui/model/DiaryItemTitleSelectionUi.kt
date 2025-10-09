@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal data class DiaryItemTitleSelection(
+internal data class DiaryItemTitleSelectionUi(
     val itemNumber: Int,
     val id: String?,
     val title: String,

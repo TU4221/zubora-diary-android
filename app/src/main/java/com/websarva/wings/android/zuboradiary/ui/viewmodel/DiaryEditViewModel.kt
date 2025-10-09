@@ -40,7 +40,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessa
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -452,7 +452,7 @@ internal class DiaryEditViewModel @Inject constructor(
         viewModelScope.launch {
             emitUiEvent(
                 DiaryEditEvent.NavigateDiaryItemTitleEditFragment(
-                    DiaryItemTitleSelection(itemNumber, itemTitleId, itemTitle)
+                    DiaryItemTitleSelectionUi(itemNumber, itemTitleId, itemTitle)
                 )
             )
         }
@@ -688,7 +688,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitleSelection>) {
+    fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitleSelectionUi>) {
         when (result) {
             is FragmentResult.Some -> {
                 val titleId = result.data.id ?: throw IllegalArgumentException()

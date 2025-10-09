@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
@@ -160,7 +160,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     // Fragmentからの結果受取処理
-    fun onDiaryItemTitleDataReceived(diaryItemTitleSelection: DiaryItemTitleSelection) {
+    fun onDiaryItemTitleDataReceived(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
         val itemNumber = DiaryItemNumber(diaryItemTitleSelection.itemNumber)
         updateItemNumber(itemNumber)
 
@@ -246,7 +246,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         when (val result = validateInputTextUseCase(itemTitle).value) {
             InputTextValidationResult.Valid -> {
                 val diaryItemTitleSelection =
-                    DiaryItemTitleSelection(itemNumber.value, itemId.value, itemTitle)
+                    DiaryItemTitleSelectionUi(itemNumber.value, itemId.value, itemTitle)
                 emitUiEvent(
                     DiaryItemTitleEditEvent.CompleteEdit(diaryItemTitleSelection)
                 )

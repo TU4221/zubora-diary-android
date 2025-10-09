@@ -41,7 +41,7 @@ import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinnerAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.WeatherSpinnerAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
@@ -143,7 +143,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     private fun setUpDiaryItemTitleEditFragmentResultReceiver() {
         setUpFragmentResultReceiver(
             DiaryItemTitleEditDialog.KEY_RESULT
-        ) { result: FragmentResult<DiaryItemTitleSelection> ->
+        ) { result: FragmentResult<DiaryItemTitleSelectionUi> ->
             mainViewModel.onItemTitleEditFragmentResultReceived(result)
         }
     }
@@ -754,7 +754,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryItemTitleEditFragment(diaryItemTitleSelection: DiaryItemTitleSelection) {
+    private fun navigateDiaryItemTitleEditFragment(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemTitleEditDialog(
                 diaryItemTitleSelection

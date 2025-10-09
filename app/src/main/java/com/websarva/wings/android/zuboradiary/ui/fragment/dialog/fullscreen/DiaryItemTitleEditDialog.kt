@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItem
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
+import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import dagger.hilt.android.AndroidEntryPoint
@@ -180,7 +180,7 @@ class DiaryItemTitleEditDialog :
     }
 
     // DiaryItemTitleEditDialogを閉じる
-    private fun completeItemTitleEdit(diaryItemTitleSelection: DiaryItemTitleSelection) {
+    private fun completeItemTitleEdit(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
         val navBackStackEntry = checkNotNull(findNavController().previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
         savedStateHandle[KEY_RESULT] = FragmentResult.Some(diaryItemTitleSelection)
