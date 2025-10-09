@@ -44,7 +44,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinnerAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.WeatherSpinnerAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -728,7 +728,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.imageFilePath
-                .collectLatest { value: ImageFilePathUi? ->
+                .collectLatest { value: FilePathUi? ->
                     binding.imageProgressAttachedImage.loadImage(value?.path)
                 }
         }

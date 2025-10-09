@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpd
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -225,7 +225,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.imageFilePath
-                .collectLatest { value: ImageFilePathUi? ->
+                .collectLatest { value: FilePathUi? ->
                     // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
                     //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
                     //      クリアという意味合いでデフォルト画像をセットする。

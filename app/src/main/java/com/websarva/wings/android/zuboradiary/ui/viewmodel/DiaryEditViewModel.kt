@@ -42,7 +42,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
@@ -1155,10 +1155,10 @@ internal class DiaryEditViewModel @Inject constructor(
                     )
                 when (result) {
                     is UseCaseResult.Success -> {
-                        ImageFilePathUi.Available(result.value)
+                        FilePathUi.Available(result.value)
                     }
                     is UseCaseResult.Failure -> {
-                        ImageFilePathUi.Unavailable
+                        FilePathUi.Unavailable
                     }
                 }
             }
@@ -1269,7 +1269,7 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.imageFileName.value = imageFileName
     }
 
-    private fun updateImageFilePath(imageFilePath: ImageFilePathUi?) {
+    private fun updateImageFilePath(imageFilePath: FilePathUi?) {
         diaryStateFlow.imageFilePath.value = imageFilePath
     }
 

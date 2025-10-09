@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
@@ -93,17 +93,17 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
                     )
                 when (result) {
                     is UseCaseResult.Success -> {
-                        ImageFilePathUi.Available(result.value)
+                        FilePathUi.Available(result.value)
                     }
                     is UseCaseResult.Failure -> {
-                        ImageFilePathUi.Unavailable
+                        FilePathUi.Unavailable
                     }
                 }
             }
         updateImageFilePath(imageFilePathUi)
     }
 
-    private fun updateImageFilePath(imageFilePath: ImageFilePathUi?) {
+    private fun updateImageFilePath(imageFilePath: FilePathUi?) {
         diaryStateFlow.imageFilePath.value = imageFilePath
     }
 }

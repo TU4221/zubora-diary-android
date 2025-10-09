@@ -4,14 +4,14 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileN
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthListItem
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListItemUi
 
 @JvmName("toUiModelStandard")
 internal suspend fun DiaryYearMonthList<DiaryDayListItem.Standard>.toUiModel(
-    processFileNameToPath: suspend (DiaryImageFileName?) -> ImageFilePathUi?
+    processFileNameToPath: suspend (DiaryImageFileName?) -> FilePathUi?
 ): DiaryYearMonthListUi<DiaryDayListItemUi.Standard> {
     return DiaryYearMonthListUi(
         itemList.map {

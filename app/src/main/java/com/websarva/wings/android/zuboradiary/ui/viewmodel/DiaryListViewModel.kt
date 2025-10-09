@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryIma
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryYearMonthListUi
@@ -359,8 +359,8 @@ internal class DiaryListViewModel @Inject constructor(
                         result.value.toUiModel { fileName: DiaryImageFileName? ->
                             fileName?.let {
                                 when (val buildResult = buildDiaryImageFilePathUseCase(fileName)) {
-                                    is UseCaseResult.Success -> ImageFilePathUi.Available(buildResult.value)
-                                    is UseCaseResult.Failure -> ImageFilePathUi.Unavailable
+                                    is UseCaseResult.Success -> FilePathUi.Available(buildResult.value)
+                                    is UseCaseResult.Failure -> FilePathUi.Unavailable
                                 }
                             }
                         }

@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -54,7 +54,7 @@ internal open class DiaryStateFlow {
     protected val initialImageFileName = initialDiary.imageFileName
     open val imageFileName = MutableStateFlow(initialImageFileName)
 
-    private val initialImageFilePath: ImageFilePathUi? = null
+    private val initialImageFilePath: FilePathUi? = null
     val imageFilePath = MutableStateFlow(initialImageFilePath)
 
     protected val initialLog = null // MEMO:Logは保存記録の意味合となるため日記新規作成時を考慮してnullとする。

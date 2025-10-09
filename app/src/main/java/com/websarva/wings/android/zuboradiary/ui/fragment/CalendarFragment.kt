@@ -33,7 +33,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpd
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
-import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -544,7 +544,7 @@ class CalendarFragment :
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.imageFilePath
-                .collectLatest { value: ImageFilePathUi? ->
+                .collectLatest { value: FilePathUi? ->
                     DiaryImageUpdater()
                         .update(
                             binding.includeDiaryShow.imageProgressAttachedImage,
