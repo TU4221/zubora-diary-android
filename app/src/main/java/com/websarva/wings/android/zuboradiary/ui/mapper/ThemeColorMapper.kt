@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColor
-import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 
 internal fun ThemeColor.toUiModel(): ThemeColorUi {
     return when (this) {

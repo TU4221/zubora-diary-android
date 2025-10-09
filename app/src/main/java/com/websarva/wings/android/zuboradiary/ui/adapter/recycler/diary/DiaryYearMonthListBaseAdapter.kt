@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryYearMonthListBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowNoDiaryMessageBinding
 import com.websarva.wings.android.zuboradiary.databinding.RowProgressBarBinding

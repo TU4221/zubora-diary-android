@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback

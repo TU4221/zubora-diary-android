@@ -20,7 +20,7 @@ import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
-import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger

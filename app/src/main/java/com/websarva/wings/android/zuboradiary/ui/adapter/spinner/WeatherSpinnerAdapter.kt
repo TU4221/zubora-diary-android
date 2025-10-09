@@ -4,7 +4,7 @@ import android.content.Context
 import android.widget.ArrayAdapter
 import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 
 internal class WeatherSpinnerAdapter(

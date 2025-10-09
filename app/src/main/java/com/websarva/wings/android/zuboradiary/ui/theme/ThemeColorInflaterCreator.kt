@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.theme
 import android.content.Context
 import android.view.LayoutInflater
 import androidx.appcompat.view.ContextThemeWrapper
-import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 
 internal class ThemeColorInflaterCreator {
 

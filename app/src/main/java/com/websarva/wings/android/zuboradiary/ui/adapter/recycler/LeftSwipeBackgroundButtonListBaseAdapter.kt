@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.recycler
 
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 
 internal abstract class LeftSwipeBackgroundButtonListBaseAdapter <T, VH : RecyclerView.ViewHolder> protected constructor(

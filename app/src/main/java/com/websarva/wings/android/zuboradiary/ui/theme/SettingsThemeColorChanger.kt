@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.theme
 
 import android.widget.TextView
-import com.websarva.wings.android.zuboradiary.ui.model.ThemeColorUi
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 
 internal class SettingsThemeColorChanger : ThemeColorChanger() {
 
