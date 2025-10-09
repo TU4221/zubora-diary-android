@@ -34,7 +34,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.CheckWeatherInfoFetchEnabledUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
@@ -322,11 +321,14 @@ internal class DiaryEditViewModel @Inject constructor(
         // MEMO:下記条件はアプリ設定変更時のアプリ再起動時の不要初期化対策
         if (uiState.value != DiaryEditState.Idle) return
 
-        val id = handle.get<DiaryIdUi>(DIARY_ID_ARGUMENT_KEY)
+        val id = handle.get<String>(DIARY_ID_ARGUMENT_KEY)
         val date =
             handle.get<LocalDate>(DIARY_DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         viewModelScope.launch {
-            prepareDiaryEntry(id, date)
+            prepareDiaryEntry(
+                id,
+                date
+            )
         }
     }
 
@@ -399,7 +401,10 @@ internal class DiaryEditViewModel @Inject constructor(
         val originalDate = originalDiary.date
 
         viewModelScope.launch {
-            updatePendingDiaryDeleteParameters(originalId, originalDate)
+            updatePendingDiaryDeleteParameters(
+                originalId,
+                originalDate
+            )
             emitUiEvent(
                 DiaryEditEvent.NavigateDiaryDeleteDialog(originalDate)
             )
@@ -749,7 +754,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // データ処理
     private suspend fun prepareDiaryEntry(
-        id: DiaryIdUi?,
+        id: String?,
         date: LocalDate
     ) {
         if (id == null) {
@@ -761,7 +766,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun prepareNewDiaryEntry(date: LocalDate) {
         updateIsNewDiary(true)
-        updateId(DiaryId.generate().toUiModel())
+        updateId(DiaryId.generate().value)
         updateDate(date)
         updateOriginalDiary(handle[SAVED_ORIGINAL_DIARY_KEY] ?: diaryStateFlow.createDiary())
         val previousDate = previousDate
@@ -775,10 +780,10 @@ internal class DiaryEditViewModel @Inject constructor(
         )
     }
 
-    private suspend fun loadDiaryById(id: DiaryIdUi, date: LocalDate) {
+    private suspend fun loadDiaryById(id: String, date: LocalDate) {
         executeDiaryLoad(id, date) { id, _ ->
             id ?: throw IllegalArgumentException()
-            loadDiaryByIdUseCase(id.toDomainModel())
+            loadDiaryByIdUseCase(DiaryId(id))
         }
     }
 
@@ -789,9 +794,9 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun <E : UseCaseException> executeDiaryLoad(
-        id: DiaryIdUi? = null,
+        id: String? = null,
         date: LocalDate,
-        processDiaryLoad: suspend (DiaryIdUi?, LocalDate) -> UseCaseResult<Diary, E>
+        processDiaryLoad: suspend (String?, LocalDate) -> UseCaseResult<Diary, E>
     ) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
@@ -865,14 +870,14 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun deleteDiary(
-        id: DiaryIdUi,
+        id: String,
         date: LocalDate
     ) {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
         updateUiState(DiaryEditState.Deleting)
-        when (val result = deleteDiaryUseCase(id.toDomainModel())) {
+        when (val result = deleteDiaryUseCase(DiaryId(id))) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 clearDiaryImageCacheFile()
@@ -1104,10 +1109,10 @@ internal class DiaryEditViewModel @Inject constructor(
         clearDiaryImageCacheFile()
     }
 
-    private suspend fun cacheDiaryImage(uri: Uri?, diaryId: DiaryIdUi) {
+    private suspend fun cacheDiaryImage(uri: Uri?, diaryId: String) {
         if (uri != null) {
             val result =
-                cacheDiaryImageUseCase(uri.toString(), diaryId.toDomainModel())
+                cacheDiaryImageUseCase(uri.toString(), DiaryId(diaryId))
             when (result) {
                 is UseCaseResult.Success -> {
                     updateImageFileName(result.value.toUiModel())
@@ -1213,7 +1218,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun updateId(id: DiaryIdUi) {
+    private fun updateId(id: String) {
         diaryStateFlow.id.value = id
     }
 
@@ -1308,7 +1313,7 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryUpdateParameters = null
     }
 
-    private fun updatePendingDiaryDeleteParameters(id: DiaryIdUi, date: LocalDate) {
+    private fun updatePendingDiaryDeleteParameters(id: String, date: LocalDate) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
 
@@ -1352,7 +1357,7 @@ internal class DiaryEditViewModel @Inject constructor(
     )
 
     private data class DiaryDeleteParameters(
-        val id: DiaryIdUi,
+        val id: String,
         val date: LocalDate
     )
 

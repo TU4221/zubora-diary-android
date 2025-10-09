@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
@@ -15,7 +16,7 @@ internal suspend fun DiaryDayListItem.Standard.toUiModel(
     processFileNameToPath: suspend (DiaryImageFileName?) -> ImageFilePathUi?
 ): DiaryDayListItemUi.Standard {
     return DiaryDayListItemUi.Standard(
-        id.toUiModel(),
+        id.value,
         date,
         title.value,
         imageFileName?.toUiModel(),
@@ -26,7 +27,7 @@ internal suspend fun DiaryDayListItem.Standard.toUiModel(
 @JvmName("toUiModelWordSearchResult")
 internal fun DiaryDayListItem.WordSearchResult.toUiModel(): DiaryDayListItemUi.WordSearchResult {
     return DiaryDayListItemUi.WordSearchResult(
-        id.toUiModel(),
+        id.value,
         date,
         title.value,
         itemNumber.value,
@@ -39,7 +40,7 @@ internal fun DiaryDayListItem.WordSearchResult.toUiModel(): DiaryDayListItemUi.W
 @JvmName("toUiModelStandard")
 internal fun DiaryDayListItemUi.Standard.toDomainModel(): DiaryDayListItem.Standard {
     return DiaryDayListItem.Standard(
-        id.toDomainModel(),
+        DiaryId(id),
         date,
         DiaryTitle(title),
         imageFileName?.toDomainModel()
@@ -49,7 +50,7 @@ internal fun DiaryDayListItemUi.Standard.toDomainModel(): DiaryDayListItem.Stand
 @JvmName("toUiModelWordSearchResult")
 internal fun DiaryDayListItemUi.WordSearchResult.toDomainModel(): DiaryDayListItem.WordSearchResult {
     return DiaryDayListItem.WordSearchResult(
-        id.toDomainModel(),
+        DiaryId(id),
         date,
         DiaryTitle(title),
         DiaryItemNumber(itemNumber),

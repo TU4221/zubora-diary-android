@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.mapper
 
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
@@ -8,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
 
 internal fun Diary.toUiModel(): DiaryUi {
     return DiaryUi(
-        id.toUiModel(),
+        id.value,
         date,
         log,
         weather1.toUiModel(),
@@ -31,7 +32,7 @@ internal fun Diary.toUiModel(): DiaryUi {
 
 internal fun DiaryUi.toDomainModel(): Diary {
     return Diary(
-        id.toDomainModel(),
+        DiaryId(id),
         date,
         log,
         weather1.toDomainModel(),

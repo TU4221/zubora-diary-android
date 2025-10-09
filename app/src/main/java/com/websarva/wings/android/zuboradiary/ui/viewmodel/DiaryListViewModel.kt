@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SavedDiaryDateRange
@@ -17,7 +18,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryIma
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
@@ -182,7 +182,9 @@ internal class DiaryListViewModel @Inject constructor(
         val id = item.id
         val date = item.date
         viewModelScope.launch {
-            updatePendingDiaryDeleteParameters(id)
+            updatePendingDiaryDeleteParameters(
+                DiaryId(id)
+            )
             emitUiEvent(
                 DiaryListEvent.NavigateDiaryDeleteDialog(date)
             )
@@ -390,14 +392,14 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun deleteDiary(
-        id: DiaryIdUi,
+        id: DiaryId,
         currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
     ) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryListState.DeletingDiary)
-        when (val result = deleteDiaryUseCase(id.toDomainModel())) {
+        when (val result = deleteDiaryUseCase(id)) {
             is UseCaseResult.Success -> {
                 refreshDiaryList(currentList)
                 Log.i(logTag, "${logMsg}_完了")
@@ -461,7 +463,7 @@ internal class DiaryListViewModel @Inject constructor(
         isLoadingOnScrolled = isLoading
     }
 
-    private fun updatePendingDiaryDeleteParameters(id: DiaryIdUi) {
+    private fun updatePendingDiaryDeleteParameters(id: DiaryId) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id)
     }
 
@@ -470,6 +472,6 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private data class DiaryDeleteParameters(
-        val id: DiaryIdUi
+        val id: DiaryId
     )
 }

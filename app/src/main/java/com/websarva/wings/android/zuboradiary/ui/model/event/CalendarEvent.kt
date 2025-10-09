@@ -1,11 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import java.time.LocalDate
 
 sealed class CalendarEvent : UiEvent {
     internal data class NavigateDiaryEditFragment(
-        val id: DiaryIdUi?,
+        val id: String?,
         val date: LocalDate
     ) : CalendarEvent()
     internal data class ScrollCalendar(val date: LocalDate) : CalendarEvent()

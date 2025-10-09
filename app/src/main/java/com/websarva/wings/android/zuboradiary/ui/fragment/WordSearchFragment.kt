@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.list.diary.DiaryDayListItemUi
@@ -150,7 +149,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         listAdapter.scrollToTop()
     }
 
-    private fun navigateDiaryShowFragment(id: DiaryIdUi, date: LocalDate) {
+    private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
         val directions =
             WordSearchFragmentDirections
                 .actionNavigationWordSearchFragmentToDiaryShowFragment(id, date)

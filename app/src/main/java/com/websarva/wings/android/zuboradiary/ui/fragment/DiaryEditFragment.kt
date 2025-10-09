@@ -44,7 +44,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelection
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinnerAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.WeatherSpinnerAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -736,7 +735,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
     }
 
-    private fun navigateDiaryShowFragment(id: DiaryIdUi, date: LocalDate) {
+    private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
         // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
         val containsDiaryShowFragment =
             try {

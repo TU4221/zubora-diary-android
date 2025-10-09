@@ -33,7 +33,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpd
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
@@ -581,7 +580,7 @@ class CalendarFragment :
         binding.calendar.notifyDateChanged(date)
     }
 
-    private fun navigateDiaryEditFragment(id: DiaryIdUi?, date: LocalDate) {
+    private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {
         val directions =
             CalendarFragmentDirections.actionNavigationCalendarFragmentToDiaryEditFragment(
                 id,

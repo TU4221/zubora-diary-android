@@ -34,7 +34,7 @@ import java.time.LocalDateTime
  */
 @Parcelize
 internal data class DiaryUi(
-    val id: DiaryIdUi,
+    val id: String,
     val date: LocalDate,
     val log: LocalDateTime,
     val weather1: WeatherUi,

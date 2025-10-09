@@ -3,14 +3,13 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByIdUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
-import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -69,7 +68,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private fun initializeDiaryData(handle: SavedStateHandle) {
-        val id = handle.get<DiaryIdUi>(ID_ARGUMENT_KEY) ?: throw IllegalArgumentException()
+        val id = handle.get<String>(ID_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         val date = handle.get<LocalDate>(DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         viewModelScope.launch {
             loadSavedDiary(id, date)
@@ -171,12 +170,12 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // データ処理
-    private suspend fun loadSavedDiary(id: DiaryIdUi, date: LocalDate) {
+    private suspend fun loadSavedDiary(id: String, date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryShowState.Loading)
-        when (val result = loadDiaryByIdUseCase(id.toDomainModel())) {
+        when (val result = loadDiaryByIdUseCase(DiaryId(id))) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(DiaryShowState.LoadSuccess)
@@ -193,12 +192,12 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    private suspend fun deleteDiary(id: DiaryIdUi, date: LocalDate) {
+    private suspend fun deleteDiary(id: String, date: LocalDate) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryShowState.Deleting)
-        when (val result = deleteDiaryUseCase(id.toDomainModel())) {
+        when (val result = deleteDiaryUseCase(DiaryId(id))) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 emitUiEvent(
@@ -228,7 +227,7 @@ internal class DiaryShowViewModel @Inject constructor(
         )
     }
 
-    private fun updatePendingDiaryDeleteParameters(id: DiaryIdUi, date: LocalDate) {
+    private fun updatePendingDiaryDeleteParameters(id: String, date: LocalDate) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
 
@@ -237,7 +236,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private data class DiaryDeleteParameters(
-        val id: DiaryIdUi,
+        val id: String,
         val date: LocalDate
     )
 }

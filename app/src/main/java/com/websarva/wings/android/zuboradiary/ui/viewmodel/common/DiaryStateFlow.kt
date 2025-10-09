@@ -5,7 +5,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.ui.model.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.ui.model.DiaryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryItemTitleSelectionHistoryIdUi
 import com.websarva.wings.android.zuboradiary.ui.model.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.ImageFileNameUi
@@ -23,7 +22,7 @@ internal open class DiaryStateFlow {
     protected val initialDiary = Diary.generate().toUiModel()
 
     protected val initialId = null
-    open val id = MutableStateFlow<DiaryIdUi?>(initialId) // MEMO:初期化時IDが未定の為、null許容型とする。
+    open val id = MutableStateFlow<String?>(initialId) // MEMO:初期化時IDが未定の為、null許容型とする。
 
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
     //      StateFlow変数を用意しても意味がないので作成しない。
@@ -115,7 +114,7 @@ internal open class DiaryStateFlow {
         }
     }
 
-    private fun updateId(id: DiaryIdUi?) {
+    private fun updateId(id: String?) {
         this.id.value = id
     }
 
