@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
+import com.websarva.wings.android.zuboradiary.ui.mapper.getOnSurfaceVariantColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.numberPickerBottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
 abstract class BaseNumberPickersBottomSheetDialogFragment

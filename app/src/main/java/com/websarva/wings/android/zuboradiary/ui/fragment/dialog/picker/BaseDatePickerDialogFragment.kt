@@ -6,6 +6,7 @@ import android.util.Log
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.datepicker.MaterialDatePicker
+import com.websarva.wings.android.zuboradiary.ui.mapper.datePickerDialogThemeResId
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel

@@ -16,6 +16,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.ListBaseAdapte
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDayListBaseDiffUtilItemCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultDayListAdapter.WordSearchResultDayViewHolder
+import com.websarva.wings.android.zuboradiary.ui.mapper.getOnTertiaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getTertiaryContainerColor
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView

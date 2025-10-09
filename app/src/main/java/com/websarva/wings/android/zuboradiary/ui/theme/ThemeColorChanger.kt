@@ -13,6 +13,20 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.materialswitch.MaterialSwitch
+import com.websarva.wings.android.zuboradiary.ui.mapper.getErrorColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getOnPrimaryColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getOnPrimaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getOnSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getOnSurfaceColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getOnSurfaceVariantColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getOutlineColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getOutlineVariantColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getPrimaryColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getSurfaceColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getSurfaceContainerColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.getSurfaceContainerHighestColor
+import com.websarva.wings.android.zuboradiary.ui.mapper.isAppearanceLightStatusBars
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import java.util.function.Consumer
 

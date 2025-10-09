@@ -27,6 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.Permissio
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.mapper.asString
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
@@ -272,7 +273,7 @@ class SettingsFragment :
         launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.themeColor.filterNotNull()
                 .collectLatest { value: ThemeColorUi ->
-                    val strThemeColor = value.toSting(requireContext())
+                    val strThemeColor = value.asString(requireContext())
                     binding.includeThemeColorSetting.textValue.text = strThemeColor
                     switchViewColor(value)
                 }

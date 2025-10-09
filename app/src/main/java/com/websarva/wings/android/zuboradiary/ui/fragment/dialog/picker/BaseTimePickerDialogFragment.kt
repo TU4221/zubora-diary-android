@@ -8,6 +8,7 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
 import com.google.android.material.timepicker.TimeFormat
+import com.websarva.wings.android.zuboradiary.ui.mapper.timePickerDialogThemeResId
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel

@@ -4,6 +4,7 @@ import android.view.View
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
+import com.websarva.wings.android.zuboradiary.ui.mapper.asString
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
 class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
@@ -58,7 +59,7 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
         val themeColorList = arrayOfNulls<String>(maxNumThemeColors)
         for (item in ThemeColorUi.entries) {
             val ordinal = item.ordinal
-            themeColorList[ordinal] = item.toSting(requireContext())
+            themeColorList[ordinal] = item.asString(requireContext())
         }
         binding.numberPickerFirst.displayedValues = themeColorList
     }
