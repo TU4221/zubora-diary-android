@@ -26,15 +26,3 @@ internal val ConditionUi.stringResId: Int
 internal fun ConditionUi.asString(context: Context): String {
     return context.getString(this.stringResId)
 }
-
-// TODO:Spinnerを修正してから下記削除
-/**
- * ローカライズされた文字列から対応するConditionUi enumを取得する。
- *
- * @param context 文字列リソース解決のためのContext。
- * @param strCondition 変換元の文字列。
- * @return 対応するConditionUi。見つからない場合は例外をスローする。
- */
-internal fun conditionUiFromString(context: Context, strCondition: String): ConditionUi {
-    return ConditionUi.entries.first { it.asString(context) == strCondition }
-}

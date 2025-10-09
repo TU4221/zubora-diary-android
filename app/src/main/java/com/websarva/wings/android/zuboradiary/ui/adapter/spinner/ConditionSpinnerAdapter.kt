@@ -16,4 +16,16 @@ internal class ConditionSpinnerAdapter(
     ContextThemeWrapper(context, themeColor.themeResId),
     R.layout.layout_drop_down_list_item,
     ConditionUi.entries.toList().map { it.asString(context) }
-)
+) {
+
+    /**
+     * 指定された位置に対応する ConditionUi を返す。
+     *
+     * @param position 取得したいアイテムの位置。
+     * @return 指定された位置にある [ConditionUi] 。
+     * @throws IndexOutOfBoundsException 指定された位置が不正な場合にスローされる。
+     */
+    fun getConditionUiItem(position: Int): ConditionUi {
+        return ConditionUi.entries[position]
+    }
+}

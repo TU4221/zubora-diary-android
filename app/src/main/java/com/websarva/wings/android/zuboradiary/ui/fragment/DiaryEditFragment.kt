@@ -47,7 +47,6 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.WeatherSpinnerA
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.asString
 import com.websarva.wings.android.zuboradiary.ui.mapper.weatherUiFromString
-import com.websarva.wings.android.zuboradiary.ui.mapper.conditionUiFromString
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -428,19 +427,17 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
     // 気分入力欄。
     private fun setUpConditionInputField() {
-        binding.autoCompleteTextCondition
-            .setAdapter(
+        binding.autoCompleteTextCondition.apply {
+            setAdapter(
                 ConditionSpinnerAdapter(requireContext(), themeColor)
             )
-
-        binding.autoCompleteTextCondition.onItemClickListener =
-            OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                requireNotNull(parent)
-                val arrayAdapter = parent.adapter as ArrayAdapter<*>
-                val conditionString = arrayAdapter.getItem(position) as String
-                val condition = conditionUiFromString(requireContext(), conditionString)
-                mainViewModel.onConditionInputFieldItemClick(condition)
-            }
+            onItemClickListener =
+                OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
+                    val arrayAdapter = parent?.adapter as ConditionSpinnerAdapter
+                    val condition = arrayAdapter.getConditionUiItem(position)
+                    mainViewModel.onConditionInputFieldItemClick(condition)
+                }
+        }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.condition
