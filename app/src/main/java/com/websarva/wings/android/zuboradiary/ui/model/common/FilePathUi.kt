@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model
+package com.websarva.wings.android.zuboradiary.ui.model.common
 
 internal sealed class FilePathUi {
 

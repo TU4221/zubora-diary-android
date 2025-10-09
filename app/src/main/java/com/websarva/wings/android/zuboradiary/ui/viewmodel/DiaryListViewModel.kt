@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryIma
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi

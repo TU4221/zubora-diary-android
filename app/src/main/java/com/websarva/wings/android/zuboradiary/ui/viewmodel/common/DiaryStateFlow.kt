@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
-import com.websarva.wings.android.zuboradiary.ui.model.FilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
 import java.time.LocalDateTime
