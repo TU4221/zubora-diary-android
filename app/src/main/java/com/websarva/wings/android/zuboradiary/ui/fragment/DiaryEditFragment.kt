@@ -45,6 +45,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinnerAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.WeatherSpinnerAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
+import com.websarva.wings.android.zuboradiary.ui.mapper.asString
+import com.websarva.wings.android.zuboradiary.ui.mapper.weatherUiFromString
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
@@ -390,7 +392,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 requireNotNull(parent)
                 val arrayAdapter = parent.adapter as ArrayAdapter<*>
                 val weatherString = arrayAdapter.getItem(position) as String
-                val weather = WeatherUi.of(requireContext(), weatherString)
+                val weather = weatherUiFromString(requireContext(), weatherString)
                 mainViewModel.onWeather1InputFieldItemClick(weather)
             }
 
@@ -398,7 +400,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             mainViewModel.weather1
                 .collectLatest { value: WeatherUi ->
                     Log.d("20250428", "Weather collectLatest()")
-                    val strWeather = value.toString(requireContext())
+                    val strWeather = value.asString(requireContext())
                     binding.autoCompleteTextWeather1.setText(strWeather, false)
                     binding.autoCompleteTextWeather2
                         .setAdapter(WeatherSpinnerAdapter(requireContext(), themeColor, value))
@@ -410,14 +412,14 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 requireNotNull(parent)
                 val arrayAdapter = parent.adapter as ArrayAdapter<*>
                 val weatherString = arrayAdapter.getItem(position) as String
-                val weather = WeatherUi.of(requireContext(), weatherString)
+                val weather = weatherUiFromString(requireContext(), weatherString)
                 mainViewModel.onWeather2InputFieldItemClick(weather)
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.weather2
                 .collectLatest { value: WeatherUi ->
-                    val strWeather = value.toString(requireContext())
+                    val strWeather = value.asString(requireContext())
                     binding.autoCompleteTextWeather2.setText(strWeather, false)
                 }
         }
