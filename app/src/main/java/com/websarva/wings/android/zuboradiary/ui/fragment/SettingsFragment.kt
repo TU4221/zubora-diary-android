@@ -32,7 +32,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.utils.formatToHourMinuteString
+import com.websarva.wings.android.zuboradiary.ui.utils.formatHourMinuteString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.asCalendarStartDayOfWeekString
@@ -402,7 +402,7 @@ class SettingsFragment :
                         return@collectLatest
                     }
 
-                    val timeString = value.formatToHourMinuteString(requireContext())
+                    val timeString = value.formatHourMinuteString(requireContext())
                     binding.includeReminderNotificationSetting.textValue.text = timeString
                 }
         }

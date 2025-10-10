@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.utils.formatJapaneseDateString
+import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 
 class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
 
@@ -21,7 +21,7 @@ class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
     override fun createMessage(): String {
         val diaryDate =
             DiaryLoadFailureDialogFragmentArgs.fromBundle(requireArguments()).date
-        val diaryDateString = diaryDate.formatJapaneseDateString(requireContext())
+        val diaryDateString = diaryDate.formatDateString(requireContext())
         return diaryDateString + getString(R.string.dialog_diary_load_failure_message)
     }
 

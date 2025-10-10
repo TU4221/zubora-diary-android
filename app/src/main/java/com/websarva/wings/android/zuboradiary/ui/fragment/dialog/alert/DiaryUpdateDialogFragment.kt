@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.utils.formatJapaneseDateString
+import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 
 class DiaryUpdateDialogFragment : BaseAlertDialogFragment() {
 
@@ -20,7 +20,7 @@ class DiaryUpdateDialogFragment : BaseAlertDialogFragment() {
     override fun createMessage(): String {
         val updateDiaryDate =
             DiaryUpdateDialogFragmentArgs.fromBundle(requireArguments()).date
-        val updateDiaryDateString = updateDiaryDate.formatJapaneseDateString(requireContext())
+        val updateDiaryDateString = updateDiaryDate.formatDateString(requireContext())
         return updateDiaryDateString + getString(R.string.dialog_diary_update_message)
     }
 

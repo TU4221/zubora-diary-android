@@ -37,7 +37,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.utils.formatJapaneseDateString
+import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -469,7 +469,7 @@ class CalendarFragment :
     }
 
     private fun updateToolBarDate(date: LocalDate) {
-        val dateString = date.formatJapaneseDateString(requireContext())
+        val dateString = date.formatDateString(requireContext())
         binding.materialToolbarTopAppBar.title = dateString
     }
 

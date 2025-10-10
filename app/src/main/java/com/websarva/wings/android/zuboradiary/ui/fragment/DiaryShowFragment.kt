@@ -24,7 +24,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
-import com.websarva.wings.android.zuboradiary.ui.utils.formatJapaneseDateString
+import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -142,7 +142,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.date.filterNotNull()
                 .collectLatest { value: LocalDate ->
-                    val dateString = value.formatJapaneseDateString(requireContext())
+                    val dateString = value.formatDateString(requireContext())
                     binding.materialToolbarTopAppBar.title = dateString
                 }
         }
