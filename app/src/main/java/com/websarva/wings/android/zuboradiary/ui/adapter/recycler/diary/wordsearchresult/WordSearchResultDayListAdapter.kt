@@ -16,8 +16,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.ListBaseAdapte
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDayListBaseDiffUtilItemCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultDayListAdapter.WordSearchResultDayViewHolder
-import com.websarva.wings.android.zuboradiary.ui.utils.asOnTertiaryContainerColor
-import com.websarva.wings.android.zuboradiary.ui.utils.asTertiaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnTertiaryContainerColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asTertiaryContainerColorInt
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
@@ -136,8 +136,8 @@ internal class WordSearchResultDayListAdapter(
             val spannableString = SpannableString(string)
             var fromIndex = 0
             while (string.indexOf(targetWord, fromIndex) != -1) {
-                val textColor = themeColor.asOnTertiaryContainerColor(context.resources)
-                val backgroundColor = themeColor.asTertiaryContainerColor(context.resources)
+                val textColor = themeColor.asOnTertiaryContainerColorInt(context.resources)
+                val backgroundColor = themeColor.asTertiaryContainerColorInt(context.resources)
                 val backgroundColorSpan = BackgroundColorSpan(backgroundColor)
                 val foregroundColorSpan = ForegroundColorSpan(textColor)
                 val start = string.indexOf(targetWord, fromIndex)

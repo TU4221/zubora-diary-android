@@ -5,12 +5,12 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.utils.asOnSecondaryColor
-import com.websarva.wings.android.zuboradiary.ui.utils.asOnSecondaryContainerColor
-import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceColor
-import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryColor
-import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColor
-import com.websarva.wings.android.zuboradiary.ui.utils.asSurfaceColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSecondaryColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSecondaryContainerColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asSurfaceColorInt
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 
 internal class CalendarThemeColorChanger : ThemeColorChanger() {
@@ -18,16 +18,16 @@ internal class CalendarThemeColorChanger : ThemeColorChanger() {
     fun applyCalendarTodayColor(textDay: TextView, viewDot: View, themeColor: ThemeColorUi) {
         val resources = textDay.requireResources()
 
-        val color = themeColor.asSecondaryContainerColor(resources)
-        val onColor = themeColor.asOnSecondaryContainerColor(resources)
+        val color = themeColor.asSecondaryContainerColorInt(resources)
+        val onColor = themeColor.asOnSecondaryContainerColorInt(resources)
         applyCalendarDayColor(color, onColor, textDay, viewDot)
     }
 
     fun applyCalendarSelectedDayColor(textDay: TextView, viewDot: View, themeColor: ThemeColorUi) {
         val resources = textDay.requireResources()
 
-        val color = themeColor.asSecondaryColor(resources)
-        val onColor = themeColor.asOnSecondaryColor(resources)
+        val color = themeColor.asSecondaryColorInt(resources)
+        val onColor = themeColor.asOnSecondaryColorInt(resources)
         applyCalendarDayColor(color, onColor, textDay, viewDot)
     }
 
@@ -92,11 +92,11 @@ internal class CalendarThemeColorChanger : ThemeColorChanger() {
     }
 
     private fun getCalendarSurfaceColor(themeColor: ThemeColorUi, resources: Resources): Int {
-        return themeColor.asSurfaceColor(resources)
+        return themeColor.asSurfaceColorInt(resources)
     }
 
     private fun getOnWeekdaysColor(themeColor: ThemeColorUi, resources: Resources): Int {
-        return themeColor.asOnSurfaceColor(resources)
+        return themeColor.asOnSurfaceColorInt(resources)
     }
 
     private fun getOnSaturdayColor(resources: Resources): Int {

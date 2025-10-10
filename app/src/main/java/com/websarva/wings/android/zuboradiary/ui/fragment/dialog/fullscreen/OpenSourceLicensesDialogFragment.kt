@@ -16,8 +16,8 @@ import com.mikepenz.aboutlibraries.ui.compose.chipColors
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
-import com.websarva.wings.android.zuboradiary.ui.utils.asPrimaryColor
-import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asPrimaryColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColorInt
 
 class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<FragmentOpenSourceLicensesBinding>() {
 
@@ -58,10 +58,10 @@ class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<Fragm
                         modifier = Modifier.fillMaxSize(),
                         contentPadding = PaddingValues(16.dp),
                         colors = LibraryDefaults.libraryColors(
-                            backgroundColor = Color(themeColor.asSecondaryContainerColor(resources)),
-                            contentColor = Color(themeColor.asPrimaryColor(resources)),
+                            backgroundColor = Color(themeColor.asSecondaryContainerColorInt(resources)),
+                            contentColor = Color(themeColor.asPrimaryColorInt(resources)),
                             licenseChipColors = LibraryDefaults.chipColors(),
-                            dialogConfirmButtonColor = Color(themeColor.asPrimaryColor(resources))
+                            dialogConfirmButtonColor = Color(themeColor.asPrimaryColorInt(resources))
                         ),
                         // itemContentPadding と itemSpacing は padding や dimensions パラメータに統合されたか、
                         // LibraryDefaults 内で設定するようになった可能性があります。

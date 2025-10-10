@@ -1,9 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.theme
 
 import android.widget.TextView
-import com.websarva.wings.android.zuboradiary.ui.utils.asOnSecondaryContainerColor
-import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceVariantColor
-import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSecondaryContainerColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceVariantColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColorInt
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 
 internal class SettingsThemeColorChanger : ThemeColorChanger() {
@@ -12,8 +12,8 @@ internal class SettingsThemeColorChanger : ThemeColorChanger() {
         require(textViewList.isNotEmpty())
         val resources = textViewList.first().requireResources()
 
-        val color = themeColor.asSecondaryContainerColor(resources)
-        val onColor = themeColor.asOnSecondaryContainerColor(resources)
+        val color = themeColor.asSecondaryContainerColorInt(resources)
+        val onColor = themeColor.asOnSecondaryContainerColorInt(resources)
         applyTextViewsColor(textViewList, color, onColor)
     }
 
@@ -21,7 +21,7 @@ internal class SettingsThemeColorChanger : ThemeColorChanger() {
         require(textViewList.isNotEmpty())
         val resources = textViewList.first().requireResources()
 
-        val color = themeColor.asOnSurfaceVariantColor(resources)
+        val color = themeColor.asOnSurfaceVariantColorInt(resources)
         applyTextViewsColorOnlyIcon(textViewList, color)
     }
 }
