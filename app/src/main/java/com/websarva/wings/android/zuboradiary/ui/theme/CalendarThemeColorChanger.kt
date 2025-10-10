@@ -5,12 +5,12 @@ import android.view.View
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.mapper.getOnSecondaryColor
-import com.websarva.wings.android.zuboradiary.ui.mapper.getOnSecondaryContainerColor
-import com.websarva.wings.android.zuboradiary.ui.mapper.getOnSurfaceColor
-import com.websarva.wings.android.zuboradiary.ui.mapper.getSecondaryColor
-import com.websarva.wings.android.zuboradiary.ui.mapper.getSecondaryContainerColor
-import com.websarva.wings.android.zuboradiary.ui.mapper.getSurfaceColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getOnSecondaryColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getOnSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getOnSurfaceColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getSecondaryColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getSurfaceColor
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 
 internal class CalendarThemeColorChanger : ThemeColorChanger() {

@@ -1,9 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.theme
 
 import android.widget.TextView
-import com.websarva.wings.android.zuboradiary.ui.mapper.getOnSecondaryContainerColor
-import com.websarva.wings.android.zuboradiary.ui.mapper.getOnSurfaceVariantColor
-import com.websarva.wings.android.zuboradiary.ui.mapper.getSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getOnSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getOnSurfaceVariantColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getSecondaryContainerColor
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 
 internal class SettingsThemeColorChanger : ThemeColorChanger() {

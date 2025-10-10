@@ -16,8 +16,8 @@ import com.mikepenz.aboutlibraries.ui.compose.chipColors
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
-import com.websarva.wings.android.zuboradiary.ui.mapper.getPrimaryColor
-import com.websarva.wings.android.zuboradiary.ui.mapper.getSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getPrimaryColor
+import com.websarva.wings.android.zuboradiary.ui.utils.getSecondaryContainerColor
 
 class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<FragmentOpenSourceLicensesBinding>() {
 

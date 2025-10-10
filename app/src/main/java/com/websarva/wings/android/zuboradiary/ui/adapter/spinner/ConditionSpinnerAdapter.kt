@@ -5,8 +5,8 @@ import android.widget.ArrayAdapter
 import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
-import com.websarva.wings.android.zuboradiary.ui.mapper.asString
-import com.websarva.wings.android.zuboradiary.ui.mapper.themeResId
+import com.websarva.wings.android.zuboradiary.ui.utils.asString
+import com.websarva.wings.android.zuboradiary.ui.utils.themeResId
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 
 
