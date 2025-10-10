@@ -11,12 +11,15 @@ internal sealed interface AppMessage : Parcelable {
 
     @get:StringRes
     val dialogMessageStringResId: Int
+    
+    val dialogMessageArgs: List<Any>
+        get() = emptyList()
 
     fun getDialogTitle(context: Context): String {
         return context.getString(dialogTitleStringResId)
     }
 
     fun getDialogMessage(context: Context): String {
-        return context.getString(dialogMessageStringResId)
+        return context.getString(dialogMessageStringResId, dialogMessageArgs.toTypedArray())
     }
 }
