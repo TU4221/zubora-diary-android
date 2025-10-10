@@ -13,7 +13,6 @@ internal fun DayOfWeek.toCalendarStartDayOfWeekString(context: Context): String 
         DayOfWeek.THURSDAY -> R.string.day_of_week_name_thursday
         DayOfWeek.FRIDAY -> R.string.day_of_week_name_friday
         DayOfWeek.SATURDAY -> R.string.day_of_week_name_saturday
-        else -> throw IllegalArgumentException()
     }
     return context.getString(resId)
 }
@@ -27,7 +26,6 @@ internal fun DayOfWeek.toDiaryListDayOfWeekString(context: Context): String {
         DayOfWeek.THURSDAY -> R.string.day_of_week_short_name_thursday
         DayOfWeek.FRIDAY -> R.string.day_of_week_short_name_friday
         DayOfWeek.SATURDAY -> R.string.day_of_week_short_name_saturday
-        else -> throw IllegalArgumentException()
     }
     return context.getString(resId)
 }
