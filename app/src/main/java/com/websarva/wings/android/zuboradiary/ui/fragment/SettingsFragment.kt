@@ -35,7 +35,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.utils.formatToHourMinuteString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
-import com.websarva.wings.android.zuboradiary.ui.utils.toCalendarStartDayOfWeekString
+import com.websarva.wings.android.zuboradiary.ui.utils.asCalendarStartDayOfWeekString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -386,7 +386,7 @@ class SettingsFragment :
         launchAndRepeatOnViewLifeCycleStarted {
             settingsViewModel.calendarStartDayOfWeek.filterNotNull()
                 .collectLatest { value: DayOfWeek ->
-                    val strDayOfWeek = value.toCalendarStartDayOfWeekString(requireContext())
+                    val strDayOfWeek = value.asCalendarStartDayOfWeekString(requireContext())
                     binding.includeCalendarStartDaySetting.textValue.text = strDayOfWeek
                 }
         }

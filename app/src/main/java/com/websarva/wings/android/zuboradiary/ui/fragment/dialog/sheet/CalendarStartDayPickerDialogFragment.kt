@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPi
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.utils.toCalendarStartDayOfWeekString
+import com.websarva.wings.android.zuboradiary.ui.utils.asCalendarStartDayOfWeekString
 import java.time.DayOfWeek
 
 class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
@@ -78,7 +78,7 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
                 dayOfWeek.value
             }
             dayOfWeekList[dayOfWeekNumber] =
-                dayOfWeek.toCalendarStartDayOfWeekString(requireContext())
+                dayOfWeek.asCalendarStartDayOfWeekString(requireContext())
         }
         binding.numberPickerFirst.displayedValues = dayOfWeekList
     }

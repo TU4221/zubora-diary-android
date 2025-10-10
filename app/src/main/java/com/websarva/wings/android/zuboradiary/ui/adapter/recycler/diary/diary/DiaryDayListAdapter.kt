@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeSimpl
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDayListBaseDiffUtilItemCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryDayListAdapter.DiaryDayListViewHolder
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
+import com.websarva.wings.android.zuboradiary.ui.utils.asDiaryListDayOfWeekString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 import java.text.NumberFormat
 
@@ -107,7 +107,7 @@ internal class DiaryDayListAdapter
         ) {
             val date = item.date
             val context = binding.root.context
-            val strDayOfWeek = date.dayOfWeek.toDiaryListDayOfWeekString(context)
+            val strDayOfWeek = date.dayOfWeek.asDiaryListDayOfWeekString(context)
             val imageFilePath = item.imageFilePath
             binding.includeDay.textDayOfWeek.text = strDayOfWeek
             binding.includeDay.textDayOfMonth.text =

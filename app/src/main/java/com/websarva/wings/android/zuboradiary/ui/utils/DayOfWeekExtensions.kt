@@ -4,7 +4,7 @@ import android.content.Context
 import com.websarva.wings.android.zuboradiary.R
 import java.time.DayOfWeek
 
-internal fun DayOfWeek.toCalendarStartDayOfWeekString(context: Context): String {
+internal fun DayOfWeek.asCalendarStartDayOfWeekString(context: Context): String {
     val resId = when (this) {
         DayOfWeek.SUNDAY -> R.string.day_of_week_name_sunday
         DayOfWeek.MONDAY -> R.string.day_of_week_name_monday
@@ -17,7 +17,7 @@ internal fun DayOfWeek.toCalendarStartDayOfWeekString(context: Context): String 
     return context.getString(resId)
 }
 
-internal fun DayOfWeek.toDiaryListDayOfWeekString(context: Context): String {
+internal fun DayOfWeek.asDiaryListDayOfWeekString(context: Context): String {
     val resId = when (this) {
         DayOfWeek.SUNDAY -> R.string.day_of_week_short_name_sunday
         DayOfWeek.MONDAY -> R.string.day_of_week_short_name_monday

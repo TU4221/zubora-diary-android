@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsear
 import com.websarva.wings.android.zuboradiary.ui.utils.asOnTertiaryContainerColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asTertiaryContainerColorInt
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.utils.toDiaryListDayOfWeekString
+import com.websarva.wings.android.zuboradiary.ui.utils.asDiaryListDayOfWeekString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 import java.text.NumberFormat
 
@@ -93,7 +93,7 @@ internal class WordSearchResultDayListAdapter(
             val context = binding.root.context
             binding.apply {
                 val date = item.date
-                val dayOfWeekString = date.dayOfWeek.toDiaryListDayOfWeekString(context)
+                val dayOfWeekString = date.dayOfWeek.asDiaryListDayOfWeekString(context)
                 includeDay.textDayOfWeek.text = dayOfWeekString
                 includeDay.textDayOfMonth.text = NumberFormat.getInstance().format(date.dayOfMonth)
 
