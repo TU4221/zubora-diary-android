@@ -12,8 +12,6 @@ internal sealed class CalendarAppMessage : AppMessage {
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_calendar_app_message_diary_load_failure
-
-        private fun readResolve(): Any = DiaryLoadFailure
     }
 
     data object DiaryInfoLoadFailure : CalendarAppMessage() {
@@ -21,8 +19,6 @@ internal sealed class CalendarAppMessage : AppMessage {
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_calendar_app_message_diary_info_load_failure
-
-        private fun readResolve(): Any = DiaryInfoLoadFailure
     }
 
 }

@@ -12,8 +12,6 @@ internal sealed class DiaryListAppMessage : AppMessage {
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_diary_list_app_message_diary_list_load_failure
-
-        private fun readResolve(): Any = DiaryListLoadFailure
     }
 
     data object DiaryDeleteFailure : DiaryListAppMessage() {
@@ -21,8 +19,6 @@ internal sealed class DiaryListAppMessage : AppMessage {
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_diary_list_app_message_diary_delete_failure
-
-        private fun readResolve(): Any = DiaryDeleteFailure
     }
 
     data object DiaryImageDeleteFailure : DiaryListAppMessage() {
@@ -30,8 +26,6 @@ internal sealed class DiaryListAppMessage : AppMessage {
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_diary_list_app_message_diary_image_delete_failure
-
-        private fun readResolve(): Any = DiaryImageDeleteFailure
     }
 
     data object DiaryInfoLoadFailure : DiaryListAppMessage() {
@@ -39,7 +33,5 @@ internal sealed class DiaryListAppMessage : AppMessage {
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_diary_list_app_message_diary_info_load_failure
-
-        private fun readResolve(): Any = DiaryInfoLoadFailure
     }
 }
