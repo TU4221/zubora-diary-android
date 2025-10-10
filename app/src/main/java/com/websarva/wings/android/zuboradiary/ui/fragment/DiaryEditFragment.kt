@@ -47,7 +47,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
-import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
+import com.websarva.wings.android.zuboradiary.ui.utils.formatJapaneseDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -361,7 +361,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.originalDiaryDate
                 .collectLatest { value: LocalDate? ->
-                    val dateString = value?.toJapaneseDateString(requireContext())
+                    val dateString = value?.formatJapaneseDateString(requireContext())
                     mainViewModel.onOriginalDiaryDateChanged(dateString)
                 }
         }
@@ -374,7 +374,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 .collectLatest { value: LocalDate ->
                     if (mainViewModel.isTesting) return@collectLatest
 
-                    val dateString = value.toJapaneseDateString(requireContext())
+                    val dateString = value.formatJapaneseDateString(requireContext())
                     binding.textInputEditTextDate.setText(dateString)
                 }
         }

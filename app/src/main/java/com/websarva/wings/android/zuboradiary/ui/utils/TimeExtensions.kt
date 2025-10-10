@@ -7,13 +7,13 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-internal fun LocalDate.toJapaneseDateString(context: Context): String {
+internal fun LocalDate.formatJapaneseDateString(context: Context): String {
     val dateFormatPattern = context.getString(R.string.local_date_format_pattern_japanese_date)
     val dateFormatter = DateTimeFormatter.ofPattern(dateFormatPattern)
     return this.format(dateFormatter)
 }
 
-internal fun LocalDateTime.toJapaneseDateTimeWithSecondsString(context: Context): String {
+internal fun LocalDateTime.formatJapaneseDateTimeWithSecondsString(context: Context): String {
     val dateTimeFormatPattern = context.getString(R.string.local_date_time_format_pattern_japanese_date_time_with_seconds)
     val dateTimeFormatter = DateTimeFormatter.ofPattern(dateTimeFormatPattern)
     return this.format(dateTimeFormatter)

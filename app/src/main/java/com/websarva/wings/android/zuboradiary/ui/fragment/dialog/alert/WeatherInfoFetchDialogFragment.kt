@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
+import com.websarva.wings.android.zuboradiary.ui.utils.formatJapaneseDateString
 
 class WeatherInfoFetchDialogFragment : BaseAlertDialogFragment() {
 
@@ -20,7 +20,7 @@ class WeatherInfoFetchDialogFragment : BaseAlertDialogFragment() {
     override fun createMessage(): String {
         val date =
             WeatherInfoFetchDialogFragmentArgs.fromBundle(requireArguments()).date
-        val dateString = date.toJapaneseDateString(requireContext())
+        val dateString = date.formatJapaneseDateString(requireContext())
         return dateString + getString(R.string.dialog_weather_info_fetch_message)
     }
 

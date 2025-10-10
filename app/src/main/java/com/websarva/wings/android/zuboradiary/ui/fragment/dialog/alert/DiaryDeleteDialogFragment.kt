@@ -4,7 +4,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.utils.toJapaneseDateString
+import com.websarva.wings.android.zuboradiary.ui.utils.formatJapaneseDateString
 
 class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
 
@@ -20,7 +20,7 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
     override fun createMessage(): String {
         val diaryDate =
             DiaryDeleteDialogFragmentArgs.fromBundle(requireArguments()).date
-        val diaryDateString = diaryDate.toJapaneseDateString(requireContext())
+        val diaryDateString = diaryDate.formatJapaneseDateString(requireContext())
         return diaryDateString + getString(R.string.dialog_diary_delete_message)
     }
 
