@@ -7,7 +7,7 @@ import androidx.core.content.res.ResourcesCompat
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 
-//region ThemeColorString
+//region StringConverter
 /**
  * ThemeColorUi enumに対応する文字列リソースIDを取得する拡張プロパティ。
  */
@@ -29,7 +29,7 @@ internal fun ThemeColorUi.asString(context: Context): String {
 }
 //endregion
 
-//region ThemeResProperties
+//region ResourceProperties
 /**
  * ステータスバーのアイコン等を明るい色で表示するべきか (背景が暗い色か) を示す。
  */
@@ -137,8 +137,8 @@ internal val ThemeColorUi.bottomSheetDialogThemeResId: Int
     }
 //endregion
 
-//region ThemeColorValue
-internal fun ThemeColorUi.getPrimaryColor(resources: Resources): Int {
+//region ColorValueConverter
+internal fun ThemeColorUi.asPrimaryColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_primary
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_primary
@@ -150,7 +150,7 @@ internal fun ThemeColorUi.getPrimaryColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getOnPrimaryColor(resources: Resources): Int {
+internal fun ThemeColorUi.asOnPrimaryColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onPrimary
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_onPrimary
@@ -162,7 +162,7 @@ internal fun ThemeColorUi.getOnPrimaryColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getOnPrimaryContainerColor(resources: Resources): Int {
+internal fun ThemeColorUi.asOnPrimaryContainerColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onPrimaryContainer
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_onPrimaryContainer
@@ -174,7 +174,7 @@ internal fun ThemeColorUi.getOnPrimaryContainerColor(resources: Resources): Int 
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getSecondaryColor(resources: Resources): Int {
+internal fun ThemeColorUi.asSecondaryColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_secondary
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_secondary
@@ -186,7 +186,7 @@ internal fun ThemeColorUi.getSecondaryColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getOnSecondaryColor(resources: Resources): Int {
+internal fun ThemeColorUi.asOnSecondaryColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onSecondary
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_onSecondary
@@ -198,7 +198,7 @@ internal fun ThemeColorUi.getOnSecondaryColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getSecondaryContainerColor(resources: Resources): Int {
+internal fun ThemeColorUi.asSecondaryContainerColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_secondaryContainer
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_secondaryContainer
@@ -210,7 +210,7 @@ internal fun ThemeColorUi.getSecondaryContainerColor(resources: Resources): Int 
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getOnSecondaryContainerColor(resources: Resources): Int {
+internal fun ThemeColorUi.asOnSecondaryContainerColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onSecondaryContainer
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_onSecondaryContainer
@@ -222,7 +222,7 @@ internal fun ThemeColorUi.getOnSecondaryContainerColor(resources: Resources): In
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getTertiaryContainerColor(resources: Resources): Int {
+internal fun ThemeColorUi.asTertiaryContainerColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_tertiaryContainer
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_tertiaryContainer
@@ -234,7 +234,7 @@ internal fun ThemeColorUi.getTertiaryContainerColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getOnTertiaryContainerColor(resources: Resources): Int {
+internal fun ThemeColorUi.asOnTertiaryContainerColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onTertiaryContainer
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_onTertiaryContainer
@@ -246,7 +246,7 @@ internal fun ThemeColorUi.getOnTertiaryContainerColor(resources: Resources): Int
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getSurfaceColor(resources: Resources): Int {
+internal fun ThemeColorUi.asSurfaceColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_surface
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_surface
@@ -258,7 +258,7 @@ internal fun ThemeColorUi.getSurfaceColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getSurfaceContainerColor(resources: Resources): Int {
+internal fun ThemeColorUi.asSurfaceContainerColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_surfaceContainer
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_surfaceContainer
@@ -270,7 +270,7 @@ internal fun ThemeColorUi.getSurfaceContainerColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getSurfaceContainerHighestColor(resources: Resources): Int {
+internal fun ThemeColorUi.asSurfaceContainerHighestColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_surfaceContainerHighest
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_surfaceContainerHighest
@@ -282,7 +282,7 @@ internal fun ThemeColorUi.getSurfaceContainerHighestColor(resources: Resources):
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getOnSurfaceColor(resources: Resources): Int {
+internal fun ThemeColorUi.asOnSurfaceColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onSurface
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_onSurface
@@ -294,7 +294,7 @@ internal fun ThemeColorUi.getOnSurfaceColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getOnSurfaceVariantColor(resources: Resources): Int {
+internal fun ThemeColorUi.asOnSurfaceVariantColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onSurfaceVariant
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_onSurfaceVariant
@@ -306,7 +306,7 @@ internal fun ThemeColorUi.getOnSurfaceVariantColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getOutlineColor(resources: Resources): Int {
+internal fun ThemeColorUi.asOutlineColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_outline
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_outline
@@ -318,7 +318,7 @@ internal fun ThemeColorUi.getOutlineColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getOutlineVariantColor(resources: Resources): Int {
+internal fun ThemeColorUi.asOutlineVariantColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_outlineVariant
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_outlineVariant
@@ -330,7 +330,7 @@ internal fun ThemeColorUi.getOutlineVariantColor(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
-internal fun ThemeColorUi.getErrorColor(resources: Resources): Int {
+internal fun ThemeColorUi.asErrorColor(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_error
         ThemeColorUi.BLACK -> R.color.md_theme_color_black_error

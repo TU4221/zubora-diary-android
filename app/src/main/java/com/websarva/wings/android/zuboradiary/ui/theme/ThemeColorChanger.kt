@@ -13,19 +13,19 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.divider.MaterialDivider
 import com.google.android.material.materialswitch.MaterialSwitch
-import com.websarva.wings.android.zuboradiary.ui.utils.getErrorColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getOnPrimaryColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getOnPrimaryContainerColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getOnSecondaryContainerColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getOnSurfaceColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getOnSurfaceVariantColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getOutlineColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getOutlineVariantColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getPrimaryColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getSecondaryContainerColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getSurfaceColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getSurfaceContainerColor
-import com.websarva.wings.android.zuboradiary.ui.utils.getSurfaceContainerHighestColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asErrorColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnPrimaryColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnPrimaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceVariantColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOutlineColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOutlineVariantColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asPrimaryColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asSurfaceColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asSurfaceContainerColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asSurfaceContainerHighestColor
 import com.websarva.wings.android.zuboradiary.ui.utils.isAppearanceLightStatusBars
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import java.util.function.Consumer
@@ -44,7 +44,7 @@ internal open class ThemeColorChanger {
 
     fun applyBackgroundColor(view: View, themeColor: ThemeColorUi) {
         val resources = view.requireResources()
-        val surfaceColor = themeColor.getSurfaceColor(resources)
+        val surfaceColor = themeColor.asSurfaceColor(resources)
         applyViewColor(view, surfaceColor)
     }
 
@@ -52,7 +52,7 @@ internal open class ThemeColorChanger {
         require(textViewList.isNotEmpty())
 
         val resources = textViewList.first().requireResources()
-        val onSurfaceColor = themeColor.getOnSurfaceColor(resources)
+        val onSurfaceColor = themeColor.asOnSurfaceColor(resources)
         applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
     }
 
@@ -60,7 +60,7 @@ internal open class ThemeColorChanger {
         require(textViewList.isNotEmpty())
 
         val resources = textViewList.first().requireResources()
-        val onSurfaceColor = themeColor.getErrorColor(resources)
+        val onSurfaceColor = themeColor.asErrorColor(resources)
         applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
     }
 
@@ -93,7 +93,7 @@ internal open class ThemeColorChanger {
     ) {
         val resources = bottomNavigationView.requireResources()
 
-        val color = themeColor.getSurfaceContainerColor(resources)
+        val color = themeColor.asSurfaceContainerColor(resources)
         bottomNavigationView.backgroundTintList = ColorStateList.valueOf(color)
     }
 
@@ -103,8 +103,8 @@ internal open class ThemeColorChanger {
     ) {
         val resources = bottomNavigationView.requireResources()
 
-        val checkedColor = themeColor.getPrimaryColor(resources)
-        val unCheckedColor = themeColor.getOnSurfaceVariantColor(resources)
+        val checkedColor = themeColor.asPrimaryColor(resources)
+        val unCheckedColor = themeColor.asOnSurfaceVariantColor(resources)
         val colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
         bottomNavigationView.itemRippleColor = colorStateList
     }
@@ -115,8 +115,8 @@ internal open class ThemeColorChanger {
     ) {
         val resources = bottomNavigationView.requireResources()
 
-        val checkedColor = themeColor.getOnSurfaceColor(resources)
-        val unCheckedColor = themeColor.getOnSurfaceVariantColor(resources)
+        val checkedColor = themeColor.asOnSurfaceColor(resources)
+        val unCheckedColor = themeColor.asOnSurfaceVariantColor(resources)
         val colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
         bottomNavigationView.itemTextColor = colorStateList
     }
@@ -127,8 +127,8 @@ internal open class ThemeColorChanger {
     ) {
         val resources = bottomNavigationView.requireResources()
 
-        val checkedColor = themeColor.getOnSecondaryContainerColor(resources)
-        val unCheckedColor = themeColor.getOnSurfaceVariantColor(resources)
+        val checkedColor = themeColor.asOnSecondaryContainerColor(resources)
+        val unCheckedColor = themeColor.asOnSurfaceVariantColor(resources)
         val colorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
         bottomNavigationView.itemIconTintList = colorStateList
     }
@@ -139,7 +139,7 @@ internal open class ThemeColorChanger {
     ) {
         val resources = bottomNavigationView.requireResources()
 
-        val secondaryContainerColor = themeColor.getSecondaryContainerColor(resources)
+        val secondaryContainerColor = themeColor.asSecondaryContainerColor(resources)
         bottomNavigationView.itemActiveIndicatorColor =
             ColorStateList.valueOf(secondaryContainerColor)
     }
@@ -147,9 +147,9 @@ internal open class ThemeColorChanger {
     fun applyToolbarColor(toolbar: MaterialToolbar, themeColor: ThemeColorUi, appBarLayout: AppBarLayout? = null) {
         val resources = toolbar.requireResources()
 
-        val surfaceColor = themeColor.getSurfaceColor(resources)
-        val onSurfaceColor = themeColor.getOnSurfaceColor(resources)
-        val onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(resources)
+        val surfaceColor = themeColor.asSurfaceColor(resources)
+        val onSurfaceColor = themeColor.asOnSurfaceColor(resources)
+        val onSurfaceVariantColor = themeColor.asOnSurfaceVariantColor(resources)
         toolbar.setBackgroundColor(surfaceColor)
         toolbar.setTitleTextColor(onSurfaceColor)
         applyToolbarMenuColor(toolbar, onSurfaceColor)
@@ -195,8 +195,8 @@ internal open class ThemeColorChanger {
         require(switchList.isNotEmpty())
         val resources = switchList.first().requireResources()
 
-        val checkedColor = themeColor.getOnPrimaryColor(resources)
-        val unCheckedColor = themeColor.getOutlineColor(resources)
+        val checkedColor = themeColor.asOnPrimaryColor(resources)
+        val unCheckedColor = themeColor.asOutlineColor(resources)
         val thumbColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
         switchList.forEach(Consumer { x: MaterialSwitch ->
             x.thumbTintList = thumbColorStateList
@@ -207,8 +207,8 @@ internal open class ThemeColorChanger {
         require(switchList.isNotEmpty())
         val resources = switchList.first().requireResources()
 
-        val checkedColor = themeColor.getOnPrimaryContainerColor(resources)
-        val unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources)
+        val checkedColor = themeColor.asOnPrimaryContainerColor(resources)
+        val unCheckedColor = themeColor.asSurfaceContainerHighestColor(resources)
         val thumbIconColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
         switchList.forEach(Consumer { x: MaterialSwitch ->
             x.thumbIconTintList = thumbIconColorStateList
@@ -219,8 +219,8 @@ internal open class ThemeColorChanger {
         require(switchList.isNotEmpty())
         val resources = switchList.first().requireResources()
 
-        val checkedColor = themeColor.getPrimaryColor(resources)
-        val unCheckedColor = themeColor.getSurfaceContainerHighestColor(resources)
+        val checkedColor = themeColor.asPrimaryColor(resources)
+        val unCheckedColor = themeColor.asSurfaceContainerHighestColor(resources)
         val trackColorStateList = createCheckedColorStateList(checkedColor, unCheckedColor)
         switchList.forEach(Consumer { x: MaterialSwitch ->
             x.trackTintList = trackColorStateList
@@ -231,7 +231,7 @@ internal open class ThemeColorChanger {
         require(dividerList.isNotEmpty())
         val resources = dividerList.first().requireResources()
 
-        val color = themeColor.getOutlineVariantColor(resources)
+        val color = themeColor.asOutlineVariantColor(resources)
         dividerList.forEach(Consumer { x: MaterialDivider ->
             x.dividerColor = color
         })

@@ -9,7 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
-import com.websarva.wings.android.zuboradiary.ui.utils.getOnSurfaceVariantColor
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceVariantColor
 import com.websarva.wings.android.zuboradiary.ui.utils.numberPickerBottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 
@@ -61,7 +61,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     // HACK:NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
     private fun setUpNumberPickerTextColor(binding: DialogFragmentNumberPickersBinding) {
         if (Build.VERSION.SDK_INT >= 29) {
-            val onSurfaceVariantColor = themeColor.getOnSurfaceVariantColor(resources)
+            val onSurfaceVariantColor = themeColor.asOnSurfaceVariantColor(resources)
             binding.apply {
                 numberPickerFirst.textColor = onSurfaceVariantColor
                 numberPickerSecond.textColor = onSurfaceVariantColor
