@@ -83,4 +83,21 @@ internal sealed class DiaryEditAppMessage : AppMessage {
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_image_load_insufficient_storage_failure
     }
+
+    class Unexpected(val exception: Exception) : DiaryEditAppMessage() {
+        @IgnoredOnParcel
+        private val delegate = UnexpectedMessageDelegate(exception)
+
+        @IgnoredOnParcel
+        override val dialogTitleStringResId: Int
+            get() = delegate.dialogTitleStringResId
+
+        @IgnoredOnParcel
+        override val dialogMessageStringResId: Int
+            get() = delegate.dialogMessageStringResId
+
+        @IgnoredOnParcel
+        override val dialogMessageArgs: List<Any>
+            get() = delegate.dialogMessageArgs
+    }
 }

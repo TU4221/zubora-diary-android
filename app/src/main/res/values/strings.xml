@@ -283,12 +283,15 @@
     <string name="dialog_app_message_title_connection_error">通信エラー</string>
     <string name="dialog_app_message_title_permission_request">権限が必要です</string>
     <string name="dialog_app_message_title_hint">ヒント</string>
+    <string name="dialog_app_message_title_unexpected_error">予期せぬエラー</string>
     <!-- AppMessageCommonMessage -->
     <string name="dialog_app_message_diary_load_failure">日記の読込に失敗しました。</string>
     <string name="dialog_app_message_diary_delete_failure">日記の削除に失敗しました。</string>
     <string name="dialog_app_message_diary_image_delete_failure">日記の削除には成功しましたが、添付画像ファイルの削除に失敗しました。</string>
     <string name="dialog_app_message_diary_info_load_failure">日記情報の読込に失敗しました。</string>
     <string name="dialog_app_message_setting_load_failure">設定の読込に失敗しました。</string>
+    <string name="dialog_app_message_unexpected_error">予期せぬ問題が発生しました。時間をおいてもう一度お試しください。</string>
+    <string name="dialog_app_message_developer_unexpected_error">開発者向けメッセージ:\n予期せぬ例外が発生しました。\n\nエラーコード: %s</string>
     <!-- DiaryListAppMessage -->
     <string name="dialog_diary_list_app_message_diary_list_load_failure">日記リストの読込に失敗しました。</string>
     <string name="dialog_diary_list_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>

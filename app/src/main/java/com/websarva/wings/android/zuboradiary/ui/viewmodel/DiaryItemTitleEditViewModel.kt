@@ -8,6 +8,8 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleS
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryDeleteException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputTextUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -107,16 +109,20 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
+    override fun createUnexpectedAppMessage(e: Exception): DiaryItemTitleEditAppMessage {
+        return DiaryItemTitleEditAppMessage.Unexpected(e)
+    }
+
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
     }
 
     // Viewクリック処理
     fun onNavigationIconClick() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
     }
@@ -124,7 +130,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     fun onNewDiaryItemTitleSelectionButtonClick() {
         val itemNumber = _itemNumber.requireValue()
         val itemTitle = _itemTitle.value
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             completeItemTitleEdit(itemNumber, itemTitle = itemTitle)
         }
     }
@@ -133,7 +139,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val itemNumber = _itemNumber.requireValue()
         val itemId = item.id
         val itemTitle = item.title
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             completeItemTitleEdit(
                 itemNumber,
                 DiaryItemTitleSelectionHistoryId(itemId),
@@ -145,7 +151,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     fun onDiaryItemTitleSelectionHistoryListItemSwipe(item: DiaryItemTitleSelectionHistoryListItemUi) {
         val itemId = item.id
         val itemTitle = item.title
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             updatePendingHistoryItemDeleteParameters(
                 DiaryItemTitleSelectionHistoryId(itemId),
                 DiaryItemTitle(itemTitle)
@@ -188,7 +194,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private fun handleDiaryItemTitleSelectionHistoryDeleteDialogPositiveResult(
         parameters: HistoryItemDeleteParameters?
     ) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             parameters?.let {
                 deleteDiaryItemTitleSelectionHistory(it.itemId, it.itemTitle)
             }
@@ -196,7 +202,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private fun handleDiaryItemTitleSelectionHistoryDeleteDialogNegativeResult() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 DiaryItemTitleEditEvent.CloseSwipedItem
             )
@@ -227,9 +233,16 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                             it.value.toUiModel()
                         }
                         is UseCaseResult.Failure -> {
-                            emitAppMessageEvent(
-                                DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadFailure
-                            )
+                            when (it.exception) {
+                                is DiaryItemTitleSelectionHistoryLoadException.LoadFailure -> {
+                                    emitAppMessageEvent(
+                                        DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadFailure
+                                    )
+                                }
+                                is DiaryItemTitleSelectionHistoryLoadException.Unknown -> {
+                                    emitUnexpectedAppMessage(it.exception)
+                                }
+                            }
                             initialItemTitleSelectionHistoryList
                         }
                     }
@@ -283,7 +296,14 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗")
-                emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)
+                when (result.exception) {
+                    is DiaryItemTitleSelectionHistoryDeleteException.DeleteFailure -> {
+                        emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)
+                    }
+                    is DiaryItemTitleSelectionHistoryDeleteException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }

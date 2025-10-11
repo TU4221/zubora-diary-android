@@ -34,4 +34,21 @@ internal sealed class DiaryListAppMessage : AppMessage {
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_diary_list_app_message_diary_info_load_failure
     }
+
+    class Unexpected(val exception: Exception) : DiaryListAppMessage() {
+        @IgnoredOnParcel
+        private val delegate = UnexpectedMessageDelegate(exception)
+
+        @IgnoredOnParcel
+        override val dialogTitleStringResId: Int
+            get() = delegate.dialogTitleStringResId
+
+        @IgnoredOnParcel
+        override val dialogMessageStringResId: Int
+            get() = delegate.dialogMessageStringResId
+
+        @IgnoredOnParcel
+        override val dialogMessageArgs: List<Any>
+            get() = delegate.dialogMessageArgs
+    }
 }

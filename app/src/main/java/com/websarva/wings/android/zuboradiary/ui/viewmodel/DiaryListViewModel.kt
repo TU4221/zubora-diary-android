@@ -16,6 +16,10 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryList
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshDiaryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListAdditionLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListNewLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListRefreshException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
@@ -100,7 +104,7 @@ internal class DiaryListViewModel @Inject constructor(
         if (uiState.value != DiaryListState.Idle) return
 
         val currentList = _diaryList.value
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             val logMsg = "日記リスト準備"
             Log.i(logTag, "${logMsg}_開始")
             try {
@@ -112,7 +116,7 @@ internal class DiaryListViewModel @Inject constructor(
                 Log.e(logTag, "${logMsg}_失敗", e)
                 updateUiStateOnDiaryListLoadCompleted(currentList)
                 emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
-                return@launch
+                return@launchWithUnexpectedErrorHandler
             }
             Log.i(logTag, "${logMsg}_完了")
         }
@@ -138,25 +142,29 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
+    override fun createUnexpectedAppMessage(e: Exception): DiaryListAppMessage {
+        return DiaryListAppMessage.Unexpected(e)
+    }
+
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         // MEMO:DiaListFragmentはスタートフラグメントに該当するため、
         //      BaseFragmentでOnBackPressedCallbackを登録せずにNavigation機能のデフォルト戻る機能を使用する。
         //      そのため、本メソッドは呼び出されない。
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
     }
 
     // Viewクリック処理
     fun onWordSearchMenuClick() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(DiaryListEvent.NavigateWordSearchFragment)
         }
     }
 
     fun onNavigationIconClick() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             val dateRange = loadSavedDiaryDateRange()
             val newestDiaryDate = dateRange.newestDiaryDate
             val oldestDiaryDate = dateRange.oldestDiaryDate
@@ -171,7 +179,7 @@ internal class DiaryListViewModel @Inject constructor(
     fun onDiaryListItemClick(item: DiaryDayListItemUi.Standard) {
         val id = item.id
         val date = item.date
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(DiaryListEvent.NavigateDiaryShowFragment(id, date))
         }
     }
@@ -181,7 +189,7 @@ internal class DiaryListViewModel @Inject constructor(
 
         val id = item.id
         val date = item.date
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             updatePendingDiaryDeleteParameters(
                 DiaryId(id)
             )
@@ -192,7 +200,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     fun onDiaryEditButtonClick() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             val today = LocalDate.now()
             emitUiEvent(DiaryListEvent.NavigateDiaryEditFragment(date = today))
         }
@@ -206,7 +214,7 @@ internal class DiaryListViewModel @Inject constructor(
         val currentList = _diaryList.value
         cancelPreviousLoadJob()
         diaryListLoadJob =
-            viewModelScope.launch {
+            launchWithUnexpectedErrorHandler {
                 loadAdditionDiaryList(currentList)
             }
     }
@@ -234,7 +242,7 @@ internal class DiaryListViewModel @Inject constructor(
         val currentList = _diaryList.value
         cancelPreviousLoadJob()
         diaryListLoadJob =
-            viewModelScope.launch {
+            launchWithUnexpectedErrorHandler {
                 refreshDiaryList(currentList)
             }
     }
@@ -261,7 +269,7 @@ internal class DiaryListViewModel @Inject constructor(
         val currentList = _diaryList.value
         cancelPreviousLoadJob()
         diaryListLoadJob =
-            viewModelScope.launch {
+            launchWithUnexpectedErrorHandler {
                 loadNewDiaryList(currentList)
             }
     }
@@ -282,7 +290,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters?) {
         val currentList = _diaryList.value
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             parameters?.let {
                 deleteDiary(it.id, currentList)
             } ?: throw IllegalStateException()
@@ -298,41 +306,75 @@ internal class DiaryListViewModel @Inject constructor(
     private suspend fun loadNewDiaryList(currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
         loadDiaryList(
             DiaryListState.LoadingNewDiaryList,
-            currentList
-        ) { _ ->
-            showDiaryListFirstItemProgressIndicator()
-            loadNewDiaryListUseCase(sortConditionDate)
-        }
+            currentList,
+            { _ ->
+                showDiaryListFirstItemProgressIndicator()
+                loadNewDiaryListUseCase(sortConditionDate)
+            },
+            { exception ->
+                when (exception) {
+                    is DiaryListNewLoadException.LoadFailure -> {
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
+                    }
+                    is DiaryListNewLoadException.Unknown -> {
+                        emitUnexpectedAppMessage(exception)
+                    }
+                }
+            }
+        )
     }
 
     private suspend fun loadAdditionDiaryList(currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
         loadDiaryList(
             DiaryListState.LoadingAdditionDiaryList,
-            currentList
-        ) { lambdaCurrentList ->
-            require(lambdaCurrentList.isNotEmpty)
+            currentList,
+            { lambdaCurrentList ->
+                require(lambdaCurrentList.isNotEmpty)
 
-            loadAdditionDiaryListUseCase(
-                lambdaCurrentList.toDomainModel(),
-                sortConditionDate
-            )
-        }
+                loadAdditionDiaryListUseCase(
+                    lambdaCurrentList.toDomainModel(),
+                    sortConditionDate
+                )
+            },
+            { exception ->
+                when (exception) {
+                    is DiaryListAdditionLoadException.LoadFailure -> {
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
+                    }
+                    is DiaryListAdditionLoadException.Unknown -> {
+                        emitUnexpectedAppMessage(exception)
+                    }
+                }
+            }
+        )
     }
 
     private suspend fun refreshDiaryList(currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
         loadDiaryList(
             DiaryListState.UpdatingDiaryList,
-            currentList
-        ) { lambdaCurrentList ->
-            refreshDiaryListUseCase(lambdaCurrentList.toDomainModel(), sortConditionDate)
-        }
+            currentList,
+            { lambdaCurrentList ->
+                refreshDiaryListUseCase(lambdaCurrentList.toDomainModel(), sortConditionDate)
+            },
+            { exception ->
+                when (exception) {
+                    is DiaryListRefreshException.RefreshFailure -> {
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
+                    }
+                    is DiaryListRefreshException.Unknown -> {
+                        emitUnexpectedAppMessage(exception)
+                    }
+                }
+            }
+        )
     }
 
-    private suspend fun loadDiaryList(
+    private suspend fun <E : UseCaseException> loadDiaryList(
         state: DiaryListState,
         currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
         processLoad: suspend (DiaryYearMonthListUi<DiaryDayListItemUi.Standard>)
-        -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, UseCaseException>
+        -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, E>,
+        emitAppMessageOnFailure: suspend (E) -> Unit
     ) {
         require(
             when (state) {
@@ -353,9 +395,9 @@ internal class DiaryListViewModel @Inject constructor(
 
         updateUiState(state)
         try {
-            val updateDiaryList =
-                when (val result = processLoad(currentList)) {
-                    is UseCaseResult.Success -> {
+            when (val result = processLoad(currentList)) {
+                is UseCaseResult.Success -> {
+                    val updateDiaryList =
                         result.value.toUiModel { fileName: DiaryImageFileName? ->
                             fileName?.let {
                                 when (val buildResult = buildDiaryImageFilePathUseCase(fileName)) {
@@ -364,20 +406,21 @@ internal class DiaryListViewModel @Inject constructor(
                                 }
                             }
                         }
-                    }
-                    is UseCaseResult.Failure -> throw result.exception
+                    updateDiaryList(updateDiaryList)
+                    updateUiStateOnDiaryListLoadCompleted(updateDiaryList)
+                    Log.i(logTag, "${logMsg}_完了")
                 }
-            updateDiaryList(updateDiaryList)
-            updateUiStateOnDiaryListLoadCompleted(updateDiaryList)
-            Log.i(logTag, "${logMsg}_完了")
+                is UseCaseResult.Failure -> {
+                    Log.e(logTag, "${logMsg}_失敗", result.exception)
+                    updateDiaryList(currentList)
+                    updateUiStateOnDiaryListLoadCompleted(currentList)
+                    emitAppMessageOnFailure(result.exception)
+                }
+            }
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
             updateUiStateOnDiaryListLoadCompleted(currentList)
-        } catch (e: UseCaseException) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            updateDiaryList(currentList)
-            updateUiStateOnDiaryListLoadCompleted(currentList)
-            emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
+            throw e // 再スローしてコルーチン処理を中断させる
         }
     }
 
@@ -407,13 +450,17 @@ internal class DiaryListViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiStateOnDiaryListLoadCompleted(currentList)
-                val appMsg =
-                    when (result.exception) {
-                        is DiaryDeleteException.DiaryDataDeleteFailure,
-                        is DiaryDeleteException.Unknown -> DiaryListAppMessage.DiaryDeleteFailure
-                        is DiaryDeleteException.ImageFileDeleteFailure -> DiaryListAppMessage.DiaryImageDeleteFailure
+                when (result.exception) {
+                    is DiaryDeleteException.DiaryDataDeleteFailure -> {
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
                     }
-                emitAppMessageEvent(appMsg)
+                    is DiaryDeleteException.ImageFileDeleteFailure -> {
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryImageDeleteFailure)
+                    }
+                    is DiaryDeleteException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }
@@ -422,7 +469,14 @@ internal class DiaryListViewModel @Inject constructor(
         when (val result = loadDiaryListStartYearMonthPickerDateRangeUseCase()) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> {
-                emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                when (val exception = result.exception) {
+                    is DiaryListStartYearMonthPickerDateRangeLoadException.DiaryInfoLoadFailure -> {
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                    }
+                    is DiaryListStartYearMonthPickerDateRangeLoadException.Unknown -> {
+                        emitUnexpectedAppMessage(exception)
+                    }
+                }
                 return result.exception.fallbackDateRange
             }
         }

@@ -122,7 +122,7 @@ internal class SettingsViewModel @Inject constructor(
                 SettingsState.DeletingAllData -> false
 
                 SettingsState.LoadAllSettingsFailure -> {
-                    viewModelScope.launch {
+                    launchWithUnexpectedErrorHandler {
                         emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
                     }
                     false
@@ -174,6 +174,10 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
+    override fun createUnexpectedAppMessage(e: Exception): SettingsAppMessage {
+        return SettingsAppMessage.Unexpected(e)
+    }
+
     private fun setUpSettingsValue() {
         updateUiState(SettingsState.LoadingAllSettings)
         setUpThemeColorSettingValue()
@@ -183,6 +187,8 @@ internal class SettingsViewModel @Inject constructor(
         setUpWeatherInfoFetchSettingValue()
     }
 
+    // TODO:下記メソッドは一設定の読込メソッドでしか呼び出されておらず、Data層の詳細を知った呼び出し方の為、修正用。
+    //      また下記メソッド名を設定読込後のUiState更新を意味する名称に変更する。
     private fun onUserSettingsFetchSuccess() {
         when (uiState.value) {
             SettingsState.LoadingAllSettings -> {
@@ -199,11 +205,14 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
+    // TODO:下記メソッドは一設定の読込メソッドでしか呼び出されておらず、Data層の詳細を知った呼び出し方の為、修正用。
+    //      また下記メソッド名を設定読込後のUiState更新を意味する名称に変更する。
     private suspend fun onUserSettingsFetchFailure() {
         when (uiState.value) {
             SettingsState.LoadingAllSettings,
             SettingsState.LoadAllSettingsSuccess -> {
                 updateUiState(SettingsState.LoadAllSettingsFailure)
+                // TODO:ラムダ関数引数などでUnexceptedMessageを通知するように修正。
                 emitAppMessageEvent(SettingsAppMessage.SettingLoadFailure)
             }
 
@@ -335,7 +344,7 @@ internal class SettingsViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
     }
@@ -344,7 +353,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onThemeColorSettingButtonClick() {
         if (!canExecuteSettingsOperation) return
 
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsEvent.NavigateThemeColorPickerDialog
             )
@@ -355,7 +364,7 @@ internal class SettingsViewModel @Inject constructor(
         if (!canExecuteSettingsOperation) return
 
         val dayOfWeek = calendarStartDayOfWeek.requireValue()
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsEvent.NavigateCalendarStartDayPickerDialog(dayOfWeek)
             )
@@ -369,13 +378,13 @@ internal class SettingsViewModel @Inject constructor(
         if (isChecked == settingValue) return
 
         if (!canExecuteSettingsOperation) {
-            viewModelScope.launch {
+            launchWithUnexpectedErrorHandler {
                 emitUiEvent(SettingsEvent.TurnReminderNotificationSettingSwitch(false))
             }
             return
         }
 
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             if (isChecked) {
                 // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -401,13 +410,13 @@ internal class SettingsViewModel @Inject constructor(
         if (isChecked == settingValue) return
 
         if (!canExecuteSettingsOperation) {
-            viewModelScope.launch {
+            launchWithUnexpectedErrorHandler {
                 emitUiEvent(SettingsEvent.TurnPasscodeLockSettingSwitch(false))
             }
             return
         }
 
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             savePasscodeLock(isChecked)
         }
     }
@@ -419,13 +428,13 @@ internal class SettingsViewModel @Inject constructor(
         if (isChecked == settingValue) return
 
         if (!canExecuteSettingsOperation) {
-            viewModelScope.launch {
+            launchWithUnexpectedErrorHandler {
                 emitUiEvent(SettingsEvent.TurnWeatherInfoFetchSettingSwitch(false))
             }
             return
         }
 
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             if (isChecked) {
                 emitUiEvent(
                     SettingsEvent.CheckAccessLocationPermission
@@ -439,7 +448,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onAllDiariesDeleteButtonClick() {
         if (!canExecuteSettingsOperation) return
 
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsEvent.NavigateAllDiariesDeleteDialog
             )
@@ -449,7 +458,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onAllSettingsInitializationButtonClick() {
         if (!canExecuteSettingsOperation) return
 
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsEvent.NavigateAllSettingsInitializationDialog
             )
@@ -459,7 +468,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onAllDataDeleteButtonClick() {
         if (!canExecuteSettingsOperation) return
 
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsEvent.NavigateAllDataDeleteDialog
             )
@@ -467,7 +476,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onOpenSourceLicenseButtonClick() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsEvent.NavigateOpenSourceLicensesFragment
             )
@@ -488,7 +497,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun handleThemeColorSettingDialogPositiveResult(themeColor: ThemeColorUi) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             saveThemeColor(themeColor)
         }
     }
@@ -506,7 +515,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun handleCalendarStartDayOfWeekSettingDialogPositiveResult(dayOfWeek: DayOfWeek) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             saveCalendarStartDayOfWeek(dayOfWeek)
         }
     }
@@ -525,13 +534,13 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun handleReminderNotificationSettingDialogPositiveResult(time: LocalTime) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             saveReminderNotificationValid(time)
         }
     }
 
     private fun handleReminderNotificationSettingDialogNegativeResult() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsEvent.TurnReminderNotificationSettingSwitch(false)
             )
@@ -551,7 +560,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun handleAllDiariesDeleteDialogPositiveResult() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             deleteAllDiaries()
         }
     }
@@ -569,7 +578,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun handleAllSettingsInitializationDialogPositiveResult() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             initializeAllSettings()
         }
     }
@@ -587,7 +596,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun handleAllDataDeleteDialogPositiveResult() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             deleteAllData()
         }
     }
@@ -605,7 +614,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun handlePermissionDialogPositiveResult() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsEvent.ShowApplicationDetailsSettings
             )
@@ -615,7 +624,7 @@ internal class SettingsViewModel @Inject constructor(
     // Permission処理
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     fun onPostNotificationsPermissionChecked(isGranted: Boolean) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 emitUiEvent(
                     SettingsEvent.NavigateReminderNotificationTimePickerDialog
@@ -630,7 +639,7 @@ internal class SettingsViewModel @Inject constructor(
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     fun onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest: Boolean) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             if (shouldShowRequest) {
                 emitUiEvent(
                     SettingsEvent.ShowRequestPostNotificationsPermissionRationale
@@ -648,7 +657,7 @@ internal class SettingsViewModel @Inject constructor(
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     fun onRequestPostNotificationsPermissionRationaleResultReceived(isGranted: Boolean) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 emitUiEvent(
                     SettingsEvent.NavigateReminderNotificationTimePickerDialog
@@ -662,7 +671,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAccessLocationPermissionChecked(isGranted: Boolean) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 saveWeatherInfoFetch(true)
             } else {
@@ -674,7 +683,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest: Boolean) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             if (shouldShowRequest) {
                 emitUiEvent(
                     SettingsEvent.ShowRequestAccessLocationPermissionRationale
@@ -691,7 +700,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onRequestAccessLocationPermissionRationaleResultReceived(isGranted: Boolean) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 saveWeatherInfoFetch(true)
             } else {
@@ -704,8 +713,8 @@ internal class SettingsViewModel @Inject constructor(
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
     fun onEnsureReminderNotificationSettingMatchesPermission(isGranted: Boolean) {
-        viewModelScope.launch {
-            if (isGranted) return@launch
+        launchWithUnexpectedErrorHandler {
+            if (isGranted) return@launchWithUnexpectedErrorHandler
 
             saveReminderNotificationInvalid()
         }
@@ -713,8 +722,8 @@ internal class SettingsViewModel @Inject constructor(
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
     fun onEnsureWeatherInfoFetchSettingMatchesPermission(isGranted: Boolean) {
-        viewModelScope.launch {
-            if (isGranted) return@launch
+        launchWithUnexpectedErrorHandler {
+            if (isGranted) return@launchWithUnexpectedErrorHandler
 
             saveWeatherInfoFetch(false)
         }
@@ -730,17 +739,17 @@ internal class SettingsViewModel @Inject constructor(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                val appMessage =
-                    when (result.exception) {
-                        is ThemeColorSettingUpdateException.UpdateFailure,
-                        is ThemeColorSettingUpdateException.Unknown -> {
-                            SettingsAppMessage.SettingUpdateFailure
-                        }
-                        is ThemeColorSettingUpdateException.InsufficientStorage -> {
-                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
-                        }
+                when (result.exception) {
+                    is ThemeColorSettingUpdateException.UpdateFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
                     }
-                emitAppMessageEvent(appMessage)
+                    is ThemeColorSettingUpdateException.InsufficientStorage -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                    }
+                    is ThemeColorSettingUpdateException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }
@@ -755,17 +764,17 @@ internal class SettingsViewModel @Inject constructor(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                val appMessage =
-                    when (result.exception) {
-                        is CalendarStartDayOfWeekSettingUpdateException.UpdateFailure,
-                        is CalendarStartDayOfWeekSettingUpdateException.Unknown -> {
-                            SettingsAppMessage.SettingUpdateFailure
-                        }
-                        is CalendarStartDayOfWeekSettingUpdateException.InsufficientStorage -> {
-                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
-                        }
+                when (result.exception) {
+                    is CalendarStartDayOfWeekSettingUpdateException.UpdateFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
                     }
-                emitAppMessageEvent(appMessage)
+                    is CalendarStartDayOfWeekSettingUpdateException.InsufficientStorage -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                    }
+                    is CalendarStartDayOfWeekSettingUpdateException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }
@@ -781,17 +790,17 @@ internal class SettingsViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 emitUiEvent(SettingsEvent.TurnReminderNotificationSettingSwitch(false))
-                val appMessage =
-                    when (result.exception) {
-                        is ReminderNotificationSettingUpdateException.SettingUpdateFailure,
-                        is ReminderNotificationSettingUpdateException.Unknown -> {
-                            SettingsAppMessage.SettingUpdateFailure
-                        }
-                        is ReminderNotificationSettingUpdateException.InsufficientStorage -> {
-                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
-                        }
+                when (result.exception) {
+                    is ReminderNotificationSettingUpdateException.SettingUpdateFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
                     }
-                emitAppMessageEvent(appMessage)
+                    is ReminderNotificationSettingUpdateException.InsufficientStorage -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                    }
+                    is ReminderNotificationSettingUpdateException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }
@@ -807,17 +816,17 @@ internal class SettingsViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 emitUiEvent(SettingsEvent.TurnReminderNotificationSettingSwitch(true))
-                val appMessage =
-                    when (result.exception) {
-                        is ReminderNotificationSettingUpdateException.SettingUpdateFailure,
-                        is ReminderNotificationSettingUpdateException.Unknown -> {
-                            SettingsAppMessage.SettingUpdateFailure
-                        }
-                        is ReminderNotificationSettingUpdateException.InsufficientStorage -> {
-                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
-                        }
+                when (result.exception) {
+                    is ReminderNotificationSettingUpdateException.SettingUpdateFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
                     }
-                emitAppMessageEvent(appMessage)
+                    is ReminderNotificationSettingUpdateException.InsufficientStorage -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                    }
+                    is ReminderNotificationSettingUpdateException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }
@@ -842,17 +851,17 @@ internal class SettingsViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 emitUiEvent(SettingsEvent.TurnPasscodeLockSettingSwitch(!value))
-                val appMessage =
-                    when (result.exception) {
-                        is PassCodeSettingUpdateException.UpdateFailure,
-                        is PassCodeSettingUpdateException.Unknown -> {
-                            SettingsAppMessage.SettingUpdateFailure
-                        }
-                        is PassCodeSettingUpdateException.InsufficientStorage -> {
-                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
-                        }
+                when (result.exception) {
+                    is PassCodeSettingUpdateException.UpdateFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
                     }
-                emitAppMessageEvent(appMessage)
+                    is PassCodeSettingUpdateException.InsufficientStorage -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                    }
+                    is PassCodeSettingUpdateException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }
@@ -868,17 +877,17 @@ internal class SettingsViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 emitUiEvent(SettingsEvent.TurnWeatherInfoFetchSettingSwitch(!value))
-                val appMessage =
-                    when (result.exception) {
-                        is WeatherInfoFetchSettingUpdateException.Unknown,
-                        is WeatherInfoFetchSettingUpdateException.UpdateFailure -> {
-                            SettingsAppMessage.SettingUpdateFailure
-                        }
-                        is WeatherInfoFetchSettingUpdateException.InsufficientStorage -> {
-                            SettingsAppMessage.SettingUpdateInsufficientStorageFailure
-                        }
+                when (result.exception) {
+                    is WeatherInfoFetchSettingUpdateException.UpdateFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
                     }
-                emitAppMessageEvent(appMessage)
+                    is WeatherInfoFetchSettingUpdateException.InsufficientStorage -> {
+                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                    }
+                    is WeatherInfoFetchSettingUpdateException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }
@@ -893,12 +902,14 @@ internal class SettingsViewModel @Inject constructor(
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
                 Log.e(logTag, "全日記削除_失敗", result.exception)
                 when (result.exception) {
-                    is AllDiariesDeleteException.DeleteFailure,
-                    is AllDiariesDeleteException.Unknown -> {
+                    is AllDiariesDeleteException.DeleteFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
                     }
                     is AllDiariesDeleteException.ImageFileDeleteFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDiaryImagesDeleteFailure)
+                    }
+                    is AllDiariesDeleteException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
                     }
                 }
             }
@@ -912,17 +923,17 @@ internal class SettingsViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "全設定初期化_失敗", result.exception)
-                val appMessage =
-                    when (result.exception) {
-                        is AllSettingsInitializationException.InitializationFailure,
-                        is AllSettingsInitializationException.Unknown -> {
-                            SettingsAppMessage.AllSettingsInitializationFailure
-                        }
-                        is AllSettingsInitializationException.InsufficientStorage -> {
-                            SettingsAppMessage.AllSettingsInitializationInsufficientStorageFailure
-                        }
+                when (result.exception) {
+                    is AllSettingsInitializationException.InitializationFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)
                     }
-                emitAppMessageEvent(appMessage)
+                    is AllSettingsInitializationException.InsufficientStorage -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationInsufficientStorageFailure)
+                    }
+                    is AllSettingsInitializationException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }
@@ -936,23 +947,23 @@ internal class SettingsViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "アプリ全データ削除_失敗", result.exception)
                 updateUiState(SettingsState.LoadAllSettingsSuccess)
-                val appMessage =
-                    when (result.exception) {
-                        is AllDataDeleteException.DiariesDeleteFailure,
-                        is AllDataDeleteException.Unknown -> {
-                            SettingsAppMessage.AllDataDeleteFailure
-                        }
-                        is AllDataDeleteException.ImageFileDeleteFailure -> {
-                            SettingsAppMessage.AllDiaryImagesDeleteFailure
-                        }
-                        is AllDataDeleteException.SettingsInitializationFailure -> {
-                            SettingsAppMessage.AllSettingsInitializationFailure
-                        }
-                        is AllDataDeleteException.SettingsInitializationInsufficientStorageFailure -> {
-                            SettingsAppMessage.AllSettingsInitializationInsufficientStorageFailure
-                        }
+                when (result.exception) {
+                    is AllDataDeleteException.DiariesDeleteFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
                     }
-                emitAppMessageEvent(appMessage)
+                    is AllDataDeleteException.ImageFileDeleteFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllDiaryImagesDeleteFailure)
+                    }
+                    is AllDataDeleteException.SettingsInitializationFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)
+                    }
+                    is AllDataDeleteException.SettingsInitializationInsufficientStorageFailure -> {
+                        emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationInsufficientStorageFailure)
+                    }
+                    is AllDataDeleteException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }

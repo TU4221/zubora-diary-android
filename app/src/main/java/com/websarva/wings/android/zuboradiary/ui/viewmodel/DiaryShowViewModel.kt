@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUs
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByIdUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByIdException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
@@ -70,7 +71,7 @@ internal class DiaryShowViewModel @Inject constructor(
     private fun initializeDiaryData(handle: SavedStateHandle) {
         val id = handle.get<String>(ID_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         val date = handle.get<LocalDate>(DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             loadSavedDiary(id, date)
         }
     }
@@ -95,10 +96,14 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
+    override fun createUnexpectedAppMessage(e: Exception): DiaryShowAppMessage {
+        return DiaryShowAppMessage.Unexpected(e)
+    }
+
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         val date = diaryStateFlow.date.requireValue()
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             navigatePreviousFragment(date)
         }
     }
@@ -107,7 +112,7 @@ internal class DiaryShowViewModel @Inject constructor(
     fun onDiaryEditMenuClick() {
         val id = diaryStateFlow.id.requireValue()
         val date = diaryStateFlow.date.requireValue()
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 DiaryShowEvent.NavigateDiaryEditFragment(id, date)
             )
@@ -119,7 +124,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
         val id = diaryStateFlow.id.requireValue()
         val date = diaryStateFlow.date.requireValue()
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             updatePendingDiaryDeleteParameters(id, date)
             emitUiEvent(
                 DiaryShowEvent.NavigateDiaryDeleteDialog(date)
@@ -129,7 +134,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
     fun onNavigationIconClick() {
         val date = diaryStateFlow.date.requireValue()
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             navigatePreviousFragment(date)
         }
     }
@@ -139,7 +144,7 @@ internal class DiaryShowViewModel @Inject constructor(
             is DialogResult.Positive<Unit>,
             DialogResult.Negative,
             DialogResult.Cancel -> {
-                viewModelScope.launch {
+                launchWithUnexpectedErrorHandler {
                     emitUiEvent(
                         DiaryShowEvent.NavigatePreviousFragmentOnDiaryLoadFailed()
                     )
@@ -162,7 +167,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters?) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             parameters?.let {
                 deleteDiary(it.id, it.date)
             } ?: throw IllegalStateException()
@@ -185,9 +190,14 @@ internal class DiaryShowViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiState(DiaryShowState.LoadError)
-                emitUiEvent(
-                    DiaryShowEvent.NavigateDiaryLoadFailureDialog(date)
-                )
+                when (result.exception) {
+                    is DiaryLoadByIdException.LoadFailure -> {
+                        emitUiEvent(DiaryShowEvent.NavigateDiaryLoadFailureDialog(date))
+                    }
+                    is DiaryLoadByIdException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }
@@ -209,13 +219,17 @@ internal class DiaryShowViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiState(DiaryShowState.LoadSuccess)
-                val app =
-                    when (result.exception) {
-                        is DiaryDeleteException.DiaryDataDeleteFailure,
-                        is DiaryDeleteException.Unknown -> DiaryShowAppMessage.DiaryDeleteFailure
-                        is DiaryDeleteException.ImageFileDeleteFailure -> DiaryShowAppMessage.DiaryImageDeleteFailure
+                when (result.exception) {
+                    is DiaryDeleteException.DiaryDataDeleteFailure -> {
+                        emitAppMessageEvent(DiaryShowAppMessage.DiaryDeleteFailure)
                     }
-                emitAppMessageEvent(app)
+                    is DiaryDeleteException.ImageFileDeleteFailure -> {
+                        emitAppMessageEvent(DiaryShowAppMessage.DiaryImageDeleteFailure)
+                    }
+                    is DiaryDeleteException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }

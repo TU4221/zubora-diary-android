@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -10,6 +11,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.PendingNavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,6 +22,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlin.coroutines.cancellation.CancellationException
 
 internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     initialViewUiState: S
@@ -61,6 +66,44 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     )
 
     protected abstract suspend fun emitAppMessageEvent(appMessage: M)
+
+    protected abstract fun createUnexpectedAppMessage(e: Exception): M
+
+    protected suspend fun emitUnexpectedAppMessage(e: Exception) {
+        val appMessage = createUnexpectedAppMessage(e)
+        emitAppMessageEvent(appMessage)
+    }
+
+    /**
+     * 予期せぬ例外のハンドリング付きでコルーチンを起動する。
+     *
+     * [block] 内で [CancellationException] 以外の予期せぬ例外が発生した場合、
+     * エラーダイアログ表示イベントを発行する。
+     * また、UIが処理中のまま固まるのを防ぐため、 [uiState] を指定された状態にロールバックする。
+     *
+     * @param rollbackState 予期せぬエラー発生時にロールバックするUI State。デフォルトは処理開始前のState。
+     * @param block 実行するメインの処理ブロック。
+     * @return 起動したコルーチンの[Job]。
+     */
+    protected fun launchWithUnexpectedErrorHandler(
+        rollbackState: S? = null,
+        block: suspend CoroutineScope.() -> Unit
+    ) : Job {
+        return viewModelScope.launch {
+            val initialState = rollbackState ?: _uiState.value
+            try {
+                block()
+            } catch (e: Exception) {
+                // コルーチンのキャンセルはエラーではないため、再スローして処理を中断させる
+                if (e is CancellationException) {
+                    throw e
+                }
+                Log.e(logTag, "予期せぬエラーが発生", e)
+                updateUiState(initialState)
+                emitUnexpectedAppMessage(e)
+            }
+        }
+    }
 
     protected open fun updateUiState(state: S) {
         _uiState.value = state

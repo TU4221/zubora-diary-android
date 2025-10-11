@@ -13,4 +13,21 @@ internal sealed class WordSearchAppMessage : AppMessage {
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_word_search_app_message_search_result_list_load_failure
     }
+
+    class Unexpected(val exception: Exception) : WordSearchAppMessage() {
+        @IgnoredOnParcel
+        private val delegate = UnexpectedMessageDelegate(exception)
+
+        @IgnoredOnParcel
+        override val dialogTitleStringResId: Int
+            get() = delegate.dialogTitleStringResId
+
+        @IgnoredOnParcel
+        override val dialogMessageStringResId: Int
+            get() = delegate.dialogMessageStringResId
+
+        @IgnoredOnParcel
+        override val dialogMessageArgs: List<Any>
+            get() = delegate.dialogMessageArgs
+    }
 }

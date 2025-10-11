@@ -12,6 +12,9 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSear
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadNewWordSearchResultListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.RefreshWordSearchResultListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListAdditionLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListNewLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListRefreshException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.utils.createLogTag
@@ -157,16 +160,20 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
+    override fun createUnexpectedAppMessage(e: Exception): WordSearchAppMessage {
+        return WordSearchAppMessage.Unexpected(e)
+    }
+
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
     }
 
     // Viewクリック処理
     fun onNavigationIconButtonClick() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
     }
@@ -174,7 +181,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     fun onWordSearchResultListItemClick(item: DiaryDayListItemUi.WordSearchResult) {
         val id = item.id
         val date = item.date
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 WordSearchEvent.NavigateDiaryShowFragment(id, date)
             )
@@ -190,7 +197,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         val searchWord = _searchWord.value
         cancelPreviousLoadJob()
         wordSearchResultListLoadJob =
-            viewModelScope.launch {
+            launchWithUnexpectedErrorHandler {
                 loadAdditionWordSearchResultList(currentResultList, searchWord)
             }
     }
@@ -210,7 +217,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
         cancelPreviousLoadJob()
         wordSearchResultListLoadJob =
-            viewModelScope.launch {
+            launchWithUnexpectedErrorHandler {
                 updateWordSearchResultList(currentResultList, currentSearchWord)
             }
     }
@@ -221,7 +228,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // StateFlow値変更時処理
     fun onSearchWordChanged(value: String) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             prepareKeyboard(value)
         }
 
@@ -232,7 +239,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         val currentResultList = _wordSearchResultList.value
         cancelPreviousLoadJob()
         wordSearchResultListLoadJob =
-            viewModelScope.launch {
+            launchWithUnexpectedErrorHandler {
                 if (value.isEmpty()) {
                     clearWordSearchResultList()
                 } else {
@@ -260,13 +267,26 @@ internal class WordSearchViewModel @Inject internal constructor(
         loadWordSearchResultList(
             WordSearchState.Searching,
             currentResultList,
-            searchWord
-        ) { _, lambdaSearchWord ->
-            showWordSearchResultListFirstItemProgressIndicator()
-            loadNewWordSearchResultListUseCase(
-                SearchWord(lambdaSearchWord)
-            )
-        }
+            searchWord,
+            { _, lambdaSearchWord ->
+                showWordSearchResultListFirstItemProgressIndicator()
+                loadNewWordSearchResultListUseCase(
+                    SearchWord(lambdaSearchWord)
+                )
+            },
+            { exception ->
+                when (exception) {
+                    is WordSearchResultListNewLoadException.LoadFailure -> {
+                        emitAppMessageEvent(
+                            WordSearchAppMessage.SearchResultListLoadFailure
+                        )
+                    }
+                    is WordSearchResultListNewLoadException.Unknown -> {
+                        emitUnexpectedAppMessage(exception)
+                    }
+                }
+            }
+        )
     }
 
     private suspend fun loadAdditionWordSearchResultList(
@@ -276,15 +296,28 @@ internal class WordSearchViewModel @Inject internal constructor(
         loadWordSearchResultList(
             WordSearchState.AdditionLoading,
             currentResultList,
-            searchWord
-        ) { lambdaCurrentList, lambdaSearchWord ->
-            require(lambdaCurrentList.isNotEmpty)
+            searchWord,
+            { lambdaCurrentList, lambdaSearchWord ->
+                require(lambdaCurrentList.isNotEmpty)
 
-            loadAdditionWordSearchResultListUseCase(
-                lambdaCurrentList.toDomainModel(),
-                SearchWord(lambdaSearchWord)
-            )
-        }
+                loadAdditionWordSearchResultListUseCase(
+                    lambdaCurrentList.toDomainModel(),
+                    SearchWord(lambdaSearchWord)
+                )
+            },
+            { exception ->
+                when (exception) {
+                    is WordSearchResultListAdditionLoadException.LoadFailure -> {
+                        emitAppMessageEvent(
+                            WordSearchAppMessage.SearchResultListLoadFailure
+                        )
+                    }
+                    is WordSearchResultListAdditionLoadException.Unknown -> {
+                        emitUnexpectedAppMessage(exception)
+                    }
+                }
+            }
+        )
     }
 
     private suspend fun updateWordSearchResultList(
@@ -294,23 +327,38 @@ internal class WordSearchViewModel @Inject internal constructor(
         loadWordSearchResultList(
             WordSearchState.Updating,
             currentResultList,
-            searchWord
-        ) { lambdaCurrentList, lambdaSearchWord ->
-            refreshWordSearchResultListUseCase(
-                lambdaCurrentList.toDomainModel(),
-                SearchWord(lambdaSearchWord)
-            )
-        }
+            searchWord,
+            { lambdaCurrentList, lambdaSearchWord ->
+                refreshWordSearchResultListUseCase(
+                    lambdaCurrentList.toDomainModel(),
+                    SearchWord(lambdaSearchWord)
+                )
+            },
+            { exception ->
+                when (exception) {
+                    is WordSearchResultListRefreshException.RefreshFailure -> {
+                        emitAppMessageEvent(
+                            WordSearchAppMessage.SearchResultListLoadFailure
+                        )
+                    }
+                    is WordSearchResultListRefreshException.Unknown -> {
+                        emitUnexpectedAppMessage(exception)
+                    }
+                }
+            }
+        )
     }
 
-    private suspend fun loadWordSearchResultList(
+    // TODO:名称をexecuteにする。(他のViewModelも)
+    private suspend fun <E : UseCaseException> loadWordSearchResultList(
         state: WordSearchState,
         currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String,
         processLoad: suspend (
             currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
             searchWord: String
-        ) -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, UseCaseException>
+        ) -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, E>,
+        emitAppMessageOnFailure: suspend (E) -> Unit
     ) {
         require(
             when (state) {
@@ -331,25 +379,44 @@ internal class WordSearchViewModel @Inject internal constructor(
 
         updateUiState(state)
         try {
-            updateNumWordSearchResults(
-                countWordSearchResults(SearchWord(searchWordNotEmpty))
-            )
-            val updateResultList =
-                when (val result = processLoad(currentResultList, searchWordNotEmpty)) {
-                    is UseCaseResult.Success -> result.value.toUiModel()
-                    is UseCaseResult.Failure -> throw result.exception
+            when (val result  = countWordSearchResultsUseCase(SearchWord(searchWordNotEmpty))) {
+                is UseCaseResult.Success -> {
+                    updateNumWordSearchResults(result.value)
                 }
-            updateWordSearchResultList(updateResultList)
-            updateUiStateOnWorSearchResultListLoadCompleted(updateResultList)
-            Log.i(logTag, "${logMsg}_完了")
+                is UseCaseResult.Failure -> {
+                    when (result.exception) {
+                        is WordSearchResultCountException.CountFailure -> {
+                            emitAppMessageEvent(
+                                WordSearchAppMessage.SearchResultListLoadFailure
+                            )
+                        }
+                        is WordSearchResultCountException.Unknown -> {
+                            emitUnexpectedAppMessage(result.exception)
+                        }
+                    }
+                    return
+                }
+            }
+
+            when (val result = processLoad(currentResultList, searchWordNotEmpty)) {
+                is UseCaseResult.Success -> {
+                    val updateResultList = result.value.toUiModel()
+                    updateWordSearchResultList(updateResultList)
+                    updateUiStateOnWorSearchResultListLoadCompleted(updateResultList)
+                    Log.i(logTag, "${logMsg}_完了")
+                }
+                is UseCaseResult.Failure -> {
+                    Log.e(logTag, "${logMsg}_失敗", result.exception)
+                    updateWordSearchResultList(currentResultList)
+                    updateUiStateOnWorSearchResultListLoadCompleted(currentResultList)
+                    emitAppMessageOnFailure(result.exception)
+                }
+            }
+
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
             updateUiStateOnWorSearchResultListLoadCompleted(currentResultList)
-        } catch (e: UseCaseException) {
-            Log.e(logTag, "${logMsg}_失敗", e)
-            updateWordSearchResultList(currentResultList)
-            updateUiStateOnWorSearchResultListLoadCompleted(currentResultList)
-            emitAppMessageEvent(WordSearchAppMessage.SearchResultListLoadFailure)
+            throw e // 再スローしてコルーチン処理を中断させる
         }
     }
 
@@ -373,14 +440,6 @@ internal class WordSearchViewModel @Inject internal constructor(
                 )
             )
         )
-    }
-
-    @Throws(WordSearchResultCountException::class)
-    private suspend fun countWordSearchResults(searchWord:SearchWord): Int {
-        when (val result = countWordSearchResultsUseCase(searchWord)) {
-            is UseCaseResult.Success -> return result.value
-            is UseCaseResult.Failure -> throw result.exception
-        }
     }
 
     private fun clearWordSearchResultList() {

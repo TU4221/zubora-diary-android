@@ -6,6 +6,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByDateException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
@@ -59,6 +61,7 @@ internal class CalendarViewModel @Inject constructor(
 
     private var shouldSmoothScroll = false
 
+    // TODO:viewModelScope.launch不要、emit から create に変更
     override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
         viewModelScope.launch {
             emitUiEvent(
@@ -69,6 +72,7 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
+    // TODO:viewModelScope.launch不要、emit から create に変更
     override suspend fun emitAppMessageEvent(appMessage: CalendarAppMessage) {
         viewModelScope.launch {
             emitUiEvent(
@@ -79,9 +83,13 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
+    override fun createUnexpectedAppMessage(e: Exception): CalendarAppMessage {
+        return CalendarAppMessage.Unexpected(e)
+    }
+
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
     }
@@ -94,7 +102,7 @@ internal class CalendarViewModel @Inject constructor(
     fun onDiaryEditButtonClick() {
         val id = diaryStateFlow.id.value
         val date = _selectedDate.value
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 CalendarEvent.NavigateDiaryEditFragment(id, date)
             )
@@ -104,7 +112,7 @@ internal class CalendarViewModel @Inject constructor(
     fun onBottomNavigationItemReselect() {
         val selectedDate = _selectedDate.value
         val today = LocalDate.now()
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
             //      下記条件でカレンダースクロールのみ処理。
             if (selectedDate == today) {
@@ -139,14 +147,14 @@ internal class CalendarViewModel @Inject constructor(
 
     // StateFlow値変更時処理
     fun onSelectedDateChanged(date: LocalDate) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             prepareDiary(date)
         }
     }
 
     // View状態処理
     fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             processCalendarDayDotUpdate(date)
         }
     }
@@ -186,9 +194,16 @@ internal class CalendarViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 updateUiState(CalendarState.LoadError)
-                emitAppMessageEvent(
-                    CalendarAppMessage.DiaryLoadFailure
-                )
+                when (result.exception) {
+                    is DiaryLoadByDateException.LoadFailure -> {
+                        emitAppMessageEvent(
+                            CalendarAppMessage.DiaryLoadFailure
+                        )
+                    }
+                    is DiaryLoadByDateException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
             }
         }
     }
@@ -203,7 +218,14 @@ internal class CalendarViewModel @Inject constructor(
         when (val result = doesDiaryExistUseCase(date)) {
             is UseCaseResult.Success -> return result.value
             is UseCaseResult.Failure -> {
-                emitAppMessageEvent(CalendarAppMessage.DiaryInfoLoadFailure)
+                when (result.exception) {
+                    is DiaryExistenceCheckException.CheckFailure -> {
+                        emitAppMessageEvent(CalendarAppMessage.DiaryInfoLoadFailure)
+                    }
+                    is DiaryExistenceCheckException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
+                    }
+                }
                 return false
             }
         }

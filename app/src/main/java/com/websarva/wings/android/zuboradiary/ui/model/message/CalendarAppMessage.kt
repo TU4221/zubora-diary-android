@@ -21,4 +21,20 @@ internal sealed class CalendarAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_calendar_app_message_diary_info_load_failure
     }
 
+    class Unexpected(val exception: Exception) : CalendarAppMessage() {
+        @IgnoredOnParcel
+        private val delegate = UnexpectedMessageDelegate(exception)
+
+        @IgnoredOnParcel
+        override val dialogTitleStringResId: Int
+            get() = delegate.dialogTitleStringResId
+
+        @IgnoredOnParcel
+        override val dialogMessageStringResId: Int
+            get() = delegate.dialogMessageStringResId
+
+        @IgnoredOnParcel
+        override val dialogMessageArgs: List<Any>
+            get() = delegate.dialogMessageArgs
+    }
 }

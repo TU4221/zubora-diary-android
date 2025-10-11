@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
-import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
@@ -13,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.launch
 
 internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : UiState> (
     initialViewUiState: S,
@@ -69,7 +67,7 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
         get() = diaryStateFlow.log.asStateFlow()
 
     fun onDiaryImageFileNameChanged(fileName: String?) {
-        viewModelScope.launch {
+        launchWithUnexpectedErrorHandler {
             buildImageFilePath(fileName)
         }
     }
