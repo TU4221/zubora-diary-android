@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
@@ -30,7 +29,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -89,24 +87,16 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         setUpItemTitleSelectionHistoryList()
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
-        viewModelScope.launch {
-            emitUiEvent(
-                DiaryItemTitleEditEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment(result)
-                )
-            )
-        }
+    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): DiaryItemTitleEditEvent {
+        return DiaryItemTitleEditEvent.CommonEvent(
+            CommonUiEvent.NavigatePreviousFragment(result)
+        )
     }
 
-    override suspend fun emitAppMessageEvent(appMessage: DiaryItemTitleEditAppMessage) {
-        viewModelScope.launch {
-            emitUiEvent(
-                DiaryItemTitleEditEvent.CommonEvent(
-                    CommonUiEvent.NavigateAppMessage(appMessage)
-                )
-            )
-        }
+    override fun createAppMessageEvent(appMessage: DiaryItemTitleEditAppMessage): DiaryItemTitleEditEvent {
+        return DiaryItemTitleEditEvent.CommonEvent(
+            CommonUiEvent.NavigateAppMessage(appMessage)
+        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): DiaryItemTitleEditAppMessage {

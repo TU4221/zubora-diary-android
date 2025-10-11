@@ -61,11 +61,23 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
         )
     }
 
-    protected abstract suspend fun emitNavigatePreviousFragmentEvent(
+    protected abstract fun createNavigatePreviousFragmentEvent(
         result: FragmentResult<*> = FragmentResult.None
-    )
+    ): E
 
-    protected abstract suspend fun emitAppMessageEvent(appMessage: M)
+    protected suspend fun emitNavigatePreviousFragmentEvent(
+        result: FragmentResult<*> = FragmentResult.None
+    ) {
+        val navigatePreviousFragmentEvent = createNavigatePreviousFragmentEvent(result)
+        emitUiEvent(navigatePreviousFragmentEvent)
+    }
+
+    protected abstract fun createAppMessageEvent(appMessage: M): E
+
+    protected suspend fun emitAppMessageEvent(appMessage: M) {
+        val appMessageEvent = createAppMessageEvent(appMessage)
+        emitUiEvent(appMessageEvent)
+    }
 
     protected abstract fun createUnexpectedAppMessage(e: Exception): M
 

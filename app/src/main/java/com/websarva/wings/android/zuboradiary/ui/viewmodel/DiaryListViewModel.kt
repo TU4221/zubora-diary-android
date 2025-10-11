@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
@@ -39,7 +38,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
@@ -122,24 +120,16 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
-        viewModelScope.launch {
-            emitUiEvent(
-                DiaryListEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment(result)
-                )
-            )
-        }
+    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): DiaryListEvent {
+        return DiaryListEvent.CommonEvent(
+            CommonUiEvent.NavigatePreviousFragment(result)
+        )
     }
 
-    override suspend fun emitAppMessageEvent(appMessage: DiaryListAppMessage) {
-        viewModelScope.launch {
-            emitUiEvent(
-                DiaryListEvent.CommonEvent(
-                    CommonUiEvent.NavigateAppMessage(appMessage)
-                )
-            )
-        }
+    override fun createAppMessageEvent(appMessage: DiaryListAppMessage): DiaryListEvent {
+        return DiaryListEvent.CommonEvent(
+            CommonUiEvent.NavigateAppMessage(appMessage)
+        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): DiaryListAppMessage {

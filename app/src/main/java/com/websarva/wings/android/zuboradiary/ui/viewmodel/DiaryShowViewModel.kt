@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
@@ -22,7 +21,6 @@ import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -76,24 +74,16 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
-        viewModelScope.launch {
-            emitUiEvent(
-                DiaryShowEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment(result)
-                )
-            )
-        }
+    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): DiaryShowEvent {
+        return DiaryShowEvent.CommonEvent(
+            CommonUiEvent.NavigatePreviousFragment(result)
+        )
     }
 
-    override suspend fun emitAppMessageEvent(appMessage: DiaryShowAppMessage) {
-        viewModelScope.launch {
-            emitUiEvent(
-                DiaryShowEvent.CommonEvent(
-                    CommonUiEvent.NavigateAppMessage(appMessage)
-                )
-            )
-        }
+    override fun createAppMessageEvent(appMessage: DiaryShowAppMessage): DiaryShowEvent {
+        return DiaryShowEvent.CommonEvent(
+            CommonUiEvent.NavigateAppMessage(appMessage)
+        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): DiaryShowAppMessage {

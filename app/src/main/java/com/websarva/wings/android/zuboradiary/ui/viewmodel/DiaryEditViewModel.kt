@@ -63,7 +63,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 import kotlin.random.Random
@@ -348,24 +347,16 @@ internal class DiaryEditViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
-        viewModelScope.launch {
-            emitUiEvent(
-                DiaryEditEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment(result)
-                )
-            )
-        }
+    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): DiaryEditEvent {
+        return DiaryEditEvent.CommonEvent(
+            CommonUiEvent.NavigatePreviousFragment(result)
+        )
     }
 
-    override suspend fun emitAppMessageEvent(appMessage: DiaryEditAppMessage) {
-        viewModelScope.launch {
-            emitUiEvent(
-                DiaryEditEvent.CommonEvent(
-                    CommonUiEvent.NavigateAppMessage(appMessage)
-                )
-            )
-        }
+    override fun createAppMessageEvent(appMessage: DiaryEditAppMessage): DiaryEditEvent {
+        return DiaryEditEvent.CommonEvent(
+            CommonUiEvent.NavigateAppMessage(appMessage)
+        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): DiaryEditAppMessage {

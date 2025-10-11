@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
@@ -33,7 +32,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
@@ -140,24 +138,16 @@ internal class WordSearchViewModel @Inject internal constructor(
             false
         )
 
-    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
-        viewModelScope.launch {
-            emitUiEvent(
-                WordSearchEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment(result)
-                )
-            )
-        }
+    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): WordSearchEvent {
+        return WordSearchEvent.CommonEvent(
+            CommonUiEvent.NavigatePreviousFragment(result)
+        )
     }
 
-    override suspend fun emitAppMessageEvent(appMessage: WordSearchAppMessage) {
-        viewModelScope.launch {
-            emitUiEvent(
-                WordSearchEvent.CommonEvent(
-                    CommonUiEvent.NavigateAppMessage(appMessage)
-                )
-            )
-        }
+    override fun createAppMessageEvent(appMessage: WordSearchAppMessage): WordSearchEvent {
+        return WordSearchEvent.CommonEvent(
+            CommonUiEvent.NavigateAppMessage(appMessage)
+        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): WordSearchAppMessage {

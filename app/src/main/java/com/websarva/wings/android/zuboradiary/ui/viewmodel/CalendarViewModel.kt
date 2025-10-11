@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
@@ -20,7 +19,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -61,26 +59,16 @@ internal class CalendarViewModel @Inject constructor(
 
     private var shouldSmoothScroll = false
 
-    // TODO:viewModelScope.launch不要、emit から create に変更
-    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
-        viewModelScope.launch {
-            emitUiEvent(
-                CalendarEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment(result)
-                )
-            )
-        }
+    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): CalendarEvent {
+        return CalendarEvent.CommonEvent(
+            CommonUiEvent.NavigatePreviousFragment(result)
+        )
     }
 
-    // TODO:viewModelScope.launch不要、emit から create に変更
-    override suspend fun emitAppMessageEvent(appMessage: CalendarAppMessage) {
-        viewModelScope.launch {
-            emitUiEvent(
-                CalendarEvent.CommonEvent(
-                    CommonUiEvent.NavigateAppMessage(appMessage)
-                )
-            )
-        }
+    override fun createAppMessageEvent(appMessage: CalendarAppMessage): CalendarEvent {
+        return CalendarEvent.CommonEvent(
+            CommonUiEvent.NavigateAppMessage(appMessage)
+        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): CalendarAppMessage {

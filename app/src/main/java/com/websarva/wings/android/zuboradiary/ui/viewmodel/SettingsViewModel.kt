@@ -51,7 +51,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalTime
 import javax.inject.Inject
@@ -110,7 +109,6 @@ internal class SettingsViewModel @Inject constructor(
                 false
             )
 
-
     private val canExecuteSettingsOperation: Boolean
         get() {
             return when (uiState.value) {
@@ -154,24 +152,16 @@ internal class SettingsViewModel @Inject constructor(
         setUpSettingsValue()
     }
 
-    override suspend fun emitNavigatePreviousFragmentEvent(result: FragmentResult<*>) {
-        viewModelScope.launch {
-            emitUiEvent(
-                SettingsEvent.CommonEvent(
-                    CommonUiEvent.NavigatePreviousFragment(result)
-                )
-            )
-        }
+    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): SettingsEvent {
+        return SettingsEvent.CommonEvent(
+            CommonUiEvent.NavigatePreviousFragment(result)
+        )
     }
 
-    override suspend fun emitAppMessageEvent(appMessage: SettingsAppMessage) {
-        viewModelScope.launch {
-            emitUiEvent(
-                SettingsEvent.CommonEvent(
-                    CommonUiEvent.NavigateAppMessage(appMessage)
-                )
-            )
-        }
+    override fun createAppMessageEvent(appMessage: SettingsAppMessage): SettingsEvent {
+        return SettingsEvent.CommonEvent(
+            CommonUiEvent.NavigateAppMessage(appMessage)
+        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): SettingsAppMessage {
