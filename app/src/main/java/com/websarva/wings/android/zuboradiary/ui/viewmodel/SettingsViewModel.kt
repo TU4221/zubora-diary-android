@@ -719,6 +719,44 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
+    /**
+     * 設定操作の実行を試みるヘルパー関数。
+     *
+     * 現在の [SettingsState] に基づいて操作の可否を判定する。
+     * 操作可能であればメイン処理を、不可能であればリセット処理を実行する。
+     *
+     * @param currentUiState 現在のUI State。操作可否の判定に使用する。
+     * @param onExecute メイン処理。設定操作が可能な場合に実行される。
+     * @param onCannotExecute リセット処理。設定操作が不可能な場合に実行される。
+     *   [SettingsState] が [SettingsState.LoadAllSettingsFailure]の場合は、
+     *   この処理の実行前にエラーメッセージを表示する。
+     */
+    private suspend fun executeSettingsOperation(
+        currentUiState: SettingsState,
+        onExecute: suspend () -> Unit,
+        onCannotExecute: suspend () -> Unit = {}
+    ) {
+        val canExecuteSettingsOperation =
+            when (currentUiState) {
+                SettingsState.LoadAllSettingsSuccess -> true
+
+                SettingsState.Idle,
+                SettingsState.LoadingAllSettings,
+                SettingsState.DeletingAllDiaries,
+                SettingsState.DeletingAllData -> false
+
+                SettingsState.LoadAllSettingsFailure -> {
+                    emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
+                    false
+                }
+            }
+        if (canExecuteSettingsOperation) {
+            onExecute()
+        } else {
+            onCannotExecute()
+        }
+    }
+
     private suspend fun saveThemeColor(value: ThemeColorUi) {
         val result =
             updateThemeColorSettingUseCase(
