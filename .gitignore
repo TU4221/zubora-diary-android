@@ -1,15 +1,73 @@
-*.iml
-.gradle
-/local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
-.DS_Store
-/build
-/captures
-.externalNativeBuild
-.cxx
+#参照:https://github.com/github/gitignore/blob/main/Android.gitignore
+
+# =========================================
+# Build
+# =========================================
+# ビルド時に生成されるすべての中間ファイルと成果物
+build/
+# Gradleが使用するキャッシュやラッパーのファイル群
+.gradle/
+
+# =========================================
+# Local environment
+# =========================================
+# SDKのパスなど、ローカル環境固有の設定
 local.properties
+
+# =========================================
+# IDE / Editor
+# =========================================
+# --- IntelliJ / Android Studio ---
+# .ideaディレクトリは基本的にすべて無視する
+.idea/
+# ただし、下記のファイルは例外的にGit管理に含める
+# vcs.xml: このプロジェクトがGit管理下にあることをIDEに教える
+!/.idea/vcs.xml
+# プロジェクトに依存するスペルチェック辞書
+!/idea/dictionaries/zuboradiary.xml
+
+# IntelliJのモジュールファイル（古い形式、Gradleが自動生成）
+*.iml
+
+# --- OS-specific ---
+# macOSが自動生成する隠しファイル
+.DS_Store
+
+# =========================================
+# Generated files
+# =========================================
+# --- App Packages ---
+# ビルドされたアプリ本体のファイル
+*.apk
+*.aab
+
+# --- C/C++ Native Code ---
+# ネイティブコードのビルド時に生成される中間ファイル
+.cxx/
+.externalNativeBuild/
+
+# --- Profiling & Debugging ---
+# プロファイラが生成するデータファイル
+captures/
+# メモリ解析用のヒープダンプファイル
+*.hprof
+# 各種ログファイル
+*.log
+
+# --- Proguard / R8 ---
+# 難読化（R8）の際に生成されるマッピングファイルなど
+**/mapping/
+**/proguard/
+**/seeds.txt
+**/usage.txt
+
+# --- Build Metadata ---
+# ビルド出力に関するメタデータ
+output-metadata.json
+
+# =========================================
+# Keystore
+# =========================================
+# 署名鍵ファイル（絶対に共有しないこと！）
+*.jks
+*.keystore
