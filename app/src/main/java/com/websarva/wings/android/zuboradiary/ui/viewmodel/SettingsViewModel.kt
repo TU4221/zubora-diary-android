@@ -28,10 +28,15 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateThem
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PassCodeSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PasscodeLockSettingLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingUpdateException
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingUpdateException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
@@ -48,9 +53,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalTime
 import javax.inject.Inject
@@ -156,43 +165,11 @@ internal class SettingsViewModel @Inject constructor(
         setUpReminderNotificationSettingValue()
         setUpPasscodeLockSettingValue()
         setUpWeatherInfoFetchSettingValue()
-    }
 
-    // TODO:下記メソッドは一設定の読込メソッドでしか呼び出されておらず、Data層の詳細を知った呼び出し方の為、修正用。
-    //      また下記メソッド名を設定読込後のUiState更新を意味する名称に変更する。
-    private fun onUserSettingsFetchSuccess() {
-        when (uiState.value) {
-            SettingsState.LoadingAllSettings -> {
-                updateUiState(SettingsState.LoadAllSettingsSuccess)
-            }
-
-            SettingsState.Idle,
-            SettingsState.DeletingAllData,
-            SettingsState.DeletingAllDiaries,
-            SettingsState.LoadAllSettingsFailure,
-            SettingsState.LoadAllSettingsSuccess -> {
-                // 処理なし
-            }
-        }
-    }
-
-    // TODO:下記メソッドは一設定の読込メソッドでしか呼び出されておらず、Data層の詳細を知った呼び出し方の為、修正用。
-    //      また下記メソッド名を設定読込後のUiState更新を意味する名称に変更する。
-    private suspend fun onUserSettingsFetchFailure() {
-        when (uiState.value) {
-            SettingsState.LoadingAllSettings,
-            SettingsState.LoadAllSettingsSuccess -> {
-                updateUiState(SettingsState.LoadAllSettingsFailure)
-                // TODO:ラムダ関数引数などでUnexceptedMessageを通知するように修正。
-                emitAppMessageEvent(SettingsAppMessage.SettingLoadFailure)
-            }
-
-            SettingsState.Idle,
-            SettingsState.DeletingAllData,
-            SettingsState.DeletingAllDiaries,
-            SettingsState.LoadAllSettingsFailure -> {
-                // 処理なし
-            }
+        viewModelScope.launch {
+            waitForAllSettingsInitializationCompletion()
+            if (uiState.value == SettingsState.LoadAllSettingsFailure) return@launch
+            updateUiState(SettingsState.LoadAllSettingsSuccess)
         }
     }
 
@@ -202,12 +179,17 @@ internal class SettingsViewModel @Inject constructor(
             loadThemeColorSettingUseCase()
                 .map {
                     when (it) {
-                        is UseCaseResult.Success -> {
-                            onUserSettingsFetchSuccess()
-                            it.value.themeColor.toUiModel()
-                        }
+                        is UseCaseResult.Success -> it.value.themeColor.toUiModel()
                         is UseCaseResult.Failure -> {
-                            onUserSettingsFetchFailure()
+                            val failureMessage = when (it.exception) {
+                                is ThemeColorSettingLoadException.LoadFailure -> {
+                                    SettingsAppMessage.SettingLoadFailure
+                                }
+                                is ThemeColorSettingLoadException.Unknown -> {
+                                    SettingsAppMessage.Unexpected(it.exception)
+                                }
+                            }
+                            handleSettingLoadFailure(failureMessage)
                             it.exception.fallbackSetting.themeColor.toUiModel()
                         }
                     }
@@ -224,6 +206,15 @@ internal class SettingsViewModel @Inject constructor(
                     when (it) {
                         is UseCaseResult.Success -> it.value.dayOfWeek
                         is UseCaseResult.Failure -> {
+                            val failureMessage = when (it.exception) {
+                                is CalendarStartDayOfWeekSettingLoadException.LoadFailure -> {
+                                    SettingsAppMessage.SettingLoadFailure
+                                }
+                                is CalendarStartDayOfWeekSettingLoadException.Unknown -> {
+                                    SettingsAppMessage.Unexpected(it.exception)
+                                }
+                            }
+                            handleSettingLoadFailure(failureMessage)
                             it.exception.fallbackSetting.dayOfWeek
                         }
                     }
@@ -233,19 +224,37 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun setUpReminderNotificationSettingValue() {
-        isCheckedReminderNotification =
+        val sharedPasscodeLockSettingFlow =
             loadReminderNotificationSettingUseCase()
+                .onEach {
+                    when (it) {
+                        is UseCaseResult.Success -> { /*処理なし*/ }
+                        is UseCaseResult.Failure -> {
+                            val failureMessage = when (it.exception) {
+                                is ReminderNotificationSettingLoadException.LoadFailure -> {
+                                    SettingsAppMessage.SettingLoadFailure
+                                }
+                                is ReminderNotificationSettingLoadException.Unknown -> {
+                                    SettingsAppMessage.Unexpected(it.exception)
+                                }
+                            }
+                            handleSettingLoadFailure(failureMessage)
+                        }
+                    }
+                }
+                .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+        isCheckedReminderNotification =
+            sharedPasscodeLockSettingFlow
                 .map {
                     when (it) {
                         is UseCaseResult.Success -> it.value.isEnabled
-                        is UseCaseResult.Failure -> {
-                            it.exception.fallbackSetting.isEnabled
-                        }
+                        is UseCaseResult.Failure -> it.exception.fallbackSetting.isEnabled
                     }
                 }.stateInEagerly(null )
 
         reminderNotificationTime =
-            loadReminderNotificationSettingUseCase()
+            sharedPasscodeLockSettingFlow
                 .map {
                     when (it) {
                         is UseCaseResult.Success -> {
@@ -267,21 +276,37 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun setUpPasscodeLockSettingValue() {
-        isCheckedPasscodeLock =
+        val sharedPasscodeLockSettingFlow =
             loadPasscodeLockSettingUseCase()
+                .onEach {
+                    when (it) {
+                        is UseCaseResult.Success -> { /*処理なし*/ }
+                        is UseCaseResult.Failure -> {
+                            val failureMessage = when (it.exception) {
+                                is PasscodeLockSettingLoadException.LoadFailure -> {
+                                    SettingsAppMessage.SettingLoadFailure
+                                }
+                                is PasscodeLockSettingLoadException.Unknown -> {
+                                    SettingsAppMessage.Unexpected(it.exception)
+                                }
+                            }
+                            handleSettingLoadFailure(failureMessage)
+                        }
+                    }
+                }
+                .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
+
+        isCheckedPasscodeLock =
+            sharedPasscodeLockSettingFlow
                 .map {
                     when (it) {
-                        is UseCaseResult.Success -> {
-                            it.value.isEnabled
-                        }
-                        is UseCaseResult.Failure -> {
-                            it.exception.fallbackSetting.isEnabled
-                        }
+                        is UseCaseResult.Success -> it.value.isEnabled
+                        is UseCaseResult.Failure -> it.exception.fallbackSetting.isEnabled
                     }
                 }.stateInEagerly(null )
 
         passcode =
-            loadPasscodeLockSettingUseCase()
+            sharedPasscodeLockSettingFlow
                 .map {
                     when (it) {
                         is UseCaseResult.Success -> {
@@ -307,10 +332,64 @@ internal class SettingsViewModel @Inject constructor(
                     when (it) {
                         is UseCaseResult.Success -> it.value.isEnabled
                         is UseCaseResult.Failure -> {
+                            val failureMessage = when (it.exception) {
+                                is WeatherInfoFetchSettingLoadException.LoadFailure -> {
+                                    SettingsAppMessage.SettingLoadFailure
+                                }
+                                is WeatherInfoFetchSettingLoadException.Unknown -> {
+                                    SettingsAppMessage.Unexpected(it.exception)
+                                }
+                            }
+                            handleSettingLoadFailure(failureMessage)
                             it.exception.fallbackSetting.isEnabled
                         }
                     }
                 }.stateInEagerly(null)
+    }
+
+    private suspend fun handleSettingLoadFailure(failureMessage: SettingsAppMessage) {
+        val currentUiState = uiState.value
+        if (currentUiState == SettingsState.LoadAllSettingsFailure) return
+
+        updateUiState(SettingsState.LoadAllSettingsFailure)
+        if (failureMessage is SettingsAppMessage.Unexpected) {
+            emitUnexpectedAppMessage(failureMessage.exception)
+        } else {
+            emitAppMessageEvent(failureMessage)
+        }
+    }
+
+    /**
+     * 全ての設定値のFlowが初期化されるまで待機するsuspend関数。
+     */
+    private suspend fun waitForAllSettingsInitializationCompletion() {
+        val isThemeColorReady = themeColor.map { it != null }
+        val isCalendarStartDayOfWeekReady = calendarStartDayOfWeek.map { it != null }
+        val isReminderNotificationReady = combine(
+            isCheckedReminderNotification,
+            reminderNotificationTime
+        ) { isChecked, time ->
+            if (isChecked == false) true else isChecked != null && time != null
+        }
+        val isPasscodeLockReady = combine(
+            isCheckedPasscodeLock,
+            passcode
+        ) { isChecked, code ->
+            if (isChecked == false) true else isChecked != null && code != null
+        }
+        val isWeatherInfoFetchReady = isCheckedWeatherInfoFetch.map { it != null }
+
+        combine(
+            isThemeColorReady,
+            isCalendarStartDayOfWeekReady,
+            isReminderNotificationReady,
+            isPasscodeLockReady,
+            isWeatherInfoFetchReady
+        ) { values ->
+            values.all { it }
+        }.first { allAreReady ->
+            allAreReady
+        }
     }
 
     // BackPressed(戻るボタン)処理
