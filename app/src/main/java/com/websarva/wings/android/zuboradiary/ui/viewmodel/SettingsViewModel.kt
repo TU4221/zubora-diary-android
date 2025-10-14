@@ -429,7 +429,9 @@ internal class SettingsViewModel @Inject constructor(
 
         if (!canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
-                emitUiEvent(SettingsEvent.TurnReminderNotificationSettingSwitch(false))
+                emitUiEvent(
+                    SettingsEvent.TurnReminderNotificationSettingSwitch(!isChecked)
+                )
             }
             return
         }
@@ -461,7 +463,9 @@ internal class SettingsViewModel @Inject constructor(
 
         if (!canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
-                emitUiEvent(SettingsEvent.TurnPasscodeLockSettingSwitch(false))
+                emitUiEvent(
+                    SettingsEvent.TurnPasscodeLockSettingSwitch(!isChecked)
+                )
             }
             return
         }
@@ -479,7 +483,9 @@ internal class SettingsViewModel @Inject constructor(
 
         if (!canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
-                emitUiEvent(SettingsEvent.TurnWeatherInfoFetchSettingSwitch(false))
+                emitUiEvent(
+                    SettingsEvent.TurnWeatherInfoFetchSettingSwitch(!isChecked)
+                )
             }
             return
         }
