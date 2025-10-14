@@ -68,7 +68,7 @@ internal class LoadCalendarStartDayOfWeekSettingUseCase(
                         is UnknownException -> {
                             Log.w(
                                 logTag,
-                                "${logMsg}失敗_原因不明、" +
+                                "${logMsg}失敗_原因不明 (ドメイン層)、" +
                                         "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
                                 cause
                             )
@@ -89,7 +89,21 @@ internal class LoadCalendarStartDayOfWeekSettingUseCase(
                                     .LoadFailure(defaultSettingValue, cause),
                             )
                         }
-                        else -> throw cause
+                        else -> {
+                            // MEMO:このユースケースはUIの表示に必須の設定値を取得するため、
+                            //      ViewModelに例外をスローしてクラッシュさせるのではなく、
+                            //      必ずフォールバック値を返却してUIの描画を保証する。
+                            Log.w(
+                                logTag,
+                                "${logMsg}失敗_原因不明、" +
+                                        "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
+                                cause
+                            )
+                            UseCaseResult.Failure(
+                                CalendarStartDayOfWeekSettingLoadException
+                                    .Unknown(defaultSettingValue, cause),
+                            )
+                        }
                     }
                 emit(result)
             }
