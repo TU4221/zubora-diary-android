@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
 import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
-import com.websarva.wings.android.zuboradiary.data.location.exception.LocationProviderException
 import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.location.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.location.SimpleLocation
@@ -15,7 +14,7 @@ internal class LocationRepositoryImpl (
     override suspend fun fetchCurrentLocation(): SimpleLocation {
         return try {
             fusedLocationDataSource.fetchCurrentLocation().toDomainModel()
-        } catch (e: LocationProviderException) {
+        } catch (e: Exception) {
             throw locationRepositoryExceptionMapper.toDomainException(e)
         }
     }

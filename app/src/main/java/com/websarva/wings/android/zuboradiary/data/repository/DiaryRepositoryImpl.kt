@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.data.repository
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
-import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseException
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDomainModel
@@ -34,7 +33,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun countDiaries(date: LocalDate?): Int {
         return try {
             diaryDataSource.countDiaries(date)
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -42,7 +41,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun existsDiary(date: LocalDate): Boolean {
         return try {
             diaryDataSource.existsDiary(date)
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -51,7 +50,7 @@ internal class DiaryRepositoryImpl (
         return try {
             val id = diaryDataSource.selectDiaryId(date)
             DiaryId(id)
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -59,7 +58,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun loadDiary(id: DiaryId): Diary {
         return try {
             diaryDataSource.selectDiary(id.value).toDomainModel()
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -67,7 +66,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun loadNewestDiary(): Diary {
         return try {
             diaryDataSource.selectNewestDiary().toDomainModel()
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -75,7 +74,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun loadOldestDiary(): Diary {
         return try {
             diaryDataSource.selectOldestDiary().toDomainModel()
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -93,7 +92,7 @@ internal class DiaryRepositoryImpl (
             diaryDataSource
                 .selectDiaryListOrderByDateDesc(num, offset, date)
                 .map { it.toDomainModel() }
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -105,7 +104,7 @@ internal class DiaryRepositoryImpl (
             diaryDataSource.upsertDiary(
                 diary.toDataModel()
             )
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -119,7 +118,7 @@ internal class DiaryRepositoryImpl (
                 deleteDiaryId.value,
                 saveDiary.toDataModel()
             )
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -127,7 +126,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun deleteDiary(id: DiaryId) {
         try {
             diaryDataSource.deleteDiary(id.value)
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -135,7 +134,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun deleteAllDiaries() {
         try {
             diaryDataSource.deleteAllDiaries()
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -145,7 +144,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun countWordSearchResults(searchWord: SearchWord): Int {
         return try {
             diaryDataSource.countWordSearchResults(searchWord.value)
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -162,7 +161,7 @@ internal class DiaryRepositoryImpl (
             diaryDataSource
                 .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord.value)
                 .map { it.toDomainModel() }
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -178,7 +177,7 @@ internal class DiaryRepositoryImpl (
                 .selectDiaryItemTitleSelectionHistoriesByTitles(stringList).map {
                     it.toDomainModel()
                 }
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -193,7 +192,7 @@ internal class DiaryRepositoryImpl (
             .selectHistoryListOrderByLogDesc(num, offset)
             .catch {
                 // Flowストリーム内で発生した例外をDataStorageExceptionにラップ
-                throw if (it is DatabaseException) {
+                throw if (it is Exception) {
                     diaryRepositoryExceptionMapper.toDomainException(it)
                 } else {
                     it // その他の予期せぬ例外はそのままスロー
@@ -211,7 +210,7 @@ internal class DiaryRepositoryImpl (
             diaryDataSource.upsertAndPruneDiaryItemTitleSelectionHistory(
                 historyItemList.map { it.toDataModel() }
             )
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -219,7 +218,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun deleteDiaryItemTitleSelectionHistory(id: DiaryItemTitleSelectionHistoryId) {
         try {
             diaryDataSource.deleteHistoryItem(id.value)
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -229,7 +228,7 @@ internal class DiaryRepositoryImpl (
     override suspend fun deleteAllData() {
         try {
             diaryDataSource.initializeAllData()
-        } catch (e: DatabaseException) {
+        } catch (e: Exception) {
             throw diaryRepositoryExceptionMapper.toDomainException(e)
         }
     }

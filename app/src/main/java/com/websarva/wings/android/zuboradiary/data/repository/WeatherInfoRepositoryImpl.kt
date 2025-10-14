@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.data.repository
 import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherInfoRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.weather.toDomainModel
 import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
-import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOperationException
 import com.websarva.wings.android.zuboradiary.domain.model.location.SimpleLocation
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
@@ -27,7 +26,7 @@ internal class WeatherInfoRepositoryImpl (
         } catch (e: IllegalArgumentException) {
             // 指定された日付が許容範囲外の場合(位置情報はSimpleLocationで正常値を保障されている)
             throw InvalidParameterException(cause = e)
-        } catch (e: NetworkOperationException) {
+        } catch (e: Exception) {
             throw weatherInfoRepositoryExceptionMapper.toDomainException(e)
         }
     }

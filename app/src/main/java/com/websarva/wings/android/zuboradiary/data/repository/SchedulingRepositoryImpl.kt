@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.data.repository
 
 import com.websarva.wings.android.zuboradiary.data.mapper.scheduling.SchedulingRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
-import com.websarva.wings.android.zuboradiary.data.worker.exception.WorkerOperationException
 import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
 import java.time.LocalTime
 
@@ -14,7 +13,7 @@ internal class SchedulingRepositoryImpl(
     override suspend fun registerReminderNotification(settingTime: LocalTime) {
         try {
             notificationSchedulingDataSource.registerReminderNotificationWorker(settingTime)
-        } catch (e: WorkerOperationException) {
+        } catch (e: Exception) {
             throw schedulingRepositoryExceptionMapper.toDomainException(e)
         }
     }
@@ -22,7 +21,7 @@ internal class SchedulingRepositoryImpl(
     override suspend fun cancelReminderNotification() {
         try {
             notificationSchedulingDataSource.cancelReminderNotificationWorker()
-        } catch (e: WorkerOperationException) {
+        } catch (e: Exception) {
             throw schedulingRepositoryExceptionMapper.toDomainException(e)
         }
     }
