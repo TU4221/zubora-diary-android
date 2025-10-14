@@ -109,25 +109,6 @@ internal class SettingsViewModel @Inject constructor(
                 false
             )
 
-    private val canExecuteSettingsOperation: Boolean
-        get() {
-            return when (uiState.value) {
-                SettingsState.LoadAllSettingsSuccess -> true
-
-                SettingsState.Idle,
-                SettingsState.LoadingAllSettings,
-                SettingsState.DeletingAllDiaries,
-                SettingsState.DeletingAllData -> false
-
-                SettingsState.LoadAllSettingsFailure -> {
-                    launchWithUnexpectedErrorHandler {
-                        emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
-                    }
-                    false
-                }
-            }
-        }
-
     // MEMO:StateFlow型設定値変数の値はデータソースからの値のみを代入したいので、
     //      代入されるまでの間(初回設定値読込中)はnullとする。
     lateinit var themeColor: StateFlow<ThemeColorUi?>
@@ -341,7 +322,7 @@ internal class SettingsViewModel @Inject constructor(
 
     // Viewクリック処理
     fun onThemeColorSettingButtonClick() {
-        if (!canExecuteSettingsOperation) return
+        if (!canExecuteOperation()) return
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
@@ -351,7 +332,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onCalendarStartDayOfWeekSettingButtonClick() {
-        if (!canExecuteSettingsOperation) return
+        if (!canExecuteOperation()) return
 
         val dayOfWeek = calendarStartDayOfWeek.requireValue()
         launchWithUnexpectedErrorHandler {
@@ -367,7 +348,7 @@ internal class SettingsViewModel @Inject constructor(
         val settingValue = isCheckedReminderNotification.requireValue()
         if (isChecked == settingValue) return
 
-        if (!canExecuteSettingsOperation) {
+        if (!canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
                 emitUiEvent(SettingsEvent.TurnReminderNotificationSettingSwitch(false))
             }
@@ -399,7 +380,7 @@ internal class SettingsViewModel @Inject constructor(
         val settingValue = isCheckedPasscodeLock.requireValue()
         if (isChecked == settingValue) return
 
-        if (!canExecuteSettingsOperation) {
+        if (!canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
                 emitUiEvent(SettingsEvent.TurnPasscodeLockSettingSwitch(false))
             }
@@ -417,7 +398,7 @@ internal class SettingsViewModel @Inject constructor(
         val settingValue = isCheckedWeatherInfoFetch.requireValue()
         if (isChecked == settingValue) return
 
-        if (!canExecuteSettingsOperation) {
+        if (!canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
                 emitUiEvent(SettingsEvent.TurnWeatherInfoFetchSettingSwitch(false))
             }
@@ -436,7 +417,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllDiariesDeleteButtonClick() {
-        if (!canExecuteSettingsOperation) return
+        if (!canExecuteOperation()) return
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
@@ -446,7 +427,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllSettingsInitializationButtonClick() {
-        if (!canExecuteSettingsOperation) return
+        if (!canExecuteOperation()) return
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
@@ -456,7 +437,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onAllDataDeleteButtonClick() {
-        if (!canExecuteSettingsOperation) return
+        if (!canExecuteOperation()) return
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
@@ -720,40 +701,31 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     /**
-     * 設定操作の実行を試みるヘルパー関数。
+     * 現在のUI状態に基づいて、設定操作が実行可能かどうかを同期的に判定する。
+     * 操作不可能な場合は、必要に応じてユーザーにメッセージを表示する。
      *
-     * 現在の [SettingsState] に基づいて操作の可否を判定する。
-     * 操作可能であればメイン処理を、不可能であればリセット処理を実行する。
-     *
-     * @param currentUiState 現在のUI State。操作可否の判定に使用する。
-     * @param onExecute メイン処理。設定操作が可能な場合に実行される。
-     * @param onCannotExecute リセット処理。設定操作が不可能な場合に実行される。
-     *   [SettingsState] が [SettingsState.LoadAllSettingsFailure]の場合は、
-     *   この処理の実行前にエラーメッセージを表示する。
+     * @return 操作可能な場合は `true`、そうでない場合は `false`。
      */
-    private suspend fun executeSettingsOperation(
-        currentUiState: SettingsState,
-        onExecute: suspend () -> Unit,
-        onCannotExecute: suspend () -> Unit = {}
-    ) {
-        val canExecuteSettingsOperation =
-            when (currentUiState) {
-                SettingsState.LoadAllSettingsSuccess -> true
+    private fun canExecuteOperation(): Boolean {
+        return when (uiState.value) {
+            // 操作可能な状態
+            SettingsState.LoadAllSettingsSuccess,
+            SettingsState.Idle -> true
 
-                SettingsState.Idle,
-                SettingsState.LoadingAllSettings,
-                SettingsState.DeletingAllDiaries,
-                SettingsState.DeletingAllData -> false
-
-                SettingsState.LoadAllSettingsFailure -> {
-                    emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
-                    false
-                }
+            // 操作不可能な状態（ユーザー操作を待機中または処理中）
+            SettingsState.LoadingAllSettings,
+            SettingsState.DeletingAllDiaries,
+            SettingsState.DeletingAllData -> {
+                false
             }
-        if (canExecuteSettingsOperation) {
-            onExecute()
-        } else {
-            onCannotExecute()
+
+            // 操作不可能な状態（致命的なエラー）
+            SettingsState.LoadAllSettingsFailure -> {
+                launchWithUnexpectedErrorHandler {
+                    emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
+                }
+                false
+            }
         }
     }
 
