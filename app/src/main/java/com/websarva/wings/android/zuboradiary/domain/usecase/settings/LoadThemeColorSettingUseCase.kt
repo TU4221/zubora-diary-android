@@ -18,6 +18,10 @@ import kotlinx.coroutines.flow.map
  *
  * 設定の読み込み結果を [Flow] として提供する。
  *
+ * このユースケースは、アプリの動作に不可欠な設定値を取得するため、
+ * データソース層からいかなる種類の例外（RuntimeExceptionなどを含む）がスローされた場合でも、
+ * ViewModelに例外を再スローせず、必ずフォールバック値を含む [UseCaseResult] を返す。
+ *
  * @property settingsRepository 設定関連の操作を行うリポジトリ。
  */
 internal class LoadThemeColorSettingUseCase(
@@ -85,9 +89,7 @@ internal class LoadThemeColorSettingUseCase(
                             )
                         }
                         else -> {
-                            // MEMO:このユースケースはUIの表示に必須の設定値を取得するため、
-                            //      ViewModelに例外をスローしてクラッシュさせるのではなく、
-                            //      必ずフォールバック値を返却してUIの描画を保証する。
+                            // 予期せぬ例外を捕捉。詳細はクラスのKDocを参照。
                             Log.w(
                                 logTag,
                                 "${logMsg}失敗_原因不明、" +
