@@ -27,7 +27,7 @@
         android:networkSecurityConfig="@xml/network_security_config"
         tools:targetApi="35"
         tools:ignore="RemoveWorkManagerInitializer">
-        <!-- HiltでWorkManagerをカスタム初期化するため、Lintの'RemoveWorkManagerInitializer'警告は意図的に無視。 -->
+        <!-- MEMO:HiltでWorkManagerをカスタム初期化するため、Lintの'RemoveWorkManagerInitializer'警告は意図的に無視。 -->
 
         <!--
         hiltを使用してWorkerManagerを使用する場合下記設定が必要
