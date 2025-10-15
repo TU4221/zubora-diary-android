@@ -40,6 +40,7 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     }
 
     private val logTag = createLogTag()
+    private val logMsgPendingNavi = "保留ナビゲーション_"
 
     private val _uiEvent = MutableSharedFlow<ConsumableEvent<E>>(replay = 1)
     val uiEvent get() = _uiEvent.asSharedFlow()
@@ -124,14 +125,27 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     abstract fun onBackPressed()
 
     fun onFragmentNavigationFailure(command: NavigationCommand) {
-        updatePendingNavigationCommandList { it + PendingNavigationCommand(command) }
+        val newPendingCommand = PendingNavigationCommand(command)
+        Log.d(
+            logTag,
+            "${logMsgPendingNavi}失敗したナビゲーションを保留リストに追加。コマンド: $newPendingCommand"
+        )
+        updatePendingNavigationCommandList { it + newPendingCommand }
     }
 
     fun onPendingFragmentNavigationComplete(command: PendingNavigationCommand) {
+        Log.d(
+            logTag,
+            "${logMsgPendingNavi}保留中のナビゲーションが完了。リストから削除。コマンド: $command"
+        )
         updatePendingNavigationCommandList { it - command }
     }
 
     fun onPendingFragmentNavigationFailure(command: PendingNavigationCommand) {
+        Log.d(
+            logTag,
+            "${logMsgPendingNavi}保留中のナビゲーションが再度失敗。リトライ回数を更新。コマンド: $command"
+        )
         updatePendingNavigationCommandList { list ->
             list.map { commandInList ->
                 if (commandInList == command) {
@@ -146,6 +160,12 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     private fun updatePendingNavigationCommandList(
         function: (List<PendingNavigationCommand>) -> List<PendingNavigationCommand>
     ) {
+        val beforeList = _pendingNavigationCommandList.value
+        Log.d(logTag, "${logMsgPendingNavi}更新前のリスト: $beforeList")
+
         _pendingNavigationCommandList.update(function)
+
+        val afterList = _pendingNavigationCommandList.value
+        Log.d(logTag, "${logMsgPendingNavi}更新後のリスト: $afterList")
     }
 }
