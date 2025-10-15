@@ -6,7 +6,7 @@ import androidx.datastore.core.IOException
 import com.websarva.wings.android.zuboradiary.data.network.exception.HttpException
 import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkConnectivityException
 import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOperationException
-import com.websarva.wings.android.zuboradiary.data.network.exception.InvalidRequestParameterException
+import com.websarva.wings.android.zuboradiary.data.network.exception.InvalidNetworkOperationParameterException
 import com.websarva.wings.android.zuboradiary.data.network.exception.ResponseParsingException
 import com.websarva.wings.android.zuboradiary.utils.logTag
 import kotlinx.coroutines.CoroutineDispatcher
@@ -56,7 +56,7 @@ internal class WeatherApiDataSource(
      * @param latitude 天気情報を取得する地点の緯度 (-90.0 から 90.0 の範囲)。
      * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
      * @return 取得した天気情報データ。
-     * @throws InvalidRequestParameterException 引数が許容範囲外の場合。
+     * @throws InvalidNetworkOperationParameterException 引数が許容範囲外の場合。
      * @throws NetworkConnectivityException ネットワーク接続に問題がある場合。
      * @throws NetworkOperationException ネットワーク操作中に問題が発生した場合 (タイムアウト、SSLエラー、一般的なI/Oエラーなど)。
      * @throws HttpException HTTPレスポンスがエラーを示している場合。
@@ -106,7 +106,7 @@ internal class WeatherApiDataSource(
      * @param latitude 天気情報を取得する地点の緯度 (-90.0 から 90.0 の範囲)。
      * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
      * @return 取得した今日の天気情報データ ([WeatherApiData])。
-     * @throws InvalidRequestParameterException 引数が不正な範囲の場合。
+     * @throws InvalidNetworkOperationParameterException 引数が不正な範囲の場合。
      * @throws NetworkConnectivityException ネットワーク接続に問題がある場合。
      * @throws NetworkOperationException ネットワーク操作中に問題が発生した場合 (タイムアウト、SSLエラー、一般的なI/Oエラーなど)。
      * @throws HttpException HTTPレスポンスがエラーを示している場合。
@@ -136,7 +136,7 @@ internal class WeatherApiDataSource(
      * @param longitude 天気情報を取得する地点の経度 (-180.0 から 180.0 の範囲)。
      * @param numPastDays 何日前の天気情報を取得するか ([MIN_PAST_DAYS] から [MAX_PAST_DAYS] の範囲)。
      * @return 取得した過去の天気情報データ。
-     * @throws InvalidRequestParameterException 引数が不正な範囲の場合。
+     * @throws InvalidNetworkOperationParameterException 引数が不正な範囲の場合。
      * @throws NetworkConnectivityException ネットワーク接続に問題がある場合。
      * @throws NetworkOperationException ネットワーク操作中に問題が発生した場合 (タイムアウト、SSLエラー、一般的なI/Oエラーなど)。
      * @throws HttpException HTTPレスポンスがエラーを示している場合。
@@ -239,14 +239,14 @@ internal class WeatherApiDataSource(
      *
      * @param latitude 検証する緯度。-90.0 から 90.0 の範囲であること。
      * @param longitude 検証する経度。-180.0 から 180.0 の範囲であること。
-     * @throws InvalidRequestParameterException 緯度または経度が有効な範囲外の場合。
+     * @throws InvalidNetworkOperationParameterException 緯度または経度が有効な範囲外の場合。
      */
     private fun requireValidLocation(latitude: Double, longitude: Double) {
         try {
             require(latitude >= -90.0 && latitude <= 90.0) { "緯度 `$latitude` が不正値" }
             require(longitude >= -180.0 && longitude <= 180.0) { "経度 `$longitude` が不正値" }
         } catch (e: IllegalArgumentException) {
-            throw InvalidRequestParameterException(e)
+            throw InvalidNetworkOperationParameterException(e)
         }
     }
 
@@ -256,7 +256,7 @@ internal class WeatherApiDataSource(
      * 日数が [MIN_PAST_DAYS] から [MAX_PAST_DAYS] の範囲外であること。
      *
      * @param numPastDays 検証する過去日数。
-     * @throws InvalidRequestParameterException 過去日数が有効な範囲外の場合。
+     * @throws InvalidNetworkOperationParameterException 過去日数が有効な範囲外の場合。
      */
     private fun requireValidPastDays(
         @IntRange(from = MIN_PAST_DAYS.toLong(), to = MAX_PAST_DAYS.toLong()) numPastDays: Int
@@ -266,7 +266,7 @@ internal class WeatherApiDataSource(
                 numPastDays >= MIN_PAST_DAYS && numPastDays <= MAX_PAST_DAYS
             ) { "過去日数 `$numPastDays` が不正値" }
         } catch (e: IllegalArgumentException) {
-            throw InvalidRequestParameterException( e)
+            throw InvalidNetworkOperationParameterException( e)
         }
     }
 }
