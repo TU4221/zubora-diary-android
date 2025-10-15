@@ -51,6 +51,11 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+
+        }
+        debug {
+            // アプリ名に".debug"サフィックスを追加して、一つの端末でリリース版と共存できるようにする
+            applicationIdSuffix = ".debug"
         }
     }
 
@@ -68,6 +73,7 @@ android {
         dataBinding = true
         viewBinding = true
         compose = true
+        buildConfig = true
     }
 }
 
