@@ -13,7 +13,7 @@
         <!-- MEMO:親タグのFrameLayoutにpadding属性を設定するのではなく、子タグにmargin属性を設定する理由は、
                   スワイプ時にViewの端が途切れずに画面外に出てくような動きを表現するため。 -->
         <include
-            layout="@layout/row_left_swipe_delete_button_background"
+            layout="@layout/row_left_swipe_button_background"
             android:id="@+id/include_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"

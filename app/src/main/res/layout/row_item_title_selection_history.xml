@@ -8,7 +8,7 @@
         android:layout_height="wrap_content" >
 
         <include
-            layout="@layout/row_left_swipe_delete_action_background"
+            layout="@layout/row_left_swipe_action_background"
             android:id="@+id/include_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />
