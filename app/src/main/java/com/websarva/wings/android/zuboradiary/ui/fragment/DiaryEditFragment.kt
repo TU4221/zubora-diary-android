@@ -350,11 +350,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
                     val menu = binding.materialToolbarTopAppBar.menu
                     val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
-                    deleteMenuItem.setEnabled(isDeleteEnabled)
+                    deleteMenuItem.isEnabled = isDeleteEnabled
 
                     // TODO:テスト用の為、最終的に削除
                     val testMenuItem = menu.findItem(R.id.diaryEditToolbarOptionTest)
-                    testMenuItem.setEnabled(!isDeleteEnabled)
+                    testMenuItem.isEnabled = !isDeleteEnabled
                 }
         }
 
