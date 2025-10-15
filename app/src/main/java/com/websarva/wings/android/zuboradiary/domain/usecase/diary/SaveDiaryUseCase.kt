@@ -17,7 +17,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.PermissionExcepti
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
 import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import java.time.LocalDate
 
 /**
@@ -35,7 +35,6 @@ internal class SaveDiaryUseCase(
     private val fileRepository: FileRepository,
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "日記保存_"
 
     /**

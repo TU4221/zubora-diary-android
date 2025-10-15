@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.data.database.exception.RecordDele
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordNotFoundException
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordReadException
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordUpdateException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -39,8 +39,6 @@ internal class DiaryDataSource(
     private val diaryItemTitleSelectionHistoryDao: DiaryItemTitleSelectionHistoryDao,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
-
-    private val logTag = createLogTag()
 
     //region Diary
     /**

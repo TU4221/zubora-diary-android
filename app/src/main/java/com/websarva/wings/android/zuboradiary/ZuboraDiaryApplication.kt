@@ -21,7 +21,7 @@ import coil3.request.crossfade
 import coil3.util.DebugLogger
 import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import com.websarva.wings.android.zuboradiary.ui.notification.ReminderNotificationManager
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,8 +32,6 @@ class ZuboraDiaryApplication :
     DefaultLifecycleObserver,
     Configuration.Provider,
     SingletonImageLoader.Factory {
-
-    private val logTag = createLogTag()
 
     @Inject
     lateinit var imageFileDataSource: ImageFileDataSource

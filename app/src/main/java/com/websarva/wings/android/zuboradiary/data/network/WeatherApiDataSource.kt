@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.data.network.exception.HttpExcepti
 import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkConnectivityException
 import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOperationException
 import com.websarva.wings.android.zuboradiary.data.network.exception.ResponseParsingException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -32,8 +32,6 @@ internal class WeatherApiDataSource(
     private val weatherApiService: WeatherApiService,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
-
-    private val logTag = createLogTag()
 
     // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
     //      その為、@Suppress("RedundantSuppression")で警告回避。

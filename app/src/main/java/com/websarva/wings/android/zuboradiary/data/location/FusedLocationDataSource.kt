@@ -11,7 +11,7 @@ import com.websarva.wings.android.zuboradiary.data.location.exception.LocationAc
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationProviderException
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationUnavailableException
 import com.websarva.wings.android.zuboradiary.data.location.exception.PermissionDeniedException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
@@ -32,8 +32,6 @@ internal class FusedLocationDataSource(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
-
-    val logTag = createLogTag()
 
     // MEMO:fusedLocationProviderClient.lastLocation()を記述する時、Permission確認コードが必須となるが、
     //      Permission確認はプロパティで管理する為、@SuppressLintで警告抑制。

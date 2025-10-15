@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByIdException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * 特定のIDの日記データを読み込むユースケース。
@@ -22,7 +22,6 @@ internal class LoadDiaryByIdUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "IDによる日記取得_"
 
     /**

@@ -1,5 +1,4 @@
 package com.websarva.wings.android.zuboradiary.utils
 
-internal fun Any.createLogTag(): String {
-    return this.javaClass.name
-}
+internal val Any.logTag: String
+    get() = this.javaClass.simpleName

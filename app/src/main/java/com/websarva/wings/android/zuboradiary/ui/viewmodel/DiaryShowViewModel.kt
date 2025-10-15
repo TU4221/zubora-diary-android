@@ -10,7 +10,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryById
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByIdException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
@@ -19,6 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
@@ -40,8 +40,6 @@ internal class DiaryShowViewModel @Inject constructor(
         private const val ID_ARGUMENT_KEY = "load_diary_id"
         private const val DATE_ARGUMENT_KEY = "load_diary_date"
     }
-
-    private val logTag = createLogTag()
 
     override val isProgressIndicatorVisible =
         uiState

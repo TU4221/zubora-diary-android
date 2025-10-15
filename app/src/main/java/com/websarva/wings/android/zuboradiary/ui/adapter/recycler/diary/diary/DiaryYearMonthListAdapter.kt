@@ -5,12 +5,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.SwipeDiaryYearMonthListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListItemUi
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 internal abstract class DiaryYearMonthListAdapter(
     recyclerView: RecyclerView,
@@ -66,8 +66,6 @@ internal abstract class DiaryYearMonthListAdapter(
 
     private class DiffUtilItemCallback :
         DiaryYearMonthListBaseAdapter.DiffUtilItemCallback<DiaryDayListItemUi.Standard>() {
-
-        private val logTag = createLogTag()
 
             override fun areContentsTheSame(
                 oldItem: DiaryYearMonthListItemUi<DiaryDayListItemUi.Standard>,

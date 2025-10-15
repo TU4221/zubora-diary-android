@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * 特定の日付の日記を削除するユースケース。
@@ -25,7 +25,6 @@ internal class DeleteDiaryUseCase(
     private val fileRepository: FileRepository
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "日記削除_"
 
     /**

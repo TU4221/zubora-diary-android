@@ -4,7 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryUpdateConfirmationCheckException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import java.time.LocalDate
 
 /**
@@ -22,7 +22,6 @@ internal class ShouldRequestDiaryUpdateConfirmationUseCase(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "日記更新確認要否判定_"
 
     /**

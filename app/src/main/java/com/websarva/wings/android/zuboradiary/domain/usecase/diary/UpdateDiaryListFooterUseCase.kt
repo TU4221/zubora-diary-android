@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import java.time.LocalDate
 
 /**
@@ -24,7 +24,6 @@ internal class UpdateDiaryListFooterUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "日記リストフッター更新_"
 
     /**

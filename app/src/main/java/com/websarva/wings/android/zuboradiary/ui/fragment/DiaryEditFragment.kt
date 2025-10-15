@@ -23,7 +23,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.DatePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
@@ -48,6 +47,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -60,8 +60,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         // Navigation関係
         val KEY_RESULT = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
     }
-
-    val logTag = createLogTag()
 
     private val motionLayoutTransitionTime = 500 /*ms*/
 
@@ -529,8 +527,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         private val onDiaryItemTransitionToVisibleCompleted: (Int) -> Unit,
         private val processSelectionItemMotionLayout: (Int) -> MotionLayout,
     ): MotionLayout.TransitionListener {
-
-        private val logTag = createLogTag()
 
         private val scrollTimeMotionLayoutTransition = 1000 /*ms*/
 

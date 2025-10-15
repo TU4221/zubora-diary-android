@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * カレンダーの週の開始曜日設定を更新するユースケース。
@@ -19,7 +19,6 @@ internal class UpdateCalendarStartDayOfWeekSettingUseCase(
     private val settingsRepository: SettingsRepository
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "カレンダー開始曜日設定更新_"
 
     /**

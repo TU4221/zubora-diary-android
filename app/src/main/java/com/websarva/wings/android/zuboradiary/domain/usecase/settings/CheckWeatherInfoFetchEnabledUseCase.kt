@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -17,7 +17,6 @@ internal class CheckWeatherInfoFetchEnabledUseCase(
     private val loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "天気情報取得設定確認_"
 
     /**

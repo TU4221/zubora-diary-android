@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * 天気情報取得設定を更新するユースケース。
@@ -19,7 +19,6 @@ internal class UpdateWeatherInfoFetchSettingUseCase(
     private val settingsRepository: SettingsRepository
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "天気情報取得設定更新_"
 
     /**

@@ -19,7 +19,6 @@ import androidx.navigation.ui.NavigationUI.onNavDestinationSelected
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
@@ -37,11 +36,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import androidx.core.view.size
 import androidx.core.view.get
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 @AndroidEntryPoint
 class MainActivity : LoggingActivity() {
-
-    private val logTag = createLogTag()
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = checkNotNull(_binding)

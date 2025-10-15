@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import java.time.LocalDate
 
 /**
@@ -18,7 +18,6 @@ internal class DoesDiaryExistUseCase(
     private val diaryRepository: DiaryRepository
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "日記既存確認_"
 
     /**

@@ -3,12 +3,10 @@ package com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary
 import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 internal abstract class DiaryDayListBaseDiffUtilItemCallback<T : DiaryDayListItemUi> :
     DiffUtil.ItemCallback<T>() {
-
-    private val logTag = createLogTag()
 
     override fun areItemsTheSame(
         oldItem: T,

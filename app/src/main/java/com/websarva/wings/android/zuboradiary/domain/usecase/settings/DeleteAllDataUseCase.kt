@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllDataDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * アプリケーションの全データを削除するユースケース。
@@ -28,7 +28,6 @@ internal class DeleteAllDataUseCase(
     private val initializeAllSettingsUseCase: InitializeAllSettingsUseCase
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "アプリ全データ削除_"
 
     /**

@@ -7,13 +7,13 @@ import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.RowDiaryDayListBinding
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeBackgroundButtonSimpleCallback
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.LeftSwipeSimpleCallback.LeftSwipeViewHolder
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.DiaryDayListBaseDiffUtilItemCallback
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryDayListAdapter.DiaryDayListViewHolder
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.utils.asDiaryListDayOfWeekString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import java.text.NumberFormat
 
 internal class DiaryDayListAdapter
@@ -125,8 +125,6 @@ internal class DiaryDayListAdapter
     }
 
     private class DiffUtilItemCallback : DiaryDayListBaseDiffUtilItemCallback<DiaryDayListItemUi.Standard>() {
-
-        val logTag = createLogTag()
 
         override fun areContentsTheSame(
             oldItem: DiaryDayListItemUi.Standard,

@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLock
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * アプリケーションの全ての設定項目を初期値にリセットするユースケース。
@@ -40,7 +40,6 @@ internal class InitializeAllSettingsUseCase(
     private val updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "全設定初期化_"
 
     /**

@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsear
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListItemUi
 import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 internal abstract class DiaryYearMonthListBaseAdapter<
         CLIT : DiaryDayListItemUi
@@ -32,8 +32,6 @@ internal abstract class DiaryYearMonthListBaseAdapter<
     themeColor,
     diffUtilItemCallback
 ) {
-
-    private val logTag = createLogTag()
 
     fun interface OnChildItemClickListener<T> {
         fun onClick(item: T)
@@ -181,8 +179,6 @@ internal abstract class DiaryYearMonthListBaseAdapter<
 
     protected abstract class DiffUtilItemCallback<T : DiaryDayListItemUi>
         : DiffUtil.ItemCallback<DiaryYearMonthListItemUi<T>>() {
-
-            private val logTag = createLogTag()
 
             override fun areItemsTheSame(
                 oldItem: DiaryYearMonthListItemUi<T>,

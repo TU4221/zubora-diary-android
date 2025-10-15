@@ -7,9 +7,9 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.websarva.wings.android.zuboradiary.ui.utils.datePickerDialogThemeResId
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -17,8 +17,6 @@ import java.time.ZoneOffset
 
 
 abstract class BaseDatePickerDialogFragment : DialogFragment() {
-
-    private val logTag = createLogTag()
 
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。

@@ -6,7 +6,7 @@ import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import com.websarva.wings.android.zuboradiary.data.worker.exception.WorkerCancellationException
 import com.websarva.wings.android.zuboradiary.data.worker.exception.WorkerEnqueueException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -29,8 +29,6 @@ internal class NotificationSchedulingDataSource(
 
     private val reminderNotificationWorkTag = "ReminderNotification"
     private val reminderNotificationUniqueWorkName = reminderNotificationWorkTag
-
-    private val logTag = createLogTag()
 
     /**
      * リマインダー通知ワーカー ([ReminderNotificationWorker]) を指定された時刻に毎日実行するようにスケジュール登録する。

@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -31,8 +31,6 @@ internal class CalendarViewModel @Inject constructor(
     CalendarState.Idle,
     buildDiaryImageFilePathUseCase
 ) {
-
-    val logTag = createLogTag()
 
     override val isProgressIndicatorVisible =
         uiState

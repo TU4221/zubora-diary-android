@@ -16,7 +16,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.RawW
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -26,8 +26,6 @@ internal class DiaryRepositoryImpl (
     private val diaryDataSource: DiaryDataSource,
     private val diaryRepositoryExceptionMapper: DiaryRepositoryExceptionMapper
 ) : DiaryRepository {
-
-    private val logTag = createLogTag()
 
     //region Diary
     override suspend fun countDiaries(date: LocalDate?): Int {

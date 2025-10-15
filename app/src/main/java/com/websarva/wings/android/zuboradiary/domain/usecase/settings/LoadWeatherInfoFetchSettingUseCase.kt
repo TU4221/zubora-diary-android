@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -28,7 +28,6 @@ internal class LoadWeatherInfoFetchSettingUseCase(
     private val settingsRepository: SettingsRepository
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "天気情報取得設定読込_"
 
     /**

@@ -15,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.FileReadExcept
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileWriteException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileNotFoundException
 import com.websarva.wings.android.zuboradiary.data.utils.isInsufficientStorage
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -24,6 +23,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import androidx.core.net.toUri
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * 画像ファイルの永続化およびキャッシュ処理を担当するデータソース。
@@ -43,8 +43,6 @@ class ImageFileDataSource(
     private val permanentDir: File,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
-
-    private val logTag = createLogTag()
 
     private val imageFileExtension = Bitmap.CompressFormat.JPEG
 

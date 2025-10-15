@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
@@ -11,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.PendingNavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -38,8 +38,7 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
             initialValue
         )
     }
-
-    private val logTag = createLogTag()
+    
     private val logMsgPendingNavi = "保留ナビゲーション_"
 
     private val _uiEvent = MutableSharedFlow<ConsumableEvent<E>>(replay = 1)

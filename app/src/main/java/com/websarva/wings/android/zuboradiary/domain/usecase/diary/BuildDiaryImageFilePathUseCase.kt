@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundE
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageFilePathBuildingException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * 日記画像ファイルの絶対パスを取得するユースケース。
@@ -18,8 +18,6 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
 internal class BuildDiaryImageFilePathUseCase(
     private val fileRepository: FileRepository
 ) {
-
-    private val logTag = createLogTag()
     private val logMsg = "日記画像ファイルパス取得_"
 
     /**

@@ -3,11 +3,9 @@ package com.websarva.wings.android.zuboradiary.ui.activity
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 abstract class LoggingActivity : AppCompatActivity() {
-
-    private val logTag = createLogTag()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         application

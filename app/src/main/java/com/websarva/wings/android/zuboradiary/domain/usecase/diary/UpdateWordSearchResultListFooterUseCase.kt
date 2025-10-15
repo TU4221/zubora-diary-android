@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Wor
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * ワード検索結果リストのフッターを更新するユースケース。
@@ -21,7 +21,6 @@ internal class UpdateWordSearchResultListFooterUseCase(
     private val countWordSearchResultsUseCase: CountWordSearchResultsUseCase
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "ワード検索結果リストフッター更新_"
 
     /**

@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * 日記を保存せずに終了する際の確認ダイアログを表示する必要があるかどうかを判断するユースケース。
@@ -14,7 +14,6 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
  */
 internal class ShouldRequestExitWithoutDiarySaveConfirmationUseCase {
 
-    private val logTag = createLogTag()
     private val logMsg = "日記未保存終了確認要否判定_"
 
     /**

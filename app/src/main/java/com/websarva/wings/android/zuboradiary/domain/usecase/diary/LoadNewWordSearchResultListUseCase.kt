@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Wor
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListNewLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * 新規にワード検索結果リストを読み込み、フッターを更新するユースケース。
@@ -24,7 +24,6 @@ internal class LoadNewWordSearchResultListUseCase(
     private val updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "新規ワード検索結果リスト読込_"
 
     /**

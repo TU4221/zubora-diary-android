@@ -9,7 +9,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Wor
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
+
 /**
  * 既存のワード検索結果リストに追加の検索結果データを読み込み、結合してフッターを更新するユースケース。
  *
@@ -23,7 +24,6 @@ internal class LoadAdditionWordSearchResultListUseCase(
     private val updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "追加ワード検索結果リスト読込_"
 
     /**

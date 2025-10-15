@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListNewLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import java.time.LocalDate
 
 /**
@@ -24,7 +24,6 @@ internal class LoadNewDiaryListUseCase(
     private val updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
 ) {
 
-    private val logTag = createLogTag()
     private val logMsg = "新規日記リスト読込_"
 
     /**

@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 import java.time.LocalDate
 
 /**
@@ -13,7 +13,6 @@ import java.time.LocalDate
  */
 internal class ShouldFetchWeatherInfoUseCase {
 
-    private val logTag = createLogTag()
     private val logMsg = "天気情報取得要否判定_"
 
     /**

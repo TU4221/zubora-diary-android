@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.text
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
-import com.websarva.wings.android.zuboradiary.utils.createLogTag
+import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
  * 入力されたテキストの有効性を検証するユースケース。
@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.utils.createLogTag
  */
 internal class ValidateInputTextUseCase {
 
-    private val logTag = createLogTag()
     private val logMsg = "インプットテキスト有効確認_"
 
     /**
