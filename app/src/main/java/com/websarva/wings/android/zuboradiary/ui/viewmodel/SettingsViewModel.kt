@@ -166,6 +166,9 @@ internal class SettingsViewModel @Inject constructor(
         setUpPasscodeLockSettingValue()
         setUpWeatherInfoFetchSettingValue()
 
+        // MEMO:このViewModelの初期化処理では、各設定の読み込み失敗を個別にハンドリングしているため、
+        //      予期せぬ例外のみを処理する共通の`launchWithUnexpectedErrorHandler`は使用せず、
+        //      素の`launch`で実行する。
         viewModelScope.launch {
             waitForAllSettingsInitializationCompletion()
             if (uiState.value == SettingsState.LoadAllSettingsFailure) return@launch
