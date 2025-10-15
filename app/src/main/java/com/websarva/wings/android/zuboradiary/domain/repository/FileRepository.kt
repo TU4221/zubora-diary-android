@@ -70,6 +70,7 @@ internal interface FileRepository {
      * @param uriString キャッシュしたい画像ファイルのUri。
      * @param fileBaseName キャッシュされるファイルのベース名。
      * @return キャッシュストレージへ保存されたファイル名。
+     * @throws InvalidParameterException ファイルベース名が不正な場合。
      * @throws ResourceNotFoundException 指定されたURI/ファイルパスの画像が見つからない場合。
      * @throws PermissionException ファイルへのアクセス権限がない場合。
      * @throws DataStorageException ファイルの保存に失敗した場合。

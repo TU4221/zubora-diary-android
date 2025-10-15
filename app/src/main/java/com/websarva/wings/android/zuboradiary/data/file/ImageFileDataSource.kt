@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
+import androidx.compose.ui.input.key.Key.Companion.I
 import com.websarva.wings.android.zuboradiary.data.file.exception.DirectoryDeletionFailedException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileAlreadyExistsException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileDeleteException
@@ -22,6 +23,7 @@ import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import androidx.core.net.toUri
+import com.websarva.wings.android.zuboradiary.data.file.exception.InvalidFileOperationParameterException
 import com.websarva.wings.android.zuboradiary.utils.logTag
 
 /**
@@ -67,7 +69,6 @@ class ImageFileDataSource(
      *
      * @param fileName 構築対象の画像ファイルの名前 (空でない、またはブランクのみでないこと)。
      * @return 構築された絶対パス。
-     * @throws IllegalArgumentException 引数が不正な場合。
      */
     fun buildImageFileAbsolutePathFromCache(fileName: ImageFileName): String {
         return File(imageCacheDir, fileName.fullName).absolutePath
@@ -78,7 +79,6 @@ class ImageFileDataSource(
      *
      * @param fileName 構築対象の画像ファイルの名前 (空でない、またはブランクのみでないこと)。
      * @return 構築された絶対パス。
-     * @throws IllegalArgumentException 引数が不正な場合。
      */
     fun buildImageFileAbsolutePathFromPermanent(fileName: ImageFileName): String {
         return File(imagePermanentDir, fileName.fullName).absolutePath
@@ -150,7 +150,7 @@ class ImageFileDataSource(
      * @param height リサイズ後の目標高さ。0の場合は元の高さを維持。
      * @param quality JPEG圧縮品質 (0-100)。
      * @return 保存されたファイル名 (拡張子付き)。
-     * @throws IllegalArgumentException ファイルベース名が不正な場合。
+     * @throws InvalidFileOperationParameterException ファイルベース名が不正な場合。
      * @throws FileNotFoundException 指定されたURI/ファイルパスの画像が見つからない場合。
      * @throws FilePermissionDeniedException ファイルへのアクセス権限がない場合。
      * @throws FileReadException 画像の読み込みまたはデコードに失敗した場合。
@@ -164,7 +164,11 @@ class ImageFileDataSource(
         height: Int = 0,
         quality: Int = 100
     ): String {
-        require(fileBaseName.isNotBlank()) {"ファイルベース名が空文字列"}
+        try {
+            require(fileBaseName.isNotBlank()) {"ファイルベース名が空文字列"}
+        } catch (e: IllegalArgumentException) {
+            throw InvalidFileOperationParameterException(e)
+        }
 
         return withContext(dispatcher) {
             val uri = uriString.toUri()

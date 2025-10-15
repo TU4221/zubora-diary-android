@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.FilePermission
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileReadException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileWriteException
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileInsufficientStorageException
+import com.websarva.wings.android.zuboradiary.data.file.exception.InvalidFileOperationParameterException
 import com.websarva.wings.android.zuboradiary.data.mapper.RepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
@@ -15,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.PermissionExcepti
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 
 internal object FileRepositoryExceptionMapper
@@ -29,6 +31,7 @@ internal object FileRepositoryExceptionMapper
             is FilePermissionDeniedException -> PermissionException(cause = e)
             is FileReadException -> DataStorageException(cause = e)
             is FileWriteException -> DataStorageException(cause = e)
+            is InvalidFileOperationParameterException -> InvalidParameterException(cause = e)
             is RuntimeException -> throw e
             else -> UnknownException(cause = e)
         }
