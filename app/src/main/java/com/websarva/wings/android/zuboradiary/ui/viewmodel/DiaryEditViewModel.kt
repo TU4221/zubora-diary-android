@@ -787,12 +787,6 @@ internal class DiaryEditViewModel @Inject constructor(
             date,
             { id, _ ->
                 id ?: throw IllegalArgumentException()
-
-                // TODO:下記、日記読込失敗ダイアログ不要確認テスト用
-                /*UseCaseResult.Failure(
-                    DiaryLoadByIdException.LoadFailure(DiaryId(id), IllegalStateException())
-                )*/
-
                 loadDiaryByIdUseCase(DiaryId(id))
             },
             { exception ->
@@ -852,15 +846,12 @@ internal class DiaryEditViewModel @Inject constructor(
                 if (previousState == DiaryEditState.Idle) {
                     updateUiState(DiaryEditState.LoadError)
 
-                    // TODO:戻るEventでいいかも？先にダイアログを表示してるから、閉じたら戻る処理される。
+                    // MEMO:連続するUIイベント（エラー表示と画面遷移）は、監視開始前に発行されると
+                    //      取りこぼされる可能性がある。これを防ぐため、間に確認ダイアログを挟み、
+                    //      ユーザーの応答を待ってから画面遷移を実行する。
                     emitUiEvent(
                         DiaryEditEvent.NavigateDiaryLoadFailureDialog(date)
                     )
-                    // TODO:上記の代替案として下記コードを記述したが、保留Navigationが上手く機能していない為下記が正常に処理されない
-                    /*emitAppMessageOnFailure(result.exception)
-                    emitUiEvent(
-                        DiaryEditEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed()
-                    )*/
                 } else {
                     updateUiState(DiaryEditState.Editing)
                     emitAppMessageOnFailure(result.exception)
@@ -1253,7 +1244,6 @@ internal class DiaryEditViewModel @Inject constructor(
         updateImageFilePath(imageFilePathUi)
     }
 
-    // TODO:読込に失敗した時は編集途中確認をパスすること。(呼び出しもとでDiaryUiを作成するときにエラー発生するため)
     private suspend fun handleBackNavigation(
         diary: DiaryUi,
         originalDiary: DiaryUi
