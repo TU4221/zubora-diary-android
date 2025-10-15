@@ -136,9 +136,9 @@ internal class FragmentHelper {
                         val firstPendingCommand = value.first()
                         if (!firstPendingCommand.canRetry()) {
                             Log.e(logTag, "保留ナビゲーションコマンド最大リトライ回数到達")
-                            // TODO:リトライハンドリング検討
                             if (BuildConfig.DEBUG) throw IllegalStateException()
-                            return@collectLatest
+                            mainViewModel
+                                .onPendingFragmentNavigationRetryLimitReached(firstPendingCommand)
                         }
 
                         val isNavigationSuccessful =

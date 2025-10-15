@@ -157,6 +157,14 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
         }
     }
 
+    fun onPendingFragmentNavigationRetryLimitReached(command: PendingNavigationCommand) {
+        Log.e(
+            logTag,
+            "${logMsgPendingNavi}保留中のナビゲーションがリトライ回数に到達。コマンド: $command"
+        )
+        updatePendingNavigationCommandList { it - command }
+    }
+
     private fun updatePendingNavigationCommandList(
         function: (List<PendingNavigationCommand>) -> List<PendingNavigationCommand>
     ) {
