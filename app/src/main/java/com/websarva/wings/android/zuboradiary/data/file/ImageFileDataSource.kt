@@ -23,6 +23,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
+import androidx.core.net.toUri
 
 /**
  * 画像ファイルの永続化およびキャッシュ処理を担当するデータソース。
@@ -169,7 +170,7 @@ class ImageFileDataSource(
         require(fileBaseName.isNotBlank()) {"ファイルベース名が空文字列"}
 
         return withContext(dispatcher) {
-            val uri = Uri.parse(uriString)
+            val uri = uriString.toUri()
             val outputFileName = "$fileBaseName.${imageFileExtension.name}"
             val outputFile = File(imageCacheDir, outputFileName)
             var bitmap: Bitmap? = null
