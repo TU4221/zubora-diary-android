@@ -29,6 +29,8 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asSurfaceContainerHighest
 import com.websarva.wings.android.zuboradiary.ui.utils.isAppearanceLightStatusBars
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import java.util.function.Consumer
+import androidx.core.view.size
+import androidx.core.view.get
 
 /**
  * Enum ThemeColorをもとにViewの色を変更するクラス。
@@ -176,11 +178,11 @@ internal open class ThemeColorChanger {
     private fun applyToolbarMenuIconColor(toolbar: MaterialToolbar, color: Int) {
         val menu = toolbar.menu ?: return
 
-        val numMenuIcons = menu.size()
+        val numMenuIcons = menu.size
         if (numMenuIcons <= 0) return
 
         for (i in 0 until numMenuIcons) {
-            val icon = menu.getItem(i).icon
+            val icon = menu[i].icon
             icon?.setTint(color)
         }
     }

@@ -35,6 +35,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
+import androidx.core.view.size
+import androidx.core.view.get
 
 @AndroidEntryPoint
 class MainActivity : LoggingActivity() {
@@ -233,9 +235,9 @@ class MainActivity : LoggingActivity() {
 
     private fun switchBottomNavigationEnabled(state: MainActivityUiState) {
         val menu = binding.bottomNavigation.menu
-        val size = menu.size()
+        val size = menu.size
         for (i in 0 until size) {
-            menu.getItem(i).setEnabled(state.isBottomNavigationEnabled)
+            menu[i].isEnabled = state.isBottomNavigationEnabled
         }
     }
 
@@ -330,7 +332,7 @@ class MainActivity : LoggingActivity() {
     private fun navigateBottomNavigationStartTabFragment() {
         binding.bottomNavigation.apply {
             selectedItemId =
-                menu.getItem(0).itemId // 初期メニューアイテム(アプリ起動で最初に選択されているアイテム)
+                menu[0].itemId // 初期メニューアイテム(アプリ起動で最初に選択されているアイテム)
         }
     }
 
