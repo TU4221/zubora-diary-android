@@ -524,7 +524,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val previousDate = previousDate
 
         launchWithUnexpectedErrorHandler {
-            processWeatherInfoFetch(date, previousDate)
+            fetchWeatherInfo(date, previousDate)
         }
     }
 
@@ -748,7 +748,7 @@ internal class DiaryEditViewModel @Inject constructor(
         clearPendingWeatherInfoFetchParameters()
         launchWithUnexpectedErrorHandler {
             parameters?.let {
-                fetchWeatherInfo(isGranted, it.date)
+                executeFetchWeatherInfo(isGranted, it.date)
             } ?: throw IllegalStateException()
         }
     }
@@ -811,7 +811,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private suspend fun loadDiaryByDate(date: LocalDate) {
         executeDiaryLoad(
             date = date,
-            processDiaryLoad = { _, date ->
+            executeLoadDiary = { _, date ->
                 loadDiaryByDateUseCase(date)
             },
             emitAppMessageOnFailure = { exception ->
@@ -830,7 +830,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private suspend fun <E : UseCaseException> executeDiaryLoad(
         id: String? = null,
         date: LocalDate,
-        processDiaryLoad: suspend (String?, LocalDate) -> UseCaseResult<Diary, E>,
+        executeLoadDiary: suspend (String?, LocalDate) -> UseCaseResult<Diary, E>,
         emitAppMessageOnFailure: suspend (E) -> Unit
     ) {
         val logMsg = "日記読込"
@@ -839,7 +839,7 @@ internal class DiaryEditViewModel @Inject constructor(
         val previousState = uiState.value
         Log.i(logTag, "${logMsg}_previousState: $previousState")
         updateUiState(DiaryEditState.Loading)
-        when (val result = processDiaryLoad(id, date)) {
+        when (val result = executeLoadDiary(id, date)) {
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)
                 val diary = result.value
@@ -970,7 +970,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         DiaryEditEvent.NavigateDiaryLoadDialog(date)
                     )
                 } else {
-                    processWeatherInfoFetch(date, previousDate)
+                    fetchWeatherInfo(date, previousDate)
                 }
             }
             is UseCaseResult.Failure -> {
@@ -1035,7 +1035,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 天気情報取得関係
-    private suspend fun processWeatherInfoFetch(date: LocalDate, previousDate: LocalDate?) {
+    private suspend fun fetchWeatherInfo(date: LocalDate, previousDate: LocalDate?) {
         updateUiState(DiaryEditState.CheckingWeatherAvailability)
         val isEnabled = checkWeatherInfoFetchEnabledUseCase().value
         updateUiState(DiaryEditState.Editing)
@@ -1072,7 +1072,7 @@ internal class DiaryEditViewModel @Inject constructor(
         )
     }
 
-    private suspend fun fetchWeatherInfo(
+    private suspend fun executeFetchWeatherInfo(
         isGranted: Boolean,
         date: LocalDate
     ) {

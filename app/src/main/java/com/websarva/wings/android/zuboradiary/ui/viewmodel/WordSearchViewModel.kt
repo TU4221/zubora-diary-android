@@ -254,7 +254,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String
     ) {
-        loadWordSearchResultList(
+        executeLoadWordSearchResultList(
             WordSearchState.Searching,
             currentResultList,
             searchWord,
@@ -283,7 +283,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String
     ) {
-        loadWordSearchResultList(
+        executeLoadWordSearchResultList(
             WordSearchState.AdditionLoading,
             currentResultList,
             searchWord,
@@ -314,7 +314,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String
     ) {
-        loadWordSearchResultList(
+        executeLoadWordSearchResultList(
             WordSearchState.Updating,
             currentResultList,
             searchWord,
@@ -339,8 +339,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
     }
 
-    // TODO:名称をexecuteにする。(他のViewModelも)
-    private suspend fun <E : UseCaseException> loadWordSearchResultList(
+    private suspend fun <E : UseCaseException> executeLoadWordSearchResultList(
         state: WordSearchState,
         currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String,

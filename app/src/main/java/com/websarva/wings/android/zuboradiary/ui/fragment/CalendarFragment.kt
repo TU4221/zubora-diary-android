@@ -117,7 +117,7 @@ class CalendarFragment :
             is CalendarEvent.SmoothScrollCalendar -> {
                 smoothScrollCalendar(event.date)
             }
-            is CalendarEvent.UpdateCalendarDayDotVisibility -> {
+            is CalendarEvent.RefreshCalendarDayDotVisibility -> {
                 updateCalendarDayDotVisibility(event.date, event.isVisible)
             }
             is CalendarEvent.CommonEvent -> {
@@ -202,7 +202,7 @@ class CalendarFragment :
     private class CalendarMonthDayBinder(
         private val themeColor: ThemeColorUi,
         private val onDateClick: (date: LocalDate) -> Unit,
-        private val processDiaryExistCheck: (date: LocalDate) -> Unit
+        private val processCheckDiaryExists: (date: LocalDate) -> Unit
     ) : MonthDayBinder<DayViewContainer> {
 
         private var selectedDate: LocalDate = LocalDate.now()
@@ -289,7 +289,7 @@ class CalendarFragment :
             val boolean = dayDotVisibilityCache[localDate]
             viewCalendarDayDot.visibility =
                 if (boolean == null) {
-                    processDiaryExistCheck(localDate)
+                    processCheckDiaryExists(localDate)
                     View.INVISIBLE
                 } else {
                     if (boolean) View.VISIBLE else View.INVISIBLE

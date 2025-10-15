@@ -527,7 +527,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         private val scrollView: NestedScrollView,
         private val onDiaryItemTransitionToInvisibleCompleted: (Int) -> Unit,
         private val onDiaryItemTransitionToVisibleCompleted: (Int) -> Unit,
-        private val processItemMotionLayoutSelection: (Int) -> MotionLayout,
+        private val processSelectionItemMotionLayout: (Int) -> MotionLayout,
     ): MotionLayout.TransitionListener {
 
         private val logTag = createLogTag()
@@ -588,7 +588,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         private fun isNextItemInvisibleState(): Boolean {
             if (itemNumber == maxItemNumber) return true
             val nextItemNumber = itemNumber.inc()
-            val motionLayout = processItemMotionLayoutSelection(nextItemNumber)
+            val motionLayout = processSelectionItemMotionLayout(nextItemNumber)
             return motionLayout.currentState == R.id.motion_scene_edit_diary_item_invisible_state
         }
 

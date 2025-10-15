@@ -9,7 +9,7 @@ sealed class CalendarEvent : UiEvent {
     ) : CalendarEvent()
     internal data class ScrollCalendar(val date: LocalDate) : CalendarEvent()
     internal data class SmoothScrollCalendar(val date: LocalDate) : CalendarEvent()
-    internal data class UpdateCalendarDayDotVisibility(
+    internal data class RefreshCalendarDayDotVisibility(
         val date: LocalDate,
         val isVisible: Boolean
     ) : CalendarEvent()

@@ -143,7 +143,7 @@ internal class CalendarViewModel @Inject constructor(
     // View状態処理
     fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
         launchWithUnexpectedErrorHandler {
-            processCalendarDayDotUpdate(date)
+            refreshCalendarDayDot(date)
         }
     }
 
@@ -196,9 +196,9 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    private suspend fun processCalendarDayDotUpdate(date: LocalDate) {
+    private suspend fun refreshCalendarDayDot(date: LocalDate) {
         emitUiEvent(
-            CalendarEvent.UpdateCalendarDayDotVisibility(date, existsSavedDiary(date))
+            CalendarEvent.RefreshCalendarDayDotVisibility(date, existsSavedDiary(date))
         )
     }
 

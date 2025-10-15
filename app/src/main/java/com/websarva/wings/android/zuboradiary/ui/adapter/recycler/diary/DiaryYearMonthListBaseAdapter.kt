@@ -242,7 +242,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
     //         反映されるまでの間にタイムラグがあるため、その間にスクロール読込開始条件が揃って読込処理が重複してしまう。
     //         これを解消するために独自のフラグを用意した。
     private class ListAdditionalLoadOnScrollListener(
-        val processListAdditionalLoad: () -> Unit
+        val processAdditionalLoadList: () -> Unit
     ) : RecyclerView.OnScrollListener() {
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             super.onScrolled(recyclerView, dx, dy)
@@ -261,7 +261,7 @@ internal abstract class DiaryYearMonthListBaseAdapter<
             val recyclerViewAdapter = checkNotNull(recyclerView.adapter)
             val lastItemViewType = recyclerViewAdapter.getItemViewType(lastItemPosition)
             if (lastItemViewType == ViewType.PROGRESS_INDICATOR.viewTypeNumber) {
-                processListAdditionalLoad()
+                processAdditionalLoadList()
             }
         }
     }

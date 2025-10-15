@@ -127,7 +127,7 @@ class MainActivity : LoggingActivity() {
     //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにする。
     //      Fragment A → B → A
     private class BottomNavigationEnabledSwitchCallbacks(
-        private val processBottomNavigationEnabled: (isEnabled: Boolean) -> Unit
+        private val processEnabledBottomNavigation: (isEnabled: Boolean) -> Unit
     ) : FragmentManager.FragmentLifecycleCallbacks() {
 
         override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
@@ -135,7 +135,7 @@ class MainActivity : LoggingActivity() {
             if (f.parentFragment !is NavHostFragment) return
 
             if (isFragmentWithBottomNavigation(f)) {
-                processBottomNavigationEnabled(true)
+                processEnabledBottomNavigation(true)
             }
         }
 
@@ -144,7 +144,7 @@ class MainActivity : LoggingActivity() {
             if (f.parentFragment !is NavHostFragment) return
 
             if (isFragmentWithBottomNavigation(f)) {
-                processBottomNavigationEnabled(false)
+                processEnabledBottomNavigation(false)
             }
         }
 
@@ -154,7 +154,7 @@ class MainActivity : LoggingActivity() {
     }
 
     private class BottomNavigationStateSwitchCallbacks(
-        private val processBottomNavigationVisibilityState: (isVisible: Boolean) -> Unit
+        private val processVisibleBottomNavigation: (isVisible: Boolean) -> Unit
     ) : FragmentManager.FragmentLifecycleCallbacks() {
         override fun onFragmentViewCreated(
             fm: FragmentManager,
@@ -167,7 +167,7 @@ class MainActivity : LoggingActivity() {
 
             if (f is DialogFragment) return
 
-            processBottomNavigationVisibilityState(f is RequiresBottomNavigation)
+            processVisibleBottomNavigation(f is RequiresBottomNavigation)
         }
     }
 

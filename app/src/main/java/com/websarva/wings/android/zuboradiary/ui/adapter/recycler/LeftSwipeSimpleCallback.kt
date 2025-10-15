@@ -102,22 +102,22 @@ internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRec
     }
 
     private class SwipeStatePositionsResetObserver(
-        private val processSwipeStatePositionsReset: () -> Unit
+        private val processResetSwipeStatePositions: () -> Unit
     ) : RecyclerView.AdapterDataObserver() {
         override fun onItemRangeChanged(positionStart: Int, itemCount: Int) {
-            processSwipeStatePositionsReset()
+            processResetSwipeStatePositions()
         }
 
         override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-            processSwipeStatePositionsReset()
+            processResetSwipeStatePositions()
         }
 
         override fun onItemRangeRemoved(positionStart: Int, itemCount: Int) {
-            processSwipeStatePositionsReset()
+            processResetSwipeStatePositions()
         }
 
         override fun onItemRangeMoved(fromPosition: Int, toPosition: Int, itemCount: Int) {
-            processSwipeStatePositionsReset()
+            processResetSwipeStatePositions()
         }
     }
 

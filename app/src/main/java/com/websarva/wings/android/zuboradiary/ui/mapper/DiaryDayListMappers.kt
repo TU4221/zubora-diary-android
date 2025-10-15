@@ -9,10 +9,10 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListIt
 
 @JvmName("toUiModelStandard")
 internal suspend fun DiaryDayList<DiaryDayListItem.Standard>.toUiModel(
-    processFileNameToPath: suspend (DiaryImageFileName?) -> FilePathUi?
+    processBuildPathFromFileName: suspend (DiaryImageFileName?) -> FilePathUi?
 ): DiaryDayListUi<DiaryDayListItemUi.Standard> {
     return DiaryDayListUi(
-        itemList.map { it.toUiModel(processFileNameToPath) }
+        itemList.map { it.toUiModel(processBuildPathFromFileName) }
     )
 }
 

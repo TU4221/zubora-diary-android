@@ -294,7 +294,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun loadNewDiaryList(currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
-        loadDiaryList(
+        executeLoadDiaryList(
             DiaryListState.LoadingNewDiaryList,
             currentList,
             { _ ->
@@ -315,7 +315,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun loadAdditionDiaryList(currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
-        loadDiaryList(
+        executeLoadDiaryList(
             DiaryListState.LoadingAdditionDiaryList,
             currentList,
             { lambdaCurrentList ->
@@ -340,7 +340,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private suspend fun refreshDiaryList(currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
-        loadDiaryList(
+        executeLoadDiaryList(
             DiaryListState.UpdatingDiaryList,
             currentList,
             { lambdaCurrentList ->
@@ -359,10 +359,10 @@ internal class DiaryListViewModel @Inject constructor(
         )
     }
 
-    private suspend fun <E : UseCaseException> loadDiaryList(
+    private suspend fun <E : UseCaseException> executeLoadDiaryList(
         state: DiaryListState,
         currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
-        processLoad: suspend (DiaryYearMonthListUi<DiaryDayListItemUi.Standard>)
+        executeLoad: suspend (DiaryYearMonthListUi<DiaryDayListItemUi.Standard>)
         -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, E>,
         emitAppMessageOnFailure: suspend (E) -> Unit
     ) {
@@ -385,7 +385,7 @@ internal class DiaryListViewModel @Inject constructor(
 
         updateUiState(state)
         try {
-            when (val result = processLoad(currentList)) {
+            when (val result = executeLoad(currentList)) {
                 is UseCaseResult.Success -> {
                     val updateDiaryList =
                         result.value.toUiModel { fileName: DiaryImageFileName? ->

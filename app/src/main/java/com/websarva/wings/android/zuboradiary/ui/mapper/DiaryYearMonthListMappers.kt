@@ -11,12 +11,12 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonth
 
 @JvmName("toUiModelStandard")
 internal suspend fun DiaryYearMonthList<DiaryDayListItem.Standard>.toUiModel(
-    processFileNameToPath: suspend (DiaryImageFileName?) -> FilePathUi?
+    processBuildPathFromFileName: suspend (DiaryImageFileName?) -> FilePathUi?
 ): DiaryYearMonthListUi<DiaryDayListItemUi.Standard> {
     return DiaryYearMonthListUi(
         itemList.map {
             when (it) {
-                is DiaryYearMonthListItem.Diary -> it.toUiModel(processFileNameToPath)
+                is DiaryYearMonthListItem.Diary -> it.toUiModel(processBuildPathFromFileName)
                 is DiaryYearMonthListItem.NoDiaryMessage -> DiaryYearMonthListItemUi.NoDiaryMessage()
                 is DiaryYearMonthListItem.ProgressIndicator -> DiaryYearMonthListItemUi.ProgressIndicator()
             }
