@@ -734,7 +734,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             try {
                 findNavController().getBackStackEntry(R.id.navigation_diary_show_fragment)
                 true
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 false
             }
 
@@ -823,7 +823,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             try {
                 findNavController().getBackStackEntry(R.id.navigation_calendar_fragment)
                 R.id.navigation_calendar_fragment
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 R.id.navigation_diary_list_fragment
             }
         navigateFragmentWithRetry(
