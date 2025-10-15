@@ -200,9 +200,6 @@
         <item name="android:textColor">@color/text_color_on_secondary_container</item>
     </style>
 
-    <style name="DiaryDayListImageViewStyle" parent="AppImageViewStyle">
-    </style>
-
     <!-- 検索バー -->
     <style name="WordSearchTextInputLayoutStyle" parent="AppTextInputLayoutClearTextStyle">
         <item name="endIconTint">?colorOnSecondaryContainer</item>
