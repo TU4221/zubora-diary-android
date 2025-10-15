@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
+import com.websarva.wings.android.zuboradiary.data.network.exception.InvalidRequestParameterException
 import com.websarva.wings.android.zuboradiary.domain.model.location.SimpleLocation
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
@@ -30,8 +31,8 @@ internal interface WeatherInfoRepository {
      * @param date 天気情報を取得する対象の日付。
      * @param location 天気情報を取得する対象の位置情報。
      * @return 取得された天気情報。
-     * @throws NetworkConnectionException 天気情報の取得に失敗した場合。
      * @throws InvalidParameterException 指定された日付が天気情報の取得可能範囲を超えてた場合。
+     * @throws NetworkConnectionException 天気情報の取得に失敗した場合。
      */
     suspend fun fetchWeatherInfo(date: LocalDate, location: SimpleLocation): Weather
 }

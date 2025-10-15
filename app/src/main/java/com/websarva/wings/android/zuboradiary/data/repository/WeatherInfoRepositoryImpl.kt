@@ -23,9 +23,6 @@ internal class WeatherInfoRepositoryImpl (
             weatherApiDataSource
                 .fetchWeatherInfo(date, location.latitude, location.longitude)
                 .toDomainModel()
-        } catch (e: IllegalArgumentException) {
-            // 指定された日付が許容範囲外の場合(位置情報はSimpleLocationで正常値を保障されている)
-            throw InvalidParameterException(cause = e)
         } catch (e: Exception) {
             throw weatherInfoRepositoryExceptionMapper.toDomainException(e)
         }
