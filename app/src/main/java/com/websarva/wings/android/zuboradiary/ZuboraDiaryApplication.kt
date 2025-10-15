@@ -4,7 +4,6 @@ import android.app.Application
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.Context
 import android.os.Build
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
@@ -86,7 +85,7 @@ class ZuboraDiaryApplication :
         // MEMO:NotificationChannelはSdk26以降の機能
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             val channelName = getString(R.string.reminder_notification_worker_channel_name)
             val channelDescription = getString(R.string.reminder_notification_worker_channel_description)
             val channel =
