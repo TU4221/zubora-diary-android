@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.view.custom
 import android.content.Context
 import android.text.InputType
 import android.util.AttributeSet
-import android.view.View
 import com.websarva.wings.android.zuboradiary.ui.view.edittext.EditTextConfigurator
 
 internal class ScrollableMultiLineTextInputEditText : ImeActionHandlingTextInputEditText {
@@ -23,7 +22,7 @@ internal class ScrollableMultiLineTextInputEditText : ImeActionHandlingTextInput
 
     init {
         inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
-        overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS
+        overScrollMode = OVER_SCROLL_IF_CONTENT_SCROLLS
         EditTextConfigurator()
             .apply {
                 setUpScrollable(this@ScrollableMultiLineTextInputEditText)
