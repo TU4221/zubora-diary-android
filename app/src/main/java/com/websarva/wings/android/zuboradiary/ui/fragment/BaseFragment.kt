@@ -28,8 +28,6 @@ import kotlinx.coroutines.flow.collectLatest
 
 abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
-    private val logTag = createLogTag()
-
     // View関係
     private var _binding: T? = null
     internal val binding get() = checkNotNull(_binding)
