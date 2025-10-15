@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.message
 
-import com.squareup.leakcanary.core.BuildConfig
+import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.R
 
 internal class UnexpectedMessageDelegate(val exception: Exception) {

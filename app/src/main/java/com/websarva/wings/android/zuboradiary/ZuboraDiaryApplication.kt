@@ -20,7 +20,6 @@ import coil3.SingletonImageLoader
 import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import coil3.util.DebugLogger
-import com.squareup.leakcanary.core.BuildConfig
 import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import com.websarva.wings.android.zuboradiary.ui.notification.ReminderNotificationManager
 import com.websarva.wings.android.zuboradiary.utils.createLogTag

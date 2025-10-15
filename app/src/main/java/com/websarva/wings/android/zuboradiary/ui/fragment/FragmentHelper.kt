@@ -8,7 +8,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
-import com.squareup.leakcanary.core.BuildConfig
+import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -136,7 +136,7 @@ internal class FragmentHelper {
                         val firstPendingCommand = value.first()
                         if (!firstPendingCommand.canRetry()) {
                             Log.e(logTag, "保留ナビゲーションコマンド最大リトライ回数到達")
-                            // TODO:DEBUGの設定を行う
+                            // TODO:リトライハンドリング検討
                             if (BuildConfig.DEBUG) throw IllegalStateException()
                             return@collectLatest
                         }
