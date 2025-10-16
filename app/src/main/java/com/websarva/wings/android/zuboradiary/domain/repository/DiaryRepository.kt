@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
+import com.websarva.wings.android.zuboradiary.data.database.exception.InvalidDatabaseOperationParameterException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
@@ -8,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.Diar
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
+import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
@@ -94,6 +96,7 @@ internal interface DiaryRepository {
      * @param date 日記を読み込む期間の開始日。`null` の場合は全期間を対象とする。
      * @return 読み込まれた日記リスト ([DiaryDayListItem.Standard])。条件に合う日記がない場合は空のリスト。
      * @throws DataStorageException 日記リストの読み込みに失敗した場合。
+     * @throws InvalidParameterException numまたはoffsetの引数が不正な場合。
      */
     suspend fun loadDiaryList(
         num: Int,
@@ -147,6 +150,7 @@ internal interface DiaryRepository {
      * @param searchWord 検索する単語。
      * @return 検索ワードに一致した日記の数。
      * @throws DataStorageException 検索結果数の取得に失敗した場合。
+     * @throws InvalidParameterException 引数が不正な場合。
      */
     suspend fun countWordSearchResults(searchWord: SearchWord): Int
 
@@ -158,6 +162,7 @@ internal interface DiaryRepository {
      * @param searchWord 検索する単語。
      * @return 読み込まれた検索結果のリスト。条件に合う日記がない場合は空のリスト。
      * @throws DataStorageException 検索結果リストの読み込みに失敗した場合。
+     * @throws InvalidParameterException 引数が不正な場合。
      */
     suspend fun loadWordSearchResultList(
         num: Int,
@@ -187,9 +192,8 @@ internal interface DiaryRepository {
      * @param offset 取得開始位置のオフセット。
      * @return 読み込まれた日記アイテムのタイトル選択履歴リスト ([DiaryItemTitleSelectionHistoryListItem]) を放出する Flow。
      *         条件に合う履歴がない場合は空のリストを放出する。
-     * @throws DataStorageException 履歴リストの読み込みに失敗した場合。
-     *   ([Flow] 内部で発生する可能性がある)
-     *
+     * @throws DataStorageException 履歴リストの読み込みに失敗した場合。 ([Flow] 内部で発生する可能性がある)
+     * @throws InvalidParameterException 引数が不正な場合。 ([Flow] 内部で発生する可能性がある)
      */
     fun loadDiaryItemTitleSelectionHistoryList(
         num: Int, offset: Int

@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.data.repository
 
-import android.util.Log
 import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryExceptionMapper
 import com.websarva.wings.android.zuboradiary.data.mapper.diary.toDataModel
@@ -16,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.RawW
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diaryitemtitle.DiaryItemTitleSelectionHistoryListItem
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
-import com.websarva.wings.android.zuboradiary.utils.logTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
@@ -82,10 +80,6 @@ internal class DiaryRepositoryImpl (
         offset: Int,
         date: LocalDate?
     ): List<DiaryDayListItem.Standard> {
-        Log.d(logTag, "loadDiaryList(num = $num, offset = $offset, date = $date)")
-        require(num >= 1)
-        require(offset >= 0)
-
         return try {
             diaryDataSource
                 .selectDiaryListOrderByDateDesc(num, offset, date)
@@ -152,9 +146,6 @@ internal class DiaryRepositoryImpl (
         offset: Int,
         searchWord: SearchWord
     ): List<RawWordSearchResultListItem> {
-        require(num >= 1)
-        require(offset >= 0)
-
         return try {
             diaryDataSource
                 .selectWordSearchResultListOrderByDateDesc(num, offset, searchWord.value)

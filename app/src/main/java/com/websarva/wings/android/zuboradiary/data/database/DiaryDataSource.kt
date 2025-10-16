@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseEx
 import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseInitializationException
 import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseStateException
 import com.websarva.wings.android.zuboradiary.data.database.exception.DatabaseStorageFullException
+import com.websarva.wings.android.zuboradiary.data.database.exception.InvalidDatabaseOperationParameterException
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordDeleteException
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordNotFoundException
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordReadException
@@ -163,7 +164,7 @@ internal class DiaryDataSource(
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
-     * @throws IllegalArgumentException numまたはoffsetの引数が不正な場合。
+     * @throws InvalidDatabaseOperationParameterException numまたはoffsetの引数が不正な場合。
      */
     suspend fun selectDiaryListOrderByDateDesc(
         num: Int,
@@ -171,8 +172,12 @@ internal class DiaryDataSource(
         date: LocalDate?
     ): List<DiaryListItemData> {
         Log.d(logTag, "selectDiaryList(num = $num, offset = $offset, date = $date)")
-        require(num >= 1)
-        require(offset >= 0)
+        try {
+            require(num >= 1)
+            require(offset >= 0)
+        } catch (e: IllegalArgumentException) {
+            throw InvalidDatabaseOperationParameterException(e)
+        }
 
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
@@ -264,10 +269,14 @@ internal class DiaryDataSource(
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
-     * @throws IllegalArgumentException 引数が不正な場合。
+     * @throws InvalidDatabaseOperationParameterException 引数が不正な場合。
      */
     suspend fun countWordSearchResults(searchWord: String): Int {
-        require(searchWord.isNotBlank()) { "検索する単語が空、またはブランクのみ" }
+        try {
+            require(searchWord.isNotBlank()) { "検索する単語が空、またはブランクのみ" }
+        } catch (e: IllegalArgumentException) {
+            throw InvalidDatabaseOperationParameterException(e)
+        }
 
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
@@ -288,16 +297,20 @@ internal class DiaryDataSource(
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
      * @throws DatabaseCorruptionException データベースが破損している場合。
      * @throws DatabaseStateException データベースの状態が不正だった場合。
-     * @throws IllegalArgumentException 引数が不正な場合。
+     * @throws InvalidDatabaseOperationParameterException 引数が不正な場合。
      */
     suspend fun selectWordSearchResultListOrderByDateDesc(
         num: Int,
         offset: Int,
         searchWord: String
     ): List<WordSearchResultListItemData> {
-        require(num >= 1) { "取得件数 `$num` が不正値" }
-        require(offset >= 0) { "取得開始位置 `$num` が不正値" }
-        require(searchWord.isNotBlank()) { "検索する単語が空、またはブランクのみ" }
+        try {
+            require(num >= 1) { "取得件数 `$num` が不正値" }
+            require(offset >= 0) { "取得開始位置 `$num` が不正値" }
+            require(searchWord.isNotBlank()) { "検索する単語が空、またはブランクのみ" }
+        } catch (e: IllegalArgumentException) {
+            throw InvalidDatabaseOperationParameterException(e)
+        }
 
         return withContext(dispatcher) {
             executeSuspendDbReadOperation {
@@ -336,13 +349,17 @@ internal class DiaryDataSource(
      * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。([Flow] 内部で発生)
      * @throws DatabaseCorruptionException データベースが破損している場合。([Flow] 内部で発生)
      * @throws DatabaseStateException データベースの状態が不正だった場合。([Flow] 内部で発生)
-     * @throws IllegalArgumentException 引数が不正な場合。
+     * @throws InvalidDatabaseOperationParameterException 引数が不正な場合。
      */
     fun selectHistoryListOrderByLogDesc(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryEntity>> {
-        require(num >= 1) { "取得件数 `$num` が不正値" }
-        require(offset >= 0) { "取得開始位置 `$num` が不正値" }
+        try {
+            require(num >= 1) { "取得件数 `$num` が不正値" }
+            require(offset >= 0) { "取得開始位置 `$num` が不正値" }
+        } catch (e: IllegalArgumentException) {
+            throw InvalidDatabaseOperationParameterException(e)
+        }
 
         return diaryItemTitleSelectionHistoryDao
             .selectHistoryListOrderByLogDesc(num, offset)
