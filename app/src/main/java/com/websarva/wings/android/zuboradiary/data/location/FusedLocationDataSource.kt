@@ -7,6 +7,7 @@ import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.Priority
 import com.google.android.gms.tasks.CancellationTokenSource
+import com.websarva.wings.android.zuboradiary.data.location.exception.InvalidLocationRequestParameterException
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationAccessException
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationProviderException
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationUnavailableException
@@ -45,13 +46,17 @@ internal class FusedLocationDataSource(
      * @throws PermissionDeniedException 位置情報へのアクセス権限がない場合。
      * @throws LocationAccessException 位置情報のアクセスに失敗した場合。
      * @throws LocationUnavailableException 指定時間内に位置情報を取得できない、または現在地が特定できない場合。
-     * @throws IllegalArgumentException 引数が不正な場合。
+     * @throws InvalidLocationRequestParameterException 引数が不正な場合。
      */
     @SuppressLint("MissingPermission")
     suspend fun fetchCurrentLocation(
         timeoutMillis: Long = 10000L
     ): Location {
-        require(timeoutMillis >= 1) { "タイムアウトまでの時間 `$timeoutMillis` が不正値" }
+        try {
+            require(timeoutMillis >= 1) { "タイムアウトまでの時間 `$timeoutMillis` が不正値" }
+        } catch (e: IllegalArgumentException) {
+            throw InvalidLocationRequestParameterException(e)
+        }
 
         return withContext(dispatcher) {
             val logMsg = "現在位置取得"
