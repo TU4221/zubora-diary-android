@@ -324,7 +324,7 @@ internal class DiaryEditViewModel @Inject constructor(
         // MEMO:下記条件はアプリ設定変更時のアプリ再起動時の不要初期化対策
         if (uiState.value != DiaryEditState.Idle) return
 
-        val id = handle.get<String>(DIARY_ID_ARGUMENT_KEY)
+        val id = handle.get<String>(DIARY_ID_ARGUMENT_KEY)?.let { DiaryId(it) }
         val date =
             handle.get<LocalDate>(DIARY_DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         launchWithUnexpectedErrorHandler {
@@ -401,7 +401,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         launchWithUnexpectedErrorHandler {
             updatePendingDiaryDeleteParameters(
-                originalId,
+                DiaryId(originalId),
                 originalDate
             )
             emitUiEvent(
@@ -756,7 +756,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     // データ処理
     private suspend fun prepareDiaryEntry(
-        id: String?,
+        id: DiaryId?,
         date: LocalDate
     ) {
         if (id == null) {
@@ -768,7 +768,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun prepareNewDiaryEntry(date: LocalDate) {
         updateIsNewDiary(true)
-        updateId(DiaryId.generate().value)
+        updateId(DiaryId.generate())
         updateDate(date)
         updateOriginalDiary(handle[SAVED_ORIGINAL_DIARY_KEY] ?: diaryStateFlow.createDiary())
         val previousDate = previousDate
@@ -782,13 +782,13 @@ internal class DiaryEditViewModel @Inject constructor(
         )
     }
 
-    private suspend fun loadDiaryById(id: String, date: LocalDate) {
+    private suspend fun loadDiaryById(id: DiaryId, date: LocalDate) {
         executeDiaryLoad(
             id,
             date,
             { id, _ ->
                 id ?: throw IllegalArgumentException()
-                loadDiaryByIdUseCase(DiaryId(id))
+                loadDiaryByIdUseCase(id)
             },
             { exception ->
                 when (exception) {
@@ -823,9 +823,9 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun <E : UseCaseException> executeDiaryLoad(
-        id: String? = null,
+        id: DiaryId? = null,
         date: LocalDate,
-        executeLoadDiary: suspend (String?, LocalDate) -> UseCaseResult<Diary, E>,
+        executeLoadDiary: suspend (DiaryId?, LocalDate) -> UseCaseResult<Diary, E>,
         emitAppMessageOnFailure: suspend (E) -> Unit
     ) {
         val logMsg = "日記読込"
@@ -909,14 +909,14 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun deleteDiary(
-        id: String,
+        id: DiaryId,
         date: LocalDate
     ) {
         val logMsg = "日記削除_"
         Log.i(logTag, "${logMsg}開始")
 
         updateUiState(DiaryEditState.Deleting)
-        when (val result = deleteDiaryUseCase(DiaryId(id))) {
+        when (val result = deleteDiaryUseCase(id)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}完了")
                 clearDiaryImageCacheFile()
@@ -1167,10 +1167,10 @@ internal class DiaryEditViewModel @Inject constructor(
         clearDiaryImageCacheFile()
     }
 
-    private suspend fun cacheDiaryImage(uri: Uri?, diaryId: String) {
+    private suspend fun cacheDiaryImage(uri: Uri?, diaryId: DiaryId) {
         if (uri != null) {
             val result =
-                cacheDiaryImageUseCase(uri.toString(), DiaryId(diaryId))
+                cacheDiaryImageUseCase(uri.toString(), diaryId)
             when (result) {
                 is UseCaseResult.Success -> {
                     updateImageFileName(result.value.fullName)
@@ -1301,7 +1301,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun updateId(id: String) {
+    private fun updateId(id: DiaryId) {
         diaryStateFlow.id.value = id
     }
 
@@ -1396,7 +1396,7 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryUpdateParameters = null
     }
 
-    private fun updatePendingDiaryDeleteParameters(id: String, date: LocalDate) {
+    private fun updatePendingDiaryDeleteParameters(id: DiaryId, date: LocalDate) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
 
@@ -1440,7 +1440,7 @@ internal class DiaryEditViewModel @Inject constructor(
     )
 
     private data class DiaryDeleteParameters(
-        val id: String,
+        val id: DiaryId,
         val date: LocalDate
     )
 

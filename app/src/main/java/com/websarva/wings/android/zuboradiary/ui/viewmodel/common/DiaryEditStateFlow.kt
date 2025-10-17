@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
@@ -32,7 +33,9 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         private const val SAVED_LOG_STATE_KEY = "log"
     }
 
-    override val id = MutableStateFlow<String?>(handle[SAVED_ID_STATE_KEY] ?: initialId)
+    override val id = MutableStateFlow(
+        handle.get<String>(SAVED_ID_STATE_KEY)?.let { DiaryId(it) } ?: initialId
+    )
 
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
     //      StateFlow変数を用意しても意味がないので作成しない。
@@ -103,7 +106,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
     fun createDiary(): DiaryUi {
         return DiaryUi(
-            id.value ?:throw IllegalStateException("IDなし(null)"),
+            id.value?.value ?:throw IllegalStateException("IDなし(null)"),
             date.value ?:throw IllegalStateException("日付なし(null)"),
             LocalDateTime.now(),
             weather1.value,

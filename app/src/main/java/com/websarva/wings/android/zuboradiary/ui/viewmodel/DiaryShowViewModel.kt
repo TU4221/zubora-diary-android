@@ -65,7 +65,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private fun initializeDiaryData(handle: SavedStateHandle) {
-        val id = handle.get<String>(ID_ARGUMENT_KEY) ?: throw IllegalArgumentException()
+        val id = handle.get<String>(ID_ARGUMENT_KEY)?.let { DiaryId(it) } ?: throw IllegalArgumentException()
         val date = handle.get<LocalDate>(DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
         launchWithUnexpectedErrorHandler {
             loadSavedDiary(id, date)
@@ -102,7 +102,7 @@ internal class DiaryShowViewModel @Inject constructor(
         val date = diaryStateFlow.date.requireValue()
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                DiaryShowEvent.NavigateDiaryEditFragment(id, date)
+                DiaryShowEvent.NavigateDiaryEditFragment(id.value, date)
             )
         }
     }
@@ -163,12 +163,12 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // データ処理
-    private suspend fun loadSavedDiary(id: String, date: LocalDate) {
+    private suspend fun loadSavedDiary(id: DiaryId, date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryShowState.Loading)
-        when (val result = loadDiaryByIdUseCase(DiaryId(id))) {
+        when (val result = loadDiaryByIdUseCase(id)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(DiaryShowState.LoadSuccess)
@@ -190,12 +190,12 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    private suspend fun deleteDiary(id: String, date: LocalDate) {
+    private suspend fun deleteDiary(id: DiaryId, date: LocalDate) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
         updateUiState(DiaryShowState.Deleting)
-        when (val result = deleteDiaryUseCase(DiaryId(id))) {
+        when (val result = deleteDiaryUseCase(id)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 emitUiEvent(
@@ -229,7 +229,7 @@ internal class DiaryShowViewModel @Inject constructor(
         )
     }
 
-    private fun updatePendingDiaryDeleteParameters(id: String, date: LocalDate) {
+    private fun updatePendingDiaryDeleteParameters(id: DiaryId, date: LocalDate) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
 
@@ -238,7 +238,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private data class DiaryDeleteParameters(
-        val id: String,
+        val id: DiaryId,
         val date: LocalDate
     )
 }

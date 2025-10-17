@@ -90,7 +90,7 @@ internal class CalendarViewModel @Inject constructor(
         val date = _selectedDate.value
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                CalendarEvent.NavigateDiaryEditFragment(id, date)
+                CalendarEvent.NavigateDiaryEditFragment(id?.value, date)
             )
         }
     }
