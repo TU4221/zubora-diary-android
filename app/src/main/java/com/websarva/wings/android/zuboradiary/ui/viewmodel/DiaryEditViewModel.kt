@@ -170,10 +170,7 @@ internal class DiaryEditViewModel @Inject constructor(
     val date
         get() = diaryStateFlow.date.asStateFlow()
 
-    /**
-     * LayoutDataBinding用
-     * */
-    val titleMutableStateFlow
+    val titleForBinding
         get() = diaryStateFlow.title
 
     val weather1
@@ -202,64 +199,34 @@ internal class DiaryEditViewModel @Inject constructor(
     val numVisibleItems
         get() = diaryStateFlow.numVisibleItems.asStateFlow()
 
-    /**
-     * LayoutDataBinding用
-     * */
-    val item1TitleMutable
+    val item1TitleForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(1)).title
 
-    /**
-     * LayoutDataBinding用
-     * */
-    val item2TitleMutable
+    val item2TitleForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(2)).title
 
-    /**
-     * LayoutDataBinding用
-     * */
-    val item3TitleMutable
+    val item3TitleForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(3)).title
 
-    /**
-     * LayoutDataBinding用
-     * */
-    val item4TitleMutable
+    val item4TitleForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(4)).title
 
-    /**
-     * LayoutDataBinding用
-     * */
-    val item5TitleMutable
+    val item5TitleForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).title
 
-    /**
-     * LayoutDataBinding用
-     * */
-    val item1CommentMutable
+    val item1CommentForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(1)).comment
 
-    /**
-     * LayoutDataBinding用
-     * */
-    val item2CommentMutable
+    val item2CommentForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(2)).comment
 
-    /**
-     * LayoutDataBinding用
-     * */
     val item3CommentMutable
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(3)).comment
 
-    /**
-     * LayoutDataBinding用
-     * */
-    val item4CommentMutable
+    val item4CommentForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(4)).comment
 
-    /**
-     * LayoutDataBinding用
-     * */
-    val item5CommentMutable
+    val item5CommentForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).comment
 
     val isItemAdditionButtonClickable =

@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStar
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
+import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColor
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
@@ -555,7 +556,7 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun handleThemeColorSettingDialogPositiveResult(themeColor: ThemeColorUi) {
         launchWithUnexpectedErrorHandler {
-            saveThemeColor(themeColor)
+            saveThemeColor(themeColor.toDomainModel())
         }
     }
 
@@ -815,10 +816,10 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private suspend fun saveThemeColor(value: ThemeColorUi) {
+    private suspend fun saveThemeColor(value: ThemeColor) {
         val result =
             updateThemeColorSettingUseCase(
-                ThemeColorSetting(value.toDomainModel())
+                ThemeColorSetting(value)
             )
         when (result) {
             is UseCaseResult.Success -> {

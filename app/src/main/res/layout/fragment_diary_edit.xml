@@ -238,7 +238,7 @@
                                 android:layout_height="wrap_content"
                                 android:hint="@string/fragment_diary_edit_title_hint"
                                 android:maxLength="@integer/fragment_diary_edit_title_max_length"
-                                android:text="@={viewModel.titleMutableStateFlow}"
+                                android:text="@={viewModel.titleForBinding}"
                                 android:textAppearance="@style/AppImeActionHandlingTextInputEditTextTextAppearance"
                                 android:textSize="@dimen/fragment_diary_edit_text_size"
                                 tools:ignore="DuplicateSpeakableTextCheck" />
@@ -248,38 +248,38 @@
                         <include
                             android:id="@+id/include_item_1"
                             layout="@layout/layout_diary_edit_item"
-                            app:commentMutableStateFlow="@{viewModel.item1CommentMutable}"
+                            app:commentMutableStateFlow="@{viewModel.item1CommentForBinding}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_1}"
-                            app:titleMutableStateFlow="@{viewModel.item1TitleMutable}" />
+                            app:titleMutableStateFlow="@{viewModel.item1TitleForBinding}" />
 
                         <include
                             android:id="@+id/include_item_2"
                             layout="@layout/layout_diary_edit_item"
-                            app:commentMutableStateFlow="@{viewModel.item2CommentMutable}"
+                            app:commentMutableStateFlow="@{viewModel.item2CommentForBinding}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_2}"
-                            app:titleMutableStateFlow="@{viewModel.item2TitleMutable}" />
+                            app:titleMutableStateFlow="@{viewModel.item2TitleForBinding}" />
 
                         <include
                             android:id="@+id/include_item_3"
                             layout="@layout/layout_diary_edit_item"
                             app:commentMutableStateFlow="@{viewModel.item3CommentMutable}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_3}"
-                            app:titleMutableStateFlow="@{viewModel.item3TitleMutable}" />
+                            app:titleMutableStateFlow="@{viewModel.item3TitleForBinding}" />
 
                         <include
                             android:id="@+id/include_item_4"
                             layout="@layout/layout_diary_edit_item"
-                            app:commentMutableStateFlow="@{viewModel.item4CommentMutable}"
+                            app:commentMutableStateFlow="@{viewModel.item4CommentForBinding}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_4}"
-                            app:titleMutableStateFlow="@{viewModel.item4TitleMutable}" />
+                            app:titleMutableStateFlow="@{viewModel.item4TitleForBinding}" />
 
                         <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
                         <include
                             android:id="@+id/include_item_5"
                             layout="@layout/layout_diary_edit_item"
-                            app:commentMutableStateFlow="@{viewModel.item5CommentMutable}"
+                            app:commentMutableStateFlow="@{viewModel.item5CommentForBinding}"
                             app:itemNumber="@{@string/fragment_diary_edit_item_5}"
-                            app:titleMutableStateFlow="@{viewModel.item5TitleMutable}"
+                            app:titleMutableStateFlow="@{viewModel.item5TitleForBinding}"
                             tools:ignore="DuplicateIncludedIds" />
 
                         <!--

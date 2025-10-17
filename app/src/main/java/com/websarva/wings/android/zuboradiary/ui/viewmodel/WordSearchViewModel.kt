@@ -62,10 +62,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val _searchWord = MutableStateFlow("")
     val searchWord
         get() = _searchWord.asStateFlow()
-    /**
-     * LayoutDataBinding用
-     * */
-    val searchWordMutableStateFlow: MutableStateFlow<String>
+    val searchWordForBinding: MutableStateFlow<String>
         get() = _searchWord
 
     private var previousSearchWord = "" // 二重検索防止用

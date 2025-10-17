@@ -60,11 +60,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     private val _itemTitle = MutableStateFlow("")
     val itemTitle get() = _itemTitle.asStateFlow()
-
-    /**
-     * LayoutDataBinding用
-     * */
-    val itemTitleMutable get() = _itemTitle
+    val itemTitleForBinding get() = _itemTitle
 
     private val _itemTitleInputTextValidationResult =
         MutableStateFlow<InputTextValidationResult>(InputTextValidationResult.Valid)
