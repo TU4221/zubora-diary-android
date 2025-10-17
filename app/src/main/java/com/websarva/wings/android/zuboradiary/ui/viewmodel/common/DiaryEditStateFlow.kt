@@ -99,6 +99,9 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         numVisibleItems.onEach {
             handle[SAVED_NUM_VISIBLE_ITEMS_STATE_KEY] = it
         }.launchIn(scope)
+        imageFileName.onEach {
+            handle[SAVED_IMAGE_FILE_NAME_STATE_KEY] = it?.fullName
+        }.launchIn(scope)
         log.onEach {
             handle[SAVED_LOG_STATE_KEY] = it
         }.launchIn(scope)
