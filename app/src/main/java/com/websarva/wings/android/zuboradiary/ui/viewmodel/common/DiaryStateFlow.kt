@@ -19,7 +19,7 @@ internal open class DiaryStateFlow {
         const val MAX_ITEMS: Int = DiaryItemNumber.MAX_NUMBER
     }
 
-    protected val initialDiary = Diary.generate().toUiModel()
+    protected val initialDiary = Diary.generate()
 
     protected val initialId = null
     open val id = MutableStateFlow<DiaryId?>(initialId) // MEMO:初期化時IDが未定の為、null許容型とする。
@@ -30,14 +30,14 @@ internal open class DiaryStateFlow {
     open val date =
         MutableStateFlow<LocalDate?>(initialDate) // MEMO:初期化時日付が未定の為、null許容型とする。
 
-    protected val initialWeather = initialDiary.weather1
+    protected val initialWeather = initialDiary.weather1.toUiModel()
     open val weather1 = MutableStateFlow(initialWeather)
     open val weather2 = MutableStateFlow(initialWeather)
 
-    protected val initialCondition = initialDiary.condition
+    protected val initialCondition = initialDiary.condition.toUiModel()
     open val condition = MutableStateFlow(initialCondition)
 
-    protected val initialTitle = initialDiary.title
+    protected val initialTitle = initialDiary.title.value
     open val title = MutableStateFlow(initialTitle)
 
     private val initialNumVisibleItems = run {
@@ -55,7 +55,7 @@ internal open class DiaryStateFlow {
             DiaryItemStateFlow(DiaryItemNumber(i + 1))
         }
 
-    protected val initialImageFileName = initialDiary.imageFileName
+    protected val initialImageFileName = initialDiary.imageFileName?.fullName
     open val imageFileName = MutableStateFlow(initialImageFileName)
 
     private val initialImageFilePath: FilePathUi? = null
@@ -173,18 +173,34 @@ internal open class DiaryStateFlow {
 
     open class DiaryItemStateFlow(val itemNumber: DiaryItemNumber) {
 
+        private val initialDiary = Diary.generate()
+
         protected val initialTitleId = null
         open val titleId = MutableStateFlow<DiaryItemTitleSelectionHistoryId?>(initialTitleId)
 
         // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
         //      StateFlow変数を用意しても意味がないので作成しない。
-        protected val initialTitle = if (itemNumber.isMinNumber) "" else null
+        protected val initialTitle = when (itemNumber.value) {
+            1 -> initialDiary.item1Title.value
+            2 -> initialDiary.item2Title?.value
+            3 -> initialDiary.item3Title?.value
+            4 -> initialDiary.item4Title?.value
+            5 -> initialDiary.item5Title?.value
+            else -> throw IllegalStateException()
+        }
         open val title = MutableStateFlow(initialTitle)
 
         protected val initialTitleUpdateLog = null
         open val titleUpdateLog = MutableStateFlow<LocalDateTime?>(initialTitleUpdateLog)
 
-        protected val initialComment = if (itemNumber.isMinNumber) "" else null
+        protected val initialComment = when (itemNumber.value) {
+            1 -> initialDiary.item1Comment.value
+            2 -> initialDiary.item2Comment?.value
+            3 -> initialDiary.item3Comment?.value
+            4 -> initialDiary.item4Comment?.value
+            5 -> initialDiary.item5Comment?.value
+            else -> throw IllegalStateException()
+        }
         open val comment = MutableStateFlow(initialComment)
 
         val isEmpty: Boolean
