@@ -60,7 +60,9 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         MutableStateFlow(handle[SAVED_NUM_VISIBLE_ITEMS_STATE_KEY] ?: initialNumVisibleItems)
 
     override val items =
-        Array(MAX_ITEMS) { i -> DiaryItemStateFlow(scope, handle, i + 1) }
+        Array(MAX_ITEMS) { i ->
+            DiaryItemStateFlow(scope, handle, DiaryItemNumber(i + 1))
+        }
 
     override val imageFileName =
         MutableStateFlow(
@@ -187,7 +189,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
     class DiaryItemStateFlow(
         scope: CoroutineScope,
         handle: SavedStateHandle,
-        itemNumber: Int
+        itemNumber: DiaryItemNumber
     ) : DiaryStateFlow.DiaryItemStateFlow(itemNumber) {
 
         companion object {

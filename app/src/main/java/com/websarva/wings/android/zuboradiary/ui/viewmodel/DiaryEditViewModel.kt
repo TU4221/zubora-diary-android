@@ -442,17 +442,18 @@ internal class DiaryEditViewModel @Inject constructor(
         updateCondition(condition)
     }
 
-    fun onItemTitleInputFieldClick(itemNumber: Int) {
+    fun onItemTitleInputFieldClick(itemNumberInt: Int) {
         if (uiState.value == DiaryEditState.AddingItem) return
         if (uiState.value == DiaryEditState.DeletingItem) return
 
-        val itemTitleId = getItemTitleId(DiaryItemNumber(itemNumber)).value
-        val itemTitle = getItemTitle(DiaryItemNumber(itemNumber)).requireValue()
+        val itemNumber = DiaryItemNumber(itemNumberInt)
+        val itemTitleId = getItemTitleId(itemNumber).value
+        val itemTitle = getItemTitle(itemNumber).requireValue()
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 DiaryEditEvent.NavigateDiaryItemTitleEditFragment(
-                    DiaryItemTitleSelectionUi(itemNumber, itemTitleId, itemTitle)
+                    DiaryItemTitleSelectionUi(itemNumberInt, itemTitleId, itemTitle)
                 )
             )
         }
@@ -466,13 +467,14 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onItemDeleteButtonClick(itemNumber: Int) {
+    fun onItemDeleteButtonClick(itemNumberInt: Int) {
         if (!canExecuteOperationWithUiUpdate) return
 
+        val itemNumber = DiaryItemNumber(itemNumberInt)
         launchWithUnexpectedErrorHandler {
-            updatePendingDiaryItemDeleteParameters(DiaryItemNumber(itemNumber))
+            updatePendingDiaryItemDeleteParameters(itemNumber)
             emitUiEvent(
-                DiaryEditEvent.NavigateDiaryItemDeleteDialog(itemNumber)
+                DiaryEditEvent.NavigateDiaryItemDeleteDialog(itemNumberInt)
             )
         }
     }
@@ -726,10 +728,11 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // MotionLayout変更時処理
-    fun onDiaryItemInvisibleStateTransitionCompleted(itemNumber: Int) {
+    fun onDiaryItemInvisibleStateTransitionCompleted(itemNumberInt: Int) {
         check(uiState.value == DiaryEditState.DeletingItem)
 
-        deleteItem(DiaryItemNumber(itemNumber))
+        val itemNumber = DiaryItemNumber(itemNumberInt)
+        deleteItem(itemNumber)
     }
 
     fun onDiaryItemVisibleStateTransitionCompleted() {
@@ -1500,9 +1503,10 @@ internal class DiaryEditViewModel @Inject constructor(
                             DiaryItemTitleSelectionHistoryId.generate().value,
                             itemTitle
                         )
-                        updateItemComment(DiaryItemNumber(j), itemComment)
-                        diaryStateFlow.getItemStateFlow(DiaryItemNumber(j)).title.value = itemTitle
-                        diaryStateFlow.getItemStateFlow(DiaryItemNumber(j)).comment.value = itemComment
+                        val diaryItemNumber = DiaryItemNumber(j)
+                        updateItemComment(diaryItemNumber, itemComment)
+                        diaryStateFlow.getItemStateFlow(diaryItemNumber).title.value = itemTitle
+                        diaryStateFlow.getItemStateFlow(diaryItemNumber).comment.value = itemComment
                     }
 
 

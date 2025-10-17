@@ -55,7 +55,8 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             )
 
     private val _itemNumber = MutableStateFlow<DiaryItemNumber?>(null)
-    val itemNumber get() = _itemNumber.asStateFlow()
+    val itemNumber get() =
+        _itemNumber.map { it?.value }.stateInWhileSubscribed(_itemNumber.value)
 
     private val _itemTitle = MutableStateFlow("")
     val itemTitle get() = _itemTitle.asStateFlow()

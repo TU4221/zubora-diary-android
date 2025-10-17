@@ -49,7 +49,9 @@ internal open class DiaryStateFlow {
     open val numVisibleItems = MutableStateFlow(initialNumVisibleItems)
 
     protected open val items: Array<out DiaryItemStateFlow> =
-        Array(MAX_ITEMS) { i -> DiaryItemStateFlow(i + 1) }
+        Array(MAX_ITEMS) { i ->
+            DiaryItemStateFlow(DiaryItemNumber(i + 1))
+        }
 
     protected val initialImageFileName = initialDiary.imageFileName
     open val imageFileName = MutableStateFlow(initialImageFileName)
@@ -167,25 +169,20 @@ internal open class DiaryStateFlow {
         this.log.value = log
     }
 
-    open class DiaryItemStateFlow(val itemNumber: Int) {
-
-        companion object {
-            private const val MIN_ITEM_NUMBER = DiaryItemNumber.MIN_NUMBER
-            private const val MAX_ITEM_NUMBER = DiaryItemNumber.MAX_NUMBER
-        }
+    open class DiaryItemStateFlow(val itemNumber: DiaryItemNumber) {
 
         protected val initialTitleId = null
         open val titleId = MutableStateFlow<String?>(initialTitleId)
 
         // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
         //      StateFlow変数を用意しても意味がないので作成しない。
-        protected val initialTitle = if (itemNumber == 1) "" else null
+        protected val initialTitle = if (itemNumber.isMinNumber) "" else null
         open val title = MutableStateFlow(initialTitle)
 
         protected val initialTitleUpdateLog = null
         open val titleUpdateLog = MutableStateFlow<LocalDateTime?>(initialTitleUpdateLog)
 
-        protected val initialComment = if (itemNumber == 1) "" else null
+        protected val initialComment = if (itemNumber.isMinNumber) "" else null
         open val comment = MutableStateFlow(initialComment)
 
         val isEmpty: Boolean
@@ -194,14 +191,6 @@ internal open class DiaryStateFlow {
                 val comment = this.comment.value ?: return true
                 return title.isEmpty() && comment.isEmpty()
             }
-
-        init {
-            require(isItemNumberInRange(itemNumber))
-        }
-
-        private fun isItemNumberInRange(itemNumber: Int): Boolean {
-            return itemNumber in MIN_ITEM_NUMBER..MAX_ITEM_NUMBER
-        }
 
         fun initialize() {
             updateTitleId(initialTitleId)

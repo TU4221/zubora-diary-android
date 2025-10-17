@@ -119,7 +119,7 @@ class DiaryItemTitleEditDialog :
                 val toolbarTitle =
                     getString(
                         R.string.fragment_diary_item_title_edit_toolbar_title,
-                        itemNumber.value.toString()
+                        itemNumber.toString()
                     )
                 binding.materialToolbarTopAppBar.title = toolbarTitle
             }
