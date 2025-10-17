@@ -736,7 +736,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     fun onDiaryImageFileNameChanged(fileName: String?) {
         launchWithUnexpectedErrorHandler {
-            buildImageFilePath(fileName)
+            buildImageFilePath(fileName?.let { DiaryImageFileName(it) })
         }
     }
 
@@ -1231,15 +1231,12 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private suspend fun buildImageFilePath(fileName: String?) {
+    private suspend fun buildImageFilePath(fileName: DiaryImageFileName?) {
         val imageFilePathUi =
             if (fileName == null) {
                 null
             } else {
-                val result =
-                    buildDiaryImageFilePathUseCase(
-                        DiaryImageFileName(fileName)
-                    )
+                val result = buildDiaryImageFilePathUseCase(fileName)
                 when (result) {
                     is UseCaseResult.Success -> {
                         FilePathUi.Available(result.value)
