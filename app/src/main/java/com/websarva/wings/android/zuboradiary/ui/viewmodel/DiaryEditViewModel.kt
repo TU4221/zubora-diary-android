@@ -158,7 +158,9 @@ internal class DiaryEditViewModel @Inject constructor(
     val isNewDiary = _isNewDiary.asStateFlow()
 
     private val _originalDiary = MutableStateFlow<Diary?>(null)
-    val originalDiaryDate = _originalDiary.map { it?.date }.stateInWhileSubscribed(null)
+    val originalDiaryDate = _originalDiary
+        .map { it?.date }
+        .stateInWhileSubscribed(_originalDiary.value?.date)
 
     private val _editingDiaryDateString = MutableStateFlow<String?>(null)
     val editingDiaryDateString = _editingDiaryDateString.asStateFlow()
@@ -176,11 +178,13 @@ internal class DiaryEditViewModel @Inject constructor(
 
     val weather1
         get() = diaryStateFlow.weather1
-            .map { it.toUiModel() }.stateInWhileSubscribed(Weather.UNKNOWN.toUiModel())
+            .map { it.toUiModel() }
+            .stateInWhileSubscribed(diaryStateFlow.weather1.value.toUiModel())
 
     val weather2
         get() = diaryStateFlow.weather2
-            .map { it.toUiModel() }.stateInWhileSubscribed(Weather.UNKNOWN.toUiModel())
+            .map { it.toUiModel() }
+            .stateInWhileSubscribed(diaryStateFlow.weather2.value.toUiModel())
 
     private val isEqualWeathers: Boolean
         get() {
@@ -192,7 +196,8 @@ internal class DiaryEditViewModel @Inject constructor(
 
     val condition
         get() = diaryStateFlow.condition
-            .map { it.toUiModel() }.stateInWhileSubscribed(Condition.UNKNOWN.toUiModel())
+            .map { it.toUiModel() }
+            .stateInWhileSubscribed(diaryStateFlow.condition.value.toUiModel())
 
     val numVisibleItems
         get() = diaryStateFlow.numVisibleItems.asStateFlow()
@@ -281,7 +286,9 @@ internal class DiaryEditViewModel @Inject constructor(
         )
 
     val imageFileName
-        get() = diaryStateFlow.imageFileName.map { it?.fullName }.stateInWhileSubscribed(null)
+        get() = diaryStateFlow.imageFileName
+            .map { it?.fullName }
+            .stateInWhileSubscribed(diaryStateFlow.imageFileName.value?.fullName)
 
     val imageFilePath
         get() = diaryStateFlow.imageFilePath.asStateFlow()

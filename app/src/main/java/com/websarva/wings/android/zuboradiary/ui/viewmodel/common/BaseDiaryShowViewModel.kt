@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
-import com.websarva.wings.android.zuboradiary.domain.model.diary.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
@@ -28,19 +27,23 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
         get() = diaryStateFlow.date.asStateFlow()
     val weather1
         get() = diaryStateFlow.weather1
-            .map { it.toUiModel() }.stateInWhileSubscribed(Weather.UNKNOWN.toUiModel())
+            .map { it.toUiModel() }
+            .stateInWhileSubscribed(diaryStateFlow.weather1.value.toUiModel())
     val weather2
         get() = diaryStateFlow.weather2
-            .map { it.toUiModel() }.stateInWhileSubscribed(Weather.UNKNOWN.toUiModel())
+            .map { it.toUiModel() }
+            .stateInWhileSubscribed(diaryStateFlow.weather2.value.toUiModel())
     val isWeather2Visible =
         combine(diaryStateFlow.weather1, diaryStateFlow.weather2) { weather1, weather2 ->
             return@combine weather1 != Weather.UNKNOWN && weather2 != Weather.UNKNOWN
         }.stateInWhileSubscribed(
-            false
+            diaryStateFlow.weather1.value != Weather.UNKNOWN
+                    && diaryStateFlow.weather2.value != Weather.UNKNOWN
         )
     val condition
         get() = diaryStateFlow.condition
-            .map { it.toUiModel() }.stateInWhileSubscribed(Condition.UNKNOWN.toUiModel())
+            .map { it.toUiModel() }
+            .stateInWhileSubscribed(diaryStateFlow.condition.value.toUiModel())
     val title
         get() = diaryStateFlow.title.asStateFlow()
     val numVisibleItems
@@ -66,7 +69,9 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
     val item5Comment
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).comment.asStateFlow()
     val imageFileName
-        get() = diaryStateFlow.imageFileName.map { it?.fullName }.stateInWhileSubscribed(null)
+        get() = diaryStateFlow.imageFileName
+            .map { it?.fullName }
+            .stateInWhileSubscribed(diaryStateFlow.imageFileName.value?.fullName)
     val imageFilePath
         get() = diaryStateFlow.imageFilePath.asStateFlow()
     val log

@@ -56,7 +56,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     private val _itemNumber = MutableStateFlow<DiaryItemNumber?>(null)
     val itemNumber get() =
-        _itemNumber.map { it?.value }.stateInWhileSubscribed(_itemNumber.value)
+        _itemNumber.map { it?.value }.stateInWhileSubscribed(_itemNumber.value?.value)
 
     private val _itemTitle = MutableStateFlow("")
     val itemTitle get() = _itemTitle.asStateFlow()
@@ -74,7 +74,10 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     val isNewItemTitleSelectionEnabled =
         _itemTitleInputTextValidationResult
             .map { it == InputTextValidationResult.Valid }
-            .stateInWhileSubscribed(false)
+            .stateInWhileSubscribed(
+                _itemTitleInputTextValidationResult.value
+                        == InputTextValidationResult.Valid
+            )
 
     private val initialItemTitleSelectionHistoryList = DiaryItemTitleSelectionHistoryListUi(emptyList())
     lateinit var itemTitleSelectionHistoryList: StateFlow<DiaryItemTitleSelectionHistoryListUi>
