@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
@@ -69,7 +70,9 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
     override val imageFileName =
         MutableStateFlow(
-            handle[SAVED_IMAGE_FILE_NAME_STATE_KEY] ?: initialImageFileName
+            handle.get<String>(SAVED_IMAGE_FILE_NAME_STATE_KEY)?.let {
+                DiaryImageFileName(it)
+            } ?: initialImageFileName
         )
 
     override val log =
@@ -79,7 +82,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
     init {
         id.onEach {
-            handle[SAVED_ID_STATE_KEY] = it
+            handle[SAVED_ID_STATE_KEY] = it?.value
         }.launchIn(scope)
         date.onEach {
             handle[SAVED_DATE_STATE_KEY] = it
@@ -228,7 +231,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
         init {
             titleId.onEach {
-                handle[SAVED_ITEM_TITLE_ID_STATE_KEY + itemNumber] = it
+                handle[SAVED_ITEM_TITLE_ID_STATE_KEY + itemNumber] = it?.value
             }.launchIn(scope)
             title.onEach {
                 handle[SAVED_ITEM_TITLE_STATE_KEY + itemNumber] = it
