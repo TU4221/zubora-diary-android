@@ -41,12 +41,13 @@ internal open class DiaryStateFlow {
     open val title = MutableStateFlow(initialTitle)
 
     private val initialNumVisibleItems = run {
-        var count = 1
-        if (initialDiary.item2Title != null) count++
-        if (initialDiary.item3Title != null) count++
-        if (initialDiary.item4Title != null) count++
-        if (initialDiary.item5Title != null) count++
-        count
+        listOf(
+            initialDiary.item1Title,
+            initialDiary.item2Title,
+            initialDiary.item3Title,
+            initialDiary.item4Title,
+            initialDiary.item5Title
+        ).indexOfLast { it != null }.let { if (it == -1) 0 else it + 1 }
     }
     open val numVisibleItems = MutableStateFlow(initialNumVisibleItems)
 
