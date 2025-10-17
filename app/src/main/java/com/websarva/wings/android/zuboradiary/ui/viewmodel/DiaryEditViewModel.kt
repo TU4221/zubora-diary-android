@@ -202,29 +202,29 @@ internal class DiaryEditViewModel @Inject constructor(
     val item1TitleForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(1)).title
 
-    val item2TitleForBinding
-        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(2)).title
-
-    val item3TitleForBinding
-        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(3)).title
-
-    val item4TitleForBinding
-        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(4)).title
-
-    val item5TitleForBinding
-        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).title
-
     val item1CommentForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(1)).comment
+
+    val item2TitleForBinding
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(2)).title
 
     val item2CommentForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(2)).comment
 
+    val item3TitleForBinding
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(3)).title
+
     val item3CommentMutable
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(3)).comment
 
+    val item4TitleForBinding
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(4)).title
+
     val item4CommentForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(4)).comment
+
+    val item5TitleForBinding
+        get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).title
 
     val item5CommentForBinding
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).comment
