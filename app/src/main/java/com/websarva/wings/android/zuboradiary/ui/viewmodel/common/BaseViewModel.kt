@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -114,6 +115,28 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
                 updateUiState(initialState)
                 emitUnexpectedAppMessage(e)
             }
+        }
+    }
+
+    /**
+     * Flowストリーム内の予期せぬ例外をキャッチし、ログ出力とUIへのメッセージ通知を行う。
+     * 例外発生後は、 [fallbackValue] をemitする。
+     *
+     * @param fallbackValue 例外発生時にFlowに流す代替の値。
+     * @param block 例外発生時に加えて実行したい処理ブロック。発生した例外が引数として渡される。
+     * @return エラーハンドリングが適用された新しいFlow。
+     */
+    protected fun <T> Flow<T>.catchUnexpectedError(
+        fallbackValue: T,
+        block: suspend (e: Exception) -> Unit = { }
+    ): Flow<T> {
+        return this.catch { e ->
+            if (e !is Exception) throw e
+
+            Log.e(logTag, "Flowストリーム処理中に予期せぬエラーが発生しました。", e)
+            emitUnexpectedAppMessage(e)
+            block(e)
+            emit(fallbackValue)
         }
     }
 
