@@ -174,9 +174,6 @@ internal class DiaryRepositoryImpl (
     override fun loadDiaryItemTitleSelectionHistoryList(
         num: Int, offset: Int
     ): Flow<List<DiaryItemTitleSelectionHistoryListItem>> {
-        require(num >= 1)
-        require(offset >= 0)
-
         return diaryDataSource
             .selectHistoryListOrderByLogDesc(num, offset)
             .catch {
