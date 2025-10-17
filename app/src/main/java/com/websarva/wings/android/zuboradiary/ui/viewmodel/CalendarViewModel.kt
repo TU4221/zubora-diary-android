@@ -7,7 +7,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDa
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByDateException
-import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -175,7 +174,7 @@ internal class CalendarViewModel @Inject constructor(
                 Log.i(logTag, "${logMsg}_完了")
                 updateUiState(CalendarState.LoadDiarySuccess)
                 val diary = result.value
-                updateDiary(diary.toUiModel())
+                updateDiary(diary)
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)

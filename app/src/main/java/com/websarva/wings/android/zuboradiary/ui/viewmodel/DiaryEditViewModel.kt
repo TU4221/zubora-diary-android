@@ -155,7 +155,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val _isNewDiary = MutableStateFlow(handle[SAVED_IS_NEW_DIARY_KEY] ?: false)
     val isNewDiary = _isNewDiary.asStateFlow()
 
-    private val _originalDiary = MutableStateFlow<DiaryUi?>(null)
+    private val _originalDiary = MutableStateFlow<Diary?>(null)
     val originalDiaryDate = _originalDiary.map { it?.date }.stateInWhileSubscribed(null)
 
     private val _editingDiaryDateString = MutableStateFlow<String?>(null)
@@ -341,7 +341,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         _originalDiary.onEach {
-            handle[SAVED_ORIGINAL_DIARY_KEY] = it
+            handle[SAVED_ORIGINAL_DIARY_KEY] = it?.toUiModel()
         }.launchIn(viewModelScope)
     }
 
@@ -396,16 +396,13 @@ internal class DiaryEditViewModel @Inject constructor(
         if (isNewDiary) return
 
         val originalDiary = _originalDiary.requireValue()
-        val originalId = originalDiary.id
-        val originalDate = originalDiary.date
-
         launchWithUnexpectedErrorHandler {
             updatePendingDiaryDeleteParameters(
-                DiaryId(originalId),
-                originalDate
+                originalDiary.id,
+                originalDiary.date
             )
             emitUiEvent(
-                DiaryEditEvent.NavigateDiaryDeleteDialog(originalDate)
+                DiaryEditEvent.NavigateDiaryDeleteDialog(originalDiary.date)
             )
         }
 
@@ -774,7 +771,10 @@ internal class DiaryEditViewModel @Inject constructor(
         updateIsNewDiary(true)
         updateId(DiaryId.generate())
         updateDate(date)
-        updateOriginalDiary(handle[SAVED_ORIGINAL_DIARY_KEY] ?: diaryStateFlow.createDiary())
+        updateOriginalDiary(
+            handle.get<DiaryUi?>(SAVED_ORIGINAL_DIARY_KEY)?.toDomainModel()
+                ?: diaryStateFlow.createDiary()
+        )
         val previousDate = previousDate
         val originalDate = _originalDiary.requireValue().date
         val isNewDiary = isNewDiary.value
@@ -841,8 +841,7 @@ internal class DiaryEditViewModel @Inject constructor(
         when (val result = executeLoadDiary(id, date)) {
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)
-                val diary = result.value
-                diaryStateFlow.update(diary.toUiModel())
+                diaryStateFlow.update(result.value)
                 updateIsNewDiary(false)
                 updateOriginalDiary(diaryStateFlow.createDiary())
             }
@@ -866,9 +865,9 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun saveDiary(
-        diary: DiaryUi,
+        diary: Diary,
         diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
-        originalDiary: DiaryUi,
+        originalDiary: Diary,
         isNewDiary: Boolean
     ) {
         val logMsg = "日記保存_"
@@ -877,9 +876,9 @@ internal class DiaryEditViewModel @Inject constructor(
         updateUiState(DiaryEditState.Saving)
         val result =
             saveDiaryUseCase(
-                diary.toDomainModel(),
+                diary,
                 diaryItemTitleSelectionHistoryList,
-                originalDiary.toDomainModel(),
+                originalDiary,
                 isNewDiary
             )
         when (result) {
@@ -889,7 +888,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 clearDiaryImageCacheFile()
                 emitUiEvent(
                     DiaryEditEvent
-                        .NavigateDiaryShowFragment(diary.id, diary.date)
+                        .NavigateDiaryShowFragment(diary.id.value, diary.date)
                 )
             }
             is UseCaseResult.Failure -> {
@@ -984,9 +983,9 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun requestDiaryUpdateConfirmation(
-        diary: DiaryUi,
+        diary: Diary,
         diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
-        originalDiary: DiaryUi,
+        originalDiary: Diary,
         isNewDiary: Boolean
     ) {
         updateUiState(DiaryEditState.CheckingDiaryInfo)
@@ -1250,14 +1249,13 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private suspend fun handleBackNavigation(
-        diary: DiaryUi,
-        originalDiary: DiaryUi
+        diary: Diary,
+        originalDiary: Diary
     ) {
-        val shouldRequest =
-            shouldRequestExitWithoutDiarySaveConfirmationUseCase(
-                diary.toDomainModel(),
-                originalDiary.toDomainModel()
-            ).value
+        val shouldRequest = shouldRequestExitWithoutDiarySaveConfirmationUseCase(
+            diary,
+            originalDiary
+        ).value
         if (shouldRequest) {
             updatePendingPreviousNavigationParameter(originalDiary.date)
             emitUiEvent(
@@ -1361,7 +1359,7 @@ internal class DiaryEditViewModel @Inject constructor(
         _isNewDiary.value = isNew
     }
 
-    private fun updateOriginalDiary(diary: DiaryUi) {
+    private fun updateOriginalDiary(diary: Diary) {
         _originalDiary.value = diary
     }
 
@@ -1382,9 +1380,9 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun updatePendingDiaryUpdateParameters(
-        diary: DiaryUi,
+        diary: Diary,
         diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
-        originalDiary: DiaryUi,
+        originalDiary: Diary,
         isNewDiary: Boolean
     ) {
         pendingDiaryUpdateParameters =
@@ -1437,9 +1435,9 @@ internal class DiaryEditViewModel @Inject constructor(
     )
 
     private data class DiaryUpdateParameters(
-        val diary: DiaryUi,
+        val diary: Diary,
         val diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
-        val originalDiary: DiaryUi,
+        val originalDiary: Diary,
         val isNewDiary: Boolean
     )
 
@@ -1522,9 +1520,9 @@ internal class DiaryEditViewModel @Inject constructor(
 
                     val result =
                         saveDiaryUseCase(
-                            diary.toDomainModel(),
+                            diary,
                             diaryItemTitleSelectionHistoryList,
-                            originalDiary.toDomainModel(),
+                            originalDiary,
                             isNewDiary
                         )
                     when (result) {

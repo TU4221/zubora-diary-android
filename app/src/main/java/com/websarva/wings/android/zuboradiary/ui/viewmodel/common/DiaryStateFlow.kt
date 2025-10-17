@@ -8,7 +8,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileN
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
@@ -86,26 +85,46 @@ internal open class DiaryStateFlow {
         return items[arrayNumber]
     }
 
-    fun update(diary: DiaryUi) {
+    fun update(diary: Diary) {
         diary.run {
-            updateId(DiaryId(id))
+            updateId(id)
             updateDate(date)
-            updateWeather1(weather1)
-            updateWeather2(weather2)
-            updateCondition(condition)
-            updateTitle(title)
+            updateWeather1(weather1.toUiModel())
+            updateWeather2(weather2.toUiModel())
+            updateCondition(condition.toUiModel())
+            updateTitle(title.value)
 
-            setUpItemTitleAndComment(DiaryItemNumber(1), item1Title, item1Comment)
-            setUpItemTitleAndComment(DiaryItemNumber(2), item2Title, item2Comment)
-            setUpItemTitleAndComment(DiaryItemNumber(3), item3Title, item3Comment)
-            setUpItemTitleAndComment(DiaryItemNumber(4), item4Title, item4Comment)
-            setUpItemTitleAndComment(DiaryItemNumber(5), item5Title, item5Comment)
+            setUpItemTitleAndComment(
+                DiaryItemNumber(1),
+                item1Title.value,
+                item1Comment.value
+            )
+            setUpItemTitleAndComment(
+                DiaryItemNumber(2),
+                item2Title?.value,
+                item2Comment?.value
+            )
+            setUpItemTitleAndComment(
+                DiaryItemNumber(3),
+                item3Title?.value,
+                item3Comment?.value
+            )
+            setUpItemTitleAndComment(
+                DiaryItemNumber(4),
+                item4Title?.value,
+                item4Comment?.value
+            )
+            setUpItemTitleAndComment(
+                DiaryItemNumber(5),
+                item5Title?.value,
+                item5Comment?.value
+            )
 
             val numEmptyItemsAtEnd = items.takeLastWhile { it.isEmpty }.count()
             val numVisibleItems = items.size - numEmptyItemsAtEnd
             updateNumVisibleItems(numVisibleItems)
 
-            updateImageFileName(imageFileName?.let { DiaryImageFileName(it) })
+            updateImageFileName(imageFileName)
             updateLog(log)
         }
     }

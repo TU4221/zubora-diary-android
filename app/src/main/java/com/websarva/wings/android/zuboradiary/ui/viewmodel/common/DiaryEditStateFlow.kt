@@ -2,13 +2,16 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
-import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
+import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -110,28 +113,28 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         }.launchIn(scope)
     }
 
-    fun createDiary(): DiaryUi {
-        return DiaryUi(
-            id.value?.value ?:throw IllegalStateException("IDなし(null)"),
+    fun createDiary(): Diary {
+        return Diary(
+            id.value ?:throw IllegalStateException("IDなし(null)"),
             date.value ?:throw IllegalStateException("日付なし(null)"),
             LocalDateTime.now(),
-            weather1.value,
-            weather2.value,
-            condition.value,
-            title.value.trim(),
-            items[0].title.value?.trim()
+            weather1.value.toDomainModel(),
+            weather2.value.toDomainModel(),
+            condition.value.toDomainModel(),
+            DiaryTitle(title.value.trim()),
+            items[0].title.value?.trim()?.let { DiaryItemTitle(it) }
                 ?: throw IllegalStateException("項目1タイトルなし(null)"),
-            items[0].comment.value?.trim()
+            items[0].comment.value?.trim()?.let { DiaryItemComment(it)}
                 ?: throw IllegalStateException("項目1コメントなし(null)"),
-            items[1].title.value?.trim(),
-            items[1].comment.value?.trim(),
-            items[2].title.value?.trim(),
-            items[2].comment.value?.trim(),
-            items[3].title.value?.trim(),
-            items[3].comment.value?.trim(),
-            items[4].title.value?.trim(),
-            items[4].comment.value?.trim(),
-            imageFileName.value?.fullName
+            items[1].title.value?.trim()?.let { DiaryItemTitle(it) },
+            items[1].comment.value?.trim()?.let { DiaryItemComment(it)},
+            items[2].title.value?.trim()?.let { DiaryItemTitle(it) },
+            items[2].comment.value?.trim()?.let { DiaryItemComment(it)},
+            items[3].title.value?.trim()?.let { DiaryItemTitle(it) },
+            items[3].comment.value?.trim()?.let { DiaryItemComment(it)},
+            items[4].title.value?.trim()?.let { DiaryItemTitle(it) },
+            items[4].comment.value?.trim()?.let { DiaryItemComment(it)},
+            imageFileName.value
             )
     }
 

@@ -1,10 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
-import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
@@ -77,7 +77,7 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
         diaryStateFlow.initialize()
     }
 
-    protected fun updateDiary(diary: DiaryUi) {
+    protected fun updateDiary(diary: Diary) {
         diaryStateFlow.update(diary)
     }
 
