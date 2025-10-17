@@ -1,12 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
+import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SavedDiaryDateRange
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
+import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthListItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionDiaryListUseCase
@@ -19,7 +21,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListNewLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListRefreshException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
-import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
@@ -28,7 +29,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
@@ -36,7 +36,6 @@ import com.websarva.wings.android.zuboradiary.utils.logTag
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.Year
@@ -78,9 +77,13 @@ internal class DiaryListViewModel @Inject constructor(
 
     private var diaryListLoadJob: Job? = null // キャンセル用
 
-    private val _diaryList = MutableStateFlow(DiaryYearMonthListUi<DiaryDayListItemUi.Standard>())
+    private val initialDiaryList = DiaryYearMonthList<DiaryDayListItem.Standard>()
+    private val _diaryList = MutableStateFlow(initialDiaryList)
     val diaryList
-        get() = _diaryList.asStateFlow()
+        get() = _diaryList
+            .map { mapDiaryListUiModel(it) }
+            .catchUnexpectedError(DiaryYearMonthListUi())
+            .stateInWhileSubscribed(DiaryYearMonthListUi())
 
     // MEMO:画面遷移、回転時の更新フラグ
     private var shouldUpdateDiaryList = false
@@ -291,7 +294,7 @@ internal class DiaryListViewModel @Inject constructor(
         if (!job.isCompleted) job.cancel()
     }
 
-    private suspend fun loadNewDiaryList(currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
+    private suspend fun loadNewDiaryList(currentList: DiaryYearMonthList<DiaryDayListItem.Standard>) {
         executeLoadDiaryList(
             DiaryListState.LoadingNewDiaryList,
             currentList,
@@ -312,7 +315,7 @@ internal class DiaryListViewModel @Inject constructor(
         )
     }
 
-    private suspend fun loadAdditionDiaryList(currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
+    private suspend fun loadAdditionDiaryList(currentList: DiaryYearMonthList<DiaryDayListItem.Standard>) {
         executeLoadDiaryList(
             DiaryListState.LoadingAdditionDiaryList,
             currentList,
@@ -320,7 +323,7 @@ internal class DiaryListViewModel @Inject constructor(
                 require(lambdaCurrentList.isNotEmpty)
 
                 loadAdditionDiaryListUseCase(
-                    lambdaCurrentList.toDomainModel(),
+                    lambdaCurrentList,
                     sortConditionDate
                 )
             },
@@ -337,12 +340,12 @@ internal class DiaryListViewModel @Inject constructor(
         )
     }
 
-    private suspend fun refreshDiaryList(currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
+    private suspend fun refreshDiaryList(currentList: DiaryYearMonthList<DiaryDayListItem.Standard>) {
         executeLoadDiaryList(
             DiaryListState.UpdatingDiaryList,
             currentList,
             { lambdaCurrentList ->
-                refreshDiaryListUseCase(lambdaCurrentList.toDomainModel(), sortConditionDate)
+                refreshDiaryListUseCase(lambdaCurrentList, sortConditionDate)
             },
             { exception ->
                 when (exception) {
@@ -359,8 +362,8 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun <E : UseCaseException> executeLoadDiaryList(
         state: DiaryListState,
-        currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
-        executeLoad: suspend (DiaryYearMonthListUi<DiaryDayListItemUi.Standard>)
+        currentList: DiaryYearMonthList<DiaryDayListItem.Standard>,
+        executeLoad: suspend (DiaryYearMonthList<DiaryDayListItem.Standard>)
         -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, E>,
         emitAppMessageOnFailure: suspend (E) -> Unit
     ) {
@@ -385,15 +388,7 @@ internal class DiaryListViewModel @Inject constructor(
         try {
             when (val result = executeLoad(currentList)) {
                 is UseCaseResult.Success -> {
-                    val updateDiaryList =
-                        result.value.toUiModel { fileName: DiaryImageFileName? ->
-                            fileName?.let {
-                                when (val buildResult = buildDiaryImageFilePathUseCase(fileName)) {
-                                    is UseCaseResult.Success -> FilePathUi.Available(buildResult.value)
-                                    is UseCaseResult.Failure -> FilePathUi.Unavailable
-                                }
-                            }
-                        }
+                    val updateDiaryList = result.value
                     updateDiaryList(updateDiaryList)
                     updateUiStateOnDiaryListLoadCompleted(updateDiaryList)
                     Log.i(logTag, "${logMsg}_完了")
@@ -412,11 +407,33 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
+    private suspend fun mapDiaryListUiModel(
+        list: DiaryYearMonthList<DiaryDayListItem.Standard>
+    ): DiaryYearMonthListUi<DiaryDayListItemUi.Standard>{
+        return list.toUiModel { fileName: DiaryImageFileName? ->
+            fileName?.let {
+                try {
+                    when (val buildResult = buildDiaryImageFilePathUseCase(fileName)) {
+                        is UseCaseResult.Success -> FilePathUi.Available(buildResult.value)
+                        is UseCaseResult.Failure -> FilePathUi.Unavailable
+                    }
+                } catch (e: Exception) {
+                    if (BuildConfig.DEBUG) {
+                        throw e
+                    } else {
+                        FilePathUi.Unavailable
+                    }
+                }
+
+            }
+        }
+    }
+
     private fun showDiaryListFirstItemProgressIndicator() {
         val list =
-            DiaryYearMonthListUi<DiaryDayListItemUi.Standard>(
+            DiaryYearMonthList<DiaryDayListItem.Standard>(
                 listOf(
-                    DiaryYearMonthListItemUi.ProgressIndicator()
+                    DiaryYearMonthListItem.ProgressIndicator()
                 )
             )
         updateDiaryList(list)
@@ -424,7 +441,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     private suspend fun deleteDiary(
         id: DiaryId,
-        currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
+        currentList: DiaryYearMonthList<DiaryDayListItem.Standard>
     ) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
@@ -471,7 +488,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private fun updateUiStateOnDiaryListLoadCompleted(
-        list: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
+        list: DiaryYearMonthList<DiaryDayListItem.Standard>
     ) {
         val state =
             if (list.isNotEmpty) {
@@ -482,7 +499,7 @@ internal class DiaryListViewModel @Inject constructor(
         updateUiState(state)
     }
 
-    private fun updateDiaryList(diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
+    private fun updateDiaryList(diaryList: DiaryYearMonthList<DiaryDayListItem.Standard>) {
         _diaryList.value = diaryList
     }
 
