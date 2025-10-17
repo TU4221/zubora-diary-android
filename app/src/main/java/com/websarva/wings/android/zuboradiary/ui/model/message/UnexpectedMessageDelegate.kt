@@ -11,10 +11,10 @@ internal class UnexpectedMessageDelegate(val exception: Exception) {
         } else {
             R.string.dialog_app_message_unexpected_error
         }
-    val dialogMessageArgs: List<Any> =
+    val dialogMessageArgs: Array<Any> =
         if (BuildConfig.DEBUG) {
-            listOf(exception.javaClass.simpleName)
+            arrayOf(exception.javaClass.simpleName)
         } else {
-            emptyList()
+            emptyArray()
         }
 }

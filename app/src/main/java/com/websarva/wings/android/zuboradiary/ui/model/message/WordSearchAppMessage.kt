@@ -27,7 +27,7 @@ internal sealed class WordSearchAppMessage : AppMessage {
             get() = delegate.dialogMessageStringResId
 
         @IgnoredOnParcel
-        override val dialogMessageArgs: List<Any>
+        override val dialogMessageArgs: Array<Any>
             get() = delegate.dialogMessageArgs
     }
 }

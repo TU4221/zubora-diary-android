@@ -83,7 +83,7 @@ internal sealed class SettingsAppMessage : AppMessage {
             get() = delegate.dialogMessageStringResId
 
         @IgnoredOnParcel
-        override val dialogMessageArgs: List<Any>
+        override val dialogMessageArgs: Array<Any>
             get() = delegate.dialogMessageArgs
     }
 }
