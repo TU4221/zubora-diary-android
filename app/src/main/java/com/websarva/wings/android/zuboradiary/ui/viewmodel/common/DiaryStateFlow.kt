@@ -96,15 +96,8 @@ internal open class DiaryStateFlow {
             setUpItemTitleAndComment(DiaryItemNumber(4), item4Title, item4Comment)
             setUpItemTitleAndComment(DiaryItemNumber(5), item5Title, item5Comment)
 
-            var numVisibleItems = items.size
-            val maxArrayNumber = numVisibleItems - 1
-            for (i in maxArrayNumber downTo 1) {
-                if (items[i].isEmpty) {
-                    numVisibleItems--
-                } else {
-                    break
-                }
-            }
+            val numEmptyItemsAtEnd = items.takeLastWhile { it.isEmpty }.count()
+            val numVisibleItems = items.size - numEmptyItemsAtEnd
             updateNumVisibleItems(numVisibleItems)
 
             updateImageFileName(imageFileName)
