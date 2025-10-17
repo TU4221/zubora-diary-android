@@ -125,7 +125,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             items[3].comment.value?.trim(),
             items[4].title.value?.trim(),
             items[4].comment.value?.trim(),
-            imageFileName.value
+            imageFileName.value?.fullName
             )
     }
 

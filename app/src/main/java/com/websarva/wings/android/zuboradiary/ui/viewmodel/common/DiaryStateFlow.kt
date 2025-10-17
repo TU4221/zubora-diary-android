@@ -4,6 +4,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
@@ -55,7 +56,7 @@ internal open class DiaryStateFlow {
             DiaryItemStateFlow(DiaryItemNumber(i + 1))
         }
 
-    protected val initialImageFileName = initialDiary.imageFileName?.fullName
+    protected val initialImageFileName = initialDiary.imageFileName
     open val imageFileName = MutableStateFlow(initialImageFileName)
 
     private val initialImageFilePath: FilePathUi? = null
@@ -104,7 +105,7 @@ internal open class DiaryStateFlow {
             val numVisibleItems = items.size - numEmptyItemsAtEnd
             updateNumVisibleItems(numVisibleItems)
 
-            updateImageFileName(imageFileName)
+            updateImageFileName(imageFileName?.let { DiaryImageFileName(it) })
             updateLog(log)
         }
     }
@@ -163,7 +164,7 @@ internal open class DiaryStateFlow {
         this.numVisibleItems.value = count
     }
 
-    private fun updateImageFileName(imageFileName: String?) {
+    private fun updateImageFileName(imageFileName: DiaryImageFileName?) {
         this.imageFileName.value = imageFileName
     }
 

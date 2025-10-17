@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 
 internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : UiState> (
     initialViewUiState: S,
@@ -60,7 +61,7 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
     val item5Comment
         get() = diaryStateFlow.getItemStateFlow(DiaryItemNumber(5)).comment.asStateFlow()
     val imageFileName
-        get() = diaryStateFlow.imageFileName.asStateFlow()
+        get() = diaryStateFlow.imageFileName.map { it?.fullName }.stateInWhileSubscribed(null)
     val imageFilePath
         get() = diaryStateFlow.imageFilePath.asStateFlow()
     val log

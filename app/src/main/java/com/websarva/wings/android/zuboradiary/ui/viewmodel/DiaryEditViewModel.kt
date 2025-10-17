@@ -276,7 +276,7 @@ internal class DiaryEditViewModel @Inject constructor(
         )
 
     val imageFileName
-        get() = diaryStateFlow.imageFileName.asStateFlow()
+        get() = diaryStateFlow.imageFileName.map { it?.fullName }.stateInWhileSubscribed(null)
 
     val imageFilePath
         get() = diaryStateFlow.imageFilePath.asStateFlow()
@@ -1177,7 +1177,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 cacheDiaryImageUseCase(uri.toString(), diaryId)
             when (result) {
                 is UseCaseResult.Success -> {
-                    updateImageFileName(result.value.fullName)
+                    updateImageFileName(result.value)
                 }
                 is UseCaseResult.Failure -> {
                     when (result.exception) {
@@ -1349,7 +1349,7 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.getItemStateFlow(itemNumber).comment.value = comment
     }
 
-    private fun updateImageFileName(imageFileName: String?) {
+    private fun updateImageFileName(imageFileName: DiaryImageFileName?) {
         diaryStateFlow.imageFileName.value = imageFileName
     }
 
