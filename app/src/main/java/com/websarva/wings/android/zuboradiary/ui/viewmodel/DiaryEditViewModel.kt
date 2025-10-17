@@ -453,7 +453,11 @@ internal class DiaryEditViewModel @Inject constructor(
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 DiaryEditEvent.NavigateDiaryItemTitleEditFragment(
-                    DiaryItemTitleSelectionUi(itemNumberInt, itemTitleId, itemTitle)
+                    DiaryItemTitleSelectionUi(
+                        itemNumberInt,
+                        itemTitleId?.value,
+                        itemTitle
+                    )
                 )
             )
         }
@@ -696,7 +700,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 val titleId = result.data.id ?: throw IllegalArgumentException()
                 updateItemTitle(
                     DiaryItemNumber(result.data.itemNumber),
-                    titleId,
+                    DiaryItemTitleSelectionHistoryId(titleId),
                     result.data.title
                 )
             }
@@ -1120,7 +1124,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // 項目関係
-    private fun getItemTitleId(itemNumber: DiaryItemNumber): StateFlow<String?> {
+    private fun getItemTitleId(itemNumber: DiaryItemNumber): StateFlow<DiaryItemTitleSelectionHistoryId?> {
         return diaryStateFlow.getItemStateFlow(itemNumber).titleId
     }
 
@@ -1335,7 +1339,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun updateItemTitle(
         itemNumber: DiaryItemNumber,
-        titleId: String,
+        titleId: DiaryItemTitleSelectionHistoryId,
         title: String
     ) {
         diaryStateFlow.updateItemTitle(itemNumber, titleId, title)
@@ -1500,7 +1504,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         val itemComment = generateRandomAlphanumericString(50)
                         updateItemTitle(
                             DiaryItemNumber(j),
-                            DiaryItemTitleSelectionHistoryId.generate().value,
+                            DiaryItemTitleSelectionHistoryId.generate(),
                             itemTitle
                         )
                         val diaryItemNumber = DiaryItemNumber(j)

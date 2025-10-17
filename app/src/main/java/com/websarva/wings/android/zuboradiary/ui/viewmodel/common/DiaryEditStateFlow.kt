@@ -139,7 +139,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
                 null
             } else {
                 DiaryItemTitleSelectionHistory(
-                    DiaryItemTitleSelectionHistoryId(titleId),
+                    titleId,
                     DiaryItemTitle(title),
                     titleUpdateLog
                 )
@@ -183,7 +183,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
     fun updateItemTitle(
         itemNumber: DiaryItemNumber,
-        titleId: String,
+        titleId: DiaryItemTitleSelectionHistoryId,
         title: String
     ) {
         updateItemTitleWithTimestamp(itemNumber, titleId, title)
@@ -203,7 +203,11 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         }
 
         override val titleId =
-            MutableStateFlow<String?>(handle[SAVED_ITEM_TITLE_ID_STATE_KEY + itemNumber] ?: initialTitleId)
+            MutableStateFlow(
+                handle.get<String>(SAVED_ITEM_TITLE_ID_STATE_KEY + itemNumber)?.let {
+                    DiaryItemTitleSelectionHistoryId(it)
+                } ?: initialTitleId
+            )
 
         // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
         //      StateFlow変数を用意しても意味がないので作成しない。

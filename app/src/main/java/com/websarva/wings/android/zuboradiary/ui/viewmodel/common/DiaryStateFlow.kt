@@ -4,6 +4,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
@@ -142,7 +143,7 @@ internal open class DiaryStateFlow {
 
     protected fun updateItem(
         itemNumber: DiaryItemNumber,
-        id: String?,
+        id: DiaryItemTitleSelectionHistoryId?,
         title: String?,
         comment: String?,
         titleUpdateLog: LocalDateTime?
@@ -152,7 +153,7 @@ internal open class DiaryStateFlow {
 
     protected fun updateItemTitleWithTimestamp(
         itemNumber: DiaryItemNumber,
-        id: String,
+        id: DiaryItemTitleSelectionHistoryId,
         title: String
     ) {
         getItemStateFlow(itemNumber).updateTitleWithTimestamp(id, title)
@@ -173,7 +174,7 @@ internal open class DiaryStateFlow {
     open class DiaryItemStateFlow(val itemNumber: DiaryItemNumber) {
 
         protected val initialTitleId = null
-        open val titleId = MutableStateFlow<String?>(initialTitleId)
+        open val titleId = MutableStateFlow<DiaryItemTitleSelectionHistoryId?>(initialTitleId)
 
         // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
         //      StateFlow変数を用意しても意味がないので作成しない。
@@ -224,7 +225,7 @@ internal open class DiaryStateFlow {
         }
 
         fun updateAllFromOtherItem(
-            id: String?,
+            id: DiaryItemTitleSelectionHistoryId?,
             title: String?,
             comment: String?,
             titleUpdateLog: LocalDateTime?
@@ -235,13 +236,13 @@ internal open class DiaryStateFlow {
             updateTitleUpdateLog(titleUpdateLog)
         }
 
-        fun updateTitleWithTimestamp(id: String, title: String) {
+        fun updateTitleWithTimestamp(id: DiaryItemTitleSelectionHistoryId, title: String) {
             updateTitleId(id)
             updateTitle(title)
             updateTitleUpdateLog(LocalDateTime.now())
         }
 
-        private fun updateTitleId(id: String?) {
+        private fun updateTitleId(id: DiaryItemTitleSelectionHistoryId?) {
             this.titleId.value = id
         }
 
