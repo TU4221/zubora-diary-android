@@ -1,13 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
-import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
-import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
-import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import kotlinx.coroutines.flow.MutableStateFlow
 import java.time.LocalDate
@@ -30,11 +29,11 @@ internal open class DiaryStateFlow {
     open val date =
         MutableStateFlow<LocalDate?>(initialDate) // MEMO:初期化時日付が未定の為、null許容型とする。
 
-    protected val initialWeather = initialDiary.weather1.toUiModel()
+    protected val initialWeather = initialDiary.weather1
     open val weather1 = MutableStateFlow(initialWeather)
     open val weather2 = MutableStateFlow(initialWeather)
 
-    protected val initialCondition = initialDiary.condition.toUiModel()
+    protected val initialCondition = initialDiary.condition
     open val condition = MutableStateFlow(initialCondition)
 
     protected val initialTitle = initialDiary.title.value
@@ -90,9 +89,9 @@ internal open class DiaryStateFlow {
         diary.run {
             updateId(id)
             updateDate(date)
-            updateWeather1(weather1.toUiModel())
-            updateWeather2(weather2.toUiModel())
-            updateCondition(condition.toUiModel())
+            updateWeather1(weather1)
+            updateWeather2(weather2)
+            updateCondition(condition)
             updateTitle(title.value)
 
             setUpItemTitleAndComment(
@@ -138,15 +137,15 @@ internal open class DiaryStateFlow {
         this.date.value = date
     }
 
-    private fun updateWeather1(weather: WeatherUi) {
+    private fun updateWeather1(weather: Weather) {
         this.weather1.value = weather
     }
 
-    private fun updateWeather2(weather: WeatherUi) {
+    private fun updateWeather2(weather: Weather) {
         this.weather2.value = weather
     }
 
-    private fun updateCondition(condition: ConditionUi) {
+    private fun updateCondition(condition: Condition) {
         this.condition.value = condition
     }
 

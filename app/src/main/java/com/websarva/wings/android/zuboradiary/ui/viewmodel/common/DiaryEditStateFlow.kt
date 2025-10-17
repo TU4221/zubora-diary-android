@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
-import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -118,9 +117,9 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             id.value ?:throw IllegalStateException("IDなし(null)"),
             date.value ?:throw IllegalStateException("日付なし(null)"),
             LocalDateTime.now(),
-            weather1.value.toDomainModel(),
-            weather2.value.toDomainModel(),
-            condition.value.toDomainModel(),
+            weather1.value,
+            weather2.value,
+            condition.value,
             DiaryTitle(title.value.trim()),
             items[0].title.value?.trim()?.let { DiaryItemTitle(it) }
                 ?: throw IllegalStateException("項目1タイトルなし(null)"),

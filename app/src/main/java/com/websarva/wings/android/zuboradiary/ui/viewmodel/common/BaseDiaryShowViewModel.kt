@@ -1,12 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Condition
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
@@ -25,17 +27,20 @@ internal abstract class BaseDiaryShowViewModel<E : UiEvent, M : AppMessage, S : 
     val date
         get() = diaryStateFlow.date.asStateFlow()
     val weather1
-        get() = diaryStateFlow.weather1.asStateFlow()
+        get() = diaryStateFlow.weather1
+            .map { it.toUiModel() }.stateInWhileSubscribed(Weather.UNKNOWN.toUiModel())
     val weather2
-        get() = diaryStateFlow.weather2.asStateFlow()
+        get() = diaryStateFlow.weather2
+            .map { it.toUiModel() }.stateInWhileSubscribed(Weather.UNKNOWN.toUiModel())
     val isWeather2Visible =
-        combine(weather1, weather2) { weather1, weather2 ->
-            return@combine weather1 != WeatherUi.UNKNOWN && weather2 != WeatherUi.UNKNOWN
+        combine(diaryStateFlow.weather1, diaryStateFlow.weather2) { weather1, weather2 ->
+            return@combine weather1 != Weather.UNKNOWN && weather2 != Weather.UNKNOWN
         }.stateInWhileSubscribed(
             false
         )
     val condition
-        get() = diaryStateFlow.condition.asStateFlow()
+        get() = diaryStateFlow.condition
+            .map { it.toUiModel() }.stateInWhileSubscribed(Condition.UNKNOWN.toUiModel())
     val title
         get() = diaryStateFlow.title.asStateFlow()
     val numVisibleItems

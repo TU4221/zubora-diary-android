@@ -4,6 +4,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Condition
 import com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.exception.WeatherInfoFetchException
 import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
@@ -13,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
+import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
@@ -173,10 +175,12 @@ internal class DiaryEditViewModel @Inject constructor(
         get() = diaryStateFlow.title
 
     val weather1
-        get() = diaryStateFlow.weather1.asStateFlow()
+        get() = diaryStateFlow.weather1
+            .map { it.toUiModel() }.stateInWhileSubscribed(Weather.UNKNOWN.toUiModel())
 
     val weather2
-        get() = diaryStateFlow.weather2.asStateFlow()
+        get() = diaryStateFlow.weather2
+            .map { it.toUiModel() }.stateInWhileSubscribed(Weather.UNKNOWN.toUiModel())
 
     private val isEqualWeathers: Boolean
         get() {
@@ -187,7 +191,8 @@ internal class DiaryEditViewModel @Inject constructor(
         }
 
     val condition
-        get() = diaryStateFlow.condition.asStateFlow()
+        get() = diaryStateFlow.condition
+            .map { it.toUiModel() }.stateInWhileSubscribed(Condition.UNKNOWN.toUiModel())
 
     val numVisibleItems
         get() = diaryStateFlow.numVisibleItems.asStateFlow()
@@ -428,15 +433,15 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     fun onWeather1InputFieldItemClick(weather: WeatherUi) {
-        updateWeather1(weather)
+        updateWeather1(weather.toDomainModel())
     }
 
     fun onWeather2InputFieldItemClick(weather: WeatherUi) {
-        updateWeather2(weather)
+        updateWeather2(weather.toDomainModel())
     }
 
     fun onConditionInputFieldItemClick(condition: ConditionUi) {
-        updateCondition(condition)
+        updateCondition(condition.toDomainModel())
     }
 
     fun onItemTitleInputFieldClick(itemNumberInt: Int) {
@@ -1080,8 +1085,8 @@ internal class DiaryEditViewModel @Inject constructor(
         when (val result = fetchWeatherInfoUseCase(date)) {
             is UseCaseResult.Success -> {
                 updateUiState(DiaryEditState.Editing)
-                updateWeather1(result.value.toUiModel())
-                updateWeather2(WeatherUi.UNKNOWN)
+                updateWeather1(result.value)
+                updateWeather2(Weather.UNKNOWN)
             }
             is UseCaseResult.Failure -> {
                 updateUiState(DiaryEditState.Editing)
@@ -1318,16 +1323,16 @@ internal class DiaryEditViewModel @Inject constructor(
         diaryStateFlow.title.value = title
     }
 
-    private fun updateWeather1(weather: WeatherUi) {
+    private fun updateWeather1(weather: Weather) {
         diaryStateFlow.weather1.value = weather
-        if (weather == WeatherUi.UNKNOWN || isEqualWeathers) updateWeather2(WeatherUi.UNKNOWN)
+        if (weather == Weather.UNKNOWN || isEqualWeathers) updateWeather2(Weather.UNKNOWN)
     }
 
-    private fun updateWeather2(weather: WeatherUi) {
+    private fun updateWeather2(weather: Weather) {
         diaryStateFlow.weather2.value = weather
     }
 
-    private fun updateCondition(condition: ConditionUi) {
+    private fun updateCondition(condition: Condition) {
         diaryStateFlow.condition.value = condition
     }
 
@@ -1488,11 +1493,11 @@ internal class DiaryEditViewModel @Inject constructor(
                     diaryStateFlow.initialize()
                     updateDate(saveDate)
                     val weather1Int = Random.nextInt(1, WeatherUi.entries.size)
-                    updateWeather1(WeatherUi.of(weather1Int))
+                    updateWeather1(Weather.of(weather1Int))
                     val weather2Int = Random.nextInt(1, WeatherUi.entries.size)
-                    updateWeather2(WeatherUi.of(weather2Int))
+                    updateWeather2(Weather.of(weather2Int))
                     val conditionInt = Random.nextInt(1, ConditionUi.entries.size)
-                    updateCondition(ConditionUi.of(conditionInt))
+                    updateCondition(Condition.of(conditionInt))
                     val title = generateRandomAlphanumericString(15)
                     updateTitle(title)
                     val numItems = Random.nextInt(DiaryItemNumber.MIN_NUMBER, DiaryItemNumber.MAX_NUMBER + 1)
