@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
 
 /**

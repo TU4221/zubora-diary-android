@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllDataDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 /**
  * アプリケーションの全データを削除するユースケース。

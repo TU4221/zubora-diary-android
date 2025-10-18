@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.SettingsReposito
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map

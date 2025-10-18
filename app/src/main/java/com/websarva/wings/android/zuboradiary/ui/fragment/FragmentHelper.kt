@@ -22,7 +22,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull

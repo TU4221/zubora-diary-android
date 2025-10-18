@@ -15,7 +15,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 /**
  * 指定された検索ワードに一致する日記のリストを読み込み、表示用のデータに整形して返すユースケース。

@@ -17,7 +17,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.PermissionExcepti
 import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyExistsException
 import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
 
 /**

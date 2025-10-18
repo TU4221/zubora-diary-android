@@ -36,7 +36,7 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import androidx.core.view.size
 import androidx.core.view.get
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 @AndroidEntryPoint
 class MainActivity : LoggingActivity() {

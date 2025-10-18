@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Wor
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListLoadException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 /**
  * 既存のワード検索結果リストに追加の検索結果データを読み込み、結合してフッターを更新するユースケース。

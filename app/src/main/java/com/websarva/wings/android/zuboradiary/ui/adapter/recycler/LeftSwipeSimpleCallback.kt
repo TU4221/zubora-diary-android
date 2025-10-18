@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
 import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 internal open class LeftSwipeSimpleCallback(protected val recyclerView: SwipeRecyclerView) :
     ItemTouchHelper.SimpleCallback(ItemTouchHelper.ACTION_STATE_IDLE, ItemTouchHelper.LEFT) {

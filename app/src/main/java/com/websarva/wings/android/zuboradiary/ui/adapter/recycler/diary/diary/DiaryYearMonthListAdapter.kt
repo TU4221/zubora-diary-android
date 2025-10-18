@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.SwipeDia
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListItemUi
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 internal abstract class DiaryYearMonthListAdapter(
     recyclerView: RecyclerView,

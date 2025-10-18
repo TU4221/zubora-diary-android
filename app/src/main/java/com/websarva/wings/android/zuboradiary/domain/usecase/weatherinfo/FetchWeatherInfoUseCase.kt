@@ -11,7 +11,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.LocationException
 import com.websarva.wings.android.zuboradiary.domain.exception.NetworkConnectionException
 import com.websarva.wings.android.zuboradiary.domain.exception.PermissionException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
 
 /**

@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.AllDiariesDeleteException
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 /**
  * 全ての日記データ (項目タイトル選択履歴除く) と、それに関連する永続的なURI権限を削除するユースケース。

@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsear
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListItemUi
 import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 internal abstract class DiaryYearMonthListBaseAdapter<
         CLIT : DiaryDayListItemUi

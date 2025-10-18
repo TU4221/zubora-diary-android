@@ -9,7 +9,7 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.websarva.wings.android.zuboradiary.ui.utils.datePickerDialogThemeResId
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId

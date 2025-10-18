@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkConn
 import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOperationException
 import com.websarva.wings.android.zuboradiary.data.network.exception.InvalidNetworkRequestParameterException
 import com.websarva.wings.android.zuboradiary.data.network.exception.ResponseParsingException
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext

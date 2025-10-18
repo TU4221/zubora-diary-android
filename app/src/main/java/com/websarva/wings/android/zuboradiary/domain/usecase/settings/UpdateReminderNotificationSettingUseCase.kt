@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStora
 import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.domain.exception.SchedulingException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map

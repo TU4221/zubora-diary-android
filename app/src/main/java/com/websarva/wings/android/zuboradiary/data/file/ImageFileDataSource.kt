@@ -23,7 +23,7 @@ import java.io.IOException
 import java.io.InputStream
 import androidx.core.net.toUri
 import com.websarva.wings.android.zuboradiary.data.file.exception.InvalidFileOperationParameterException
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 /**
  * 画像ファイルの永続化およびキャッシュ処理を担当するデータソース。

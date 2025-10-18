@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.data.location.exception.LocationAc
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationProviderException
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationUnavailableException
 import com.websarva.wings.android.zuboradiary.data.location.exception.PermissionDeniedException
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await

@@ -13,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLock
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 /**
  * アプリケーションの全ての設定項目を初期値にリセットするユースケース。

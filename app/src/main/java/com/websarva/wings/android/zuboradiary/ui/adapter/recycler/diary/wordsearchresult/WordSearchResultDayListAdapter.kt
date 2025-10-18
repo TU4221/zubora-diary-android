@@ -20,7 +20,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asTertiaryContainerColorI
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.utils.asDiaryListDayOfWeekString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.text.NumberFormat
 
 internal class WordSearchResultDayListAdapter(

@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.bottomSheetDialogThemeRes
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
-import com.websarva.wings.android.zuboradiary.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialogFragment() {
 
