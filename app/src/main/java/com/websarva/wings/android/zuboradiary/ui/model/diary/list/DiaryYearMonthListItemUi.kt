@@ -1,8 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.model.diary.list
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.time.YearMonth
 
-internal sealed class DiaryYearMonthListItemUi<T : DiaryDayListItemUi> {
+@Parcelize
+internal sealed class DiaryYearMonthListItemUi<T : DiaryDayListItemUi> : Parcelable {
 
     data class Diary<T : DiaryDayListItemUi>(
         val yearMonth: YearMonth,

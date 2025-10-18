@@ -1,8 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.model.diary.list
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 internal data class DiaryYearMonthListUi<T: DiaryDayListItemUi>(
     val itemList: List<DiaryYearMonthListItemUi<T>> = emptyList()
-) {
+) : Parcelable {
 
     val isNotEmpty get() = itemList.isNotEmpty()
 
