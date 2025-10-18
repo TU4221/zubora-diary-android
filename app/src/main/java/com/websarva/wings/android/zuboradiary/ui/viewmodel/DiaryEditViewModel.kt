@@ -49,7 +49,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryEditState
@@ -320,7 +319,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         _originalDiary.onEach {
-            handle[SAVED_ORIGINAL_DIARY_KEY] = it?.toUiModel()
+            handle[SAVED_ORIGINAL_DIARY_KEY] = it
         }.launchIn(viewModelScope)
     }
 
@@ -751,8 +750,7 @@ internal class DiaryEditViewModel @Inject constructor(
         updateId(DiaryId.generate())
         updateDate(date)
         updateOriginalDiary(
-            handle.get<DiaryUi?>(SAVED_ORIGINAL_DIARY_KEY)?.toDomainModel()
-                ?: diaryStateFlow.createDiary()
+            handle[SAVED_ORIGINAL_DIARY_KEY] ?: diaryStateFlow.createDiary()
         )
         val previousDate = previousDate
         val originalDate = _originalDiary.requireValue().date

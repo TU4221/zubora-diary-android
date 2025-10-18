@@ -36,8 +36,8 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
         private const val SAVED_LOG_STATE_KEY = "log"
     }
 
-    override val id = MutableStateFlow(
-        handle.get<String>(SAVED_ID_STATE_KEY)?.let { DiaryId(it) } ?: initialId
+    override val id = MutableStateFlow<DiaryId?>(
+        handle[SAVED_ID_STATE_KEY] ?: initialId
     )
 
     // MEMO:双方向DataBindingが必要の為、MutableStateFlow変数はアクセス修飾子をpublicとする。
@@ -54,14 +54,6 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
     override val title = MutableStateFlow(handle[SAVED_TITLE_STATE_KEY] ?: initialTitle)
 
-    private val initialNumVisibleItems = run {
-        var count = 1
-        if (initialDiary.item2Title != null) count++
-        if (initialDiary.item3Title != null) count++
-        if (initialDiary.item4Title != null) count++
-        if (initialDiary.item5Title != null) count++
-        count
-    }
     override val numVisibleItems =
         MutableStateFlow(handle[SAVED_NUM_VISIBLE_ITEMS_STATE_KEY] ?: initialNumVisibleItems)
 
@@ -72,9 +64,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
     override val imageFileName =
         MutableStateFlow(
-            handle.get<String>(SAVED_IMAGE_FILE_NAME_STATE_KEY)?.let {
-                DiaryImageFileName(it)
-            } ?: initialImageFileName
+            handle[SAVED_IMAGE_FILE_NAME_STATE_KEY] ?: initialImageFileName
         )
 
     override val log =
@@ -84,7 +74,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
 
     init {
         id.onEach {
-            handle[SAVED_ID_STATE_KEY] = it?.value
+            handle[SAVED_ID_STATE_KEY] = it
         }.launchIn(scope)
         date.onEach {
             handle[SAVED_DATE_STATE_KEY] = it
@@ -105,7 +95,7 @@ internal class DiaryEditStateFlow(scope: CoroutineScope, handle: SavedStateHandl
             handle[SAVED_NUM_VISIBLE_ITEMS_STATE_KEY] = it
         }.launchIn(scope)
         imageFileName.onEach {
-            handle[SAVED_IMAGE_FILE_NAME_STATE_KEY] = it?.fullName
+            handle[SAVED_IMAGE_FILE_NAME_STATE_KEY] = it
         }.launchIn(scope)
         log.onEach {
             handle[SAVED_LOG_STATE_KEY] = it

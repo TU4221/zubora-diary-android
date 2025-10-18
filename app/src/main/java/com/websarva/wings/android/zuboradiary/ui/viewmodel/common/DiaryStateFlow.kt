@@ -39,7 +39,7 @@ internal open class DiaryStateFlow {
     protected val initialTitle = initialDiary.title.value
     open val title = MutableStateFlow(initialTitle)
 
-    private val initialNumVisibleItems = run {
+    protected val initialNumVisibleItems = run {
         listOf(
             initialDiary.item1Title,
             initialDiary.item2Title,
