@@ -1,6 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state
 
-internal sealed class CalendarState : UiState {
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+internal sealed class CalendarState : UiState, Parcelable {
     data object Idle: CalendarState() // 初期状態
 
     data object LoadingDiaryInfo : CalendarState() //日記情報読込中

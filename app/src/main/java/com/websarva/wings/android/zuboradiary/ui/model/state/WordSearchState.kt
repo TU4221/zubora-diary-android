@@ -1,6 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state
 
-internal sealed class WordSearchState : UiState {
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+internal sealed class WordSearchState : UiState, Parcelable {
     data object Idle: WordSearchState() // 初期状態
 
     data object Searching : WordSearchState() // 検索中

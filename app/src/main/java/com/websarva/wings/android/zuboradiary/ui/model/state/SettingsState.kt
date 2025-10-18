@@ -1,6 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state
 
-internal sealed class SettingsState : UiState {
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+internal sealed class SettingsState : UiState, Parcelable {
     data object Idle: SettingsState() // 初期状態
 
     data object LoadingAllSettings: SettingsState() // 全設定読込中

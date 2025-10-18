@@ -1,6 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state
 
-internal sealed class DiaryListState : UiState {
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+internal sealed class DiaryListState : UiState, Parcelable {
     data object Idle: DiaryListState() // 初期状態
 
     data object LoadingDiaryInfo : DiaryListState() // 日記情報読込中
