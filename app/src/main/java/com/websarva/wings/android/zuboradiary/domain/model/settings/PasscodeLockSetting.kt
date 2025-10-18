@@ -21,6 +21,7 @@ internal sealed class PasscodeLockSetting(
      * @property passcode 設定されている4桁の文字列数字のパスコード。
      * @throws IllegalArgumentException [passcode] が4桁の数字でない場合。
      */
+    @Serializable
     data class Enabled(val passcode: String) : PasscodeLockSetting(true) {
         init {
             require(checkLegalArgument(passcode))
@@ -40,6 +41,7 @@ internal sealed class PasscodeLockSetting(
     /**
      * パスコードロックが無効な状態を表すデータオブジェクト。
      */
+    @Serializable
     data object Disabled : PasscodeLockSetting(false)
 
     companion object {

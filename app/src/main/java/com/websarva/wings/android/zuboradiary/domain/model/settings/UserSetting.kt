@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
-import kotlinx.serialization.Serializable
 import java.io.Serializable as JavaSerializable
 
 /**
