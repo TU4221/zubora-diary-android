@@ -738,6 +738,7 @@ internal class DiaryEditViewModel @Inject constructor(
         id: DiaryId?,
         date: LocalDate
     ) {
+        // TODO:handleからの復元処理見直し
         if (id == null) {
             prepareNewDiaryEntry(date)
         } else {
