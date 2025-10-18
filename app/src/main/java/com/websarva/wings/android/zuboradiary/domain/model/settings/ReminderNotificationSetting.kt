@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
+import kotlinx.serialization.Serializable
 import java.time.LocalTime
 
 /**
@@ -9,6 +10,7 @@ import java.time.LocalTime
  *
  * @property isEnabled リマインダー通知が有効な場合は `true`、無効な場合は `false`。
  */
+@Serializable
 internal sealed class ReminderNotificationSetting(
     val isEnabled: Boolean
 ) : UserSetting {

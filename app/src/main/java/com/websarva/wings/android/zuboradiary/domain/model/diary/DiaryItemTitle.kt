@@ -1,5 +1,8 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary
 
+import kotlinx.serialization.Serializable
+import java.io.Serializable as JavaSerializable
+
 /**
  * 日記の項目のタイトルを表すバリュークラス。
  *
@@ -7,7 +10,8 @@ package com.websarva.wings.android.zuboradiary.domain.model.diary
  * @throws IllegalArgumentException 文字列が15文字を超える場合。
  */
 @JvmInline
-internal value class DiaryItemTitle(val value: String) {
+@Serializable
+internal value class DiaryItemTitle(val value: String) : JavaSerializable {
     init {
         require(value.length <= 15) {
             "項目のタイトルは15文字以内で入力。"

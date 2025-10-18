@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
+import kotlinx.serialization.Serializable
+
 /**
  * パスコードロック設定の状態を表す基底クララス。
  *
@@ -8,6 +10,7 @@ package com.websarva.wings.android.zuboradiary.domain.model.settings
  *
  * @property isEnabled パスコードロックが有効な場合は `true`、無効な場合は `false`。
  */
+@Serializable
 internal sealed class PasscodeLockSetting(
     val isEnabled: Boolean,
 ) : UserSetting {

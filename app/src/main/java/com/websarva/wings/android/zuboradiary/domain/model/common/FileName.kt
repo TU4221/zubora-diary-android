@@ -1,17 +1,22 @@
 package com.websarva.wings.android.zuboradiary.domain.model.common
 
+import kotlinx.serialization.Serializable
+import java.io.Serializable as JavaSerializable
+
 /**
  * ファイル名を表す抽象クラス。
  *
  * このクラスは、ファイル名が有効なファイル名であるかを検証する機能を有する。
  *
  * **【重要】** このクラスを継承するサブクラスは、自身の`init`ブロック内で必ず [validate] を呼び出すこと。
- *
- * @property fullName ファイル名。拡張子を含む。
  */
-internal abstract class FileName(
-    open val fullName: String
-) {
+@Serializable
+internal abstract class FileName : JavaSerializable {
+
+    /**
+     * ファイル名。拡張子を含む。
+     */
+    abstract val fullName: String
 
     /**
      * [fullName] プロパティが有効なファイル名であるかを検証。

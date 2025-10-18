@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary
 
 import com.websarva.wings.android.zuboradiary.domain.model.common.FileName
+import kotlinx.serialization.Serializable
 
 /**
  * ファイル名を表すデータクラス。
@@ -10,9 +11,10 @@ import com.websarva.wings.android.zuboradiary.domain.model.common.FileName
  * @property fullName ファイル名。拡張子を含む。
  * @throws IllegalArgumentException ファイル名が一般的ファイル形式 (basename.extension) でない場合。
  */
+@Serializable
 internal data class DiaryImageFileName(
     override val fullName: String
-) : FileName(fullName) {
+) : FileName() {
 
     init {
         validate()

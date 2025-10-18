@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
+import kotlinx.serialization.Serializable
+
 /**
  * アプリケーションのテーマカラー設定を表すデータクラス。
  *
@@ -7,6 +9,7 @@ package com.websarva.wings.android.zuboradiary.domain.model.settings
  *
  * @property themeColor 選択されているテーマカラー。
  */
+@Serializable
 internal data class ThemeColorSetting(
     val themeColor: ThemeColor
 ) : UserSetting {

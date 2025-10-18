@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
+import kotlinx.serialization.Serializable
 import java.time.DayOfWeek
 
 /**
@@ -9,9 +10,10 @@ import java.time.DayOfWeek
  *
  * @property dayOfWeek 選択されている開始曜日。
  */
+@Serializable
 internal data class CalendarStartDayOfWeekSetting(
     val dayOfWeek: DayOfWeek
-) : UserSetting {
+) : UserSetting{
 
     companion object {
         /**

@@ -1,5 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.model.common
 
+import kotlinx.serialization.Serializable
+import java.io.Serializable as JavaSerializable
 import java.util.UUID
 
 /**
@@ -8,10 +10,14 @@ import java.util.UUID
  * このクラスは、UUIDの文字列が有効なUUID形式であるかを検証する機能を有する。
  *
  * **【重要】** このクラスを継承するサブクラスは、自身の`init`ブロック内で必ず [validate] を呼び出すこと。
- *
- * @property value UUIDの文字列。
  */
-internal abstract class UUIDString(open val value: String) {
+@Serializable
+internal abstract class UUIDString : JavaSerializable {
+
+    /**
+     * UUIDの文字列。
+     */
+    abstract val value: String
 
     /**
      * [value] プロパティが有効なUUID形式であるかを検証。

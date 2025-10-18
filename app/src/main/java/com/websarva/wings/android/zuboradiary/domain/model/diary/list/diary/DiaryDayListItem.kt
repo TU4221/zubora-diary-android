@@ -7,6 +7,9 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
+import com.websarva.wings.android.zuboradiary.domain.model.serializer.LocalDateSerializer
+import kotlinx.serialization.Serializable
+import java.io.Serializable as JavaSerializable
 import java.time.LocalDate
 
 /**
@@ -19,10 +22,12 @@ import java.time.LocalDate
  * @property id このリストアイテムが表す日記ID。
  * @property date このリストアイテムが表す日付。
  */
+@Serializable
 internal sealed class DiaryDayListItem(
     open val id: DiaryId,
+    @Serializable(with = LocalDateSerializer::class)
     open val date: LocalDate
-) {
+) : JavaSerializable {
 
     /**
      * 標準的な日記リストアイテム。
