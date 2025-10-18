@@ -1,6 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
-import com.websarva.wings.android.zuboradiary.domain.model.serializer.LocalTimeSerializer
+import com.websarva.wings.android.zuboradiary.core.serializer.LocalTimeSerializer
 import kotlinx.serialization.Serializable
 import java.time.LocalTime
 

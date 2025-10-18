@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
-import com.websarva.wings.android.zuboradiary.domain.model.serializer.LocalDateSerializer
+import com.websarva.wings.android.zuboradiary.core.serializer.LocalDateSerializer
 import kotlinx.serialization.Serializable
 import java.io.Serializable as JavaSerializable
 import java.time.LocalDate

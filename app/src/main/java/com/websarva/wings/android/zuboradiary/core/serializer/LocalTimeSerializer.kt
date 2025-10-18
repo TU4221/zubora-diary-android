@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.domain.model.serializer
+package com.websarva.wings.android.zuboradiary.core.serializer
 
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
