@@ -41,6 +41,11 @@ internal object BindingAdapters {
         view.setImageOnClickListener(listener)
     }
 
+    @JvmStatic
+    @BindingAdapter("imagePath")
+    fun setImageProgressViewLoadImagePath(imageView: ImageProgressView, filePath: String?) {
+        imageView.loadImage(filePath)
+    }
 
 
     /**

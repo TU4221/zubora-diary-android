@@ -12,10 +12,6 @@
         <variable
             name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel" />
-        <!-- MEMO:レイアウトファイルではアップキャストが不可能な為、下記変数で対応 -->
-        <variable
-            name="baseDiaryShowViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel" />
     </data>
 
     <FrameLayout
@@ -42,6 +38,7 @@
                     app:menu="@menu/diary_show_toolbar_menu"
                     app:applySystemInsetsToPaddingLeft="@{true}"
                     app:applySystemInsetsToPaddingRight="@{true}"
+                    app:diaryDateText="@{viewModel.uiState.diaryLoadState}"
                     tools:title="@string/fragment_diary_show_toolbar_title"/>
 
             </com.google.android.material.appbar.AppBarLayout>
@@ -67,7 +64,10 @@
                     <include
                         layout="@layout/layout_diary_show"
                         android:id="@+id/include_diary_show"
-                        app:viewModel="@{baseDiaryShowViewModel}" />
+                        app:diaryLoadState="@{viewModel.uiState.diaryLoadState}"
+                        app:isWeather2Visible="@{viewModel.uiState.weather2Visible}"
+                        app:numVisibleDiaryItems="@{viewModel.uiState.numVisibleDiaryItems}"
+                        app:diaryImageFilePath="@{viewModel.uiState.diaryImageFilePath}" />
 
                 </FrameLayout>
 

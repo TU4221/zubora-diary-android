@@ -8,28 +8,16 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryConditionTextUpdater
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryImageUpdater
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryItemsVisibilityUpdater
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpdater
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
-import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
 import java.time.LocalDate
-import java.time.LocalDateTime
 
 @AndroidEntryPoint
 class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>() {
@@ -55,7 +43,6 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
             .apply {
                 lifecycleOwner = viewLifecycleOwner
                 viewModel = mainViewModel
-                baseDiaryShowViewModel = mainViewModel
             }
     }
 
@@ -63,11 +50,6 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         super.onViewCreated(view, savedInstanceState)
 
         setUpToolBar()
-        setUpWeatherLayout()
-        setUpConditionLayout()
-        setUpItemLayout()
-        setUpImage()
-        setUpLogLayout()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -137,120 +119,6 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
                 }
                 false
             }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.date.filterNotNull()
-                .collectLatest { value: LocalDate ->
-                    val dateString = value.formatDateString(requireContext())
-                    binding.materialToolbarTopAppBar.title = dateString
-                }
-        }
-    }
-
-    // 天気表示欄設定
-    private fun setUpWeatherLayout() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.weather1
-                .collectLatest { value: WeatherUi ->
-                    DiaryWeatherTextUpdater()
-                        .update(
-                            requireContext(),
-                            binding.includeDiaryShow.textWeather1Selected,
-                            value
-                        )
-                }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.weather2
-                .collectLatest { value: WeatherUi ->
-                    DiaryWeatherTextUpdater()
-                        .update(
-                            requireContext(),
-                            binding.includeDiaryShow.textWeather2Selected,
-                            value
-                        )
-                }
-        }
-    }
-
-    private fun setUpConditionLayout() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.condition
-                .collectLatest { value: ConditionUi ->
-                    DiaryConditionTextUpdater()
-                        .update(
-                            requireContext(),
-                            binding.includeDiaryShow.textConditionSelected,
-                            value
-                        )
-                }
-        }
-    }
-
-
-
-    private fun setUpItemLayout() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            val itemLayouts =
-                binding.includeDiaryShow.run {
-                    arrayOf(
-                        includeItem1.linerLayoutDiaryShowItem,
-                        includeItem2.linerLayoutDiaryShowItem,
-                        includeItem3.linerLayoutDiaryShowItem,
-                        includeItem4.linerLayoutDiaryShowItem,
-                        includeItem5.linerLayoutDiaryShowItem
-                    )
-                }
-
-            mainViewModel.numVisibleItems
-                .collectLatest { value: Int ->
-                    DiaryItemsVisibilityUpdater()
-                        .update(
-                            itemLayouts,
-                            value
-                        )
-                }
-        }
-    }
-
-    private fun setUpImage() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.imageFileName
-                .collectLatest { value: String? ->
-                    mainViewModel.onDiaryImageFileNameChanged(value)
-                }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.imageFilePath
-                .collectLatest { value: FilePathUi? ->
-                    // MEMO:添付画像がないときはnullとなり、デフォルト画像をセットする。
-                    //      nullの時ImageView自体は非表示となるためデフォルト画像をセットする意味はないが、
-                    //      クリアという意味合いでデフォルト画像をセットする。
-                    DiaryImageUpdater()
-                        .update(
-                            binding.includeDiaryShow.imageProgressAttachedImage,
-                            value
-                        )
-                }
-        }
-    }
-
-
-
-    private fun setUpLogLayout() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.log.filterNotNull()
-                .collectLatest { value: LocalDateTime ->
-                    DiaryLogTextUpdater()
-                        .update(
-                            requireContext(),
-                            binding.includeDiaryShow.textLogValue,
-                            value
-                        )
-                }
         }
     }
 

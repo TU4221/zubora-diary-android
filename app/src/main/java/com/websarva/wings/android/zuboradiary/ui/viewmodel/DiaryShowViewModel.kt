@@ -2,10 +2,10 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByIdUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByIdException
@@ -14,12 +14,20 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryShowState
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
+import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
+import com.websarva.wings.android.zuboradiary.ui.model.state.ErrorType
+import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
+import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryShowUiState
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.DiaryUiStateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -28,10 +36,9 @@ internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
     private val loadDiaryByIdUseCase: LoadDiaryByIdUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
-    buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
-) : BaseDiaryShowViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowState>(
-    DiaryShowState.Idle,
-    buildDiaryImageFilePathUseCase
+    diaryUiStateHelper: DiaryUiStateHelper
+) : BaseViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowUiState>(
+    DiaryShowUiState()
 ) {
 
     companion object {
@@ -43,24 +50,56 @@ internal class DiaryShowViewModel @Inject constructor(
     override val isProgressIndicatorVisible =
         uiState
             .map { state ->
-                when (state) {
-                    DiaryShowState.Loading,
-                    DiaryShowState.Deleting -> true
-
-                    DiaryShowState.Idle,
-                    DiaryShowState.LoadSuccess,
-                    DiaryShowState.LoadError -> false
-                }
+                state.isProcessing
             }
             .stateInWhileSubscribed(
                 false
             )
 
+    private val diaryLoadStateFlow = uiState.map { it.diaryLoadState }
+
+    private val isWeather2VisibleFlow: Flow<Boolean> = diaryUiStateHelper
+        .createIsWeather2VisibleFlow(diaryLoadStateFlow)
+
+    private val numVisibleDiaryItemsFlow: Flow<Int> = diaryUiStateHelper
+        .createNumVisibleDiaryItemsFlow(diaryLoadStateFlow)
+
+    private val diaryImageFilePathFlow: Flow<FilePathUi?> = diaryUiStateHelper
+        .createDiaryImageFilePathFlow(diaryLoadStateFlow)
+        .catchUnexpectedError(null)
+
     // キャッシュパラメータ
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
 
     init {
+        observeDerivedUiStateChanges()
         initializeDiaryData(handle)
+    }
+
+    private fun observeDerivedUiStateChanges() {
+        isWeather2VisibleFlow.onEach { isWeather2Visible ->
+            updateUiState { state ->
+                state.copy(
+                    isWeather2Visible = isWeather2Visible
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        numVisibleDiaryItemsFlow.onEach { numVisibleDiaryItems ->
+            updateUiState { state ->
+                state.copy(
+                    numVisibleDiaryItems = numVisibleDiaryItems
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        diaryImageFilePathFlow.onEach { path ->
+            updateUiState { state ->
+                state.copy(
+                    diaryImageFilePath = path
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun initializeDiaryData(handle: SavedStateHandle) {
@@ -89,7 +128,13 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
-        val date = diaryStateFlow.date.requireValue()
+        val currentUiState = uiState.value
+        if (currentUiState.isInputDisabled) return
+        val diaryLoadState = currentUiState.diaryLoadState
+        if (diaryLoadState !is LoadState.Success) return
+
+        val diary = diaryLoadState.data
+        val date = diary.date
         launchWithUnexpectedErrorHandler {
             navigatePreviousFragment(date)
         }
@@ -97,22 +142,32 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // Viewクリック処理
     fun onDiaryEditMenuClick() {
-        val id = diaryStateFlow.id.requireValue()
-        val date = diaryStateFlow.date.requireValue()
+        val currentUiState = uiState.value
+        if (currentUiState.isInputDisabled) return
+        val diaryLoadState = currentUiState.diaryLoadState
+        if (diaryLoadState !is LoadState.Success) return
+
+        val diary = diaryLoadState.data
+        val id = diary.id
+        val date = diary.date
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                DiaryShowEvent.NavigateDiaryEditFragment(id.value, date)
+                DiaryShowEvent.NavigateDiaryEditFragment(id, date)
             )
         }
     }
 
     fun onDiaryDeleteMenuClick() {
-        if (uiState.value != DiaryShowState.LoadSuccess) return
+        val currentUiState = uiState.value
+        if (currentUiState.isInputDisabled) return
+        val diaryLoadState = currentUiState.diaryLoadState
+        if (diaryLoadState !is LoadState.Success) return
 
-        val id = diaryStateFlow.id.requireValue()
-        val date = diaryStateFlow.date.requireValue()
+        val diary = diaryLoadState.data
+        val id = diary.id
+        val date = diary.date
         launchWithUnexpectedErrorHandler {
-            updatePendingDiaryDeleteParameters(id, date)
+            updatePendingDiaryDeleteParameters(DiaryId(id), date)
             emitUiEvent(
                 DiaryShowEvent.NavigateDiaryDeleteDialog(date)
             )
@@ -120,7 +175,13 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onNavigationIconClick() {
-        val date = diaryStateFlow.date.requireValue()
+        val currentUiState = uiState.value
+        if (currentUiState.isInputDisabled) return
+        val diaryLoadState = currentUiState.diaryLoadState
+        if (diaryLoadState !is LoadState.Success) return
+
+        val diary = diaryLoadState.data
+        val date = diary.date
         launchWithUnexpectedErrorHandler {
             navigatePreviousFragment(date)
         }
@@ -147,7 +208,7 @@ internal class DiaryShowViewModel @Inject constructor(
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
-                check(uiState.value == DiaryShowState.LoadSuccess)
+                // 処理なし
             }
         }
         clearPendingDiaryDeleteParameters()
@@ -166,22 +227,22 @@ internal class DiaryShowViewModel @Inject constructor(
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
-        updateUiState(DiaryShowState.Loading)
+        updateToDiaryLoadingState()
         when (val result = loadDiaryByIdUseCase(id)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
-                updateUiState(DiaryShowState.LoadSuccess)
-                val diary = result.value
-                updateDiary(diary)
+                val diary = result.value.toUiModel()
+                updateToDiaryLoadSuccessState(diary)
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
-                updateUiState(DiaryShowState.LoadError)
                 when (result.exception) {
                     is DiaryLoadByIdException.LoadFailure -> {
+                        updateToDiaryLoadErrorState(ErrorType.Failure(result.exception))
                         emitUiEvent(DiaryShowEvent.NavigateDiaryLoadFailureDialog(date))
                     }
                     is DiaryLoadByIdException.Unknown -> {
+                        updateToDiaryLoadErrorState(ErrorType.Unexpected(result.exception))
                         emitUnexpectedAppMessage(result.exception)
                     }
                 }
@@ -193,10 +254,11 @@ internal class DiaryShowViewModel @Inject constructor(
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
 
-        updateUiState(DiaryShowState.Deleting)
+        updateToProgressVisibleState()
         when (val result = deleteDiaryUseCase(id)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
+                updateToProgressInvisibleState()
                 emitUiEvent(
                     DiaryShowEvent.NavigatePreviousFragmentOnDiaryDeleted(
                         FragmentResult.Some(date)
@@ -205,7 +267,7 @@ internal class DiaryShowViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
-                updateUiState(DiaryShowState.LoadSuccess)
+                updateToProgressInvisibleState()
                 when (result.exception) {
                     is DiaryDeleteException.DiaryDataDeleteFailure -> {
                         emitAppMessageEvent(DiaryShowAppMessage.DiaryDeleteFailure)
@@ -226,6 +288,54 @@ internal class DiaryShowViewModel @Inject constructor(
         emitNavigatePreviousFragmentEvent(
             FragmentResult.Some(diaryDate)
         )
+    }
+
+    private fun updateToDiaryLoadingState() {
+        updateUiState {
+            it.copy(
+                diaryLoadState = LoadState.Loading,
+                isProcessing = true,
+                isInputDisabled = true
+            )
+        }
+    }
+
+    private fun updateToDiaryLoadSuccessState(diary: DiaryUi) {
+        updateUiState {
+            it.copy(
+                diaryLoadState = LoadState.Success(diary),
+                isProcessing = false,
+                isInputDisabled = false
+            )
+        }
+    }
+
+    private fun updateToDiaryLoadErrorState(errorType: ErrorType) {
+        updateUiState {
+            it.copy(
+                diaryLoadState = LoadState.Error(errorType),
+                isProcessing = false,
+                isInputDisabled = true
+            )
+        }
+    }
+
+    private fun updateToProgressVisibleState() {
+        updateUiState {
+            it.copy(
+                isProcessing = true,
+                isInputDisabled = true
+            )
+        }
+    }
+
+    private fun updateToProgressInvisibleState() {
+        updateUiState {
+            it.copy(
+                isProcessing = false,
+                isInputDisabled = false
+            )
+        }
     }
 
     private fun updatePendingDiaryDeleteParameters(id: DiaryId, date: LocalDate) {

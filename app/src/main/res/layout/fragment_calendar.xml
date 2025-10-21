@@ -5,17 +5,13 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.LoadState" />
         <!-- MEMO:DataBinding時のnameの定義はcamelCaseにすること。
                   上手くビルド(クラス生成)がされない不具合が発生する。
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
         <variable
             name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel" />
-        <!-- MEMO:レイアウトファイルではアップキャストが不可能な為、下記変数で対応 -->
-        <variable
-            name="baseDiaryShowViewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel" />
     </data>
 
     <FrameLayout
@@ -40,6 +36,7 @@
                     android:layout_height="wrap_content"
                     app:applySystemInsetsToPaddingLeft="@{true}"
                     app:applySystemInsetsToPaddingRight="@{true}"
+                    app:calendarDateToolbarTitle="@{viewModel.uiState.selectedDate}"
                     tools:title="@string/fragment_calendar_month_header_tools_value"/>
 
             </com.google.android.material.appbar.AppBarLayout>
@@ -86,14 +83,17 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:visibility="@{viewModel.uiState instanceof CalendarState.LoadDiarySuccess ? View.VISIBLE : View.GONE}"
+                            android:visibility="@{viewModel.uiState.diaryLoadState instanceof LoadState.Success ? View.VISIBLE : View.GONE}"
                             app:applySystemInsetsToPaddingLeft="@{true}"
                             app:applySystemInsetsToPaddingRight="@{true}" >
 
                             <include
                                 layout="@layout/layout_diary_show"
                                 android:id="@+id/include_diary_show"
-                                app:viewModel="@{baseDiaryShowViewModel}" />
+                                app:diaryLoadState="@{viewModel.uiState.diaryLoadState}"
+                                app:isWeather2Visible="@{viewModel.uiState.weather2Visible}"
+                                app:numVisibleDiaryItems="@{viewModel.uiState.numVisibleDiaryItems}"
+                                app:diaryImageFilePath="@{viewModel.uiState.diaryImageFilePath}" />
 
                         </FrameLayout>
 
@@ -103,10 +103,10 @@
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:textAppearance="@style/AppTextViewTextAppearance"
-                            android:text="@{viewModel.uiState instanceof CalendarState.LoadError ? @string/fragment_calendar_diary_load_failure_message : @string/fragment_calendar_no_diary_message}"
+                            android:text="@{viewModel.uiState.diaryLoadState instanceof LoadState.Error ? @string/fragment_calendar_diary_load_failure_message : @string/fragment_calendar_no_diary_message}"
                             android:gravity="center_horizontal|top"
                             android:paddingTop="16dp"
-                            android:visibility="@{viewModel.uiState instanceof CalendarState.NoDiary || viewModel.uiState instanceof CalendarState.LoadError ? View.VISIBLE : View.GONE}" />
+                            android:visibility="@{viewModel.uiState.diaryLoadState instanceof LoadState.Empty || viewModel.uiState.diaryLoadState instanceof LoadState.Error ? View.VISIBLE : View.GONE}" />
 
                     </FrameLayout>
 
@@ -126,6 +126,7 @@
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_edit_24px"
             android:contentDescription="@string/fragment_calendar_fab_content_description"
+            android:onClick="@{() -> viewModel.onDiaryEditButtonClick()}"
             app:applySystemInsetsToMarginRight="@{true}" />
 
     </FrameLayout>

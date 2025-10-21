@@ -1,23 +1,33 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByDateException
 import com.websarva.wings.android.zuboradiary.ui.model.message.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.state.CalendarState
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseDiaryShowViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
+import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
+import com.websarva.wings.android.zuboradiary.ui.model.state.ErrorType
+import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
+import com.websarva.wings.android.zuboradiary.ui.model.state.ui.CalendarUiState
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.DiaryUiStateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -25,36 +35,77 @@ import javax.inject.Inject
 internal class CalendarViewModel @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase,
-    buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
-) : BaseDiaryShowViewModel<CalendarEvent, CalendarAppMessage, CalendarState>(
-    CalendarState.Idle,
-    buildDiaryImageFilePathUseCase
+    diaryUiStateHelper: DiaryUiStateHelper
+) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarUiState>(
+    CalendarUiState()
 ) {
 
     override val isProgressIndicatorVisible =
         uiState
             .map { state ->
-                when (state) {
-                    CalendarState.LoadingDiary,
-                    CalendarState.LoadingDiaryInfo -> true
-
-                    CalendarState.Idle,
-                    CalendarState.LoadDiarySuccess,
-                    CalendarState.LoadError,
-                    CalendarState.NoDiary -> false
-                }
+                state.isProcessing
             }.stateInWhileSubscribed(
                 false
             )
 
+    private val selectedDateFlow = uiState.map { it.selectedDate }
 
-    private val _selectedDate = MutableStateFlow<LocalDate>(LocalDate.now())
-    val selectedDate get() = _selectedDate.asStateFlow()
+    private val diaryLoadStateFlow = uiState.map { it.diaryLoadState }
 
-    private val _previousSelectedDate = MutableStateFlow<LocalDate?>(null)
-    val previousSelectedDate get() = _previousSelectedDate.asStateFlow()
+    private val isWeather2VisibleFlow: Flow<Boolean> = diaryUiStateHelper
+        .createIsWeather2VisibleFlow(diaryLoadStateFlow)
 
-    private var shouldSmoothScroll = false
+    private val numVisibleDiaryItemsFlow: Flow<Int> = diaryUiStateHelper
+        .createNumVisibleDiaryItemsFlow(diaryLoadStateFlow)
+
+    private val diaryImageFilePathFlow: Flow<FilePathUi?> = diaryUiStateHelper
+        .createDiaryImageFilePathFlow(diaryLoadStateFlow)
+        .catchUnexpectedError(null)
+
+    init {
+        observeDerivedUiStateChanges()
+        observeUiStateChanges()
+    }
+
+    private fun observeDerivedUiStateChanges() {
+        isWeather2VisibleFlow.onEach { isWeather2Visible ->
+            updateUiState { state ->
+                state.copy(
+                    isWeather2Visible = isWeather2Visible
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        numVisibleDiaryItemsFlow.onEach { numVisibleDiaryItems ->
+            updateUiState { state ->
+                state.copy(
+                    numVisibleDiaryItems = numVisibleDiaryItems
+                )
+            }
+        }.launchIn(viewModelScope)
+
+        diaryImageFilePathFlow.onEach { path ->
+            updateUiState { state ->
+                state.copy(
+                    diaryImageFilePath = path
+                )
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun observeUiStateChanges() {
+        viewModelScope.launch {
+            selectedDateFlow
+                .distinctUntilChanged()
+                .collectLatest {
+                    try {
+                        prepareDiary(it)
+                    } catch (e: Exception) {
+                        emitUnexpectedAppMessage(e)
+                    }
+                }
+        }
+    }
 
     override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): CalendarEvent {
         return CalendarEvent.CommonEvent(
@@ -85,17 +136,40 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     fun onDiaryEditButtonClick() {
-        val id = diaryStateFlow.id.value
-        val date = _selectedDate.value
+        val currentUiState = uiState.value
+        if (currentUiState.isInputDisabled) return
+
+        val diaryLoadState = currentUiState.diaryLoadState
+        var id: String?
+        var date: LocalDate
+        when (diaryLoadState) {
+            is LoadState.Success -> {
+                val diary = diaryLoadState.data
+                id = diary.id
+                date = diary.date
+            }
+            LoadState.Empty,
+            is LoadState.Error -> {
+                id = null
+                date = currentUiState.selectedDate
+            }
+
+            LoadState.Idle,
+            LoadState.Loading -> return
+        }
+
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                CalendarEvent.NavigateDiaryEditFragment(id?.value, date)
+                CalendarEvent.NavigateDiaryEditFragment(id, date)
             )
         }
     }
 
     fun onBottomNavigationItemReselect() {
-        val selectedDate = _selectedDate.value
+        val currentUiState = uiState.value
+        if (currentUiState.isInputDisabled) return
+
+        val selectedDate = currentUiState.selectedDate
         val today = LocalDate.now()
         launchWithUnexpectedErrorHandler {
             // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
@@ -130,13 +204,6 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    // StateFlow値変更時処理
-    fun onSelectedDateChanged(date: LocalDate) {
-        launchWithUnexpectedErrorHandler {
-            prepareDiary(date)
-        }
-    }
-
     // View状態処理
     fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
         launchWithUnexpectedErrorHandler {
@@ -147,7 +214,7 @@ internal class CalendarViewModel @Inject constructor(
     // データ処理
     private suspend fun prepareDiary(date: LocalDate) {
         val action =
-            if (shouldSmoothScroll) {
+            if (uiState.value.shouldSmoothScroll) {
                 updateShouldSmoothScroll(false)
                 CalendarEvent.SmoothScrollCalendar(date)
             } else {
@@ -159,8 +226,7 @@ internal class CalendarViewModel @Inject constructor(
         if (exists) {
             loadSavedDiary(date)
         } else {
-            updateUiState(CalendarState.NoDiary)
-            initializeDiary()
+            updateToNoDiaryState()
         }
     }
 
@@ -168,27 +234,29 @@ internal class CalendarViewModel @Inject constructor(
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
-        updateUiState(CalendarState.LoadingDiary)
+        updateToDiaryLoadingState()
         when (val result = loadDiaryByDateUseCase(date)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
-                updateUiState(CalendarState.LoadDiarySuccess)
-                val diary = result.value
-                updateDiary(diary)
+                val diary = result.value.toUiModel()
+                updateToDiaryLoadSuccessState(diary)
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
-                updateUiState(CalendarState.LoadError)
-                when (result.exception) {
-                    is DiaryLoadByDateException.LoadFailure -> {
-                        emitAppMessageEvent(
-                            CalendarAppMessage.DiaryLoadFailure
-                        )
+                val errorType =
+                    when (val exception = result.exception) {
+                        is DiaryLoadByDateException.LoadFailure -> {
+                            emitAppMessageEvent(
+                                CalendarAppMessage.DiaryLoadFailure
+                            )
+                            ErrorType.Failure(exception)
+                        }
+                        is DiaryLoadByDateException.Unknown -> {
+                            emitUnexpectedAppMessage(exception)
+                            ErrorType.Unexpected(exception)
+                        }
                     }
-                    is DiaryLoadByDateException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
-                    }
-                }
+                updateToDiaryLoadErrorState(errorType)
             }
         }
     }
@@ -220,17 +288,62 @@ internal class CalendarViewModel @Inject constructor(
         // MEMO:selectedDateと同日付を選択した時、previousSelectedDateと同値となり、
         //      次に他の日付を選択した時にpreviousSelectedDateのcollectedが起動しなくなる。
         //      下記条件で対策。
-        if (date == _selectedDate.value) return
+        val uiState = uiState.value
+        if (date == uiState.selectedDate) return
 
-        updatePreviousSelectedDate(_selectedDate.value)
-        _selectedDate.value = date
-    }
-
-    private fun updatePreviousSelectedDate(date: LocalDate?) {
-        _previousSelectedDate.value = date
+        updateUiState {
+            it.copy(
+                selectedDate = date,
+                previousSelectedDate = it.selectedDate
+            )
+        }
     }
 
     private fun updateShouldSmoothScroll(shouldScroll: Boolean) {
-        shouldSmoothScroll = shouldScroll
+        updateUiState {
+            it.copy(
+                shouldSmoothScroll = shouldScroll
+            )
+        }
+    }
+
+    private fun updateToDiaryLoadingState() {
+        updateUiState {
+            it.copy(
+                diaryLoadState = LoadState.Loading,
+                isProcessing = true,
+                isInputDisabled = true
+            )
+        }
+    }
+
+    private fun updateToDiaryLoadSuccessState(diary: DiaryUi) {
+        updateUiState {
+            it.copy(
+                diaryLoadState = LoadState.Success(diary),
+                isProcessing = false,
+                isInputDisabled = false
+            )
+        }
+    }
+
+    private fun updateToDiaryLoadErrorState(errorType: ErrorType) {
+        updateUiState {
+            it.copy(
+                diaryLoadState = LoadState.Error(errorType),
+                isProcessing = false,
+                isInputDisabled = false
+            )
+        }
+    }
+
+    private fun updateToNoDiaryState() {
+        updateUiState {
+            it.copy(
+                diaryLoadState = LoadState.Empty,
+                isProcessing = false,
+                isInputDisabled = false
+            )
+        }
     }
 }

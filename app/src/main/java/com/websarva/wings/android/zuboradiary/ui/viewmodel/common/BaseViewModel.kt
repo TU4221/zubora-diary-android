@@ -144,6 +144,10 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
         _uiState.value = state
     }
 
+    protected open fun updateUiState(function: (S) -> S) {
+        _uiState.update{ function(it) }
+    }
+
     abstract fun onBackPressed()
 
     fun onFragmentNavigationFailure(command: NavigationCommand) {

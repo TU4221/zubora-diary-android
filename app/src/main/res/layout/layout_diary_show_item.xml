@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
+        <import type="android.view.View" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.LoadState" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi" />
         <variable
             name="itemNumber"
             type="java.lang.String" />
         <variable
-            name="titleStateFlow"
-            type="kotlinx.coroutines.flow.StateFlow&lt;String>" />
+            name="itemNumberInt"
+            type="int" />
         <variable
-            name="commentStateFlow"
-            type="kotlinx.coroutines.flow.StateFlow&lt;String>" />
+            name="diaryLoadState"
+            type="LoadState&lt;DiaryUi>" />
+        <variable
+            name="numVisibleDiaryItems"
+            type="int" />
     </data>
 
     <LinearLayout
         android:id="@+id/liner_layout_diary_show_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="@{numVisibleDiaryItems >= itemNumberInt ? View.VISIBLE : View.GONE}">
 
         <TextView
             style="@style/AppTextViewStyle"
@@ -39,9 +47,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top"
             android:textAppearance="@style/AppTextViewTextAppearance"
-            android:text="@{titleStateFlow}"
             android:textSize="@dimen/layout_diary_show_item_text_size"
             android:hint="@string/layout_diary_show_item_title_hint"
+            app:diaryItemNumber="@{itemNumberInt}"
+            app:diaryItemTitleText="@{diaryLoadState}"
             tools:ignore="DuplicateIncludedIds" />
 
         <com.google.android.material.divider.MaterialDivider
@@ -56,9 +65,10 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top"
             android:textAppearance="@style/AppTextViewTextAppearance"
-            android:text="@{commentStateFlow}"
             android:textSize="@dimen/layout_diary_show_item_text_size"
-            android:hint="@string/layout_diary_show_item_comment_hint" />
+            android:hint="@string/layout_diary_show_item_comment_hint"
+            app:diaryItemNumber="@{itemNumberInt}"
+            app:diaryItemCommentText="@{diaryLoadState}" />
 
     </LinearLayout>
 

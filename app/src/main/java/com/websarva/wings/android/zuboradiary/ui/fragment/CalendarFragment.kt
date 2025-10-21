@@ -17,8 +17,6 @@ import com.kizitonwose.calendar.view.MonthScrollListener
 import com.kizitonwose.calendar.view.ViewContainer
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
@@ -26,30 +24,24 @@ import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBi
 import com.websarva.wings.android.zuboradiary.ui.theme.CalendarThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryConditionTextUpdater
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryImageUpdater
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryItemsVisibilityUpdater
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryLogTextUpdater
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.DiaryWeatherTextUpdater
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
-import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.util.Arrays
 import java.util.stream.Collectors
 import java.util.stream.Stream
+
 @AndroidEntryPoint
 class CalendarFragment :
     BaseFragment<FragmentCalendarBinding, CalendarEvent>(),
@@ -73,7 +65,6 @@ class CalendarFragment :
             .apply {
                 lifecycleOwner = viewLifecycleOwner
                 viewModel = mainViewModel
-                baseDiaryShowViewModel = mainViewModel
             }
     }
 
@@ -81,8 +72,6 @@ class CalendarFragment :
         super.onViewCreated(view, savedInstanceState)
 
         setUpCalendar()
-        setUpDiaryShow()
-        setUpFloatActionButton()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -145,19 +134,17 @@ class CalendarFragment :
         calendar.setup(startMonth, endMonth, daysOfWeek[0])
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.selectedDate
+            mainViewModel.uiState.map { it.selectedDate }
                 .collectLatest { value: LocalDate ->
                     val calendarMonthDayBinder =
                         binding.calendar.dayBinder as CalendarMonthDayBinder
                     calendarMonthDayBinder.updateSelectedDate(value)
                     binding.calendar.notifyDateChanged(value) // 今回選択日付更新
-                    updateToolBarDate(value)
-                    mainViewModel.onSelectedDateChanged(value)
                 }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.previousSelectedDate.filterNotNull()
+            mainViewModel.uiState.map { it.previousSelectedDate }.filterNotNull()
                 .collectLatest { value: LocalDate ->
                     binding.calendar.notifyDateChanged(value) // 前回選択日付更新
                 }
@@ -463,111 +450,6 @@ class CalendarFragment :
                 return
             }
             calendar.scrollToMonth(targetYearMonth)
-        }
-    }
-
-    private fun updateToolBarDate(date: LocalDate) {
-        val dateString = date.formatDateString(requireContext())
-        binding.materialToolbarTopAppBar.title = dateString
-    }
-
-    private fun setUpDiaryShow() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.weather1
-                .collectLatest { value: WeatherUi ->
-                    DiaryWeatherTextUpdater()
-                        .update(
-                            requireContext(),
-                            binding.includeDiaryShow.textWeather1Selected,
-                            value
-                        )
-                }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.weather2
-                .collectLatest { value: WeatherUi ->
-                    DiaryWeatherTextUpdater()
-                        .update(
-                            requireContext(),
-                            binding.includeDiaryShow.textWeather2Selected,
-                            value
-                        )
-                }
-
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.condition
-                .collectLatest { value: ConditionUi ->
-                    DiaryConditionTextUpdater()
-                        .update(
-                            requireContext(),
-                            binding.includeDiaryShow.textConditionSelected,
-                            value
-                        )
-                }
-
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            // 項目レイアウト設定
-            val itemLayouts =
-                binding.run{
-                    arrayOf(
-                        includeDiaryShow.includeItem1.linerLayoutDiaryShowItem,
-                        includeDiaryShow.includeItem2.linerLayoutDiaryShowItem,
-                        includeDiaryShow.includeItem3.linerLayoutDiaryShowItem,
-                        includeDiaryShow.includeItem4.linerLayoutDiaryShowItem,
-                        includeDiaryShow.includeItem5.linerLayoutDiaryShowItem,
-                    )
-                }
-
-            mainViewModel.numVisibleItems
-                .collectLatest { value: Int ->
-                    DiaryItemsVisibilityUpdater()
-                        .update(
-                            itemLayouts,
-                            value
-                        )
-                }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.imageFileName
-                .collectLatest { value: String? ->
-                    mainViewModel.onDiaryImageFileNameChanged(value)
-                }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.imageFilePath
-                .collectLatest { value: FilePathUi? ->
-                    DiaryImageUpdater()
-                        .update(
-                            binding.includeDiaryShow.imageProgressAttachedImage,
-                            value
-                        )
-                }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.log.filterNotNull()
-                .collectLatest { value: LocalDateTime ->
-                    DiaryLogTextUpdater()
-                        .update(
-                            requireContext(),
-                            binding.includeDiaryShow.textLogValue,
-                            value
-                        )
-                }
-        }
-
-    }
-
-    private fun setUpFloatActionButton() {
-        binding.floatingActionButtonDiaryEdit.setOnClickListener {
-            mainViewModel.onDiaryEditButtonClick()
         }
     }
 

@@ -8,7 +8,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 
-// TODO:未使用だが開発最終に削除する
 internal fun Diary.toUiModel(): DiaryUi {
     return DiaryUi(
         id.value,
