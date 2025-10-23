@@ -24,7 +24,7 @@ internal fun Diary.toUiModel(): DiaryUi {
 }
 
 internal fun DiaryUi.toDomainModel(): Diary {
-    return Diary(
+    return Diary.create(
         DiaryId(id),
         date,
         log,

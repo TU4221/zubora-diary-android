@@ -12,8 +12,8 @@ import java.time.LocalDateTime
  *
  * このクラスは、特定の日付の日記の内容（天気、体調、タイトル、項目、画像ファイル名など）を保持する。
  *
- * アイテムは最大5つまで設定でき、itemXTitle と itemXComment はペアでnullまたは非nullである必要がある。
- * また、item(N)が設定されている場合、item(N-1)も設定されている必要がある。
+ * インスタンスの生成は [Diary.create] ファクトリメソッドを通じて行われ、
+ * 日記項目の整合性（例：項目間の空でないこと、ペアでのnull状態）が保証される。
  *
  * @property id 日記の識別番号。
  * @property date 日記の日付。
@@ -25,10 +25,10 @@ import java.time.LocalDateTime
  * @property itemTitles 日記項目のタイトルのマップ。キーは項目の連番(1-5)。
  * @property itemComments 日記項目のコメントのマップ。キーは項目の連番(1-5)。
  * @property imageFileName 日記に添付した画像ファイル名。未添付の場合 `null`。
- * @throws IllegalArgumentException 日記項目のタイトルとコメントのnull整合性、または日記項目の順序整合性に違反する場合。
  */
+@ConsistentCopyVisibility
 @Serializable
-internal data class Diary(
+internal data class Diary private constructor(
     val id: DiaryId,
     @Serializable(with = LocalDateSerializer::class)
     val date: LocalDate,
@@ -42,28 +42,6 @@ internal data class Diary(
     val itemComments: Map<Int, DiaryItemComment?>,
     val imageFileName: DiaryImageFileName?
 ) : JavaSerializable {
-
-    init {
-        for (i in 1..5) {
-            val title = itemTitles[i]
-            val comment = itemComments[i]
-            if ((title == null) != (comment == null)) {
-                throw IllegalArgumentException(
-                    "item${i}Title and item${i}Comment は両方null、又は両方非nullでであるべき。"
-                )
-            }
-
-            if (i > 1) {
-                val hasCurrent = title != null
-                val hasPrevious = itemTitles[i-1] != null
-                if (hasCurrent && !hasPrevious) {
-                    throw IllegalArgumentException(
-                        "item${i - 1}がnullの為、item${i}もnullであるべき。"
-                    )
-                }
-            }
-        }
-    }
 
     /**
      * Diaryオブジェクトの内容を比較する。
@@ -90,6 +68,82 @@ internal data class Diary(
     }
 
     companion object {
+        /**
+         * Diaryのインスタンスを生成するためのファクトリメソッド。
+         *
+         * このメソッドは、日記項目の整合性を保証するためのロジックを含む。
+         */
+        fun create(
+            id: DiaryId,
+            date: LocalDate,
+            log: LocalDateTime,
+            weather1: Weather,
+            weather2: Weather,
+            condition: Condition,
+            title: DiaryTitle,
+            itemTitles: Map<Int, DiaryItemTitle?>,
+            itemComments: Map<Int, DiaryItemComment?>,
+            imageFileName: DiaryImageFileName?
+        ): Diary {
+            val normalizedTitles = itemTitles.toMutableMap()
+            val normalizedComments = itemComments.toMutableMap()
+
+            // 1. タイトルとコメントのペアを同期(片方がnon-nullならもう片方も空でnon-nullにする)
+            for (i in 1..5) {
+                val currentTitle = normalizedTitles[i]
+                val currentComment = normalizedComments[i]
+                if (currentTitle != null && currentComment == null) {
+                    normalizedComments[i] = DiaryItemComment.empty()
+                }
+                if (currentTitle == null && currentComment != null) {
+                    normalizedTitles[i] = DiaryItemTitle.empty()
+                }
+            }
+
+            // 2. 項目1は常にnon-nullであることを保証する
+            if (normalizedTitles[1] == null) { // この時点でコメントもnullのはず
+                normalizedTitles[1] = DiaryItemTitle.empty()
+                normalizedComments[1] = DiaryItemComment.empty()
+            }
+
+            // 3. 項目2～5で、タイトルとコメントが両方空文字列ならペアをnullに変換
+            for (i in 2..5) {
+                val currentTitle = normalizedTitles[i]
+                val currentComment = normalizedComments[i]
+                if (currentTitle != null
+                    && currentComment != null
+                    && currentTitle.value.isEmpty()
+                    && currentComment.value.isEmpty()) {
+                    normalizedTitles[i] = null
+                    normalizedComments[i] = null
+                }
+            }
+
+            // 4. 最後のnon-null項目までの全ての項目がnon-nullであることを保証
+            val lastNonNull = (5 downTo 1).firstOrNull { normalizedTitles[it] != null }
+            if (lastNonNull != null) {
+                for (i in 1 until lastNonNull) {
+                    if (normalizedTitles[i] == null) { // この時点でコメントもnull
+                        normalizedTitles[i] = DiaryItemTitle.empty()
+                        normalizedComments[i] = DiaryItemComment.empty()
+                    }
+                }
+            }
+
+            return Diary(
+                id,
+                date,
+                log,
+                weather1,
+                weather2,
+                condition,
+                title,
+                normalizedTitles.toMap(),
+                normalizedComments.toMap(),
+                imageFileName
+            )
+        }
+
         /**
          * 新しい [Diary] を生成する。
          *

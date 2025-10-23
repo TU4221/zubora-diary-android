@@ -11,7 +11,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
 
 internal fun DiaryEntity.toDomainModel(): Diary {
-    return Diary(
+    return Diary.create(
         DiaryId(id),
         date,
         log,
