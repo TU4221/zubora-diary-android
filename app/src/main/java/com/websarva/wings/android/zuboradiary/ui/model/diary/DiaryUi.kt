@@ -21,16 +21,8 @@ import java.time.LocalDateTime
  * @property weather2 その日の天気（2つ目）。
  * @property condition その日の体調。
  * @property title 日記のタイトル。
- * @property item1Title 1番目の日記項目のタイトル。
- * @property item1Comment 1番目の日記項目のコメント。
- * @property item2Title 2つ目の項目のタイトル。
- * @property item2Comment 2つ目の項目のコメント。
- * @property item3Title 3つ目の項目のタイトル。
- * @property item3Comment 3つ目の項目のコメント。
- * @property item4Title 4つ目の項目のタイトル。
- * @property item4Comment 4つ目の項目のコメント。
- * @property item5Title 5つ目の項目のタイトル。
- * @property item5Comment 5つ目の項目のコメント。
+ * @property itemTitles 日記項目のタイトルのマップ。キーは項目の連番(1-5)。
+ * @property itemComments 日記項目のコメントのマップ。キーは項目の連番(1-5)。
  * @property imageFileName 日記に添付した画像ファイル名。未添付の場合 `null`。
  */
 @Parcelize
@@ -42,16 +34,6 @@ internal data class DiaryUi(
     val weather2: WeatherUi,
     val condition: ConditionUi,
     val title: String,
-    val item1Title: String,
-    val item1Comment: String,
-    val item2Title: String?,
-    val item2Comment: String?,
-    val item3Title: String?,
-    val item3Comment: String?,
-    val item4Title: String?,
-    val item4Comment: String?,
-    val item5Title: String?,
-    val item5Comment: String?,
     val itemTitles: Map<Int, String?>,
     val itemComments: Map<Int, String?>,
     val imageFileName: String?

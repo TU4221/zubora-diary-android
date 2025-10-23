@@ -19,16 +19,20 @@ internal fun DiaryEntity.toDomainModel(): Diary {
         Weather.of(weather2),
         Condition.of(condition),
         DiaryTitle(title),
-        DiaryItemTitle(item1Title),
-        DiaryItemComment(item1Comment),
-        item2Title?.let { DiaryItemTitle(it) },
-        item2Comment?.let { DiaryItemComment(it) },
-        item3Title?.let { DiaryItemTitle(it) },
-        item3Comment?.let { DiaryItemComment(it) },
-        item4Title?.let { DiaryItemTitle(it) },
-        item4Comment?.let { DiaryItemComment(it) },
-        item5Title?.let { DiaryItemTitle(it) },
-        item5Comment?.let { DiaryItemComment(it) },
+        mapOf(
+            1 to DiaryItemTitle(item1Title),
+            2 to item2Title?.let { DiaryItemTitle(it) },
+            3 to item3Title?.let { DiaryItemTitle(it) },
+            4 to item4Title?.let { DiaryItemTitle(it) },
+            5 to item5Title?.let { DiaryItemTitle(it) }
+        ),
+        mapOf(
+            1 to DiaryItemComment(item1Comment),
+            2 to item2Comment?.let { DiaryItemComment(it) },
+            3 to item3Comment?.let { DiaryItemComment(it) },
+            4 to item4Comment?.let { DiaryItemComment(it) },
+            5 to item5Comment?.let { DiaryItemComment(it) }
+        ),
         imageFileName?.let { DiaryImageFileName(it) }
     )
 }
@@ -42,16 +46,16 @@ internal fun Diary.toDataModel(): DiaryEntity {
         weather2.number,
         condition.number,
         title.value,
-        item1Title.value,
-        item1Comment.value,
-        item2Title?.value,
-        item2Comment?.value,
-        item3Title?.value,
-        item3Comment?.value,
-        item4Title?.value,
-        item4Comment?.value,
-        item5Title?.value,
-        item5Comment?.value,
+        itemTitles[1]!!.value,
+        itemComments[1]!!.value,
+        itemTitles[2]?.value,
+        itemComments[2]?.value,
+        itemTitles[3]?.value,
+        itemComments[3]?.value,
+        itemTitles[4]?.value,
+        itemComments[4]?.value,
+        itemTitles[5]?.value,
+        itemComments[5]?.value,
         imageFileName?.fullName
     )
 }

@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.view
 
-import android.util.Log
 import android.widget.AutoCompleteTextView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -114,6 +113,15 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    @BindingAdapter("diaryConditionSpinnerText")
+    @JvmStatic
+    fun setDiaryConditionSpinnerText(view: AutoCompleteTextView, condition: ConditionUi) {
+        val newText = condition.asString(view.context)
+        if (view.text.toString() != newText) {
+            view.setText(newText, false)
+        }
+    }
+
     @JvmStatic
     @BindingAdapter(
         value = [
@@ -124,29 +132,11 @@ internal object DiaryUiBindingAdapters {
     )
     fun setDiaryItemTitleText(textView: TextView, diaryItemNumber: Int, diaryLoadState: LoadState<DiaryUi>) {
         if (diaryLoadState is LoadState.Success) {
-            Log.d("20251021", "diaryItemNumber: $diaryItemNumber")
             val diaryUi = diaryLoadState.data
-            val diaryItemTitle =
-                when (diaryItemNumber) {
-                    1 -> diaryUi.item1Title
-                    2 -> diaryUi.item2Title
-                    3 -> diaryUi.item3Title
-                    4 -> diaryUi.item4Title
-                    5 -> diaryUi.item5Title
-                    else -> throw IllegalArgumentException("指定された日記項目番号($diaryItemNumber)が不正値。")
-                }
+            val diaryItemTitle = diaryUi.itemTitles[diaryItemNumber]
             if (textView.text.toString() != diaryItemTitle) {
                 textView.text = diaryItemTitle
             }
-        }
-    }
-
-    @BindingAdapter("diaryConditionSpinnerText")
-    @JvmStatic
-    fun setDiaryConditionSpinnerText(view: AutoCompleteTextView, condition: ConditionUi) {
-        val newText = condition.asString(view.context)
-        if (view.text.toString() != newText) {
-            view.setText(newText, false)
         }
     }
 
@@ -161,15 +151,7 @@ internal object DiaryUiBindingAdapters {
     fun setDiaryItemCommentText(textView: TextView, diaryItemNumber: Int, diaryLoadState: LoadState<DiaryUi>) {
         if (diaryLoadState is LoadState.Success) {
             val diaryUi = diaryLoadState.data
-            val diaryItemComment =
-                when (diaryItemNumber) {
-                    1 -> diaryUi.item1Comment
-                    2 -> diaryUi.item2Comment
-                    3 -> diaryUi.item3Comment
-                    4 -> diaryUi.item4Comment
-                    5 -> diaryUi.item5Comment
-                    else -> throw IllegalArgumentException("指定された日記項目番号($diaryItemNumber)が不正値。")
-                }
+            val diaryItemComment = diaryUi.itemComments[diaryItemNumber]
             if (textView.text.toString() != diaryItemComment) {
                 textView.text = diaryItemComment
             }

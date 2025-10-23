@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
-import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
@@ -56,22 +55,8 @@ internal class DiaryUiStateHelper @Inject constructor(
         return diaryFlow
             .distinctUntilChanged()
             .map{ diary ->
-                listOf(
-                    diary.item1Title,
-                    diary.item2Title,
-                    diary.item3Title,
-                    diary.item4Title,
-                    diary.item5Title
-                ).indexOfLast { it != null }.let { if (it == -1) 0 else it + 1 }
-            }
-    }
-
-    fun createNumVisibleDiaryItemsFlowFromMap(diaryFlow: Flow<DiaryUi>): Flow<Int> {
-        return diaryFlow
-            .distinctUntilChanged()
-            .map{ diary ->
                 diary.itemTitles
-                    .toSortedMap().values.toList().also { Log.d("202510222", it.toString()) }
+                    .toSortedMap().values.toList()
                     .indexOfLast { it != null }.let { if (it == -1) 0 else it + 1 }
             }
     }

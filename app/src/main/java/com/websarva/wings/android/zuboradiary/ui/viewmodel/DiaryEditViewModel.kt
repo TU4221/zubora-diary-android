@@ -199,7 +199,7 @@ internal class DiaryEditViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
 
-        diaryUiStateHelper.createNumVisibleDiaryItemsFlowFromMap(editingDiaryFlow)
+        diaryUiStateHelper.createNumVisibleDiaryItemsFlow(editingDiaryFlow)
             .distinctUntilChanged().onEach { numVisibleDiaryItems ->
                 updateUiState {
                     it.copy(
