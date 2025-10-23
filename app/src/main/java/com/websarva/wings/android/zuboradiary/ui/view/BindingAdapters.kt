@@ -75,7 +75,7 @@ internal object BindingAdapters {
         val dateText = selectedCalendarDate.formatDateString(toolbar.context)
         toolbar.title?.let {
             if (it.toString() == dateText) return
-        } ?: return
+        }
 
         toolbar.title = dateText
     }

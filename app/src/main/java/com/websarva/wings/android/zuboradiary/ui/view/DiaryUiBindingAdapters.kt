@@ -24,7 +24,7 @@ internal object DiaryUiBindingAdapters {
             val dateText = diaryUi.date.formatDateString(toolbar.context)
             toolbar.title?.let {
                 if (it.toString() == dateText) return
-            } ?: return
+            }
 
             toolbar.title = dateText
         }
