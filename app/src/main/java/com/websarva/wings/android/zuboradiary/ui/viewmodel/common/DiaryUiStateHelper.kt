@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 
+import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
@@ -40,23 +41,38 @@ internal class DiaryUiStateHelper @Inject constructor(
      * diaryLoadStateFlowから、NumVisibleDiaryItemsの状態を示すFlowを生成する。
      *
      * このメソッドが返すFlowは、内部で[buildDiaryImageFilePathUseCase]を呼び出しているため、
-     * 予期せぬ例外をスローする可能性があります。
      */
-    fun createNumVisibleDiaryItemsFlow(diaryLoadStateFlow: Flow<LoadState<DiaryUi>>): Flow<Int> {
+    fun createNumVisibleDiaryItemsFlowFromLoadState(
+        diaryLoadStateFlow: Flow<LoadState<DiaryUi>>
+    ): Flow<Int> {
         return diaryLoadStateFlow
             .distinctUntilChanged()
-            .mapNotNull{ state ->
-                if (state is LoadState.Success) {
-                    listOf(
-                        state.data.item1Title,
-                        state.data.item2Title,
-                        state.data.item3Title,
-                        state.data.item4Title,
-                        state.data.item5Title
-                    ).indexOfLast { it != null }.let { if (it == -1) 0 else it + 1 }
-                } else {
-                    null
-                }
+            .mapNotNull {
+                (it as? LoadState.Success)?.data
+            }.let { createNumVisibleDiaryItemsFlow(it) }
+    }
+
+    fun createNumVisibleDiaryItemsFlow(diaryFlow: Flow<DiaryUi>): Flow<Int> {
+        return diaryFlow
+            .distinctUntilChanged()
+            .map{ diary ->
+                listOf(
+                    diary.item1Title,
+                    diary.item2Title,
+                    diary.item3Title,
+                    diary.item4Title,
+                    diary.item5Title
+                ).indexOfLast { it != null }.let { if (it == -1) 0 else it + 1 }
+            }
+    }
+
+    fun createNumVisibleDiaryItemsFlowFromMap(diaryFlow: Flow<DiaryUi>): Flow<Int> {
+        return diaryFlow
+            .distinctUntilChanged()
+            .map{ diary ->
+                diary.itemTitles
+                    .toSortedMap().values.toList().also { Log.d("202510222", it.toString()) }
+                    .indexOfLast { it != null }.let { if (it == -1) 0 else it + 1 }
             }
     }
 
@@ -66,23 +82,28 @@ internal class DiaryUiStateHelper @Inject constructor(
      * このメソッドが返すFlowは、内部で[buildDiaryImageFilePathUseCase]を呼び出しているため、
      * 予期せぬ例外をスローする可能性があります。
      */
-    fun createDiaryImageFilePathFlow(diaryLoadStateFlow: Flow<LoadState<DiaryUi>>): Flow<FilePathUi?> {
+    fun createDiaryImageFilePathFlowFromLoadState(
+        diaryLoadStateFlow: Flow<LoadState<DiaryUi>>
+    ): Flow<FilePathUi?> {
         return diaryLoadStateFlow
             .distinctUntilChanged()
-            .map { loadState ->
-                if (loadState is LoadState.Success) {
-                    val diary = loadState.data
-                    val fileName = diary.imageFileName ?: return@map null
-                    val result =
-                        buildDiaryImageFilePathUseCase(
-                            DiaryImageFileName(fileName)
-                        )
-                    when (result) {
-                        is UseCaseResult.Success -> FilePathUi.Available(result.value)
-                        is UseCaseResult.Failure -> FilePathUi.Unavailable
-                    }
-                } else {
-                    null
+            .mapNotNull {
+                (it as? LoadState.Success)?.data
+            }.let { createDiaryImageFilePathFlow(it) }
+    }
+
+    fun createDiaryImageFilePathFlow(diaryFlow: Flow<DiaryUi>): Flow<FilePathUi?> {
+        return diaryFlow
+            .distinctUntilChanged()
+            .map { diary ->
+                val fileName = diary.imageFileName ?: return@map null
+                val result =
+                    buildDiaryImageFilePathUseCase(
+                        DiaryImageFileName(fileName)
+                    )
+                when (result) {
+                    is UseCaseResult.Success -> FilePathUi.Available(result.value)
+                    is UseCaseResult.Failure -> FilePathUi.Unavailable
                 }
             }
     }

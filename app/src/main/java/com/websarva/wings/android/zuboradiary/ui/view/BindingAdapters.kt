@@ -3,15 +3,20 @@ package com.websarva.wings.android.zuboradiary.ui.view
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.AutoCompleteTextView
 import android.widget.TextView
+import androidx.appcompat.widget.Toolbar
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.databinding.BindingAdapter
 import com.google.android.material.appbar.MaterialToolbar
+import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
 import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
+import java.time.LocalDate
 
 internal object BindingAdapters {
     // MEMO:既存"app:drawableStartCompat"は"@drawable/～"を代入すれば反映されるが、
@@ -32,6 +37,14 @@ internal object BindingAdapters {
         toolbar.setNavigationOnClickListener(listener)
     }
 
+    @JvmStatic
+    @BindingAdapter("onItemClick")
+    fun setOnItemClick(
+        view: AutoCompleteTextView,
+        listener: AdapterView.OnItemClickListener?) {
+        view.onItemClickListener = listener
+    }
+
     /**
      * ImageProgressView にカスタム属性を介してクリックリスナーを設定するためのBindingAdapter。
      */
@@ -45,6 +58,26 @@ internal object BindingAdapters {
     @BindingAdapter("imagePath")
     fun setImageProgressViewLoadImagePath(imageView: ImageProgressView, filePath: String?) {
         imageView.loadImage(filePath)
+    }
+
+    @JvmStatic
+    @BindingAdapter("dateText")
+    fun setDateText(textView: TextView, date: LocalDate) {
+        val dateText = date.formatDateString(textView.context)
+        if (textView.text.toString() != dateText) {
+            textView.text = dateText
+        }
+    }
+
+    @JvmStatic
+    @BindingAdapter("dateTitle")
+    fun setDateTitle(toolbar: Toolbar, selectedCalendarDate: LocalDate) {
+        val dateText = selectedCalendarDate.formatDateString(toolbar.context)
+        toolbar.title?.let {
+            if (it.toString() == dateText) return
+        } ?: return
+
+        toolbar.title = dateText
     }
 
 

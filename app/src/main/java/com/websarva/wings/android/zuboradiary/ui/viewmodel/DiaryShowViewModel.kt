@@ -62,10 +62,10 @@ internal class DiaryShowViewModel @Inject constructor(
         .createIsWeather2VisibleFlow(diaryLoadStateFlow)
 
     private val numVisibleDiaryItemsFlow: Flow<Int> = diaryUiStateHelper
-        .createNumVisibleDiaryItemsFlow(diaryLoadStateFlow)
+        .createNumVisibleDiaryItemsFlowFromLoadState(diaryLoadStateFlow)
 
     private val diaryImageFilePathFlow: Flow<FilePathUi?> = diaryUiStateHelper
-        .createDiaryImageFilePathFlow(diaryLoadStateFlow)
+        .createDiaryImageFilePathFlowFromLoadState(diaryLoadStateFlow)
         .catchUnexpectedError(null)
 
     // キャッシュパラメータ

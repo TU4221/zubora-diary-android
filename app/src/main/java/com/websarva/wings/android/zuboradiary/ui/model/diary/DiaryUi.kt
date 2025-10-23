@@ -52,5 +52,7 @@ internal data class DiaryUi(
     val item4Comment: String?,
     val item5Title: String?,
     val item5Comment: String?,
+    val itemTitles: Map<Int, String?>,
+    val itemComments: Map<Int, String?>,
     val imageFileName: String?
 ) : Parcelable

@@ -4,15 +4,25 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi" />
         <variable
             name="itemNumber"
             type="java.lang.String" />
         <variable
-            name="titleMutableStateFlow"
-            type="kotlinx.coroutines.flow.MutableStateFlow&lt;String>" />
+            name="title"
+            type="java.lang.String" />
         <variable
-            name="commentMutableStateFlow"
-            type="kotlinx.coroutines.flow.MutableStateFlow&lt;String>" />
+            name="onTitleClick"
+            type="android.view.View.OnClickListener" />
+        <variable
+            name="comment"
+            type="java.lang.String" />
+        <variable
+            name="onCommentTextChanged"
+            type="androidx.databinding.adapters.TextViewBindingAdapter.OnTextChanged" />
+        <variable
+            name="onItemDeleteButtonClick"
+            type="android.view.View.OnClickListener" />
     </data>
 
     <androidx.constraintlayout.motion.widget.MotionLayout
@@ -61,8 +71,8 @@
                     android:layout_marginStart="@dimen/layout_diary_edit_item_margin_start"
                     android:layout_gravity="center_vertical"
                     android:src="@drawable/ic_delete_forever_24px"
-                    android:contentDescription="@string/layout_diary_edit_item_delete"/>
-
+                    android:contentDescription="@string/layout_diary_edit_item_delete"
+                    android:onClick="@{onItemDeleteButtonClick}"/>
             </LinearLayout>
 
             <!-- 下記 EditText は項目タイトル入力フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
@@ -84,7 +94,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/AppTextInputEditTextTextAppearance"
-                    android:text="@={titleMutableStateFlow}"
+                    android:text="@{title}"
+                    android:onClick="@{onTitleClick}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     android:hint="@string/layout_diary_edit_item_title_hint"
                     android:maxLength="@integer/layout_diary_edit_item_title_max_length" />
@@ -107,12 +118,13 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/AppScrollableMultiLineTextInputEditTextTextAppearance"
-                    android:text="@={commentMutableStateFlow}"
+                    android:text="@{comment}"
+                    android:onTextChanged="@{onCommentTextChanged}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     android:hint="@string/layout_diary_edit_item_comment_hint"
                     android:maxLength="@integer/layout_diary_edit_item_comment_max_length"
                     android:minLines="@integer/layout_diary_edit_item_comment_min_lines"
-                    android:lines="@integer/layout_diary_edit_item_comment_min_lines"/>
+                    android:lines="@integer/layout_diary_edit_item_comment_min_lines" />
 
             </com.google.android.material.textfield.TextInputLayout>
 

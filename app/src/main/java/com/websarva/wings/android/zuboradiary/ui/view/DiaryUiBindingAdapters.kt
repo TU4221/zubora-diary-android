@@ -1,15 +1,18 @@
 package com.websarva.wings.android.zuboradiary.ui.view
 
 import android.util.Log
+import android.widget.AutoCompleteTextView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.databinding.BindingAdapter
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateTimeWithSecondsString
-import java.time.LocalDate
 
 internal object DiaryUiBindingAdapters {
 
@@ -28,14 +31,19 @@ internal object DiaryUiBindingAdapters {
     }
 
     @JvmStatic
-    @BindingAdapter("calendarDateToolbarTitle")
-    fun setCalendarDateText(toolbar: Toolbar, selectedCalendarDate: LocalDate) {
-        val dateText = selectedCalendarDate.formatDateString(toolbar.context)
-        toolbar.title?.let {
-            if (it.toString() == dateText) return
-        } ?: return
-
-        toolbar.title = dateText
+    @BindingAdapter("originalDiaryDateText")
+    fun setOriginalDiaryDateText(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
+        if (diaryLoadState is LoadState.Success) {
+            val diaryUi = diaryLoadState.data
+            val date = diaryUi.date
+            val dateText = textView.context.getString(
+                R.string.fragment_diary_edit_editing_diary,
+                date.formatDateString(textView.context)
+            )
+            if (textView.text.toString() != dateText) {
+                textView.text = dateText
+            }
+        }
     }
 
     @JvmStatic
@@ -97,6 +105,15 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    @BindingAdapter("diaryWeatherSpinnerText")
+    @JvmStatic
+    fun setDiaryWeatherSpinnerText(view: AutoCompleteTextView, weather: WeatherUi) {
+        val newText = weather.asString(view.context)
+        if (view.text.toString() != newText) {
+            view.setText(newText, false)
+        }
+    }
+
     @JvmStatic
     @BindingAdapter(
         value = [
@@ -121,6 +138,15 @@ internal object DiaryUiBindingAdapters {
             if (textView.text.toString() != diaryItemTitle) {
                 textView.text = diaryItemTitle
             }
+        }
+    }
+
+    @BindingAdapter("diaryConditionSpinnerText")
+    @JvmStatic
+    fun setDiaryConditionSpinnerText(view: AutoCompleteTextView, condition: ConditionUi) {
+        val newText = condition.asString(view.context)
+        if (view.text.toString() != newText) {
+            view.setText(newText, false)
         }
     }
 

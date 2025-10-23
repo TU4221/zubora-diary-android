@@ -10,8 +10,6 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.AdapterView
-import android.widget.AdapterView.OnItemClickListener
 import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.motion.widget.MotionLayout
@@ -40,17 +38,14 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
-import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.ConditionSpinnerAdapter
-import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.WeatherSpinnerAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
-import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
 @AndroidEntryPoint
@@ -116,12 +111,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
 
         setUpFocusViewScroll()
         setUpToolBar()
-        setUpDateInputField()
         setUpWeatherInputField()
         setUpConditionInputField()
-        setUpTitleInputField()
         setUpItemInputField()
-        setUpImageInputField()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -266,6 +258,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             is DiaryEditEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed -> {
                 navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
             }
+            is DiaryEditEvent.UpdateDiaryItemLayout -> {
+                setUpItemsLayout(event.numVisibleItems)
+            }
             is DiaryEditEvent.TransitionDiaryItemToInvisibleState -> {
                 transitionDiaryItemToInvisible(event.itemNumber, false)
             }
@@ -341,7 +336,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.isNewDiary
+            mainViewModel.uiState.map { it.isNewDiary }
                 .collectLatest { value: Boolean ->
                     // MEMO:日記新規作成時はnullとなり、新規作成状態と判断する。
                     val isDeleteEnabled = !value
@@ -355,134 +350,58 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                     testMenuItem.isEnabled = !isDeleteEnabled
                 }
         }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.originalDiaryDate
-                .collectLatest { value: LocalDate? ->
-                    val dateString = value?.formatDateString(requireContext())
-                    mainViewModel.onOriginalDiaryDateChanged(dateString)
-                }
-        }
-    }
-
-    // 日付入力欄設定
-    private fun setUpDateInputField() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.date.filterNotNull()
-                .collectLatest { value: LocalDate ->
-                    if (mainViewModel.isTesting) return@collectLatest
-
-                    val dateString = value.formatDateString(requireContext())
-                    binding.textInputEditTextDate.setText(dateString)
-                }
-        }
     }
 
     // 天気入力欄。
     private fun setUpWeatherInputField() {
-        binding.autoCompleteTextWeather1.apply {
-            setAdapter(WeatherSpinnerAdapter(requireContext(), themeColor))
-            onItemClickListener =
-                OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                    val adapter = parent?.adapter as WeatherSpinnerAdapter
-                    val weather = adapter.getWeatherUiItem(position)
-                    mainViewModel.onWeather1InputFieldItemClick(weather)
+        // TODO:ThemeColorが必要になるためLayoutDataBinding(BindingAdapter化)は保留
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState.map { it.weather1Options }
+                .collectLatest { value: List<WeatherUi> ->
+                    val context = requireContext()
+                    val adapter =
+                        AppDropdownAdapter(
+                            context,
+                            themeColor,
+                            value.map { it.asString(context) }
+                        )
+                    binding.autoCompleteTextWeather1.setAdapter(adapter)
                 }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.weather1
-                .collectLatest { value: WeatherUi ->
-                    Log.d("20250428", "Weather collectLatest()")
-                    val strWeather = value.asString(requireContext())
-                    binding.autoCompleteTextWeather1.setText(strWeather, false)
-                    binding.autoCompleteTextWeather2
-                        .setAdapter(WeatherSpinnerAdapter(requireContext(), themeColor, value))
-                }
-        }
-
-        binding.autoCompleteTextWeather2.onItemClickListener =
-            OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                val adapter = parent?.adapter as WeatherSpinnerAdapter
-                val weather = adapter.getWeatherUiItem(position)
-                mainViewModel.onWeather2InputFieldItemClick(weather)
-            }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.weather2
-                .collectLatest { value: WeatherUi ->
-                    val strWeather = value.asString(requireContext())
-                    binding.autoCompleteTextWeather2.setText(strWeather, false)
+            mainViewModel.uiState.map { it.weather2Options }
+                .collectLatest { value: List<WeatherUi> ->
+                    val context = requireContext()
+                    val adapter =
+                        AppDropdownAdapter(
+                            context,
+                            themeColor,
+                            value.map { it.asString(context) }
+                        )
+                    binding.autoCompleteTextWeather2.setAdapter(adapter)
                 }
         }
     }
 
     // 気分入力欄。
     private fun setUpConditionInputField() {
-        binding.autoCompleteTextCondition.apply {
-            setAdapter(
-                ConditionSpinnerAdapter(requireContext(), themeColor)
-            )
-            onItemClickListener =
-                OnItemClickListener { parent: AdapterView<*>?, _: View?, position: Int, _: Long ->
-                    val arrayAdapter = parent?.adapter as ConditionSpinnerAdapter
-                    val condition = arrayAdapter.getConditionUiItem(position)
-                    mainViewModel.onConditionInputFieldItemClick(condition)
-                }
-        }
-
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.condition
-                .collectLatest { value: ConditionUi ->
-                    val strCondition = value.asString(requireContext())
-                    binding.autoCompleteTextCondition.setText(strCondition, false)
+            mainViewModel.uiState.map { it.conditionOptions }
+                .collectLatest { value: List<ConditionUi> ->
+                    val context = requireContext()
+                    val adapter =
+                        AppDropdownAdapter(
+                            context,
+                            themeColor,
+                            value.map { it.asString(context) }
+                        )
+                    binding.autoCompleteTextCondition.setAdapter(adapter)
                 }
         }
-    }
-
-    @Suppress("EmptyMethod")
-    private fun setUpTitleInputField() {
-        // 処理なし
     }
 
     private fun setUpItemInputField() {
-        // 項目欄設定
-        // 項目タイトル入力欄設定
-        val textInputEditTextItemsTitle =
-            binding.run {
-                arrayOf(
-                    includeItem1.textInputEditTextTitle,
-                    includeItem2.textInputEditTextTitle,
-                    includeItem3.textInputEditTextTitle,
-                    includeItem4.textInputEditTextTitle,
-                    includeItem5.textInputEditTextTitle,
-                )
-            }
-        textInputEditTextItemsTitle.forEachIndexed { i, textInputEditText ->
-            textInputEditText.setOnClickListener {
-                val inputItemNumber = i + 1
-                mainViewModel.onItemTitleInputFieldClick(inputItemNumber)
-            }
-        }
-
-        // 項目削除ボタン設定
-        val imageButtonItemsDelete =
-            binding.run {
-                arrayOf(
-                    includeItem1.imageButtonItemDelete,
-                    includeItem2.imageButtonItemDelete,
-                    includeItem3.imageButtonItemDelete,
-                    includeItem4.imageButtonItemDelete,
-                    includeItem5.imageButtonItemDelete,
-                )
-            }
-        imageButtonItemsDelete.forEachIndexed { i, imageButton ->
-            imageButton.setOnClickListener {
-                val inputItemNumber = i + 1
-                mainViewModel.onItemDeleteButtonClick(inputItemNumber)
-            }
-        }
-
         // 項目欄MotionLayout設定
         motionLayoutDiaryEditItems =
             binding.run {
@@ -509,13 +428,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                     motionLayoutDiaryEditItems[init].setTransitionListener(it)
                 }
             }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.numVisibleItems
-                .collectLatest { value: Int ->
-                    setUpItemsLayout(value)
-                }
-        }
     }
 
     private class ItemMotionLayoutListener(
@@ -631,23 +543,24 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         return checkNotNull(itemMotionLayoutListeners)[arrayNumber]
     }
 
-    private fun setUpItemsLayout(numItems: Int) {
-        Log.d(logTag, "setUpItemsLayout()_numItems = $numItems")
+    private fun setUpItemsLayout(numVisibleItems: Int) {
+        Log.d(logTag, "setUpItemsLayout()_numItems = $numVisibleItems")
 
         // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
         if (shouldTransitionItemMotionLayout) {
             shouldTransitionItemMotionLayout = false
-            val numVisibleItems = countVisibleItems()
-            val differenceValue = numItems - numVisibleItems
-            if (numItems > numVisibleItems && differenceValue == 1) {
-                transitionDiaryItemToVisible(numItems, false)
+            val currentNumVisibleItems = countVisibleItems()
+            val differenceValue = numVisibleItems - currentNumVisibleItems
+            if (numVisibleItems > currentNumVisibleItems && differenceValue == 1) {
+                transitionDiaryItemToVisible(numVisibleItems, false)
                 return
             }
         }
 
+
         for (i in motionLayoutDiaryEditItems.indices) {
             val itemNumber = i + 1
-            if (itemNumber <= numItems) {
+            if (itemNumber <= numVisibleItems) {
                 transitionDiaryItemToVisible(itemNumber, true)
             } else {
                 transitionDiaryItemToInvisible(itemNumber, true)
@@ -706,21 +619,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     private fun countVisibleItems(): Int {
         return motionLayoutDiaryEditItems.count { motionLayout ->
             motionLayout.currentState == R.id.motion_scene_edit_diary_item_visible_state
-        }
-    }
-
-    private fun setUpImageInputField() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.imageFileName
-                .collectLatest { value: String? ->
-                    mainViewModel.onDiaryImageFileNameChanged(value)
-                }
-        }
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.imageFilePath
-                .collectLatest { value: FilePathUi? ->
-                    binding.imageProgressAttachedImage.loadImage(value?.path)
-                }
         }
     }
 

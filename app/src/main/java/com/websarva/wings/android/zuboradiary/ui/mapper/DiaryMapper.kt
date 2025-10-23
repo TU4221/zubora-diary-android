@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemCommen
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
+import kotlin.text.trim
 
 internal fun Diary.toUiModel(): DiaryUi {
     return DiaryUi(
@@ -27,11 +28,24 @@ internal fun Diary.toUiModel(): DiaryUi {
         item4Comment?.value,
         item5Title?.value,
         item5Comment?.value,
+        mapOf(
+            1 to item1Title.value,
+            2 to item2Title?.value,
+            3 to item3Title?.value,
+            4 to item4Title?.value,
+            5 to item5Title?.value
+        ),
+        mapOf(
+            1 to item1Comment.value,
+            2 to item2Comment?.value,
+            3 to item3Comment?.value,
+            4 to item4Comment?.value,
+            5 to item5Comment?.value
+        ),
         imageFileName?.fullName
     )
 }
 
-// TODO:未使用だが開発最終に削除する
 internal fun DiaryUi.toDomainModel(): Diary {
     return Diary(
         DiaryId(id),
@@ -40,17 +54,17 @@ internal fun DiaryUi.toDomainModel(): Diary {
         weather1.toDomainModel(),
         weather2.toDomainModel(),
         condition.toDomainModel(),
-        DiaryTitle(title),
-        DiaryItemTitle(item1Title),
-        DiaryItemComment(item1Comment),
-        item2Title?.let { DiaryItemTitle(it) },
-        item2Comment?.let { DiaryItemComment(it) },
-        item3Title?.let { DiaryItemTitle(it) },
-        item3Comment?.let { DiaryItemComment(it) },
-        item4Title?.let { DiaryItemTitle(it) },
-        item4Comment?.let { DiaryItemComment(it) },
-        item5Title?.let { DiaryItemTitle(it) },
-        item5Comment?.let { DiaryItemComment(it) },
+        DiaryTitle(title.trim()),
+        DiaryItemTitle(item1Title.trim()),
+        DiaryItemComment(item1Comment.trim()),
+        item2Title?.let { DiaryItemTitle(it.trim()) },
+        item2Comment?.let { DiaryItemComment(it.trim()) },
+        item3Title?.let { DiaryItemTitle(it.trim()) },
+        item3Comment?.let { DiaryItemComment(it.trim()) },
+        item4Title?.let { DiaryItemTitle(it.trim()) },
+        item4Comment?.let { DiaryItemComment(it.trim()) },
+        item5Title?.let { DiaryItemTitle(it.trim()) },
+        item5Comment?.let { DiaryItemComment(it.trim()) },
         imageFileName?.let { DiaryImageFileName(it) }
     )
 }

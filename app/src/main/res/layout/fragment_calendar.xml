@@ -36,7 +36,7 @@
                     android:layout_height="wrap_content"
                     app:applySystemInsetsToPaddingLeft="@{true}"
                     app:applySystemInsetsToPaddingRight="@{true}"
-                    app:calendarDateToolbarTitle="@{viewModel.uiState.selectedDate}"
+                    app:dateTitle="@{viewModel.uiState.selectedDate}"
                     tools:title="@string/fragment_calendar_month_header_tools_value"/>
 
             </com.google.android.material.appbar.AppBarLayout>

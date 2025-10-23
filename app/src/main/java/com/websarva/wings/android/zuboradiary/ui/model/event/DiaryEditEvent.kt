@@ -18,6 +18,7 @@ sealed class DiaryEditEvent : UiEvent {
     internal data object NavigateExitWithoutDiarySaveConfirmationDialog : DiaryEditEvent()
     internal data class NavigatePreviousFragmentOnDiaryDelete(val result: FragmentResult.Some<LocalDate>) : DiaryEditEvent()
     internal data class NavigatePreviousFragmentOnInitialDiaryLoadFailed(val result: FragmentResult.None = FragmentResult.None) : DiaryEditEvent()
+    internal data class UpdateDiaryItemLayout(val numVisibleItems: Int) : DiaryEditEvent()
     internal data class TransitionDiaryItemToInvisibleState(val itemNumber: Int) : DiaryEditEvent()
     internal data object CheckAccessLocationPermissionBeforeWeatherInfoFetch : DiaryEditEvent()
     internal data object ItemAddition : DiaryEditEvent()
