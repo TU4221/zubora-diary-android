@@ -27,6 +27,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import java.time.LocalDate
 import javax.inject.Inject
@@ -58,15 +59,25 @@ internal class DiaryShowViewModel @Inject constructor(
 
     private val diaryLoadStateFlow = uiState.map { it.diaryLoadState }
 
-    private val isWeather2VisibleFlow: Flow<Boolean> = diaryUiStateHelper
-        .createIsWeather2VisibleFlow(diaryLoadStateFlow)
+    private val isWeather2VisibleFlow: Flow<Boolean> = diaryLoadStateFlow.mapNotNull {
+        (it as? LoadState.Success)?.data
+    }.map {
+        diaryUiStateHelper.isWeather2Visible(it)
+    }
 
-    private val numVisibleDiaryItemsFlow: Flow<Int> = diaryUiStateHelper
-        .createNumVisibleDiaryItemsFlowFromLoadState(diaryLoadStateFlow)
+    private val numVisibleDiaryItemsFlow: Flow<Int> = diaryLoadStateFlow.mapNotNull {
+        (it as? LoadState.Success)?.data
+    }.map {
+        diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
+    }
 
-    private val diaryImageFilePathFlow: Flow<FilePathUi?> = diaryUiStateHelper
-        .createDiaryImageFilePathFlowFromLoadState(diaryLoadStateFlow)
-        .catchUnexpectedError(null)
+    private val diaryImageFilePathFlow: Flow<FilePathUi?> = diaryLoadStateFlow
+        .mapNotNull {
+            (it as? LoadState.Success)?.data
+        }.map {
+            diaryUiStateHelper
+                .buildImageFilePath(it)
+        }.catchUnexpectedError(null)
 
     // キャッシュパラメータ
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null

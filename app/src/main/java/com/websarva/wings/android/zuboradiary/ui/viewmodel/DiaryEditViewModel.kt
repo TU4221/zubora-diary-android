@@ -199,14 +199,15 @@ internal class DiaryEditViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
 
-        diaryUiStateHelper.createNumVisibleDiaryItemsFlow(editingDiaryFlow)
-            .distinctUntilChanged().onEach { numVisibleDiaryItems ->
-                updateUiState {
-                    it.copy(
-                        numVisibleDiaryItems = numVisibleDiaryItems
-                    )
-                }
-            }.launchIn(viewModelScope)
+        editingDiaryFlow.map {
+            diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
+        }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
+            updateUiState {
+                it.copy(
+                    numVisibleDiaryItems = numVisibleDiaryItems
+                )
+            }
+        }.launchIn(viewModelScope)
 
         uiState.map {
             !it.isInputDisabled && it.numVisibleDiaryItems < DiaryItemNumber.MAX_NUMBER
@@ -218,14 +219,15 @@ internal class DiaryEditViewModel @Inject constructor(
             }
         }.launchIn(viewModelScope)
 
-        diaryUiStateHelper.createDiaryImageFilePathFlow(editingDiaryFlow)
-            .distinctUntilChanged().onEach { path ->
-                updateUiState {
-                    it.copy(
-                        diaryImageFilePath = path
-                    )
-                }
-            }.launchIn(viewModelScope)
+        editingDiaryFlow.map {
+            diaryUiStateHelper.buildImageFilePath(it)
+        }.distinctUntilChanged().onEach { path ->
+            updateUiState {
+                it.copy(
+                    diaryImageFilePath = path
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun observeUiStateChanges() {
