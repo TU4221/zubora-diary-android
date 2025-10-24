@@ -12,7 +12,7 @@
             type="String" />
         <variable
             name="settingValue"
-            type="kotlinx.coroutines.flow.StateFlow&lt;String>" />
+            type="java.lang.Object" />
         <variable
             name="settingValueVisibility"
             type="int" />
@@ -56,8 +56,8 @@
             android:layout_height="wrap_content"
             android:layout_gravity="end|center_vertical"
             android:textAppearance="@style/SettingsItemValueTextViewTextAppearance"
-            android:text="@{settingValue}"
             android:visibility="@{settingValueVisibility}"
+            app:settingValueText="@{settingValue}"
             tools:ignore="DuplicateIncludedIds" />
 
     </FrameLayout>

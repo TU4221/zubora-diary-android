@@ -16,7 +16,6 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.utils.bottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
@@ -35,7 +34,7 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
     private val fragmentHelper = FragmentHelper()
 
     internal val themeColor
-        get() = settingsViewModel.themeColor.requireValue()
+        get() = settingsViewModel.uiState.value.themeColor!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

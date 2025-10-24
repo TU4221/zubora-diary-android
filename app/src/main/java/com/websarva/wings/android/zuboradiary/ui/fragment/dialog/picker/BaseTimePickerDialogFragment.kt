@@ -9,7 +9,6 @@ import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
 import com.google.android.material.timepicker.TimeFormat
 import com.websarva.wings.android.zuboradiary.ui.utils.timePickerDialogThemeResId
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalTime
@@ -24,7 +23,7 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
     private val settingsViewModel: SettingsViewModel by activityViewModels()
 
     private val themeColor
-        get() = settingsViewModel.themeColor.requireValue()
+        get() = settingsViewModel.uiState.value.themeColor!!
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         Log.d(logTag, "onCreateDialog()")

@@ -79,6 +79,7 @@
                             android:id="@+id/include_theme_color_setting"
                             app:settingIcon="@{@drawable/ic_palette_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_theme_color}"
+                            app:settingValue="@{viewModel.uiState.themeColor}"
                             app:onClickListener="@{() -> viewModel.onThemeColorSettingButtonClick()}" />
 
                     </LinearLayout>
@@ -113,6 +114,7 @@
                             android:id="@+id/include_calendar_start_day_setting"
                             app:settingIcon="@{@drawable/ic_calendar_month_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_calendar_start_day}"
+                            app:settingValue="@{viewModel.uiState.calendarStartDayOfWeek}"
                             app:onClickListener="@{() -> viewModel.onCalendarStartDayOfWeekSettingButtonClick()}" />
 
                         <com.google.android.material.divider.MaterialDivider
@@ -129,8 +131,9 @@
                             android:id="@+id/include_reminder_notification_setting"
                             app:settingIcon="@{@drawable/ic_notifications_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_reminder_notification}"
-                            app:settingValueVisibility="@{viewModel.isCheckedReminderNotification() ? View.VISIBLE : View.GONE}"
-                            app:settingValueSwitch="@{viewModel.isCheckedReminderNotification}"
+                            app:settingValueVisibility="@{viewModel.uiState.isReminderEnabled ? View.VISIBLE : View.GONE}"
+                            app:settingValueSwitch="@{viewModel.uiState.isReminderEnabled}"
+                            app:settingValue="@{viewModel.uiState.reminderNotificationTime}"
                             app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onReminderNotificationSettingCheckedChange(isChecked)}"
                             tools:ignore="DuplicateIncludedIds" />
 
@@ -149,7 +152,7 @@
                             app:settingIcon="@{@drawable/ic_lock_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_passcode_lock}"
                             app:settingValueVisibility="@{View.GONE}"
-                            app:settingValueSwitch="@{viewModel.isCheckedPasscodeLock}"
+                            app:settingValueSwitch="@{viewModel.uiState.isPasscodeLockEnabled}"
                             app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onPasscodeLockSettingCheckedChange(isChecked)}"
                             tools:ignore="DuplicateIncludedIds" />
 
@@ -167,7 +170,7 @@
                             android:id="@+id/include_weather_info_fetch_setting"
                             app:settingIcon="@{@drawable/ic_sunny_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_weather_info_fetch}"
-                            app:settingValueSwitch="@{viewModel.isCheckedWeatherInfoFetch}"
+                            app:settingValueSwitch="@{viewModel.uiState.isWeatherFetchEnabled}"
                             app:settingValueVisibility="@{View.GONE}"
                             app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onWeatherInfoFetchSettingCheckedChange(isChecked)}"
                             tools:ignore="DuplicateIncludedIds" />

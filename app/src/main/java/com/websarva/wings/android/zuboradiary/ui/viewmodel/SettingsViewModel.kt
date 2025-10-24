@@ -46,25 +46,22 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.state.SettingsState
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.model.state.ui.SettingsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.shareIn
-import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.DayOfWeek
 import java.time.LocalTime
 import javax.inject.Inject
 
+// TODO:現状、SettingsFragment以外にもSettingsViewModelを共有している為、これを廃止し、各ViewModelで必要な設定値を取得するように修正
+//      ダイアログ等にも共通のViewModelを用意する。
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
     handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
@@ -81,8 +78,11 @@ internal class SettingsViewModel @Inject constructor(
     private val updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase,
     private val deleteAllDiariesUseCase: DeleteAllDiariesUseCase,
     private val deleteAllDataUseCase: DeleteAllDataUseCase,
-) : BaseViewModel<SettingsEvent, SettingsAppMessage, SettingsState>(
-    SettingsState.Idle
+) : BaseViewModel<SettingsEvent, SettingsAppMessage, SettingsUiState>(
+    handle.get<SettingsUiState>(SAVED_UI_STATE_KEY)?.copy(
+        isProcessing = false,
+        isInputDisabled = false
+    ) ?: SettingsUiState()
 ) {
 
     // HACK:SavedStateHandleを使用する理由
@@ -93,49 +93,22 @@ internal class SettingsViewModel @Inject constructor(
     //      このような問題は発生しない。各フラグメントにDateSourceからの読込完了条件をいれるとコルーチンを使用する等の
     //      複雑な処理になるため、SavedStateHandleで対応する。
     companion object {
-        private const val SAVED_THEME_COLOR_STATE_KEY = "savedThemeColorState"
-        private const val SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY = "savedCalendarStartDayOfWeekState"
-    }
-
-    private fun <T> Flow<T>.stateInEagerly(initialValue: T): StateFlow<T> {
-        return this.stateIn(viewModelScope, SharingStarted.Eagerly, initialValue)
+        private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
     override val isProgressIndicatorVisible =
         uiState
-            .map { state ->
-                when (state) {
-                    SettingsState.LoadingAllSettings,
-                    SettingsState.DeletingAllData,
-                    SettingsState.DeletingAllDiaries -> true
-
-                    SettingsState.Idle,
-                    SettingsState.LoadAllSettingsSuccess,
-                    SettingsState.LoadAllSettingsFailure -> false
-                }
+            .map {
+                it.isProcessing
             }.stateInWhileSubscribed(
                 false
             )
 
-    // MEMO:StateFlow型設定値変数の値はデータソースからの値のみを代入したいので、
-    //      代入されるまでの間(初回設定値読込中)はnullとする。
-    lateinit var themeColor: StateFlow<ThemeColorUi?>
-        private set
+    private val isReadyForOperation
+        get() = !currentUiState.isInputDisabled
 
-    lateinit var calendarStartDayOfWeek: StateFlow<DayOfWeek?>
-        private set
-
-    lateinit var isCheckedReminderNotification: StateFlow<Boolean?>
-        private set
-    lateinit var reminderNotificationTime: StateFlow<LocalTime?>
-        private set
-
-    lateinit var isCheckedPasscodeLock: StateFlow<Boolean?>
-        private set
-    private lateinit var passcode: StateFlow<String?>
-
-    lateinit var isCheckedWeatherInfoFetch: StateFlow<Boolean?>
-        private set
+    private val currentUiState
+        get() = uiState.value
 
     init {
         setUpSettingsValue(handle)
@@ -158,9 +131,13 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun setUpSettingsValue(handle: SavedStateHandle) {
-        updateUiState(SettingsState.LoadingAllSettings)
-        setUpThemeColorSettingValue(handle)
-        setUpCalendarStartDayOfWeekSettingValue(handle)
+        uiState.onEach {
+            handle[SAVED_UI_STATE_KEY] = it
+        }.launchIn(viewModelScope)
+
+        updateToProcessingState()
+        setUpThemeColorSettingValue()
+        setUpCalendarStartDayOfWeekSettingValue()
         setUpReminderNotificationSettingValue()
         setUpPasscodeLockSettingValue()
         setUpWeatherInfoFetchSettingValue()
@@ -170,190 +147,164 @@ internal class SettingsViewModel @Inject constructor(
         //      素の`launch`で実行する。
         viewModelScope.launch {
             waitForAllSettingsInitializationCompletion()
-            if (uiState.value == SettingsState.LoadAllSettingsFailure) return@launch
-            updateUiState(SettingsState.LoadAllSettingsSuccess)
+            updateToIdleState()
         }
     }
 
-    private fun setUpThemeColorSettingValue(handle: SavedStateHandle) {
-        val initialValue = handle.get<ThemeColorUi>(SAVED_THEME_COLOR_STATE_KEY)
-        themeColor =
-            loadThemeColorSettingUseCase()
-                .map {
-                    when (it) {
-                        is UseCaseResult.Success -> it.value.themeColor.toUiModel()
-                        is UseCaseResult.Failure -> {
-                            val failureMessage = when (it.exception) {
-                                is ThemeColorSettingLoadException.LoadFailure -> {
-                                    SettingsAppMessage.SettingLoadFailure
-                                }
-                                is ThemeColorSettingLoadException.Unknown -> {
-                                    SettingsAppMessage.Unexpected(it.exception)
-                                }
+    private fun setUpThemeColorSettingValue() {
+        loadThemeColorSettingUseCase()
+            .map {
+                when (it) {
+                    is UseCaseResult.Success -> it.value.themeColor
+                    is UseCaseResult.Failure -> {
+                        val failureMessage = when (it.exception) {
+                            is ThemeColorSettingLoadException.LoadFailure -> {
+                                SettingsAppMessage.SettingLoadFailure
                             }
-                            handleSettingLoadFailure(failureMessage)
-                            it.exception.fallbackSetting.themeColor.toUiModel()
+                            is ThemeColorSettingLoadException.Unknown -> {
+                                SettingsAppMessage.Unexpected(it.exception)
+                            }
                         }
+                        handleSettingLoadFailure(failureMessage)
+                        it.exception.fallbackSetting.themeColor
                     }
-                }.onEach { value: ThemeColorUi ->
-                    handle[SAVED_THEME_COLOR_STATE_KEY] = value
-                }.stateInEagerly(initialValue)
+                }
+            }.distinctUntilChanged().onEach { value: ThemeColor ->
+                updateUiState {
+                    it.copy(
+                        themeColor = value.toUiModel()
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
-    private fun setUpCalendarStartDayOfWeekSettingValue(handle: SavedStateHandle) {
-        val initialValue = handle.get<DayOfWeek>(SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY)
-        calendarStartDayOfWeek =
-            loadCalendarStartDayOfWeekSettingUseCase()
-                .map {
-                    when (it) {
-                        is UseCaseResult.Success -> it.value.dayOfWeek
-                        is UseCaseResult.Failure -> {
-                            val failureMessage = when (it.exception) {
-                                is CalendarStartDayOfWeekSettingLoadException.LoadFailure -> {
-                                    SettingsAppMessage.SettingLoadFailure
-                                }
-                                is CalendarStartDayOfWeekSettingLoadException.Unknown -> {
-                                    SettingsAppMessage.Unexpected(it.exception)
-                                }
+    private fun setUpCalendarStartDayOfWeekSettingValue() {
+        loadCalendarStartDayOfWeekSettingUseCase()
+            .map {
+                when (it) {
+                    is UseCaseResult.Success -> it.value.dayOfWeek
+                    is UseCaseResult.Failure -> {
+                        val failureMessage = when (it.exception) {
+                            is CalendarStartDayOfWeekSettingLoadException.LoadFailure -> {
+                                SettingsAppMessage.SettingLoadFailure
                             }
-                            handleSettingLoadFailure(failureMessage)
-                            it.exception.fallbackSetting.dayOfWeek
+                            is CalendarStartDayOfWeekSettingLoadException.Unknown -> {
+                                SettingsAppMessage.Unexpected(it.exception)
+                            }
                         }
+                        handleSettingLoadFailure(failureMessage)
+                        it.exception.fallbackSetting.dayOfWeek
                     }
-                }.onEach { value: DayOfWeek ->
-                    handle[SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY] = value
-                }.stateInEagerly(initialValue)
+                }
+            }.distinctUntilChanged().onEach { value: DayOfWeek ->
+                updateUiState {
+                    it.copy(
+                        calendarStartDayOfWeek = value
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     private fun setUpReminderNotificationSettingValue() {
-        val sharedPasscodeLockSettingFlow =
-            loadReminderNotificationSettingUseCase()
-                .onEach {
-                    when (it) {
-                        is UseCaseResult.Success -> { /*処理なし*/ }
-                        is UseCaseResult.Failure -> {
-                            val failureMessage = when (it.exception) {
-                                is ReminderNotificationSettingLoadException.LoadFailure -> {
-                                    SettingsAppMessage.SettingLoadFailure
-                                }
-                                is ReminderNotificationSettingLoadException.Unknown -> {
-                                    SettingsAppMessage.Unexpected(it.exception)
-                                }
+        loadReminderNotificationSettingUseCase()
+            .map {
+                when (it) {
+                    is UseCaseResult.Success -> { it.value }
+                    is UseCaseResult.Failure -> {
+                        val failureMessage = when (it.exception) {
+                            is ReminderNotificationSettingLoadException.LoadFailure -> {
+                                SettingsAppMessage.SettingLoadFailure
                             }
-                            handleSettingLoadFailure(failureMessage)
+                            is ReminderNotificationSettingLoadException.Unknown -> {
+                                SettingsAppMessage.Unexpected(it.exception)
+                            }
                         }
+                        handleSettingLoadFailure(failureMessage)
+                        it.exception.fallbackSetting
                     }
                 }
-                .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
-
-        isCheckedReminderNotification =
-            sharedPasscodeLockSettingFlow
-                .map {
-                    when (it) {
-                        is UseCaseResult.Success -> it.value.isEnabled
-                        is UseCaseResult.Failure -> it.exception.fallbackSetting.isEnabled
-                    }
-                }.stateInEagerly(null )
-
-        reminderNotificationTime =
-            sharedPasscodeLockSettingFlow
-                .map {
-                    when (it) {
-                        is UseCaseResult.Success -> {
-                            when (it.value) {
-                                is ReminderNotificationSetting.Enabled -> it.value.notificationTime
+            }.distinctUntilChanged().onEach { value: ReminderNotificationSetting ->
+                updateUiState {
+                    it.copy(
+                        isReminderEnabled = value.isEnabled,
+                        reminderNotificationTime =
+                            when (value) {
+                                is ReminderNotificationSetting.Enabled -> value.notificationTime
                                 ReminderNotificationSetting.Disabled -> null
                             }
-                        }
-                        is UseCaseResult.Failure -> {
-                            when (it.exception.fallbackSetting) {
-                                is ReminderNotificationSetting.Enabled -> {
-                                    it.exception.fallbackSetting.notificationTime
-                                }
-                                ReminderNotificationSetting.Disabled -> null
-                            }
-                        }
-                    }
-                }.stateInEagerly(null)
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     private fun setUpPasscodeLockSettingValue() {
-        val sharedPasscodeLockSettingFlow =
-            loadPasscodeLockSettingUseCase()
-                .onEach {
-                    when (it) {
-                        is UseCaseResult.Success -> { /*処理なし*/ }
-                        is UseCaseResult.Failure -> {
-                            val failureMessage = when (it.exception) {
-                                is PasscodeLockSettingLoadException.LoadFailure -> {
-                                    SettingsAppMessage.SettingLoadFailure
-                                }
-                                is PasscodeLockSettingLoadException.Unknown -> {
-                                    SettingsAppMessage.Unexpected(it.exception)
-                                }
+        loadPasscodeLockSettingUseCase()
+            .map {
+                when (it) {
+                    is UseCaseResult.Success -> { it.value }
+                    is UseCaseResult.Failure -> {
+                        val failureMessage = when (it.exception) {
+                            is PasscodeLockSettingLoadException.LoadFailure -> {
+                                SettingsAppMessage.SettingLoadFailure
                             }
-                            handleSettingLoadFailure(failureMessage)
+                            is PasscodeLockSettingLoadException.Unknown -> {
+                                SettingsAppMessage.Unexpected(it.exception)
+                            }
                         }
+                        handleSettingLoadFailure(failureMessage)
+                        it.exception.fallbackSetting
                     }
                 }
-                .shareIn(viewModelScope, SharingStarted.WhileSubscribed(), replay = 1)
-
-        isCheckedPasscodeLock =
-            sharedPasscodeLockSettingFlow
-                .map {
-                    when (it) {
-                        is UseCaseResult.Success -> it.value.isEnabled
-                        is UseCaseResult.Failure -> it.exception.fallbackSetting.isEnabled
-                    }
-                }.stateInEagerly(null )
-
-        passcode =
-            sharedPasscodeLockSettingFlow
-                .map {
-                    when (it) {
-                        is UseCaseResult.Success -> {
-                            when (it.value) {
-                                is PasscodeLockSetting.Enabled -> it.value.passcode
+            }.onEach { value: PasscodeLockSetting ->
+                updateUiState {
+                    it.copy(
+                        isPasscodeLockEnabled = value.isEnabled,
+                        passcode =
+                            when (value) {
+                                is PasscodeLockSetting.Enabled -> value.passcode
                                 PasscodeLockSetting.Disabled -> null
                             }
-                        }
-                        is UseCaseResult.Failure -> {
-                            when (it.exception.fallbackSetting) {
-                                is PasscodeLockSetting.Enabled -> it.exception.fallbackSetting.passcode
-                                PasscodeLockSetting.Disabled -> null
-                            }
-                        }
-                    }
-                }.stateInEagerly(null )
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     private fun setUpWeatherInfoFetchSettingValue() {
-        isCheckedWeatherInfoFetch =
-            loadWeatherInfoFetchSettingUseCase()
-                .map {
-                    when (it) {
-                        is UseCaseResult.Success -> it.value.isEnabled
-                        is UseCaseResult.Failure -> {
-                            val failureMessage = when (it.exception) {
-                                is WeatherInfoFetchSettingLoadException.LoadFailure -> {
-                                    SettingsAppMessage.SettingLoadFailure
-                                }
-                                is WeatherInfoFetchSettingLoadException.Unknown -> {
-                                    SettingsAppMessage.Unexpected(it.exception)
-                                }
+        loadWeatherInfoFetchSettingUseCase()
+            .map {
+                when (it) {
+                    is UseCaseResult.Success -> it.value
+                    is UseCaseResult.Failure -> {
+                        val failureMessage = when (it.exception) {
+                            is WeatherInfoFetchSettingLoadException.LoadFailure -> {
+                                SettingsAppMessage.SettingLoadFailure
                             }
-                            handleSettingLoadFailure(failureMessage)
-                            it.exception.fallbackSetting.isEnabled
+                            is WeatherInfoFetchSettingLoadException.Unknown -> {
+                                SettingsAppMessage.Unexpected(it.exception)
+                            }
                         }
+                        handleSettingLoadFailure(failureMessage)
+                        it.exception.fallbackSetting
                     }
-                }.stateInEagerly(null)
+                }
+            }.distinctUntilChanged().onEach { value ->
+                updateUiState {
+                    it.copy(
+                        isWeatherFetchEnabled = value.isEnabled
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     private suspend fun handleSettingLoadFailure(failureMessage: SettingsAppMessage) {
         val currentUiState = uiState.value
-        if (currentUiState == SettingsState.LoadAllSettingsFailure) return
+        if (currentUiState.hasError) return
 
-        updateUiState(SettingsState.LoadAllSettingsFailure)
+        updateUiState {
+            it.copy(
+                hasError = true
+            )
+        }
         if (failureMessage is SettingsAppMessage.Unexpected) {
             emitUnexpectedAppMessage(failureMessage.exception)
         } else {
@@ -362,33 +313,15 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     /**
-     * 全ての設定値のFlowが初期化されるまで待機するsuspend関数。
+     * 全ての設定値が初期化されるまで待機するsuspend関数。
      */
     private suspend fun waitForAllSettingsInitializationCompletion() {
-        val isThemeColorReady = themeColor.map { it != null }
-        val isCalendarStartDayOfWeekReady = calendarStartDayOfWeek.map { it != null }
-        val isReminderNotificationReady = combine(
-            isCheckedReminderNotification,
-            reminderNotificationTime
-        ) { isChecked, time ->
-            if (isChecked == false) true else isChecked != null && time != null
-        }
-        val isPasscodeLockReady = combine(
-            isCheckedPasscodeLock,
-            passcode
-        ) { isChecked, code ->
-            if (isChecked == false) true else isChecked != null && code != null
-        }
-        val isWeatherInfoFetchReady = isCheckedWeatherInfoFetch.map { it != null }
-
-        combine(
-            isThemeColorReady,
-            isCalendarStartDayOfWeekReady,
-            isReminderNotificationReady,
-            isPasscodeLockReady,
-            isWeatherInfoFetchReady
-        ) { values ->
-            values.all { it }
+        uiState.map {
+            it.themeColor != null
+                    && it.calendarStartDayOfWeek != null
+                    && it.isReminderEnabled != null
+                    && it.isPasscodeLockEnabled != null
+                    && it.isWeatherFetchEnabled != null
         }.first { allAreReady ->
             allAreReady
         }
@@ -396,6 +329,8 @@ internal class SettingsViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
+        if (!isReadyForOperation) return
+
         launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
@@ -415,7 +350,7 @@ internal class SettingsViewModel @Inject constructor(
     fun onCalendarStartDayOfWeekSettingButtonClick() {
         if (!canExecuteOperation()) return
 
-        val dayOfWeek = calendarStartDayOfWeek.requireValue()
+        val dayOfWeek = currentUiState.calendarStartDayOfWeek ?: return
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsEvent.NavigateCalendarStartDayPickerDialog(dayOfWeek)
@@ -426,10 +361,10 @@ internal class SettingsViewModel @Inject constructor(
     fun onReminderNotificationSettingCheckedChange(isChecked: Boolean) {
         // DateSourceからの初回読込時の値がtrueの場合、本メソッドが呼び出される。
         // 初回読込時は処理不要のため下記条件追加。
-        val settingValue = isCheckedReminderNotification.requireValue()
+        val settingValue = currentUiState.isReminderEnabled
         if (isChecked == settingValue) return
 
-        if (!canExecuteOperation()) {
+        if (settingValue == null || !canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
                 emitUiEvent(
                     SettingsEvent.TurnReminderNotificationSettingSwitch(!isChecked)
@@ -460,10 +395,10 @@ internal class SettingsViewModel @Inject constructor(
     fun onPasscodeLockSettingCheckedChange(isChecked: Boolean) {
         // DateSourceからの初回読込時の値がtrueの場合、本メソッドが呼び出される。
         // 初回読込時は処理不要のため下記条件追加。
-        val settingValue = isCheckedPasscodeLock.requireValue()
+        val settingValue = currentUiState.isPasscodeLockEnabled
         if (isChecked == settingValue) return
 
-        if (!canExecuteOperation()) {
+        if (settingValue == null || !canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
                 emitUiEvent(
                     SettingsEvent.TurnPasscodeLockSettingSwitch(!isChecked)
@@ -480,10 +415,10 @@ internal class SettingsViewModel @Inject constructor(
     fun onWeatherInfoFetchSettingCheckedChange(isChecked: Boolean) {
         // DateSourceからの初回読込時の値がtrueの場合、本メソッドが呼び出される。
         // 初回読込時は処理不要のため下記条件追加。
-        val settingValue = isCheckedWeatherInfoFetch.requireValue()
+        val settingValue = currentUiState.isWeatherFetchEnabled
         if (isChecked == settingValue) return
 
-        if (!canExecuteOperation()) {
+        if (settingValue == null || !canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
                 emitUiEvent(
                     SettingsEvent.TurnWeatherInfoFetchSettingSwitch(!isChecked)
@@ -534,6 +469,8 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     fun onOpenSourceLicenseButtonClick() {
+        if (!isReadyForOperation) return
+
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsEvent.NavigateOpenSourceLicensesFragment
@@ -794,26 +731,13 @@ internal class SettingsViewModel @Inject constructor(
      * @return 操作可能な場合は `true`、そうでない場合は `false`。
      */
     private fun canExecuteOperation(): Boolean {
-        return when (uiState.value) {
-            // 操作可能な状態
-            SettingsState.LoadAllSettingsSuccess,
-            SettingsState.Idle -> true
-
-            // 操作不可能な状態（ユーザー操作を待機中または処理中）
-            SettingsState.LoadingAllSettings,
-            SettingsState.DeletingAllDiaries,
-            SettingsState.DeletingAllData -> {
-                false
+        if (currentUiState.hasError) {
+            launchWithUnexpectedErrorHandler {
+                emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
             }
-
-            // 操作不可能な状態（致命的なエラー）
-            SettingsState.LoadAllSettingsFailure -> {
-                launchWithUnexpectedErrorHandler {
-                    emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
-                }
-                false
-            }
+            return false
         }
+        return isReadyForOperation
     }
 
     private suspend fun saveThemeColor(value: ThemeColor) {
@@ -980,13 +904,13 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun deleteAllDiaries() {
-        updateUiState(SettingsState.DeletingAllDiaries)
+        updateToProcessingState()
         when (val result = deleteAllDiariesUseCase()) {
             is UseCaseResult.Success -> {
-                updateUiState(SettingsState.LoadAllSettingsSuccess)
+                updateToIdleState()
             }
             is UseCaseResult.Failure -> {
-                updateUiState(SettingsState.LoadAllSettingsSuccess)
+                updateToIdleState()
                 Log.e(logTag, "全日記削除_失敗", result.exception)
                 when (result.exception) {
                     is AllDiariesDeleteException.DeleteFailure -> {
@@ -1026,14 +950,14 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun deleteAllData() {
-        updateUiState(SettingsState.DeletingAllData)
+        updateToProcessingState()
         when (val result = deleteAllDataUseCase()) {
             is UseCaseResult.Success -> {
-                updateUiState(SettingsState.LoadAllSettingsSuccess)
+                updateToIdleState()
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "アプリ全データ削除_失敗", result.exception)
-                updateUiState(SettingsState.LoadAllSettingsSuccess)
+                updateToIdleState()
                 when (result.exception) {
                     is AllDataDeleteException.DiariesDeleteFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
@@ -1052,6 +976,24 @@ internal class SettingsViewModel @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    private fun updateToIdleState() {
+        updateUiState {
+            it.copy(
+                isProcessing = false,
+                isInputDisabled = false
+            )
+        }
+    }
+
+    private fun updateToProcessingState() {
+        updateUiState {
+            it.copy(
+                isProcessing = true,
+                isInputDisabled = true
+            )
         }
     }
 }

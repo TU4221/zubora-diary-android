@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 
 abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
@@ -30,7 +29,7 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
     internal val fragmentHelper = FragmentHelper()
 
     internal val themeColor
-        get() = settingsViewModel.themeColor.requireValue()
+        get() = settingsViewModel.uiState.value.themeColor!!
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

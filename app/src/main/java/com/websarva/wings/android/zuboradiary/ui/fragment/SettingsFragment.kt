@@ -27,20 +27,17 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.Permissio
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.utils.formatHourMinuteString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
-import com.websarva.wings.android.zuboradiary.ui.utils.asCalendarStartDayOfWeekString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
-import java.time.LocalTime
 
 @AndroidEntryPoint
 class SettingsFragment :
@@ -117,8 +114,6 @@ class SettingsFragment :
         super.onViewCreated(view, savedInstanceState)
 
         setUpThemeColorSettingItem()
-        setUpCalendarStartDaySettingItem()
-        setUpReminderNotificationSettingItem()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -271,10 +266,8 @@ class SettingsFragment :
 
     private fun setUpThemeColorSettingItem() {
         launchAndRepeatOnViewLifeCycleStarted {
-            settingsViewModel.themeColor.filterNotNull()
+            settingsViewModel.uiState.map { it.themeColor }.filterNotNull()
                 .collectLatest { value: ThemeColorUi ->
-                    val strThemeColor = value.asString(requireContext())
-                    binding.includeThemeColorSetting.textValue.text = strThemeColor
                     switchViewColor(value)
                 }
         }
@@ -380,32 +373,6 @@ class SettingsFragment :
             },
             themeColor
         )
-    }
-
-    private fun setUpCalendarStartDaySettingItem() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            settingsViewModel.calendarStartDayOfWeek.filterNotNull()
-                .collectLatest { value: DayOfWeek ->
-                    val strDayOfWeek = value.asCalendarStartDayOfWeekString(requireContext())
-                    binding.includeCalendarStartDaySetting.textValue.text = strDayOfWeek
-                }
-        }
-    }
-
-    private fun setUpReminderNotificationSettingItem() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            settingsViewModel.reminderNotificationTime
-                .collectLatest { value: LocalTime? ->
-                    // MEMO:無効状態の場合nullが代入される。
-                    if (value == null) {
-                        binding.includeReminderNotificationSetting.textValue.text = ""
-                        return@collectLatest
-                    }
-
-                    val timeString = value.formatHourMinuteString(requireContext())
-                    binding.includeReminderNotificationSetting.textValue.text = timeString
-                }
-        }
     }
 
     private fun navigateThemeColorPickerDialog() {

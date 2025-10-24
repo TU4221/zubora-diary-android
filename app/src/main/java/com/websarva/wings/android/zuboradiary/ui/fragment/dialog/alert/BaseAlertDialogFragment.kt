@@ -9,7 +9,6 @@ import androidx.fragment.app.activityViewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.utils.alertDialogThemeResId
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
@@ -22,7 +21,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     private val settingsViewModel: SettingsViewModel by activityViewModels()
 
     private val themeColor
-        get() = settingsViewModel.themeColor.requireValue()
+        get() = settingsViewModel.uiState.value.themeColor!!
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         Log.d(logTag, "onCreateDialog()")

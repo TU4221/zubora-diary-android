@@ -37,6 +37,7 @@ import kotlinx.coroutines.launch
 import androidx.core.view.size
 import androidx.core.view.get
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import kotlinx.coroutines.flow.map
 
 @AndroidEntryPoint
 class MainActivity : LoggingActivity() {
@@ -75,7 +76,7 @@ class MainActivity : LoggingActivity() {
         setUpFragmentLifeCycleCallBacks()
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsViewModel.themeColor.filterNotNull()
+                settingsViewModel.uiState.map { it.themeColor }.filterNotNull()
                     .collectLatest { value: ThemeColorUi ->
                         if (isMainActivityLayoutInflated) return@collectLatest
                         setUpMainActivityBinding(value)
@@ -242,7 +243,7 @@ class MainActivity : LoggingActivity() {
     private fun setUpThemeColor() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsViewModel.themeColor.filterNotNull()
+                settingsViewModel.uiState.map { it.themeColor }.filterNotNull()
                     .collectLatest { themeColor: ThemeColorUi ->
                         switchThemeColor(themeColor)
                     }
