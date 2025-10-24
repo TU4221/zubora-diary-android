@@ -67,7 +67,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
-    private val handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
+    handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
     private val initializeAllSettingsUseCase: InitializeAllSettingsUseCase,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
@@ -138,7 +138,7 @@ internal class SettingsViewModel @Inject constructor(
         private set
 
     init {
-        setUpSettingsValue()
+        setUpSettingsValue(handle)
     }
 
     override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): SettingsEvent {
@@ -157,10 +157,10 @@ internal class SettingsViewModel @Inject constructor(
         return SettingsAppMessage.Unexpected(e)
     }
 
-    private fun setUpSettingsValue() {
+    private fun setUpSettingsValue(handle: SavedStateHandle) {
         updateUiState(SettingsState.LoadingAllSettings)
-        setUpThemeColorSettingValue()
-        setUpCalendarStartDayOfWeekSettingValue()
+        setUpThemeColorSettingValue(handle)
+        setUpCalendarStartDayOfWeekSettingValue(handle)
         setUpReminderNotificationSettingValue()
         setUpPasscodeLockSettingValue()
         setUpWeatherInfoFetchSettingValue()
@@ -175,7 +175,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    private fun setUpThemeColorSettingValue() {
+    private fun setUpThemeColorSettingValue(handle: SavedStateHandle) {
         val initialValue = handle.get<ThemeColorUi>(SAVED_THEME_COLOR_STATE_KEY)
         themeColor =
             loadThemeColorSettingUseCase()
@@ -200,7 +200,7 @@ internal class SettingsViewModel @Inject constructor(
                 }.stateInEagerly(initialValue)
     }
 
-    private fun setUpCalendarStartDayOfWeekSettingValue() {
+    private fun setUpCalendarStartDayOfWeekSettingValue(handle: SavedStateHandle) {
         val initialValue = handle.get<DayOfWeek>(SAVED_CALENDAR_START_DAY_OF_WEEK_STATE_KEY)
         calendarStartDayOfWeek =
             loadCalendarStartDayOfWeekSettingUseCase()
