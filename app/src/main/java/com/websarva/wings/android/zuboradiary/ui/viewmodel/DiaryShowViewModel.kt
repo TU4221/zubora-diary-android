@@ -23,6 +23,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryShowUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.DiaryUiStateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -69,7 +70,7 @@ internal class DiaryShowViewModel @Inject constructor(
     private fun observeDerivedUiStateChanges(diaryUiStateHelper: DiaryUiStateHelper) {
         diaryFlow.map {
             diaryUiStateHelper.isWeather2Visible(it)
-        }.onEach { isWeather2Visible ->
+        }.distinctUntilChanged().onEach { isWeather2Visible ->
             updateUiState {
                 it.copy(
                     isWeather2Visible = isWeather2Visible
@@ -79,7 +80,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
         diaryFlow.map {
             diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
-        }.onEach { numVisibleDiaryItems ->
+        }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
             updateUiState {
                 it.copy(
                     numVisibleDiaryItems = numVisibleDiaryItems
@@ -89,7 +90,7 @@ internal class DiaryShowViewModel @Inject constructor(
 
         diaryFlow.map {
             diaryUiStateHelper.buildImageFilePath(it)
-        }.catchUnexpectedError(null).onEach { path ->
+        }.catchUnexpectedError(null).distinctUntilChanged().onEach { path ->
             updateUiState {
                 it.copy(
                     diaryImageFilePath = path

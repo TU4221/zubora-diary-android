@@ -60,7 +60,7 @@ internal class CalendarViewModel @Inject constructor(
     private fun observeDerivedUiStateChanges(diaryUiStateHelper: DiaryUiStateHelper) {
         diaryFlow.map {
             diaryUiStateHelper.isWeather2Visible(it)
-        }.onEach { isWeather2Visible ->
+        }.distinctUntilChanged().onEach { isWeather2Visible ->
             updateUiState {
                 it.copy(
                     isWeather2Visible = isWeather2Visible
@@ -70,7 +70,7 @@ internal class CalendarViewModel @Inject constructor(
 
         diaryFlow.map {
             diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
-        }.onEach { numVisibleDiaryItems ->
+        }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
             updateUiState {
                 it.copy(
                     numVisibleDiaryItems = numVisibleDiaryItems
@@ -80,7 +80,7 @@ internal class CalendarViewModel @Inject constructor(
 
         diaryFlow.map {
             diaryUiStateHelper.buildImageFilePath(it)
-        }.catchUnexpectedError(null).onEach { path ->
+        }.distinctUntilChanged().catchUnexpectedError(null).onEach { path ->
             updateUiState {
                 it.copy(
                     diaryImageFilePath = path
