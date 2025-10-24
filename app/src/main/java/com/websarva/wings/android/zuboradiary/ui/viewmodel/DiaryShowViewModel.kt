@@ -56,6 +56,16 @@ internal class DiaryShowViewModel @Inject constructor(
                 false
             )
 
+    private val isReadyForOperation
+        get() = !currentUiState.isInputDisabled
+                && (currentUiState.diaryLoadState is LoadState.Success)
+
+    private val currentUiState
+        get() = uiState.value
+
+    private val diary
+        get() = (currentUiState.diaryLoadState as LoadState.Success).data
+
     private val diaryFlow =
         uiState.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
@@ -125,12 +135,8 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
-        val currentUiState = uiState.value
-        if (currentUiState.isInputDisabled) return
-        val diaryLoadState = currentUiState.diaryLoadState
-        if (diaryLoadState !is LoadState.Success) return
+        if (!isReadyForOperation) return
 
-        val diary = diaryLoadState.data
         val date = diary.date
         launchWithUnexpectedErrorHandler {
             navigatePreviousFragment(date)
@@ -139,12 +145,8 @@ internal class DiaryShowViewModel @Inject constructor(
 
     // Viewクリック処理
     fun onDiaryEditMenuClick() {
-        val currentUiState = uiState.value
-        if (currentUiState.isInputDisabled) return
-        val diaryLoadState = currentUiState.diaryLoadState
-        if (diaryLoadState !is LoadState.Success) return
+        if (!isReadyForOperation) return
 
-        val diary = diaryLoadState.data
         val id = diary.id
         val date = diary.date
         launchWithUnexpectedErrorHandler {
@@ -155,12 +157,8 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onDiaryDeleteMenuClick() {
-        val currentUiState = uiState.value
-        if (currentUiState.isInputDisabled) return
-        val diaryLoadState = currentUiState.diaryLoadState
-        if (diaryLoadState !is LoadState.Success) return
+        if (!isReadyForOperation) return
 
-        val diary = diaryLoadState.data
         val id = diary.id
         val date = diary.date
         launchWithUnexpectedErrorHandler {
@@ -172,12 +170,8 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     fun onNavigationIconClick() {
-        val currentUiState = uiState.value
-        if (currentUiState.isInputDisabled) return
-        val diaryLoadState = currentUiState.diaryLoadState
-        if (diaryLoadState !is LoadState.Success) return
+        if (!isReadyForOperation) return
 
-        val diary = diaryLoadState.data
         val date = diary.date
         launchWithUnexpectedErrorHandler {
             navigatePreviousFragment(date)

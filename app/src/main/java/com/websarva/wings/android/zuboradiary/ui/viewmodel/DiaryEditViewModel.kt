@@ -109,14 +109,12 @@ internal class DiaryEditViewModel @Inject constructor(
             false
         )
 
-    private val isReadyForOperation: Boolean
-        get() {
-            return !currentUiState.isInputDisabled
-                    && currentUiState.originalDiaryLoadState is LoadState.Success
-        }
+    private val isReadyForOperation
+        get() = !currentUiState.isInputDisabled
+                && currentUiState.originalDiaryLoadState is LoadState.Success
 
     // TODO:BaseViewModelに用意
-    private val currentUiState: DiaryEditUiState
+    private val currentUiState
         get() = uiState.value
 
     private val originalDiary

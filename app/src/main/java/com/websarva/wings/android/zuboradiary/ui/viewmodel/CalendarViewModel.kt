@@ -47,6 +47,14 @@ internal class CalendarViewModel @Inject constructor(
                 false
             )
 
+    private val isReadyForOperation
+        get() = !currentUiState.isInputDisabled
+                && (currentUiState.diaryLoadState is LoadState.Success
+                        || currentUiState.diaryLoadState is LoadState.Empty)
+
+    private val currentUiState
+        get() = uiState.value
+
     private val selectedDateFlow = uiState.map { it.selectedDate }
 
     private val diaryFlow =
@@ -121,6 +129,8 @@ internal class CalendarViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
+        if (!isReadyForOperation) return
+
         launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
@@ -132,8 +142,7 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     fun onDiaryEditButtonClick() {
-        val currentUiState = uiState.value
-        if (currentUiState.isInputDisabled) return
+        if (!isReadyForOperation) return
 
         val diaryLoadState = currentUiState.diaryLoadState
         var id: String?
@@ -162,8 +171,7 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     fun onBottomNavigationItemReselect() {
-        val currentUiState = uiState.value
-        if (currentUiState.isInputDisabled) return
+        if (!isReadyForOperation) return
 
         val selectedDate = currentUiState.selectedDate
         val today = LocalDate.now()
@@ -210,7 +218,7 @@ internal class CalendarViewModel @Inject constructor(
     // データ処理
     private suspend fun prepareDiary(date: LocalDate) {
         val action =
-            if (uiState.value.shouldSmoothScroll) {
+            if (currentUiState.shouldSmoothScroll) {
                 updateShouldSmoothScroll(false)
                 CalendarEvent.SmoothScrollCalendar(date)
             } else {
@@ -284,8 +292,7 @@ internal class CalendarViewModel @Inject constructor(
         // MEMO:selectedDateと同日付を選択した時、previousSelectedDateと同値となり、
         //      次に他の日付を選択した時にpreviousSelectedDateのcollectedが起動しなくなる。
         //      下記条件で対策。
-        val uiState = uiState.value
-        if (date == uiState.selectedDate) return
+        if (date == currentUiState.selectedDate) return
 
         updateUiState {
             it.copy(
