@@ -69,7 +69,8 @@ import kotlin.random.Random
 
 @HiltViewModel
 internal class DiaryEditViewModel @Inject constructor(
-    private val handle: SavedStateHandle,
+    handle: SavedStateHandle,
+    diaryUiStateHelper: DiaryUiStateHelper,
     private val shouldRequestExitWithoutDiarySaveConfirmationUseCase: ShouldRequestExitWithoutDiarySaveConfirmationUseCase,
     private val shouldRequestDiaryLoadConfirmationUseCase: ShouldRequestDiaryLoadConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
@@ -83,8 +84,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val shouldFetchWeatherInfoUseCase: ShouldFetchWeatherInfoUseCase,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val cacheDiaryImageUseCase: CacheDiaryImageUseCase,
-    private val clearDiaryImageCacheFileUseCase: ClearDiaryImageCacheFileUseCase,
-    private val diaryUiStateHelper: DiaryUiStateHelper
+    private val clearDiaryImageCacheFileUseCase: ClearDiaryImageCacheFileUseCase
 ) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditUiState>(
     handle.get<DiaryEditUiState>(SAVED_UI_STATE_KEY)?.copy(
         isProcessing = false,
@@ -139,7 +139,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     init {
         initializeDiaryData(handle)
-        observeDerivedUiStateChanges()
+        observeDerivedUiStateChanges(handle, diaryUiStateHelper)
         observeUiStateChanges()
     }
 
@@ -157,7 +157,10 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun observeDerivedUiStateChanges() {
+    private fun observeDerivedUiStateChanges(
+        handle: SavedStateHandle,
+        diaryUiStateHelper: DiaryUiStateHelper
+    ) {
         uiState.onEach {
             Log.d(logTag, it.toString())
             handle[SAVED_UI_STATE_KEY] = it

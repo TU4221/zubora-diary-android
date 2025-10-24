@@ -32,9 +32,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
+    diaryUiStateHelper: DiaryUiStateHelper,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
-    private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase,
-    private val diaryUiStateHelper: DiaryUiStateHelper
+    private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
 ) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarUiState>(
     CalendarUiState()
 ) {
@@ -53,11 +53,11 @@ internal class CalendarViewModel @Inject constructor(
         uiState.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
     init {
-        observeDerivedUiStateChanges()
+        observeDerivedUiStateChanges(diaryUiStateHelper)
         observeUiStateChanges()
     }
 
-    private fun observeDerivedUiStateChanges() {
+    private fun observeDerivedUiStateChanges(diaryUiStateHelper: DiaryUiStateHelper) {
         diaryFlow.map {
             diaryUiStateHelper.isWeather2Visible(it)
         }.onEach { isWeather2Visible ->

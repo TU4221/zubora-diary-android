@@ -33,9 +33,9 @@ import javax.inject.Inject
 @HiltViewModel
 internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
+    diaryUiStateHelper: DiaryUiStateHelper,
     private val loadDiaryByIdUseCase: LoadDiaryByIdUseCase,
-    private val deleteDiaryUseCase: DeleteDiaryUseCase,
-    private val diaryUiStateHelper: DiaryUiStateHelper
+    private val deleteDiaryUseCase: DeleteDiaryUseCase
 ) : BaseViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowUiState>(
     DiaryShowUiState()
 ) {
@@ -62,11 +62,11 @@ internal class DiaryShowViewModel @Inject constructor(
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
 
     init {
-        observeDerivedUiStateChanges()
+        observeDerivedUiStateChanges(diaryUiStateHelper)
         initializeDiaryData(handle)
     }
 
-    private fun observeDerivedUiStateChanges() {
+    private fun observeDerivedUiStateChanges(diaryUiStateHelper: DiaryUiStateHelper) {
         diaryFlow.map {
             diaryUiStateHelper.isWeather2Visible(it)
         }.onEach { isWeather2Visible ->
