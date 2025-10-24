@@ -7,7 +7,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
@@ -16,8 +16,12 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.utils.bottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.utils.firstNotNull
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.DialogViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlin.getValue
 
 abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialogFragment() {
 
@@ -29,12 +33,14 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    private val settingsViewModel: SettingsViewModel by activityViewModels()
+    private val viewModel: DialogViewModel by viewModels()
 
     private val fragmentHelper = FragmentHelper()
 
     internal val themeColor
-        get() = settingsViewModel.uiState.value.themeColor!!
+        get() = runBlocking(Dispatchers.Main.immediate) {
+            viewModel.themeColor.firstNotNull()
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

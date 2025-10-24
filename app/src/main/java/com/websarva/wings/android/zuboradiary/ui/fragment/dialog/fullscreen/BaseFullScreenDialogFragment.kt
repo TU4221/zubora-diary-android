@@ -59,7 +59,6 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
 
     private fun setUpUiEvent() {
         setUpMainUiEvent()
-        setUpSettingsUiEvent()
     }
 
     private fun setUpMainUiEvent() {
@@ -72,15 +71,6 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
     }
 
     internal abstract fun onMainUiEventReceived(event: E)
-
-    private fun setUpSettingsUiEvent() {
-        fragmentHelper.setUpSettingsUiEvent(
-            this,
-            mainViewModel,
-            settingsViewModel,
-            ::navigateAppMessageDialog
-        )
-    }
 
     private fun setUpPendingNavigationCollector() {
         fragmentHelper

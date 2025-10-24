@@ -5,14 +5,18 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
+import com.websarva.wings.android.zuboradiary.ui.utils.firstNotNull
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.DialogViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlin.getValue
 
 abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
 
@@ -24,12 +28,14 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    internal val settingsViewModel: SettingsViewModel by activityViewModels()
+    internal val viewModel: DialogViewModel by viewModels()
 
     internal val fragmentHelper = FragmentHelper()
 
     internal val themeColor
-        get() = settingsViewModel.uiState.value.themeColor!!
+        get() = runBlocking(Dispatchers.Main.immediate) {
+            viewModel.themeColor.firstNotNull()
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
