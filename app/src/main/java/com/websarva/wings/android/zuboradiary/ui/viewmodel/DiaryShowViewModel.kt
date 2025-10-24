@@ -16,7 +16,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.ErrorType
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
@@ -24,7 +23,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryShowUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.DiaryUiStateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -37,7 +35,7 @@ internal class DiaryShowViewModel @Inject constructor(
     handle: SavedStateHandle,
     private val loadDiaryByIdUseCase: LoadDiaryByIdUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
-    diaryUiStateHelper: DiaryUiStateHelper
+    private val diaryUiStateHelper: DiaryUiStateHelper
 ) : BaseViewModel<DiaryShowEvent, DiaryShowAppMessage, DiaryShowUiState>(
     DiaryShowUiState()
 ) {
@@ -57,27 +55,8 @@ internal class DiaryShowViewModel @Inject constructor(
                 false
             )
 
-    private val diaryLoadStateFlow = uiState.map { it.diaryLoadState }
-
-    private val isWeather2VisibleFlow: Flow<Boolean> = diaryLoadStateFlow.mapNotNull {
-        (it as? LoadState.Success)?.data
-    }.map {
-        diaryUiStateHelper.isWeather2Visible(it)
-    }
-
-    private val numVisibleDiaryItemsFlow: Flow<Int> = diaryLoadStateFlow.mapNotNull {
-        (it as? LoadState.Success)?.data
-    }.map {
-        diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
-    }
-
-    private val diaryImageFilePathFlow: Flow<FilePathUi?> = diaryLoadStateFlow
-        .mapNotNull {
-            (it as? LoadState.Success)?.data
-        }.map {
-            diaryUiStateHelper
-                .buildImageFilePath(it)
-        }.catchUnexpectedError(null)
+    private val diaryFlow =
+        uiState.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
     // キャッシュパラメータ
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
@@ -88,25 +67,31 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private fun observeDerivedUiStateChanges() {
-        isWeather2VisibleFlow.onEach { isWeather2Visible ->
-            updateUiState { state ->
-                state.copy(
+        diaryFlow.map {
+            diaryUiStateHelper.isWeather2Visible(it)
+        }.onEach { isWeather2Visible ->
+            updateUiState {
+                it.copy(
                     isWeather2Visible = isWeather2Visible
                 )
             }
         }.launchIn(viewModelScope)
 
-        numVisibleDiaryItemsFlow.onEach { numVisibleDiaryItems ->
-            updateUiState { state ->
-                state.copy(
+        diaryFlow.map {
+            diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
+        }.onEach { numVisibleDiaryItems ->
+            updateUiState {
+                it.copy(
                     numVisibleDiaryItems = numVisibleDiaryItems
                 )
             }
         }.launchIn(viewModelScope)
 
-        diaryImageFilePathFlow.onEach { path ->
-            updateUiState { state ->
-                state.copy(
+        diaryFlow.map {
+            diaryUiStateHelper.buildImageFilePath(it)
+        }.catchUnexpectedError(null).onEach { path ->
+            updateUiState {
+                it.copy(
                     diaryImageFilePath = path
                 )
             }
