@@ -8,6 +8,8 @@ internal data class DiaryYearMonthListUi<T: DiaryDayListItemUi>(
     val itemList: List<DiaryYearMonthListItemUi<T>> = emptyList()
 ) : Parcelable {
 
+    val isEmpty get() = itemList.isEmpty()
+
     val isNotEmpty get() = itemList.isNotEmpty()
 
     fun countDiaries(): Int {

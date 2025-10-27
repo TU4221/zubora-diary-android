@@ -562,7 +562,7 @@ internal class DiaryListViewModel @Inject constructor(
         updateUiState {
             it.copy(
                 diaryList = list,
-                hasNoDiaries = !list.isNotEmpty, // TODO:isEmpty用意する？
+                hasNoDiaries = list.isEmpty,
                 isRefreshing = false,
                 isProcessing = false,
                 isInputDisabled = false,
