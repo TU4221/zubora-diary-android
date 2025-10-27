@@ -5,7 +5,6 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.SettingsState"/>
         <variable
             name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel" />

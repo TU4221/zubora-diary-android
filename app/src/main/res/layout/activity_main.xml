@@ -4,7 +4,6 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState" />
         <variable
             name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel" />
