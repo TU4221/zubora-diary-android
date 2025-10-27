@@ -18,12 +18,12 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomN
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryListState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.Year
 
@@ -34,6 +34,8 @@ class DiaryListFragment :
     RequiresBottomNavigation {
 
     override val destinationId = R.id.navigation_diary_list_fragment
+
+    private lateinit var diaryListAdapter: DiaryYearMonthListAdapter
 
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -129,46 +131,40 @@ class DiaryListFragment :
 
     // 日記リスト(年月)設定
     private fun setUpDiaryList() {
-        val diaryListAdapter = setUpListAdapter()
-
+        setUpListAdapter()
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.diaryList
+            mainViewModel.uiState.map { it.diaryList }
                 .collectLatest { value: DiaryYearMonthListUi<DiaryDayListItemUi.Standard> ->
-                    val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
-                    listAdapter.submitList(value.itemList) {
+                    diaryListAdapter.submitList(value.itemList) {
                         mainViewModel.onDiaryListUpdateCompleted()
                     }
                 }
         }
 
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState
+            mainViewModel.uiState.map { it.isLoadingOnScrolled }
                 .collectLatest { value ->
-                    val isEnabled =
-                        value != DiaryListState.LoadingAdditionDiaryList
-                    diaryListAdapter.setSwipeEnabled(isEnabled)
+                    diaryListAdapter.setSwipeEnabled(!value)
                 }
         }
     }
 
-    private fun setUpListAdapter(): DiaryYearMonthListAdapter {
-        val diaryListAdapter =
+    private fun setUpListAdapter() {
+        diaryListAdapter =
             object : DiaryYearMonthListAdapter(binding.recyclerDiaryList, themeColor) {
                 override fun loadListOnScrollEnd() {
                     mainViewModel.onDiaryListEndScrolled()
                 }
+            }.apply {
+                build()
+                registerOnChildItemClickListener { item: DiaryDayListItemUi.Standard ->
+                    mainViewModel.onDiaryListItemClick(item)
+                }
+                registerOnChildItemBackgroundButtonClickListener { item: DiaryDayListItemUi.Standard ->
+                    mainViewModel.onDiaryListItemDeleteButtonClick(item)
+                }
             }
-
-        return diaryListAdapter.apply {
-            build()
-            registerOnChildItemClickListener { item: DiaryDayListItemUi.Standard ->
-                mainViewModel.onDiaryListItemClick(item)
-            }
-            registerOnChildItemBackgroundButtonClickListener { item: DiaryDayListItemUi.Standard ->
-                mainViewModel.onDiaryListItemDeleteButtonClick(item)
-            }
-        }
     }
 
     private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {

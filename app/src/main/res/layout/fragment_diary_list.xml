@@ -53,7 +53,7 @@
                     android:textAppearance="@style/AppTextViewTextAppearance"
                     android:text="@string/fragment_diary_list_no_saved_diary_message"
                     android:gravity="center"
-                    android:visibility="@{viewModel.uiState instanceof DiaryListState.NoDiaries ? View.VISIBLE : View.INVISIBLE}"
+                    android:visibility="@{viewModel.uiState.hasNoDiaries ? View.VISIBLE : View.INVISIBLE}"
                     tools:visibility="visible"/>
 
                 <!-- MEMO:スクロールバーを表示させたいが、子RecyclerViewに反応してスクロールバーの長さが安定しない。
@@ -63,7 +63,7 @@
                     android:id="@+id/recycler_diary_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:visibility="@{viewModel.uiState instanceof DiaryListState.NoDiaries ? View.INVISIBLE : View.VISIBLE}"
+                    android:visibility="@{viewModel.uiState.hasNoDiaries ? View.INVISIBLE : View.VISIBLE}"
                     android:scrollbars="none"
                     tools:visibility="visible"/>
 
@@ -81,7 +81,7 @@
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_edit_24px"
             android:contentDescription="@string/fragment_diary_list_fab_new_diary_creation"
-            android:enabled="@{viewModel.uiState instanceof DiaryListState.UpdatingDiaryList ? false : true}"
+            android:enabled="@{!viewModel.uiState.isRefreshing}"
             android:onClick="@{() -> viewModel.onDiaryEditButtonClick()}"
             app:applySystemInsetsToMarginRight="@{true}" />
 
