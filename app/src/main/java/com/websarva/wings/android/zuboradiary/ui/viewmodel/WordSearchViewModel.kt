@@ -1,6 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
@@ -18,120 +20,116 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Wor
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
+import com.websarva.wings.android.zuboradiary.ui.model.state.ui.WordSearchUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 internal class WordSearchViewModel @Inject internal constructor(
+    handle: SavedStateHandle,
     private val countWordSearchResultsUseCase: CountWordSearchResultsUseCase,
     private val loadNewWordSearchResultListUseCase: LoadNewWordSearchResultListUseCase,
     private val loadAdditionWordSearchResultListUseCase: LoadAdditionWordSearchResultListUseCase,
     private val refreshWordSearchResultListUseCase: RefreshWordSearchResultListUseCase
-) : BaseViewModel<WordSearchEvent, WordSearchAppMessage, WordSearchState>(
-    WordSearchState.Idle
+) : BaseViewModel<WordSearchEvent, WordSearchAppMessage, WordSearchUiState>(
+    handle.get<WordSearchUiState>(SAVED_UI_STATE_KEY)?.copy(
+        isLoadingOnScrolled = false,
+        isProcessing = false,
+        isInputDisabled = false
+    ) ?: WordSearchUiState()
 ) {
+
+    companion object {
+        private const val SAVED_UI_STATE_KEY = "uiState"
+    }
 
     override val isProgressIndicatorVisible =
         uiState
-            .map { state ->
-                when (state) {
-                    WordSearchState.Updating -> true
-
-                    WordSearchState.Searching,
-                    WordSearchState.AdditionLoading -> false
-
-                    WordSearchState.Idle,
-                    WordSearchState.ShowingResultList,
-                    WordSearchState.NoResults -> false
-                }
+            .map {
+                it.isProcessing
             }.stateInWhileSubscribed(
                 false
             )
 
-    private val _searchWord = MutableStateFlow("")
-    val searchWord
-        get() = _searchWord.asStateFlow()
-    val searchWordForBinding: MutableStateFlow<String>
-        get() = _searchWord
+    private val isReadyForOperation
+        get() = !currentUiState.isInputDisabled
 
-    private var previousSearchWord = "" // 二重検索防止用
+    private val currentUiState
+        get() = uiState.value
 
     private val initialWordSearchResultListLoadJob: Job? = null
     private var wordSearchResultListLoadJob: Job? = initialWordSearchResultListLoadJob // キャンセル用
 
-    private val initialWordSearchResultList = DiaryYearMonthList<DiaryDayListItem.WordSearchResult>()
-    private val _wordSearchResultList = MutableStateFlow(initialWordSearchResultList)
-    val wordSearchResultList
-        get() = _wordSearchResultList
-            .map { it.toUiModel() }
-            .stateInWhileSubscribed(_wordSearchResultList.value.toUiModel())
+    private var isRestoringFromProcessDeath: Boolean = false
 
-    private val initialNumWordSearchResults = 0
-    private val _numWordSearchResults = MutableStateFlow(initialNumWordSearchResults)
-    val numWordSearchResults
-        get() = _numWordSearchResults.asStateFlow()
+    init {
+        checkForRestoration(handle)
+        observeDerivedUiStateChanges(handle)
+        observeUiStateChanges()
+    }
 
-    // MEMO:画面遷移、回転時の更新フラグ
-    private var shouldUpdateWordSearchResultList = false
-
-    private val initialIsLoadingOnScrolled = false
-    private var isLoadingOnScrolled = initialIsLoadingOnScrolled
-
-    val isResultsVisible =
-        uiState.map { value ->
-            when (value) {
-                WordSearchState.Searching,
-                WordSearchState.AdditionLoading,
-                WordSearchState.Updating,
-                WordSearchState.ShowingResultList -> true
-
-                WordSearchState.Idle,
-                WordSearchState.NoResults -> false
-            }
-        }.stateInWhileSubscribed(
-            false
+    private fun checkForRestoration(handle: SavedStateHandle) {
+        updateIsRestoringFromProcessDeath(
+            handle.contains(SAVED_UI_STATE_KEY)
         )
+    }
 
-    val isNumResultsVisible =
-        uiState.map { value ->
-            when (value) {
-                WordSearchState.AdditionLoading,
-                WordSearchState.Updating,
-                WordSearchState.ShowingResultList -> true
+    private fun observeDerivedUiStateChanges(handle: SavedStateHandle) {
+        uiState.onEach {
+            Log.d(logTag, it.toString())
+            handle[SAVED_UI_STATE_KEY] = it
+        }.launchIn(viewModelScope)
+    }
 
-                WordSearchState.Idle,
-                WordSearchState.Searching,
-                WordSearchState.NoResults -> false
-            }
-        }.stateInWhileSubscribed(
-            false
-        )
+    private fun observeUiStateChanges() {
+        viewModelScope.launch {
+            uiState.map { it.searchWord }
+                .distinctUntilChanged()
+                .collectLatest {
+                    try {
+                        val currentNumWordSearchResults = currentUiState.numWordSearchResults
+                        val currentResultList = currentUiState.wordSearchResultList
+                        if (isRestoringFromProcessDeath) {
+                            refreshWordSearchResultList(
+                                currentNumWordSearchResults,
+                                currentResultList,
+                                it
+                            )
+                            updateIsRestoringFromProcessDeath(false)
+                            return@collectLatest
+                        }
 
-    val isNoResultsMessageVisible =
-        uiState.map { value ->
-            when (value) {
-                WordSearchState.NoResults -> true
-
-                WordSearchState.Idle,
-                WordSearchState.Searching,
-                WordSearchState.AdditionLoading,
-                WordSearchState.Updating,
-                WordSearchState.ShowingResultList -> false
-            }
-        }.stateInWhileSubscribed(
-            false
-        )
+                        if (it.isEmpty()) {
+                            emitUiEvent(WordSearchEvent.ShowKeyboard)
+                            clearWordSearchResultList()
+                        } else {
+                            loadNewWordSearchResultList(
+                                currentNumWordSearchResults,
+                                currentResultList,
+                                it
+                            )
+                        }
+                    } catch (e: Exception) {
+                        emitUnexpectedAppMessage(e)
+                    }
+                }
+        }
+    }
 
     override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): WordSearchEvent {
         return WordSearchEvent.CommonEvent(
@@ -174,16 +172,25 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     // View状態処理
+    fun onSearchWordTextChanged(text: CharSequence) {
+        updateSearchWord(text.toString())
+    }
+
     fun onWordSearchResultListEndScrolled() {
-        if (isLoadingOnScrolled) return
+        if (currentUiState.isLoadingOnScrolled) return
         updateIsLoadingOnScrolled(true)
 
-        val currentResultList = _wordSearchResultList.value
-        val searchWord = _searchWord.value
+        val currentNumWordSearchResults = currentUiState.numWordSearchResults
+        val currentResultList = currentUiState.wordSearchResultList
+        val searchWord = currentUiState.searchWord
         cancelPreviousLoadJob()
         wordSearchResultListLoadJob =
             launchWithUnexpectedErrorHandler {
-                loadAdditionWordSearchResultList(currentResultList, searchWord)
+                loadAdditionWordSearchResultList(
+                    currentNumWordSearchResults,
+                    currentResultList,
+                    searchWord
+                )
             }
     }
 
@@ -193,17 +200,22 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // Ui状態処理
     fun onUiReady() {
-        if (!shouldUpdateWordSearchResultList) return
+        if (!currentUiState.shouldRefreshWordSearchResultList) return
         updateShouldUpdateWordSearchResultList(false)
-        if (uiState.value != WordSearchState.ShowingResultList) return
+        if (!isReadyForOperation) return
 
-        val currentResultList = _wordSearchResultList.value
-        val currentSearchWord = _searchWord.value
+        val currentNumWordSearchResults = currentUiState.numWordSearchResults
+        val currentResultList = currentUiState.wordSearchResultList
+        val currentSearchWord = currentUiState.searchWord
 
         cancelPreviousLoadJob()
         wordSearchResultListLoadJob =
             launchWithUnexpectedErrorHandler {
-                updateWordSearchResultList(currentResultList, currentSearchWord)
+                refreshWordSearchResultList(
+                    currentNumWordSearchResults,
+                    currentResultList,
+                    currentSearchWord
+                )
             }
     }
 
@@ -211,50 +223,23 @@ internal class WordSearchViewModel @Inject internal constructor(
         updateShouldUpdateWordSearchResultList(true)
     }
 
-    // StateFlow値変更時処理
-    fun onSearchWordChanged(value: String) {
-        launchWithUnexpectedErrorHandler {
-            prepareKeyboard(value)
-        }
-
-        // HACK:画面再表示時(Pause -> Resume)にCollectorが起動してしまい
-        //      同じキーワードで不必要に検索してしまう。防止策として下記条件追加。
-        if (value == previousSearchWord) return
-
-        val currentResultList = _wordSearchResultList.value
-        cancelPreviousLoadJob()
-        wordSearchResultListLoadJob =
-            launchWithUnexpectedErrorHandler {
-                if (value.isEmpty()) {
-                    clearWordSearchResultList()
-                } else {
-                    loadNewWordSearchResultList(currentResultList, value)
-                }
-
-                updatePreviousSearchWord(value)
-            }
-    }
-
     // データ処理
-    private suspend fun prepareKeyboard(searchWord: String) {
-        if (searchWord.isEmpty()) emitUiEvent(WordSearchEvent.ShowKeyboard)
-    }
-
     private fun cancelPreviousLoadJob() {
         val job = wordSearchResultListLoadJob ?: return
         if (!job.isCompleted) job.cancel()
     }
 
     private suspend fun loadNewWordSearchResultList(
-        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
+        currentNumWordSearchResults: Int,
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String
     ) {
         executeLoadWordSearchResultList(
-            WordSearchState.Searching,
+            { updateToWordSearchResultListNewLoadState() },
+            currentNumWordSearchResults,
             currentResultList,
             searchWord,
             { _, lambdaSearchWord ->
-                showWordSearchResultListFirstItemProgressIndicator()
                 loadNewWordSearchResultListUseCase(
                     SearchWord(lambdaSearchWord)
                 )
@@ -275,16 +260,16 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private suspend fun loadAdditionWordSearchResultList(
-        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
+        currentNumWordSearchResults: Int,
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String
     ) {
         executeLoadWordSearchResultList(
-            WordSearchState.AdditionLoading,
+            { updateToWordSearchResultListAdditionLoadState() },
+            currentNumWordSearchResults,
             currentResultList,
             searchWord,
             { lambdaCurrentList, lambdaSearchWord ->
-                require(lambdaCurrentList.isNotEmpty)
-
                 loadAdditionWordSearchResultListUseCase(
                     lambdaCurrentList,
                     SearchWord(lambdaSearchWord)
@@ -305,12 +290,14 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
     }
 
-    private suspend fun updateWordSearchResultList(
-        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
+    private suspend fun refreshWordSearchResultList(
+        currentNumWordSearchResults: Int,
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String
     ) {
         executeLoadWordSearchResultList(
-            WordSearchState.Updating,
+            { updateToWordSearchResultListRefreshState() },
+            currentNumWordSearchResults,
             currentResultList,
             searchWord,
             { lambdaCurrentList, lambdaSearchWord ->
@@ -335,37 +322,27 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private suspend fun <E : UseCaseException> executeLoadWordSearchResultList(
-        state: WordSearchState,
-        currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
+        updateToLoadingUiState: suspend () -> Unit,
+        currentNumWordSearchResults: Int,
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
         searchWord: String,
-        processLoad: suspend (
+        executeLoad: suspend (
             currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
             searchWord: String
         ) -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, E>,
         emitAppMessageOnFailure: suspend (E) -> Unit
     ) {
-        require(
-            when (state) {
-                WordSearchState.Searching,
-                WordSearchState.AdditionLoading,
-                WordSearchState.Updating -> true
-
-                WordSearchState.Idle,
-                WordSearchState.NoResults,
-                WordSearchState.ShowingResultList -> false
-            }
-        )
-
-        val logMsg = "ワード検索結果読込($state)"
-        Log.i(logTag, "${logMsg}_開始")
-
         val searchWordNotEmpty = searchWord.ifEmpty { return }
 
-        updateUiState(state)
+        val logMsg = "ワード検索結果読込"
+        Log.i(logTag, "${logMsg}_開始")
+
+        updateToLoadingUiState()
         try {
+            val updateNumWordSearchResults: Int
             when (val result  = countWordSearchResultsUseCase(SearchWord(searchWordNotEmpty))) {
                 is UseCaseResult.Success -> {
-                    updateNumWordSearchResults(result.value)
+                    updateNumWordSearchResults = result.value
                 }
                 is UseCaseResult.Failure -> {
                     when (result.exception) {
@@ -382,76 +359,127 @@ internal class WordSearchViewModel @Inject internal constructor(
                 }
             }
 
-            when (val result = processLoad(currentResultList, searchWordNotEmpty)) {
+            when (val result = executeLoad(currentResultList.toDomainModel(), searchWordNotEmpty)) {
                 is UseCaseResult.Success -> {
-                    val updateResultList = result.value
-                    updateWordSearchResultList(updateResultList)
-                    updateUiStateOnWorSearchResultListLoadCompleted(updateResultList)
+                    val updateResultList = result.value.toUiModel()
+                    updateToWordSearchResultListLoadCompletedState(
+                        updateNumWordSearchResults,
+                        updateResultList
+                    )
                     Log.i(logTag, "${logMsg}_完了")
                 }
                 is UseCaseResult.Failure -> {
                     Log.e(logTag, "${logMsg}_失敗", result.exception)
-                    updateWordSearchResultList(currentResultList)
-                    updateUiStateOnWorSearchResultListLoadCompleted(currentResultList)
+                    updateToWordSearchResultListLoadCompletedState(
+                        currentNumWordSearchResults,
+                        currentResultList
+                    )
                     emitAppMessageOnFailure(result.exception)
                 }
             }
 
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
-            updateUiStateOnWorSearchResultListLoadCompleted(currentResultList)
+            updateToWordSearchResultListLoadCompletedState(
+                currentNumWordSearchResults,
+                currentResultList
+            )
             throw e // 再スローしてコルーチン処理を中断させる
         }
     }
 
-    private fun updateUiStateOnWorSearchResultListLoadCompleted(
-        list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>
-    ) {
-        val state =
-            if (list.isNotEmpty) {
-                WordSearchState.ShowingResultList
-            } else {
-                WordSearchState.NoResults
-            }
-        updateUiState(state)
-    }
-
-    private fun showWordSearchResultListFirstItemProgressIndicator() {
-        updateWordSearchResultList(
-            DiaryYearMonthList(
-                listOf(
-                    DiaryYearMonthListItem.ProgressIndicator()
-                )
-            )
-        )
+    private fun updateIsRestoringFromProcessDeath(bool: Boolean) {
+        isRestoringFromProcessDeath = bool
     }
 
     private fun clearWordSearchResultList() {
-        updateUiState(WordSearchState.Idle)
         cancelPreviousLoadJob()
         wordSearchResultListLoadJob = initialWordSearchResultListLoadJob
-        updateWordSearchResultList(initialWordSearchResultList)
-        updateNumWordSearchResults(initialNumWordSearchResults)
-        updateIsLoadingOnScrolled(initialIsLoadingOnScrolled)
+        updateUiState {
+            WordSearchUiState()
+        }
     }
 
-    private fun updatePreviousSearchWord(searchWord: String) {
-        previousSearchWord = searchWord
-    }
-
-    private fun updateWordSearchResultList(list: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>) {
-        _wordSearchResultList.value = list
-    }
-
-    private fun updateNumWordSearchResults(count: Int) {
-        _numWordSearchResults.value = count
+    private fun updateSearchWord(searchWord: String) {
+        updateUiState {
+            it.copy(
+                searchWord = searchWord
+            )
+        }
     }
 
     private fun updateShouldUpdateWordSearchResultList(shouldUpdate: Boolean) {
-        shouldUpdateWordSearchResultList = shouldUpdate
+        updateUiState {
+            it.copy(
+                shouldRefreshWordSearchResultList = shouldUpdate
+            )
+        }
     }
 
     private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
-        isLoadingOnScrolled = isLoading
+        updateUiState {
+            it.copy(
+                isLoadingOnScrolled = isLoading
+            )
+        }
+    }
+
+    private fun updateToWordSearchResultListNewLoadState() {
+        val list =
+            DiaryYearMonthList<DiaryDayListItem.WordSearchResult>(
+                listOf(
+                    DiaryYearMonthListItem.ProgressIndicator()
+                )
+            ).toUiModel()
+        updateUiState {
+            it.copy(
+                wordSearchResultList = list,
+                hasNoWordSearchResults = false,
+                isNumWordSearchResultsVisible = false,
+                isWordSearchResultListVisible = true,
+                isProcessing = false,
+                isInputDisabled = true
+            )
+        }
+    }
+
+    private fun updateToWordSearchResultListAdditionLoadState() {
+        updateUiState {
+            it.copy(
+                hasNoWordSearchResults = false,
+                isNumWordSearchResultsVisible = true,
+                isWordSearchResultListVisible = true,
+                isProcessing = false,
+                isInputDisabled = true
+            )
+        }
+    }
+
+    private fun updateToWordSearchResultListRefreshState() {
+        updateUiState {
+            it.copy(
+                isTopScrollFabEnabled = true,
+                isProcessing = true,
+                isInputDisabled = true
+            )
+        }
+    }
+
+    private fun updateToWordSearchResultListLoadCompletedState(
+        numWordSearchResults: Int,
+        list: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>
+    ) {
+        updateUiState {
+            it.copy(
+                numWordSearchResults = numWordSearchResults,
+                wordSearchResultList = list,
+                hasNoWordSearchResults = list.isEmpty,
+                isNumWordSearchResultsVisible = !list.isEmpty,
+                isWordSearchResultListVisible = !list.isEmpty,
+                isTopScrollFabEnabled = false,
+                isProcessing = false,
+                isInputDisabled = false,
+            )
+        }
     }
 }

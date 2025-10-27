@@ -18,7 +18,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonth
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
 @AndroidEntryPoint
@@ -33,6 +34,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: WordSearchViewModel by viewModels()
 
+    private lateinit var wordSearchResultListAdapter: WordSearchResultYearMonthListAdapter
+
     override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): FragmentWordSearchBinding {
@@ -46,8 +49,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpWordSearchView()
-        setUpWordSearchResultList()
+        observeUiState()
+        setUpWordSearchResultListAdapter()
         setUpFloatingActionButton()
 
         mainViewModel.onUiReady()
@@ -78,35 +81,25 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         }
     }
 
-    private fun setUpWordSearchView() {
+    private fun observeUiState() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.searchWord
-                .collectLatest { value: String ->
-                    mainViewModel.onSearchWordChanged(value)
+            mainViewModel.uiState
+                .map { it.wordSearchResultList }.distinctUntilChanged().collect {
+                    updateWordSearchResultList(it)
                 }
         }
     }
 
-    private fun setUpWordSearchResultList() {
-        setUpListAdapter()
-
-        binding.floatingActionButtonTopScroll.hide() // MEMO:初回起動用
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.wordSearchResultList
-                .collectLatest { value: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult> ->
-                    val listAdapter =
-                        binding.recyclerWordSearchResultList.adapter
-                                as WordSearchResultYearMonthListAdapter
-                    listAdapter.submitList(value.itemList) {
-                        mainViewModel.onWordSearchResultListUpdateCompleted()
-                    }
-                }
+    private fun updateWordSearchResultList(
+        list: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>
+    ) {
+        wordSearchResultListAdapter.submitList(list.itemList) {
+            mainViewModel.onWordSearchResultListUpdateCompleted()
         }
     }
 
-    private fun setUpListAdapter() {
-        val wordSearchResultListAdapter =
+    private fun setUpWordSearchResultListAdapter() {
+        wordSearchResultListAdapter =
             object : WordSearchResultYearMonthListAdapter(
                 binding.recyclerWordSearchResultList,
                 themeColor
@@ -125,8 +118,11 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
     }
 
     private fun setUpFloatingActionButton() {
-        binding.floatingActionButtonTopScroll.setOnClickListener {
-            resultListScrollToFirstPosition()
+        binding.floatingActionButtonTopScroll.apply {
+            hide() // MEMO:初回起動用
+            setOnClickListener {
+                wordSearchResultListAdapter.scrollToTop()
+            }
         }
         binding.recyclerWordSearchResultList.addOnScrollListener(object :
             RecyclerView.OnScrollListener() {
@@ -140,13 +136,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
                 }
             }
         })
-    }
-
-    //日記リスト(年月)を自動でトップへスクロールさせるメソッド。
-    private fun resultListScrollToFirstPosition() {
-        val adapter = binding.recyclerWordSearchResultList.adapter
-        val listAdapter = adapter as WordSearchResultYearMonthListAdapter
-        listAdapter.scrollToTop()
     }
 
     private fun navigateDiaryShowFragment(id: String, date: LocalDate) {

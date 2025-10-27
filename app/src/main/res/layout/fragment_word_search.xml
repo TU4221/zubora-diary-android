@@ -5,7 +5,6 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.WordSearchState" />
         <variable
             name="viewModel"
             type="com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel" />
@@ -64,7 +63,8 @@
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
                                 android:textAppearance="@style/WordSearchTextInputEditTextTextAppearance"
-                                android:text="@={viewModel.searchWordForBinding}" />
+                                android:text="@{viewModel.uiState.searchWord}"
+                                android:onTextChanged="@{(s, start, before, count) -> viewModel.onSearchWordTextChanged(s)}" />
 
                         </com.google.android.material.textfield.TextInputLayout>
 
@@ -87,7 +87,7 @@
                     android:text="@string/fragment_word_search_no_results_message"
                     android:gravity="center_horizontal"
                     android:paddingTop="100dp"
-                    android:visibility="@{viewModel.isNoResultsMessageVisible ? View.VISIBLE : View.INVISIBLE}"
+                    android:visibility="@{viewModel.uiState.hasNoWordSearchResults ? View.VISIBLE : View.INVISIBLE}"
                     tools:visibility="visible"/>
 
                 <LinearLayout
@@ -95,7 +95,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:visibility="@{viewModel.isResultsVisible ? View.VISIBLE : View.INVISIBLE}"
+                    android:visibility="@{viewModel.uiState.isWordSearchResultListVisible ? View.VISIBLE : View.INVISIBLE}"
                     tools:visibility="visible" >
 
                     <TextView
@@ -104,9 +104,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:textAppearance="@style/AppTextViewTextAppearance"
-                        android:text="@{Integer.toString(viewModel.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
+                        android:text="@{Integer.toString(viewModel.uiState.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
                         android:padding="8dp"
-                        android:visibility="@{viewModel.isNumResultsVisible ? View.VISIBLE : View.INVISIBLE}"
+                        android:visibility="@{viewModel.uiState.isNumWordSearchResultsVisible ? View.VISIBLE : View.INVISIBLE}"
                         app:applySystemInsetsToPaddingLeft="@{true}"
                         tools:visibility="visible" />
 
@@ -137,7 +137,7 @@
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_arrow_upward_24px"
             android:contentDescription="@string/fragment_word_search_fab_top_scroll"
-            android:enabled="@{viewModel.uiState instanceof WordSearchState.Updating ? false : true}"
+            android:enabled="@{!viewModel.uiState.topScrollFabEnabled}"
             app:applySystemInsetsToMarginRight="@{true}"
             app:applySystemInsetsToMarginBottom="@{true}" />
 
