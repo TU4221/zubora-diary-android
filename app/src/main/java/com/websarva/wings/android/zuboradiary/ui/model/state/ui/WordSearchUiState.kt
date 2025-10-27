@@ -11,12 +11,11 @@ internal data class WordSearchUiState(
     val searchWord: String = "",
     val numWordSearchResults: Int = 0,
     val wordSearchResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult> = DiaryYearMonthListUi(),
-    val shouldRefreshWordSearchResultList: Boolean = false, // MEMO:画面遷移、回転時の更新フラグ
-    val isLoadingOnScrolled: Boolean = false,
-    val hasNoWordSearchResults: Boolean = false,
-    val isTopScrollFabEnabled: Boolean = false,
-    val isNumWordSearchResultsVisible: Boolean = false,
-    val isWordSearchResultListVisible: Boolean = false,
+
     val isProcessing: Boolean = false,
-    val isInputDisabled: Boolean = false
+    val isInputDisabled: Boolean = false,
+    val isIdle: Boolean = true,
+    val isRefreshing: Boolean = false,
+    val isWordSearchCompleted: Boolean = false,
+    val hasNoWordSearchResults: Boolean = false,
 ) : UiState, Parcelable

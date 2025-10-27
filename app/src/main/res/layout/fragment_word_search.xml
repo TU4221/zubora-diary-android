@@ -95,7 +95,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
-                    android:visibility="@{viewModel.uiState.isWordSearchResultListVisible ? View.VISIBLE : View.INVISIBLE}"
+                    android:visibility="@{!viewModel.uiState.isIdle ? View.VISIBLE : View.INVISIBLE}"
                     tools:visibility="visible" >
 
                     <TextView
@@ -106,7 +106,7 @@
                         android:textAppearance="@style/AppTextViewTextAppearance"
                         android:text="@{Integer.toString(viewModel.uiState.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
                         android:padding="8dp"
-                        android:visibility="@{viewModel.uiState.isNumWordSearchResultsVisible ? View.VISIBLE : View.INVISIBLE}"
+                        android:visibility="@{viewModel.uiState.isWordSearchCompleted ? View.VISIBLE : View.INVISIBLE}"
                         app:applySystemInsetsToPaddingLeft="@{true}"
                         tools:visibility="visible" />
 
@@ -137,7 +137,7 @@
             android:layout_marginBottom="@dimen/fab_margin_bottom"
             android:src="@drawable/ic_arrow_upward_24px"
             android:contentDescription="@string/fragment_word_search_fab_top_scroll"
-            android:enabled="@{!viewModel.uiState.topScrollFabEnabled}"
+            android:enabled="@{!viewModel.uiState.isRefreshing}"
             app:applySystemInsetsToMarginRight="@{true}"
             app:applySystemInsetsToMarginBottom="@{true}" />
 

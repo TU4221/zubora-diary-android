@@ -47,11 +47,13 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val loadAdditionWordSearchResultListUseCase: LoadAdditionWordSearchResultListUseCase,
     private val refreshWordSearchResultListUseCase: RefreshWordSearchResultListUseCase
 ) : BaseViewModel<WordSearchEvent, WordSearchAppMessage, WordSearchUiState>(
-    handle.get<WordSearchUiState>(SAVED_UI_STATE_KEY)?.copy(
-        isLoadingOnScrolled = false,
-        isProcessing = false,
-        isInputDisabled = false
-    ) ?: WordSearchUiState()
+    handle.get<WordSearchUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
+        WordSearchUiState().copy(
+            searchWord = savedUiState.searchWord,
+            numWordSearchResults = savedUiState.numWordSearchResults,
+            wordSearchResultList = savedUiState.wordSearchResultList,
+        )
+    } ?: WordSearchUiState()
 ) {
 
     companion object {
@@ -77,6 +79,10 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private var isRestoringFromProcessDeath: Boolean = false
 
+    private var needsRefreshWordSearchResultList: Boolean = false // MEMO:画面遷移、回転時の更新フラグ
+
+    private var isLoadingOnScrolled: Boolean = false
+
     init {
         checkForRestoration(handle)
         observeDerivedUiStateChanges(handle)
@@ -98,36 +104,26 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun observeUiStateChanges() {
         viewModelScope.launch {
-            uiState.map { it.searchWord }
-                .distinctUntilChanged()
-                .collectLatest {
-                    try {
-                        val currentNumWordSearchResults = currentUiState.numWordSearchResults
-                        val currentResultList = currentUiState.wordSearchResultList
-                        if (isRestoringFromProcessDeath) {
-                            refreshWordSearchResultList(
-                                currentNumWordSearchResults,
-                                currentResultList,
-                                it
-                            )
-                            updateIsRestoringFromProcessDeath(false)
-                            return@collectLatest
-                        }
-
-                        if (it.isEmpty()) {
-                            emitUiEvent(WordSearchEvent.ShowKeyboard)
-                            clearWordSearchResultList()
-                        } else {
-                            loadNewWordSearchResultList(
-                                currentNumWordSearchResults,
-                                currentResultList,
-                                it
-                            )
-                        }
-                    } catch (e: Exception) {
-                        emitUnexpectedAppMessage(e)
+            uiState.distinctUntilChanged { oldState, newState ->
+                oldState.searchWord == newState.searchWord
+            }.collectLatest {
+                try {
+                    if (isRestoringFromProcessDeath) {
+                        updateIsRestoringFromProcessDeath(false)
+                        refreshWordSearchResultList(it)
+                        return@collectLatest
                     }
+
+                    if (it.searchWord.isEmpty()) {
+                        emitUiEvent(WordSearchEvent.ShowKeyboard)
+                        clearWordSearchResultList()
+                    } else {
+                        loadNewWordSearchResultList(it)
+                    }
+                } catch (e: Exception) {
+                    emitUnexpectedAppMessage(e)
                 }
+            }
         }
     }
 
@@ -177,20 +173,14 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     fun onWordSearchResultListEndScrolled() {
-        if (currentUiState.isLoadingOnScrolled) return
+        if (isLoadingOnScrolled) return
         updateIsLoadingOnScrolled(true)
 
-        val currentNumWordSearchResults = currentUiState.numWordSearchResults
-        val currentResultList = currentUiState.wordSearchResultList
-        val searchWord = currentUiState.searchWord
+        val currentUiState = currentUiState
         cancelPreviousLoadJob()
         wordSearchResultListLoadJob =
             launchWithUnexpectedErrorHandler {
-                loadAdditionWordSearchResultList(
-                    currentNumWordSearchResults,
-                    currentResultList,
-                    searchWord
-                )
+                loadAdditionWordSearchResultList(currentUiState)
             }
     }
 
@@ -200,27 +190,20 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     // Ui状態処理
     fun onUiReady() {
-        if (!currentUiState.shouldRefreshWordSearchResultList) return
-        updateShouldUpdateWordSearchResultList(false)
+        if (!needsRefreshWordSearchResultList) return
+        updateNeedsRefreshWordSearchResultList(false)
         if (!isReadyForOperation) return
 
-        val currentNumWordSearchResults = currentUiState.numWordSearchResults
-        val currentResultList = currentUiState.wordSearchResultList
-        val currentSearchWord = currentUiState.searchWord
-
+        val currentUiState = currentUiState
         cancelPreviousLoadJob()
         wordSearchResultListLoadJob =
             launchWithUnexpectedErrorHandler {
-                refreshWordSearchResultList(
-                    currentNumWordSearchResults,
-                    currentResultList,
-                    currentSearchWord
-                )
+                refreshWordSearchResultList(currentUiState)
             }
     }
 
     fun onUiGone() {
-        updateShouldUpdateWordSearchResultList(true)
+        updateNeedsRefreshWordSearchResultList(true)
     }
 
     // データ処理
@@ -229,20 +212,12 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (!job.isCompleted) job.cancel()
     }
 
-    private suspend fun loadNewWordSearchResultList(
-        currentNumWordSearchResults: Int,
-        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
-        searchWord: String
-    ) {
+    private suspend fun loadNewWordSearchResultList(currentUiState: WordSearchUiState) {
         executeLoadWordSearchResultList(
             { updateToWordSearchResultListNewLoadState() },
-            currentNumWordSearchResults,
-            currentResultList,
-            searchWord,
-            { _, lambdaSearchWord ->
-                loadNewWordSearchResultListUseCase(
-                    SearchWord(lambdaSearchWord)
-                )
+            currentUiState,
+            { _, searchWord ->
+                loadNewWordSearchResultListUseCase(searchWord)
             },
             { exception ->
                 when (exception) {
@@ -259,21 +234,12 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
     }
 
-    private suspend fun loadAdditionWordSearchResultList(
-        currentNumWordSearchResults: Int,
-        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
-        searchWord: String
-    ) {
+    private suspend fun loadAdditionWordSearchResultList(currentUiState: WordSearchUiState) {
         executeLoadWordSearchResultList(
             { updateToWordSearchResultListAdditionLoadState() },
-            currentNumWordSearchResults,
-            currentResultList,
-            searchWord,
-            { lambdaCurrentList, lambdaSearchWord ->
-                loadAdditionWordSearchResultListUseCase(
-                    lambdaCurrentList,
-                    SearchWord(lambdaSearchWord)
-                )
+            currentUiState,
+            { currentList, searchWord ->
+                loadAdditionWordSearchResultListUseCase(currentList, searchWord)
             },
             { exception ->
                 when (exception) {
@@ -290,21 +256,12 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
     }
 
-    private suspend fun refreshWordSearchResultList(
-        currentNumWordSearchResults: Int,
-        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
-        searchWord: String
-    ) {
+    private suspend fun refreshWordSearchResultList(currentUiState: WordSearchUiState) {
         executeLoadWordSearchResultList(
             { updateToWordSearchResultListRefreshState() },
-            currentNumWordSearchResults,
-            currentResultList,
-            searchWord,
-            { lambdaCurrentList, lambdaSearchWord ->
-                refreshWordSearchResultListUseCase(
-                    lambdaCurrentList,
-                    SearchWord(lambdaSearchWord)
-                )
+            currentUiState,
+            { currentList, searchWord ->
+                refreshWordSearchResultListUseCase(currentList, searchWord)
             },
             { exception ->
                 when (exception) {
@@ -323,24 +280,23 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private suspend fun <E : UseCaseException> executeLoadWordSearchResultList(
         updateToLoadingUiState: suspend () -> Unit,
-        currentNumWordSearchResults: Int,
-        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
-        searchWord: String,
+        currentUiState: WordSearchUiState,
         executeLoad: suspend (
             currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
-            searchWord: String
+            searchWord: SearchWord
         ) -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, E>,
         emitAppMessageOnFailure: suspend (E) -> Unit
     ) {
-        val searchWordNotEmpty = searchWord.ifEmpty { return }
+        val searchWord = SearchWord(currentUiState.searchWord)
 
         val logMsg = "ワード検索結果読込"
         Log.i(logTag, "${logMsg}_開始")
 
+
         updateToLoadingUiState()
         try {
             val updateNumWordSearchResults: Int
-            when (val result  = countWordSearchResultsUseCase(SearchWord(searchWordNotEmpty))) {
+            when (val result  = countWordSearchResultsUseCase(searchWord)) {
                 is UseCaseResult.Success -> {
                     updateNumWordSearchResults = result.value
                 }
@@ -359,7 +315,8 @@ internal class WordSearchViewModel @Inject internal constructor(
                 }
             }
 
-            when (val result = executeLoad(currentResultList.toDomainModel(), searchWordNotEmpty)) {
+            val currentResultList = currentUiState.wordSearchResultList
+            when (val result = executeLoad(currentResultList.toDomainModel(), searchWord)) {
                 is UseCaseResult.Success -> {
                     val updateResultList = result.value.toUiModel()
                     updateToWordSearchResultListLoadCompletedState(
@@ -370,26 +327,16 @@ internal class WordSearchViewModel @Inject internal constructor(
                 }
                 is UseCaseResult.Failure -> {
                     Log.e(logTag, "${logMsg}_失敗", result.exception)
-                    updateToWordSearchResultListLoadCompletedState(
-                        currentNumWordSearchResults,
-                        currentResultList
-                    )
+                    updateUiState { currentUiState }
                     emitAppMessageOnFailure(result.exception)
                 }
             }
 
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
-            updateToWordSearchResultListLoadCompletedState(
-                currentNumWordSearchResults,
-                currentResultList
-            )
+            updateUiState { currentUiState }
             throw e // 再スローしてコルーチン処理を中断させる
         }
-    }
-
-    private fun updateIsRestoringFromProcessDeath(bool: Boolean) {
-        isRestoringFromProcessDeath = bool
     }
 
     private fun clearWordSearchResultList() {
@@ -400,26 +347,22 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
+    private fun updateIsRestoringFromProcessDeath(bool: Boolean) {
+        isRestoringFromProcessDeath = bool
+    }
+
+    private fun updateNeedsRefreshWordSearchResultList(needsRefresh: Boolean) {
+        needsRefreshWordSearchResultList = needsRefresh
+    }
+
+    private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
+        isLoadingOnScrolled = isLoading
+    }
+
     private fun updateSearchWord(searchWord: String) {
         updateUiState {
             it.copy(
                 searchWord = searchWord
-            )
-        }
-    }
-
-    private fun updateShouldUpdateWordSearchResultList(shouldUpdate: Boolean) {
-        updateUiState {
-            it.copy(
-                shouldRefreshWordSearchResultList = shouldUpdate
-            )
-        }
-    }
-
-    private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
-        updateUiState {
-            it.copy(
-                isLoadingOnScrolled = isLoading
             )
         }
     }
@@ -434,11 +377,13 @@ internal class WordSearchViewModel @Inject internal constructor(
         updateUiState {
             it.copy(
                 wordSearchResultList = list,
-                hasNoWordSearchResults = false,
-                isNumWordSearchResultsVisible = false,
-                isWordSearchResultListVisible = true,
+
                 isProcessing = false,
-                isInputDisabled = true
+                isInputDisabled = true,
+                isIdle = false,
+                isRefreshing = false,
+                isWordSearchCompleted = false,
+                hasNoWordSearchResults = false,
             )
         }
     }
@@ -446,11 +391,12 @@ internal class WordSearchViewModel @Inject internal constructor(
     private fun updateToWordSearchResultListAdditionLoadState() {
         updateUiState {
             it.copy(
-                hasNoWordSearchResults = false,
-                isNumWordSearchResultsVisible = true,
-                isWordSearchResultListVisible = true,
                 isProcessing = false,
-                isInputDisabled = true
+                isInputDisabled = true,
+                isIdle = false,
+                isRefreshing = false,
+                isWordSearchCompleted = true,
+                hasNoWordSearchResults = false,
             )
         }
     }
@@ -458,9 +404,11 @@ internal class WordSearchViewModel @Inject internal constructor(
     private fun updateToWordSearchResultListRefreshState() {
         updateUiState {
             it.copy(
-                isTopScrollFabEnabled = true,
                 isProcessing = true,
-                isInputDisabled = true
+                isInputDisabled = true,
+                isIdle = false,
+                isRefreshing = true,
+                isWordSearchCompleted = true,
             )
         }
     }
@@ -473,12 +421,13 @@ internal class WordSearchViewModel @Inject internal constructor(
             it.copy(
                 numWordSearchResults = numWordSearchResults,
                 wordSearchResultList = list,
-                hasNoWordSearchResults = list.isEmpty,
-                isNumWordSearchResultsVisible = !list.isEmpty,
-                isWordSearchResultListVisible = !list.isEmpty,
-                isTopScrollFabEnabled = false,
+
                 isProcessing = false,
-                isInputDisabled = false,
+                isInputDisabled = true,
+                isIdle = false,
+                isRefreshing = false,
+                isWordSearchCompleted = true,
+                hasNoWordSearchResults = list.isEmpty,
             )
         }
     }
