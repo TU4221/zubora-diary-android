@@ -44,9 +44,10 @@ import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
+import kotlin.collections.map
 
 @AndroidEntryPoint
 class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>() {
@@ -109,10 +110,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        observeUiState()
         setUpFocusViewScroll()
         setUpToolBar()
-        setUpWeatherInputField()
-        setUpConditionInputField()
         setUpItemInputField()
     }
 
@@ -286,6 +286,79 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
     }
 
+    private fun observeUiState() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState
+                .map { it.isNewDiary }.distinctUntilChanged().collect {
+                    updateToolbarMenuState(it)
+                }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState
+                .map { it.weather1Options }.distinctUntilChanged().collect {
+                    updateWeather1DropdownAdapter(it)
+                }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState
+                .map { it.weather2Options }.distinctUntilChanged().collect {
+                    updateWeather2DropdownAdapter(it)
+                }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState
+                .map { it.conditionOptions }.distinctUntilChanged().collect {
+                    updateConditionDropdownAdapter(it)
+                }
+        }
+    }
+
+    private fun updateToolbarMenuState(isDeleteEnabled: Boolean) {
+        val menu = binding.materialToolbarTopAppBar.menu
+        val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
+        deleteMenuItem.isEnabled = isDeleteEnabled
+
+        // TODO:テスト用の為、最終的に削除
+        val testMenuItem = menu.findItem(R.id.diaryEditToolbarOptionTest)
+        testMenuItem.isEnabled = !isDeleteEnabled
+    }
+
+    private fun updateWeather1DropdownAdapter(options: List<WeatherUi>) {
+        val context = requireContext()
+        val adapter =
+            AppDropdownAdapter(
+                context,
+                themeColor,
+                options.map { it.asString(context) }
+            )
+        binding.autoCompleteTextWeather1.setAdapter(adapter)
+    }
+
+    private fun updateWeather2DropdownAdapter(options: List<WeatherUi>) {
+        val context = requireContext()
+        val adapter =
+            AppDropdownAdapter(
+                context,
+                themeColor,
+                options.map { it.asString(context) }
+            )
+        binding.autoCompleteTextWeather2.setAdapter(adapter)
+    }
+
+    private fun updateConditionDropdownAdapter(options: List<ConditionUi>) {
+        val context = requireContext()
+        val adapter =
+            AppDropdownAdapter(
+                context,
+                themeColor,
+                options.map { it.asString(context) }
+            )
+        binding.autoCompleteTextCondition.setAdapter(adapter)
+    }
+
     private fun setUpFocusViewScroll() {
         KeyboardManager().registerKeyBoredStateListener(this) { isVisible ->
             if (!isVisible) return@registerKeyBoredStateListener
@@ -334,71 +407,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
                 }
                 false
             }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.map { it.isNewDiary }
-                .collectLatest { value: Boolean ->
-                    // MEMO:日記新規作成時はnullとなり、新規作成状態と判断する。
-                    val isDeleteEnabled = !value
-
-                    val menu = binding.materialToolbarTopAppBar.menu
-                    val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
-                    deleteMenuItem.isEnabled = isDeleteEnabled
-
-                    // TODO:テスト用の為、最終的に削除
-                    val testMenuItem = menu.findItem(R.id.diaryEditToolbarOptionTest)
-                    testMenuItem.isEnabled = !isDeleteEnabled
-                }
-        }
-    }
-
-    // 天気入力欄。
-    private fun setUpWeatherInputField() {
-        // TODO:ThemeColorが必要になるためLayoutDataBinding(BindingAdapter化)は保留
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.map { it.weather1Options }
-                .collectLatest { value: List<WeatherUi> ->
-                    val context = requireContext()
-                    val adapter =
-                        AppDropdownAdapter(
-                            context,
-                            themeColor,
-                            value.map { it.asString(context) }
-                        )
-                    binding.autoCompleteTextWeather1.setAdapter(adapter)
-                }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.map { it.weather2Options }
-                .collectLatest { value: List<WeatherUi> ->
-                    val context = requireContext()
-                    val adapter =
-                        AppDropdownAdapter(
-                            context,
-                            themeColor,
-                            value.map { it.asString(context) }
-                        )
-                    binding.autoCompleteTextWeather2.setAdapter(adapter)
-                }
-        }
-    }
-
-    // 気分入力欄。
-    private fun setUpConditionInputField() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.map { it.conditionOptions }
-                .collectLatest { value: List<ConditionUi> ->
-                    val context = requireContext()
-                    val adapter =
-                        AppDropdownAdapter(
-                            context,
-                            themeColor,
-                            value.map { it.asString(context) }
-                        )
-                    binding.autoCompleteTextCondition.setAdapter(adapter)
-                }
-        }
     }
 
     private fun setUpItemInputField() {

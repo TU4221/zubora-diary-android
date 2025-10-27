@@ -30,8 +30,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -70,6 +69,7 @@ class CalendarFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        observeUiState()
         setUpCalendar()
     }
 
@@ -121,6 +121,28 @@ class CalendarFragment :
         }
     }
 
+    private fun observeUiState() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState
+                .map { Pair(it.selectedDate, it.previousSelectedDate) }
+                .distinctUntilChanged().collect { (selectedDate, previousSelectedDate) ->
+                    updateCalendarSelectedDate(selectedDate, previousSelectedDate)
+            }
+        }
+    }
+
+    private fun updateCalendarSelectedDate(
+        selectedDate: LocalDate,
+        previousSelectedDate: LocalDate?
+    ) {
+        val calendar = binding.calendar
+        val calendarMonthDayBinder =
+            calendar.dayBinder as CalendarMonthDayBinder
+        calendarMonthDayBinder.updateSelectedDate(selectedDate)
+        calendar.notifyDateChanged(selectedDate) // 今回選択日付更新
+        previousSelectedDate?.let { calendar.notifyDateChanged(it) } // 前回選択日付更新
+    }
+
     private fun setUpCalendar() {
         val calendar = binding.calendar
 
@@ -131,23 +153,6 @@ class CalendarFragment :
         val startMonth = currentMonth.minusMonths(60) //現在から過去5年分
         val endMonth = currentMonth.plusMonths(60) //現在から未来5年分
         calendar.setup(startMonth, endMonth, daysOfWeek[0])
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.map { it.selectedDate }
-                .collectLatest { value: LocalDate ->
-                    val calendarMonthDayBinder =
-                        binding.calendar.dayBinder as CalendarMonthDayBinder
-                    calendarMonthDayBinder.updateSelectedDate(value)
-                    binding.calendar.notifyDateChanged(value) // 今回選択日付更新
-                }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.map { it.previousSelectedDate }.filterNotNull()
-                .collectLatest { value: LocalDate ->
-                    binding.calendar.notifyDateChanged(value) // 前回選択日付更新
-                }
-        }
     }
 
     private fun createDayOfWeekList(): List<DayOfWeek> {

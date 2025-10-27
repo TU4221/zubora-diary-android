@@ -34,7 +34,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
@@ -113,7 +113,7 @@ class SettingsFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpThemeColorSettingItem()
+        observeUiState()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -264,11 +264,11 @@ class SettingsFragment :
         }
     }
 
-    private fun setUpThemeColorSettingItem() {
+    private fun observeUiState() {
         launchAndRepeatOnViewLifeCycleStarted {
-            settingsViewModel.uiState.map { it.themeColor }.filterNotNull()
-                .collectLatest { value: ThemeColorUi ->
-                    switchViewColor(value)
+            settingsViewModel.uiState
+                .map { it.themeColor }.filterNotNull().distinctUntilChanged().collect {
+                    switchViewColor(it)
                 }
         }
     }

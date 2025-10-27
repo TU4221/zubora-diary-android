@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
@@ -20,9 +19,10 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYear
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.Year
@@ -57,6 +57,7 @@ class DiaryListFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        observeUiState() // TODO:BaseFragmentに抽象メソッド作成
         setUpToolBar()
         setUpDiaryList()
 
@@ -116,6 +117,32 @@ class DiaryListFragment :
         }
     }
 
+    private fun observeUiState() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState
+                .map { it.diaryList }.distinctUntilChanged().collect {
+                    updateDiaryList(it)
+                }
+        }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState
+                .map { it.isLoadingOnScrolled }.distinctUntilChanged().collect {
+                    updateDiaryListSwipeEnabled(!it)
+                }
+        }
+    }
+
+    private fun updateDiaryList(diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
+        diaryListAdapter.submitList(diaryList.itemList) {
+            mainViewModel.onDiaryListUpdateCompleted()
+        }
+    }
+
+    private fun updateDiaryListSwipeEnabled(isSwipeEnabled: Boolean) {
+        diaryListAdapter.setSwipeEnabled(isSwipeEnabled)
+    }
+
     // ツールバー設定
     private fun setUpToolBar() {
         binding.materialToolbarTopAppBar
@@ -131,26 +158,6 @@ class DiaryListFragment :
 
     // 日記リスト(年月)設定
     private fun setUpDiaryList() {
-        setUpListAdapter()
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.map { it.diaryList }
-                .collectLatest { value: DiaryYearMonthListUi<DiaryDayListItemUi.Standard> ->
-                    diaryListAdapter.submitList(value.itemList) {
-                        mainViewModel.onDiaryListUpdateCompleted()
-                    }
-                }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.map { it.isLoadingOnScrolled }
-                .collectLatest { value ->
-                    diaryListAdapter.setSwipeEnabled(!value)
-                }
-        }
-    }
-
-    private fun setUpListAdapter() {
         diaryListAdapter =
             object : DiaryYearMonthListAdapter(binding.recyclerDiaryList, themeColor) {
                 override fun loadListOnScrollEnd() {
