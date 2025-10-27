@@ -90,10 +90,10 @@ internal class DiaryListViewModel @Inject constructor(
                 loadNewDiaryList(currentList, sortConditionDate)
             } catch (e: CancellationException) {
                 Log.i(logTag, "${logMsg}_キャンセル", e)
-                updateUiStateOnDiaryListLoadCompleted(currentList)
+                updateToDiaryListLoadCompletedState(currentList)
             } catch (e: UseCaseException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
-                updateUiStateOnDiaryListLoadCompleted(currentList)
+                updateToDiaryListLoadCompletedState(currentList)
                 emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
                 return@launchWithUnexpectedErrorHandler
             }
@@ -377,19 +377,19 @@ internal class DiaryListViewModel @Inject constructor(
             when (val result = executeLoad(currentList.toDomainModel())) {
                 is UseCaseResult.Success -> {
                     val updateDiaryList = mapDiaryListUiModel(result.value)
-                    updateUiStateOnDiaryListLoadCompleted(updateDiaryList)
+                    updateToDiaryListLoadCompletedState(updateDiaryList)
                     Log.i(logTag, "${logMsg}_完了")
                 }
                 is UseCaseResult.Failure -> {
                     Log.e(logTag, "${logMsg}_失敗", result.exception)
                     updateDiaryList(currentList)
-                    updateUiStateOnDiaryListLoadCompleted(currentList)
+                    updateToDiaryListLoadCompletedState(currentList)
                     emitAppMessageOnFailure(result.exception)
                 }
             }
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
-            updateUiStateOnDiaryListLoadCompleted(currentList)
+            updateToDiaryListLoadCompletedState(currentList)
             throw e // 再スローしてコルーチン処理を中断させる
         }
     }
@@ -432,7 +432,7 @@ internal class DiaryListViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
-                updateUiStateOnDiaryListLoadCompleted(currentList)
+                updateToDiaryListLoadCompletedState(currentList)
                 when (result.exception) {
                     is DiaryDeleteException.DiaryDataDeleteFailure -> {
                         emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
@@ -466,21 +466,6 @@ internal class DiaryListViewModel @Inject constructor(
         }
         updateToIdleState()
         return dateRange
-    }
-
-    // TODO:コメント統一(updateToDiaryListLoadCompleted)
-    private fun updateUiStateOnDiaryListLoadCompleted(
-        list: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
-    ) {
-        updateUiState {
-            it.copy(
-                diaryList = list,
-                hasNoDiaries = !list.isNotEmpty, // TODO:isEmpty用意する？
-                isRefreshing = false,
-                isProcessing = false,
-                isInputDisabled = false,
-            )
-        }
     }
 
     private fun updateDiaryList(diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
@@ -533,14 +518,6 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private fun updateToInputDisabledState() {
-        updateUiState {
-            it.copy(
-                isInputDisabled = true
-            )
-        }
-    }
-
     private suspend fun updateToDiaryListNewLoadState() {
         val list =
             DiaryYearMonthList<DiaryDayListItem.Standard>(
@@ -575,6 +552,20 @@ internal class DiaryListViewModel @Inject constructor(
                 isRefreshing = true,
                 isProcessing = true,
                 isInputDisabled = true
+            )
+        }
+    }
+
+    private fun updateToDiaryListLoadCompletedState(
+        list: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
+    ) {
+        updateUiState {
+            it.copy(
+                diaryList = list,
+                hasNoDiaries = !list.isNotEmpty, // TODO:isEmpty用意する？
+                isRefreshing = false,
+                isProcessing = false,
+                isInputDisabled = false,
             )
         }
     }
