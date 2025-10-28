@@ -106,7 +106,7 @@
                         android:textAppearance="@style/AppTextViewTextAppearance"
                         android:text="@{Integer.toString(viewModel.uiState.numWordSearchResults) + @string/fragment_word_search_num_results_message}"
                         android:padding="8dp"
-                        android:visibility="@{viewModel.uiState.isWordSearchCompleted ? View.VISIBLE : View.INVISIBLE}"
+                        android:visibility="@{viewModel.uiState.hasWordSearchCompleted ? View.VISIBLE : View.INVISIBLE}"
                         app:applySystemInsetsToPaddingLeft="@{true}"
                         tools:visibility="visible" />
 

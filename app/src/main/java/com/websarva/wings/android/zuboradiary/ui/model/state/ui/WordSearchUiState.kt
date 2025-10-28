@@ -16,6 +16,6 @@ internal data class WordSearchUiState(
     val isInputDisabled: Boolean = false,
     val isIdle: Boolean = true,
     val isRefreshing: Boolean = false,
-    val isWordSearchCompleted: Boolean = false,
+    val hasWordSearchCompleted: Boolean = false,
     val hasNoWordSearchResults: Boolean = false,
 ) : UiState, Parcelable

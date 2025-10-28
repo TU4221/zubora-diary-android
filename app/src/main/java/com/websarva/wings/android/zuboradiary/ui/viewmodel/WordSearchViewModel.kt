@@ -382,7 +382,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 isInputDisabled = true,
                 isIdle = false,
                 isRefreshing = false,
-                isWordSearchCompleted = false,
+                hasWordSearchCompleted = false,
                 hasNoWordSearchResults = false,
             )
         }
@@ -395,7 +395,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 isInputDisabled = true,
                 isIdle = false,
                 isRefreshing = false,
-                isWordSearchCompleted = true,
+                hasWordSearchCompleted = true,
                 hasNoWordSearchResults = false,
             )
         }
@@ -408,7 +408,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 isInputDisabled = true,
                 isIdle = false,
                 isRefreshing = true,
-                isWordSearchCompleted = true,
+                hasWordSearchCompleted = true,
             )
         }
     }
@@ -426,7 +426,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 isInputDisabled = true,
                 isIdle = false,
                 isRefreshing = false,
-                isWordSearchCompleted = true,
+                hasWordSearchCompleted = true,
                 hasNoWordSearchResults = list.isEmpty,
             )
         }
