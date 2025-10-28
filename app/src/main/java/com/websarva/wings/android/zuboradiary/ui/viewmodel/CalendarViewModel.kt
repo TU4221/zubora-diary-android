@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
@@ -32,12 +33,22 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
+    handle: SavedStateHandle,
     diaryUiStateHelper: DiaryUiStateHelper,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
 ) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarUiState>(
-    CalendarUiState()
+    handle.get<CalendarUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
+        CalendarUiState().copy(
+            selectedDate = savedUiState.selectedDate,
+            previousSelectedDate = savedUiState.previousSelectedDate
+        )
+    } ?:CalendarUiState()
 ) {
+
+    companion object {
+        private const val SAVED_UI_STATE_KEY = "uiState"
+    }
 
     override val isProgressIndicatorVisible =
         uiState
