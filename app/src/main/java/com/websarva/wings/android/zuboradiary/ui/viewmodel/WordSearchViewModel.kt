@@ -100,6 +100,14 @@ internal class WordSearchViewModel @Inject internal constructor(
             Log.d(logTag, it.toString())
             handle[SAVED_UI_STATE_KEY] = it
         }.launchIn(viewModelScope)
+
+        uiState.map { it.searchWord }.distinctUntilChanged().onEach { searchWord ->
+            updateUiState {
+                it.copy(
+                    isIdle = searchWord.isEmpty()
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     private fun observeUiStateChanges() {
@@ -378,7 +386,6 @@ internal class WordSearchViewModel @Inject internal constructor(
             it.copy(
                 wordSearchResultList = list,
 
-                isIdle = false,
                 hasWordSearchCompleted = false,
                 hasNoWordSearchResults = false,
 
@@ -392,7 +399,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     private fun updateToWordSearchResultListAdditionLoadState() {
         updateUiState {
             it.copy(
-                isIdle = false,
                 hasWordSearchCompleted = true,
                 hasNoWordSearchResults = false,
                 isProcessing = false,
@@ -405,7 +411,6 @@ internal class WordSearchViewModel @Inject internal constructor(
     private fun updateToWordSearchResultListRefreshState() {
         updateUiState {
             it.copy(
-                isIdle = false,
                 hasWordSearchCompleted = true,
                 isProcessing = true,
                 isInputDisabled = true,
@@ -423,7 +428,6 @@ internal class WordSearchViewModel @Inject internal constructor(
                 numWordSearchResults = numWordSearchResults,
                 wordSearchResultList = list,
 
-                isIdle = false,
                 hasWordSearchCompleted = true,
                 hasNoWordSearchResults = list.isEmpty,
 
