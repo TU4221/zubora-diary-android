@@ -107,6 +107,7 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
             try {
                 block()
             } catch (e: Exception) {
+                // TODO:下記メソッド化して継承先でも同じ処理ができるように修正
                 // コルーチンのキャンセルはエラーではないため、再スローして処理を中断させる
                 if (e is CancellationException) {
                     throw e
