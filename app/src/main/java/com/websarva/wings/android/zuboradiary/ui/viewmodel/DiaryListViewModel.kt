@@ -94,20 +94,14 @@ internal class DiaryListViewModel @Inject constructor(
         viewModelScope.launch {
             uiState.distinctUntilChanged { oldState, newState ->
                 oldState.sortConditionDate == newState.sortConditionDate
-            }.collectLatest { uiState ->
-                try {
+            }.map {
+                Pair(it.diaryList, it.sortConditionDate)
+            }.collectLatest { (diaryList, sortConditionDate) ->
+                withUnexpectedErrorHandler {
                     loadNewDiaryList(
-                        uiState.diaryList,
-                        uiState.sortConditionDate
+                        diaryList,
+                        sortConditionDate
                     )
-                } catch (e: Exception) {
-                    // コルーチンのキャンセルはエラーではないため、再スローして処理を中断させる
-                    if (e is CancellationException) {
-                        throw e
-                    }
-                    Log.e(logTag, "予期せぬエラーが発生", e)
-                    updateUiState { uiState }
-                    emitUnexpectedAppMessage(e)
                 }
             }
         }
