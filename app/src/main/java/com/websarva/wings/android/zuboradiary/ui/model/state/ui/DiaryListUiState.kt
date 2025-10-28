@@ -10,11 +10,10 @@ import java.time.LocalDate
 @Parcelize
 internal data class DiaryListUiState(
     val diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard> = DiaryYearMonthListUi(),
-    val shouldUpdateDiaryList: Boolean = false, // MEMO:画面遷移、回転時の更新フラグ
     val sortConditionDate: LocalDate? = null,
-    val isLoadingOnScrolled: Boolean = false,
-    val hasNoDiaries: Boolean = false,
-    val isRefreshing: Boolean = false,
+
     val isProcessing: Boolean = false,
-    val isInputDisabled: Boolean = false
+    val isInputDisabled: Boolean = false,
+    val isRefreshing: Boolean = false,
+    val hasNoDiaries: Boolean = false
 ) : UiState, Parcelable

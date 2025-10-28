@@ -72,6 +72,10 @@ internal class DiaryListViewModel @Inject constructor(
 
     private var diaryListLoadJob: Job? = null // キャンセル用
 
+    private var needsRefreshDiaryList = false // MEMO:画面遷移、回転時の更新フラグ
+
+    private var isLoadingOnScrolled = false
+
     // キャッシュパラメータ
     private var pendingSortConditionDateUpdateParameters: SortConditionDateUpdateParameters? = null
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
@@ -187,7 +191,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     // View状態処理
     fun onDiaryListEndScrolled() {
-        if (currentUiState.isLoadingOnScrolled) return
+        if (isLoadingOnScrolled) return
         updateIsLoadingOnScrolled(true)
 
         val currentList = currentUiState.diaryList
@@ -205,8 +209,8 @@ internal class DiaryListViewModel @Inject constructor(
 
     // Ui状態処理
     fun onUiReady() {
-        if (!currentUiState.shouldUpdateDiaryList) return
-        updateShouldUpdateDiaryList(false)
+        if (needsRefreshDiaryList) return
+        updateNeedsRefreshDiaryList(false)
         if (!isReadyForOperation) return
 
         val currentList = currentUiState.diaryList
@@ -219,7 +223,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     fun onUiGone() {
-        updateShouldUpdateDiaryList(true)
+        updateNeedsRefreshDiaryList(true)
     }
 
     // Fragmentからの結果受取処理
@@ -468,6 +472,14 @@ internal class DiaryListViewModel @Inject constructor(
         return dateRange
     }
 
+    private fun updateNeedsRefreshDiaryList(shouldUpdate: Boolean) {
+        needsRefreshDiaryList = shouldUpdate
+    }
+
+    private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
+        isLoadingOnScrolled = isLoading
+    }
+
     private fun updateDiaryList(diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
         updateUiState {
             it.copy(
@@ -476,26 +488,10 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private fun updateShouldUpdateDiaryList(shouldUpdate: Boolean) {
-        updateUiState {
-            it.copy(
-                shouldUpdateDiaryList = shouldUpdate
-            )
-        }
-    }
-
     private fun updateSortConditionDate(date: LocalDate?) {
         updateUiState {
             it.copy(
                 sortConditionDate = date
-            )
-        }
-    }
-
-    private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
-        updateUiState {
-            it.copy(
-                isLoadingOnScrolled = isLoading
             )
         }
     }
