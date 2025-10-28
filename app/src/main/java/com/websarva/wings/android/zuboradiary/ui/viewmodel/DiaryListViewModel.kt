@@ -125,8 +125,6 @@ internal class DiaryListViewModel @Inject constructor(
 
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
-
-
         // MEMO:DiaListFragmentはスタートフラグメントに該当するため、
         //      BaseFragmentでOnBackPressedCallbackを登録せずにNavigation機能のデフォルト戻る機能を使用する。
         //      そのため、本メソッドは呼び出されない。
