@@ -9,11 +9,15 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 internal data class DiaryShowUiState(
+    // UiData
     override val diaryLoadState: LoadState<DiaryUi> = LoadState.Idle,
-    override val isWeather2Visible: Boolean = false,
-    override val numVisibleDiaryItems: Int = 1,
     override val diaryImageFilePath: FilePathUi? = null,
 
+    // UiState
+    override val isWeather2Visible: Boolean = false,
+    override val numVisibleDiaryItems: Int = 1,
+
+    // ProcessingState
     val isProcessing: Boolean = false,
     val isInputDisabled: Boolean = false
 ) : UiState, DiaryUiState, Parcelable

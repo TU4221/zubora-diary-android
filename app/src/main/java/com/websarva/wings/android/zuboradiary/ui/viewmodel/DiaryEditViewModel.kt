@@ -1309,9 +1309,9 @@ internal class DiaryEditViewModel @Inject constructor(
         val newDiary = Diary.generate().toUiModel().copy(date = date)
         updateUiState {
             it.copy(
-                isNewDiary = true,
                 originalDiaryLoadState = LoadState.Success(newDiary),
-                editingDiary = newDiary
+                editingDiary = newDiary,
+                isNewDiary = true
             )
         }
     }private fun updateToDiaryLoadingState() {
@@ -1328,9 +1328,9 @@ internal class DiaryEditViewModel @Inject constructor(
         val diaryUi = diary.toUiModel()
         updateUiState {
             it.copy(
-                isNewDiary = false,
                 originalDiaryLoadState = LoadState.Success(diaryUi),
                 editingDiary = diaryUi,
+                isNewDiary = false,
                 isProcessing = false,
                 isInputDisabled = false
             )

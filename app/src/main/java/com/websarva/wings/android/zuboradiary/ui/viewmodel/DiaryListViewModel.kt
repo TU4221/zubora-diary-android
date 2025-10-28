@@ -528,9 +528,9 @@ internal class DiaryListViewModel @Inject constructor(
         updateUiState {
             it.copy(
                 hasNoDiaries = false,
-                isRefreshing = true,
                 isProcessing = true,
-                isInputDisabled = true
+                isInputDisabled = true,
+                isRefreshing = true,
             )
         }
     }
@@ -542,9 +542,9 @@ internal class DiaryListViewModel @Inject constructor(
             it.copy(
                 diaryList = list,
                 hasNoDiaries = list.isEmpty,
-                isRefreshing = false,
                 isProcessing = false,
                 isInputDisabled = false,
+                isRefreshing = false
             )
         }
     }

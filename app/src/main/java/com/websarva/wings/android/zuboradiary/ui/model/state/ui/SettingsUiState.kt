@@ -9,6 +9,7 @@ import java.time.LocalTime
 
 @Parcelize
 internal data class SettingsUiState(
+    // UiData
     val themeColor: ThemeColorUi? = null,
     val calendarStartDayOfWeek: DayOfWeek? = null,
     val isReminderEnabled: Boolean? = null,
@@ -17,7 +18,10 @@ internal data class SettingsUiState(
     val passcode: String? = null,
     val isWeatherFetchEnabled: Boolean? = null,
 
+    // UiState
+    val hasSettingsLoadFailure: Boolean = false,
+
+    // ProcessingState
     val isProcessing: Boolean = false,
-    val isInputDisabled: Boolean = false,
-    val hasSettingsLoadFailure: Boolean = false
+    val isInputDisabled: Boolean = false
 ) : UiState, Parcelable

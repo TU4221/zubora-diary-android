@@ -10,13 +10,17 @@ import java.time.LocalDate
 
 @Parcelize
 internal data class CalendarUiState(
+    // UiData
     val selectedDate: LocalDate = LocalDate.now(),
     val previousSelectedDate: LocalDate? = null,
     override val diaryLoadState: LoadState<DiaryUi> = LoadState.Idle,
-    override val isWeather2Visible: Boolean = false,
-    override val numVisibleDiaryItems: Int = 1,
     override val diaryImageFilePath: FilePathUi? = null,
 
+    // UiState
+    override val isWeather2Visible: Boolean = false,
+    override val numVisibleDiaryItems: Int = 1,
+
+    // ProcessingState
     val isProcessing: Boolean = false,
     val isInputDisabled: Boolean = false
 ) : UiState, DiaryUiState, Parcelable

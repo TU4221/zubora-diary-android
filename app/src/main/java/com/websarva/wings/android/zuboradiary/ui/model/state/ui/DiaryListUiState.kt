@@ -9,11 +9,15 @@ import java.time.LocalDate
 
 @Parcelize
 internal data class DiaryListUiState(
+    // UiData
     val diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard> = DiaryYearMonthListUi(),
     val sortConditionDate: LocalDate? = null,
 
+    // UiState
+    val hasNoDiaries: Boolean = false,
+
+    // ProcessingState
     val isProcessing: Boolean = false,
     val isInputDisabled: Boolean = false,
-    val isRefreshing: Boolean = false,
-    val hasNoDiaries: Boolean = false
+    val isRefreshing: Boolean = false
 ) : UiState, Parcelable

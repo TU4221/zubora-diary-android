@@ -8,14 +8,18 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 internal data class WordSearchUiState(
+    // UiData
     val searchWord: String = "",
     val numWordSearchResults: Int = 0,
     val wordSearchResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult> = DiaryYearMonthListUi(),
 
-    val isProcessing: Boolean = false,
-    val isInputDisabled: Boolean = false,
+    // UiState
     val isIdle: Boolean = true,
-    val isRefreshing: Boolean = false,
     val hasWordSearchCompleted: Boolean = false,
     val hasNoWordSearchResults: Boolean = false,
+
+    // ProcessingState
+    val isProcessing: Boolean = false,
+    val isInputDisabled: Boolean = false,
+    val isRefreshing: Boolean = false
 ) : UiState, Parcelable

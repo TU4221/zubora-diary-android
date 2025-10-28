@@ -378,12 +378,13 @@ internal class WordSearchViewModel @Inject internal constructor(
             it.copy(
                 wordSearchResultList = list,
 
-                isProcessing = false,
-                isInputDisabled = true,
                 isIdle = false,
-                isRefreshing = false,
                 hasWordSearchCompleted = false,
                 hasNoWordSearchResults = false,
+
+                isProcessing = false,
+                isInputDisabled = true,
+                isRefreshing = false
             )
         }
     }
@@ -391,12 +392,12 @@ internal class WordSearchViewModel @Inject internal constructor(
     private fun updateToWordSearchResultListAdditionLoadState() {
         updateUiState {
             it.copy(
-                isProcessing = false,
-                isInputDisabled = true,
                 isIdle = false,
-                isRefreshing = false,
                 hasWordSearchCompleted = true,
                 hasNoWordSearchResults = false,
+                isProcessing = false,
+                isInputDisabled = true,
+                isRefreshing = false
             )
         }
     }
@@ -404,11 +405,11 @@ internal class WordSearchViewModel @Inject internal constructor(
     private fun updateToWordSearchResultListRefreshState() {
         updateUiState {
             it.copy(
+                isIdle = false,
+                hasWordSearchCompleted = true,
                 isProcessing = true,
                 isInputDisabled = true,
-                isIdle = false,
-                isRefreshing = true,
-                hasWordSearchCompleted = true,
+                isRefreshing = true
             )
         }
     }
@@ -422,12 +423,13 @@ internal class WordSearchViewModel @Inject internal constructor(
                 numWordSearchResults = numWordSearchResults,
                 wordSearchResultList = list,
 
-                isProcessing = false,
-                isInputDisabled = false,
                 isIdle = false,
-                isRefreshing = false,
                 hasWordSearchCompleted = true,
                 hasNoWordSearchResults = list.isEmpty,
+
+                isProcessing = false,
+                isInputDisabled = false,
+                isRefreshing = false
             )
         }
     }

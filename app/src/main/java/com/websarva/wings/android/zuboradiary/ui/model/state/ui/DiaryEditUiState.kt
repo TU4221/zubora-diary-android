@@ -14,19 +14,23 @@ import java.time.LocalDate
 // TODO:初期化はstaticメソッドでやる
 @Parcelize
 internal data class DiaryEditUiState(
-    val isNewDiary: Boolean = false,
+    // UiData
     val originalDiaryLoadState: LoadState<DiaryUi> = LoadState.Idle,
     val editingDiary: DiaryUi,
     val previousSelectedDate: LocalDate? = null,
     val weather1Options: List<WeatherUi> = WeatherUi.entries,
     val weather2Options: List<WeatherUi> = WeatherUi.entries,
-    val isWeather2Enabled: Boolean = false,
     val conditionOptions: List<ConditionUi> = ConditionUi.entries,
-    val numVisibleDiaryItems: Int = 1,
-    val isDiaryItemAdditionEnabled: Boolean = false,
     val diaryImageFilePath: FilePathUi? = null,
     val diaryItemTitleSelectionHistories: Map<Int, DiaryItemTitleSelectionHistoryUi?> = emptyMap(),
 
+    // UiState
+    val isNewDiary: Boolean = false,
+    val isWeather2Enabled: Boolean = false,
+    val numVisibleDiaryItems: Int = 1,
+    val isDiaryItemAdditionEnabled: Boolean = false,
+
+    // ProcessingState
     val isProcessing: Boolean = false,
     val isInputDisabled: Boolean = false
 ) : UiState, Parcelable
