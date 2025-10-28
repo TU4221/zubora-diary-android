@@ -119,10 +119,8 @@ internal class CalendarViewModel @Inject constructor(
     private fun observeUiStateChanges() {
         viewModelScope.launch {
             uiState.map { it.selectedDate }.distinctUntilChanged().collectLatest {
-                try {
+                withUnexpectedErrorHandler {
                     prepareDiary(it)
-                } catch (e: Exception) {
-                    emitUnexpectedAppMessage(e)
                 }
             }
         }
