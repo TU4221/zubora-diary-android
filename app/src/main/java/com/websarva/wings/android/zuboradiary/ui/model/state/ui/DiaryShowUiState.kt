@@ -13,6 +13,7 @@ internal data class DiaryShowUiState(
     override val isWeather2Visible: Boolean = false,
     override val numVisibleDiaryItems: Int = 1,
     override val diaryImageFilePath: FilePathUi? = null,
+
     val isProcessing: Boolean = false,
     val isInputDisabled: Boolean = false
 ) : UiState, DiaryUiState, Parcelable
