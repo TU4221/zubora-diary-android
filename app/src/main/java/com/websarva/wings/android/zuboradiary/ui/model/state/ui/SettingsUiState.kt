@@ -16,7 +16,8 @@ internal data class SettingsUiState(
     val isPasscodeLockEnabled: Boolean? = null,
     val passcode: String? = null,
     val isWeatherFetchEnabled: Boolean? = null,
-    val hasError: Boolean = false,
+
     val isProcessing: Boolean = false,
-    val isInputDisabled: Boolean = false
+    val isInputDisabled: Boolean = false,
+    val hasSettingsLoadFailure: Boolean = false
 ) : UiState, Parcelable

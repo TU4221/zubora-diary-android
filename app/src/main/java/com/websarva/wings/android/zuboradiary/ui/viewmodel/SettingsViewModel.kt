@@ -298,11 +298,11 @@ internal class SettingsViewModel @Inject constructor(
 
     private suspend fun handleSettingLoadFailure(failureMessage: SettingsAppMessage) {
         val currentUiState = uiState.value
-        if (currentUiState.hasError) return
+        if (currentUiState.hasSettingsLoadFailure) return
 
         updateUiState {
             it.copy(
-                hasError = true
+                hasSettingsLoadFailure = true
             )
         }
         if (failureMessage is SettingsAppMessage.Unexpected) {
@@ -731,7 +731,7 @@ internal class SettingsViewModel @Inject constructor(
      * @return 操作可能な場合は `true`、そうでない場合は `false`。
      */
     private fun canExecuteOperation(): Boolean {
-        if (currentUiState.hasError) {
+        if (currentUiState.hasSettingsLoadFailure) {
             launchWithUnexpectedErrorHandler {
                 emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
             }
