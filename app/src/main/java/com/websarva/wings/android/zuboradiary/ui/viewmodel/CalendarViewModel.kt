@@ -72,11 +72,19 @@ internal class CalendarViewModel @Inject constructor(
     private var shouldSmoothScroll = false
 
     init {
-        observeDerivedUiStateChanges(diaryUiStateHelper)
+        observeDerivedUiStateChanges(handle, diaryUiStateHelper)
         observeUiStateChanges()
     }
 
-    private fun observeDerivedUiStateChanges(diaryUiStateHelper: DiaryUiStateHelper) {
+    private fun observeDerivedUiStateChanges(
+        handle: SavedStateHandle,
+        diaryUiStateHelper: DiaryUiStateHelper
+    ) {
+        uiState.onEach {
+            Log.d(logTag, it.toString())
+            handle[SAVED_UI_STATE_KEY] = it
+        }.launchIn(viewModelScope)
+
         diaryFlow.map {
             diaryUiStateHelper.isWeather2Visible(it)
         }.distinctUntilChanged().onEach { isWeather2Visible ->
