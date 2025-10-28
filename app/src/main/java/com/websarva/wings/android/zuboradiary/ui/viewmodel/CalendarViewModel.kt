@@ -55,8 +55,6 @@ internal class CalendarViewModel @Inject constructor(
     private val currentUiState
         get() = uiState.value
 
-    private val selectedDateFlow = uiState.map { it.selectedDate }
-
     private val diaryFlow =
         uiState.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
@@ -101,15 +99,13 @@ internal class CalendarViewModel @Inject constructor(
 
     private fun observeUiStateChanges() {
         viewModelScope.launch {
-            selectedDateFlow
-                .distinctUntilChanged()
-                .collectLatest {
-                    try {
-                        prepareDiary(it)
-                    } catch (e: Exception) {
-                        emitUnexpectedAppMessage(e)
-                    }
+            uiState.map { it.selectedDate }.distinctUntilChanged().collectLatest {
+                try {
+                    prepareDiary(it)
+                } catch (e: Exception) {
+                    emitUnexpectedAppMessage(e)
                 }
+            }
         }
     }
 
