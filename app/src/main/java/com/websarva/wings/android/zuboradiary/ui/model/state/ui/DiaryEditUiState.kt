@@ -17,15 +17,16 @@ internal data class DiaryEditUiState(
     val isNewDiary: Boolean = false,
     val originalDiaryLoadState: LoadState<DiaryUi> = LoadState.Idle,
     val editingDiary: DiaryUi,
-    val diaryItemTitleSelectionHistories: Map<Int, DiaryItemTitleSelectionHistoryUi?> = emptyMap(),
     val previousSelectedDate: LocalDate? = null,
     val weather1Options: List<WeatherUi> = WeatherUi.entries,
     val weather2Options: List<WeatherUi> = WeatherUi.entries,
-    val isEnabledWeather2: Boolean = false,
+    val isWeather2Enabled: Boolean = false,
     val conditionOptions: List<ConditionUi> = ConditionUi.entries,
     val numVisibleDiaryItems: Int = 1,
-    val isClickableDiaryItemAdditionButton: Boolean = false,
+    val isDiaryItemAdditionEnabled: Boolean = false,
     val diaryImageFilePath: FilePathUi? = null,
+    val diaryItemTitleSelectionHistories: Map<Int, DiaryItemTitleSelectionHistoryUi?> = emptyMap(),
+
     val isProcessing: Boolean = false,
     val isInputDisabled: Boolean = false
 ) : UiState, Parcelable

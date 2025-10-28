@@ -187,14 +187,14 @@ internal class DiaryEditViewModel @Inject constructor(
             if (isEnabled) {
                 updateUiState {
                     it.copy(
-                        isEnabledWeather2 = isEnabled
+                        isWeather2Enabled = isEnabled
                     )
                 }
             } else {
                 updateUiState {
                     it.copy(
                         editingDiary = it.editingDiary.copy(weather2 = WeatherUi.UNKNOWN),
-                        isEnabledWeather2 = isEnabled
+                        isWeather2Enabled = isEnabled
                     )
                 }
             }
@@ -212,10 +212,10 @@ internal class DiaryEditViewModel @Inject constructor(
 
         uiState.map {
             !it.isInputDisabled && it.numVisibleDiaryItems < DiaryItemNumber.MAX_NUMBER
-        }.distinctUntilChanged().onEach { isClickable ->
+        }.distinctUntilChanged().onEach { isEnabled ->
             updateUiState {
                 it.copy(
-                    isClickableDiaryItemAdditionButton = isClickable
+                    isDiaryItemAdditionEnabled = isEnabled
                 )
             }
         }.launchIn(viewModelScope)

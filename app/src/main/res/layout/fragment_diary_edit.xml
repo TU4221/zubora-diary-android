@@ -163,7 +163,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
                                 android:layout_weight="1"
-                                android:enabled="@{viewModel.uiState.isEnabledWeather2}">
+                                android:enabled="@{viewModel.uiState.weather2Enabled}">
 
                                 <!-- MEMO:"android:contentDescription"で代用-->
                                 <AutoCompleteTextView
@@ -173,7 +173,7 @@
                                     android:layout_height="wrap_content"
                                     android:textAppearance="@style/AppAutoCompleteTextViewDropDownTextAppearance"
                                     android:textColor="@color/text_color_on_surface"
-                                    android:enabled="@{viewModel.uiState.isEnabledWeather2}"
+                                    android:enabled="@{viewModel.uiState.weather2Enabled}"
                                     app:onItemClick="@{(parent, view, position, id) -> viewModel.onWeather2InputFieldItemClick(position)}"
                                     app:diaryWeatherSpinnerText="@{viewModel.uiState.editingDiary.weather2}"
                                     tools:text="@string/fragment_diary_edit_weather_value_tools" />
@@ -319,8 +319,8 @@
                             android:layout_gravity="end"
                             android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
                             android:contentDescription="@string/fragment_diary_edit_item_addition"
-                            android:src="@{viewModel.uiState.isClickableDiaryItemAdditionButton ? @drawable/ic_add_circle_24px : @drawable/ic_add_circle_disabled_24px}"
-                            android:clickable="@{viewModel.uiState.isClickableDiaryItemAdditionButton}"
+                            android:src="@{viewModel.uiState.diaryItemAdditionEnabled ? @drawable/ic_add_circle_24px : @drawable/ic_add_circle_disabled_24px}"
+                            android:clickable="@{viewModel.uiState.diaryItemAdditionEnabled}"
                             android:onClick="@{() -> viewModel.onItemAdditionButtonClick()}"/>
 
                         <LinearLayout
