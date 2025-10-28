@@ -107,16 +107,31 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
             try {
                 block()
             } catch (e: Exception) {
-                // TODO:下記メソッド化して継承先でも同じ処理ができるように修正
-                // コルーチンのキャンセルはエラーではないため、再スローして処理を中断させる
-                if (e is CancellationException) {
-                    throw e
-                }
-                Log.e(logTag, "予期せぬエラーが発生", e)
-                updateUiState(initialState)
-                emitUnexpectedAppMessage(e)
+                handleUnexpectedError(e, initialState)
             }
         }
+    }
+
+    protected suspend fun withUnexpectedErrorHandler(
+        rollbackState: S? = null,
+        block: suspend () -> Unit
+    ) {
+        val initialState = rollbackState ?: _uiState.value
+        try {
+            block()
+        } catch (e: Exception) {
+            handleUnexpectedError(e, initialState)
+        }
+    }
+
+    private suspend fun handleUnexpectedError(e: Exception, rollbackState: S) {
+        // コルーチンのキャンセルはエラーではないため、再スローして処理を中断させる
+        if (e is CancellationException) {
+            throw e
+        }
+        Log.e(logTag, "予期せぬエラーが発生", e)
+        updateUiState(rollbackState)
+        emitUnexpectedAppMessage(e)
     }
 
     /**
