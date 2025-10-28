@@ -386,7 +386,6 @@ internal class DiaryListViewModel @Inject constructor(
                 }
                 is UseCaseResult.Failure -> {
                     Log.e(logTag, "${logMsg}_失敗", result.exception)
-                    updateDiaryList(currentList)
                     updateToDiaryListLoadCompletedState(currentList)
                     emitAppMessageOnFailure(result.exception)
                 }
@@ -478,14 +477,6 @@ internal class DiaryListViewModel @Inject constructor(
 
     private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
         isLoadingOnScrolled = isLoading
-    }
-
-    private fun updateDiaryList(diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
-        updateUiState {
-            it.copy(
-                diaryList = diaryList
-            )
-        }
     }
 
     private fun updateSortConditionDate(date: LocalDate?) {
