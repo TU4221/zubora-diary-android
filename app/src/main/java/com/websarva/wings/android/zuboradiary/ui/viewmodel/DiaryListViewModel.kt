@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
@@ -41,7 +42,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.Year
@@ -52,6 +55,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryListViewModel @Inject constructor(
+    handle: SavedStateHandle,
     private val loadNewDiaryListUseCase: LoadNewDiaryListUseCase,
     private val loadAdditionDiaryListUseCase: LoadAdditionDiaryListUseCase,
     private val refreshDiaryListUseCase: RefreshDiaryListUseCase,
@@ -59,8 +63,17 @@ internal class DiaryListViewModel @Inject constructor(
     private val loadDiaryListStartYearMonthPickerDateRangeUseCase: LoadDiaryListStartYearMonthPickerDateRangeUseCase,
     private val buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
 ) : BaseViewModel<DiaryListEvent, DiaryListAppMessage, DiaryListUiState>(
-    DiaryListUiState()
+    handle.get<DiaryListUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
+        DiaryListUiState().copy(
+            diaryList = savedUiState.diaryList,
+            sortConditionDate = savedUiState.sortConditionDate
+        )
+    } ?: DiaryListUiState()
 ) {
+
+    companion object {
+        private const val SAVED_UI_STATE_KEY = "uiState"
+    }
 
     override val isProgressIndicatorVisible =
         uiState
@@ -78,6 +91,8 @@ internal class DiaryListViewModel @Inject constructor(
 
     private var diaryListLoadJob: Job? = null // キャンセル用
 
+    private var isRestoringFromProcessDeath: Boolean = false
+
     private var needsRefreshDiaryList = false // MEMO:画面遷移、回転時の更新フラグ
 
     private val _isLoadingOnScrolled = MutableStateFlow(false)
@@ -87,7 +102,22 @@ internal class DiaryListViewModel @Inject constructor(
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
 
     init {
+        checkForRestoration(handle)
+        observeDerivedUiStateChanges(handle)
         observeUiStateChanges()
+    }
+
+    private fun checkForRestoration(handle: SavedStateHandle) {
+        updateIsRestoringFromProcessDeath(
+            handle.contains(SAVED_UI_STATE_KEY)
+        )
+    }
+
+    private fun observeDerivedUiStateChanges(handle: SavedStateHandle) {
+        uiState.onEach {
+            Log.d(logTag, it.toString())
+            handle[SAVED_UI_STATE_KEY] = it
+        }.launchIn(viewModelScope)
     }
 
     private fun observeUiStateChanges() {
@@ -98,6 +128,12 @@ internal class DiaryListViewModel @Inject constructor(
                 Pair(it.diaryList, it.sortConditionDate)
             }.collectLatest { (diaryList, sortConditionDate) ->
                 withUnexpectedErrorHandler {
+                    if (isRestoringFromProcessDeath) {
+                        updateIsRestoringFromProcessDeath(false)
+                        refreshDiaryList(diaryList, sortConditionDate)
+                        return@withUnexpectedErrorHandler
+                    }
+
                     loadNewDiaryList(
                         diaryList,
                         sortConditionDate
@@ -207,7 +243,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     // Ui状態処理
     fun onUiReady() {
-        if (needsRefreshDiaryList) return
+        if (!needsRefreshDiaryList) return
         updateNeedsRefreshDiaryList(false)
         if (!isReadyForOperation) return
 
@@ -453,6 +489,10 @@ internal class DiaryListViewModel @Inject constructor(
         }
         updateToIdleState()
         return dateRange
+    }
+
+    private fun updateIsRestoringFromProcessDeath(bool: Boolean) {
+        isRestoringFromProcessDeath = bool
     }
 
     private fun updateNeedsRefreshDiaryList(shouldUpdate: Boolean) {
