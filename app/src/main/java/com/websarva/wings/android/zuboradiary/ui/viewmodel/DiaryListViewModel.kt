@@ -378,13 +378,13 @@ internal class DiaryListViewModel @Inject constructor(
                 }
                 is UseCaseResult.Failure -> {
                     Log.e(logTag, "${logMsg}_失敗", result.exception)
-                    updateToDiaryListLoadCompletedState(currentList)
+                    updateToIdleState()
                     emitAppMessageOnFailure(result.exception)
                 }
             }
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
-            updateToDiaryListLoadCompletedState(currentList)
+            updateToIdleState()
             throw e // 再スローしてコルーチン処理を中断させる
         }
     }
@@ -427,7 +427,7 @@ internal class DiaryListViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
-                updateToDiaryListLoadCompletedState(currentList)
+                updateToIdleState()
                 when (result.exception) {
                     is DiaryDeleteException.DiaryDataDeleteFailure -> {
                         emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
@@ -483,7 +483,8 @@ internal class DiaryListViewModel @Inject constructor(
         updateUiState {
             it.copy(
                 isProcessing = false,
-                isInputDisabled = false
+                isInputDisabled = false,
+                isRefreshing = false
             )
         }
     }
