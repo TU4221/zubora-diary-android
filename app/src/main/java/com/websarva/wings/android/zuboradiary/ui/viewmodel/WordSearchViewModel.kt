@@ -309,6 +309,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                     updateNumWordSearchResults = result.value
                 }
                 is UseCaseResult.Failure -> {
+                    updateToIdleState()
                     when (result.exception) {
                         is WordSearchResultCountException.CountFailure -> {
                             emitAppMessageEvent(
@@ -335,14 +336,14 @@ internal class WordSearchViewModel @Inject internal constructor(
                 }
                 is UseCaseResult.Failure -> {
                     Log.e(logTag, "${logMsg}_失敗", result.exception)
-                    updateUiState { currentUiState }
+                    updateToIdleState()
                     emitAppMessageOnFailure(result.exception)
                 }
             }
 
         } catch (e: CancellationException) {
             Log.i(logTag, "${logMsg}_キャンセル", e)
-            updateUiState { currentUiState }
+            updateToIdleState()
             throw e // 再スローしてコルーチン処理を中断させる
         }
     }
@@ -371,6 +372,16 @@ internal class WordSearchViewModel @Inject internal constructor(
         updateUiState {
             it.copy(
                 searchWord = searchWord
+            )
+        }
+    }
+
+    private fun updateToIdleState() {
+        updateUiState {
+            it.copy(
+                isProcessing = false,
+                isInputDisabled = false,
+                isRefreshing = false
             )
         }
     }
