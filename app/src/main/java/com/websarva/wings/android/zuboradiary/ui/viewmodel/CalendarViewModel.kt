@@ -60,6 +60,8 @@ internal class CalendarViewModel @Inject constructor(
     private val diaryFlow =
         uiState.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
+    private var shouldSmoothScroll = false
+
     init {
         observeDerivedUiStateChanges(diaryUiStateHelper)
         observeUiStateChanges()
@@ -218,7 +220,7 @@ internal class CalendarViewModel @Inject constructor(
     // データ処理
     private suspend fun prepareDiary(date: LocalDate) {
         val action =
-            if (currentUiState.shouldSmoothScroll) {
+            if (shouldSmoothScroll) {
                 updateShouldSmoothScroll(false)
                 CalendarEvent.SmoothScrollCalendar(date)
             } else {
@@ -288,6 +290,10 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
+    private fun updateShouldSmoothScroll(shouldScroll: Boolean) {
+        shouldSmoothScroll = shouldScroll
+    }
+
     private fun updateSelectedDate(date: LocalDate) {
         // MEMO:selectedDateと同日付を選択した時、previousSelectedDateと同値となり、
         //      次に他の日付を選択した時にpreviousSelectedDateのcollectedが起動しなくなる。
@@ -298,14 +304,6 @@ internal class CalendarViewModel @Inject constructor(
             it.copy(
                 selectedDate = date,
                 previousSelectedDate = it.selectedDate
-            )
-        }
-    }
-
-    private fun updateShouldSmoothScroll(shouldScroll: Boolean) {
-        updateUiState {
-            it.copy(
-                shouldSmoothScroll = shouldScroll
             )
         }
     }

@@ -12,11 +12,11 @@ import java.time.LocalDate
 internal data class CalendarUiState(
     val selectedDate: LocalDate = LocalDate.now(),
     val previousSelectedDate: LocalDate? = null,
-    val shouldSmoothScroll: Boolean = false,
     override val diaryLoadState: LoadState<DiaryUi> = LoadState.Idle,
     override val isWeather2Visible: Boolean = false,
     override val numVisibleDiaryItems: Int = 1,
     override val diaryImageFilePath: FilePathUi? = null,
+
     val isProcessing: Boolean = false,
     val isInputDisabled: Boolean = false
 ) : UiState, DiaryUiState, Parcelable
