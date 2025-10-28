@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
@@ -36,7 +37,12 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
@@ -74,34 +80,36 @@ internal class DiaryListViewModel @Inject constructor(
 
     private var needsRefreshDiaryList = false // MEMO:画面遷移、回転時の更新フラグ
 
-    private var isLoadingOnScrolled = false
+    private val _isLoadingOnScrolled = MutableStateFlow(false)
+    val isLoadingOnScrolled = _isLoadingOnScrolled.asStateFlow()
 
     // キャッシュパラメータ
-    private var pendingSortConditionDateUpdateParameters: SortConditionDateUpdateParameters? = null
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
 
     init {
-        initializeDiaryListData()
+        observeUiStateChanges()
     }
 
-    private fun initializeDiaryListData() {
-        val currentList = currentUiState.diaryList
-        val sortConditionDate = currentUiState.sortConditionDate
-        launchWithUnexpectedErrorHandler {
-            val logMsg = "日記リスト準備"
-            Log.i(logTag, "${logMsg}_開始")
-            try {
-                loadNewDiaryList(currentList, sortConditionDate)
-            } catch (e: CancellationException) {
-                Log.i(logTag, "${logMsg}_キャンセル", e)
-                updateToDiaryListLoadCompletedState(currentList)
-            } catch (e: UseCaseException) {
-                Log.e(logTag, "${logMsg}_失敗", e)
-                updateToDiaryListLoadCompletedState(currentList)
-                emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
-                return@launchWithUnexpectedErrorHandler
+    private fun observeUiStateChanges() {
+        viewModelScope.launch {
+            uiState.distinctUntilChanged { oldState, newState ->
+                oldState.sortConditionDate == newState.sortConditionDate
+            }.collectLatest { uiState ->
+                try {
+                    loadNewDiaryList(
+                        uiState.diaryList,
+                        uiState.sortConditionDate
+                    )
+                } catch (e: Exception) {
+                    // コルーチンのキャンセルはエラーではないため、再スローして処理を中断させる
+                    if (e is CancellationException) {
+                        throw e
+                    }
+                    Log.e(logTag, "予期せぬエラーが発生", e)
+                    updateUiState { uiState }
+                    emitUnexpectedAppMessage(e)
+                }
             }
-            Log.i(logTag, "${logMsg}_完了")
         }
     }
 
@@ -141,8 +149,6 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     fun onNavigationIconClick() {
-        val currentList = currentUiState.diaryList
-        updatePendingSortConditionDateUpdateParameters(currentList)
         launchWithUnexpectedErrorHandler {
             val dateRange = loadSavedDiaryDateRange()
             val newestDiaryDate = dateRange.newestDiaryDate
@@ -191,7 +197,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     // View状態処理
     fun onDiaryListEndScrolled() {
-        if (isLoadingOnScrolled) return
+        if (_isLoadingOnScrolled.value) return
         updateIsLoadingOnScrolled(true)
 
         val currentList = currentUiState.diaryList
@@ -230,33 +236,19 @@ internal class DiaryListViewModel @Inject constructor(
     fun onDatePickerDialogResultReceived(result: DialogResult<YearMonth>) {
         when (result) {
             is DialogResult.Positive<YearMonth> -> {
-                handleDatePickerDialogPositiveResult(
-                    result.data,
-                    pendingSortConditionDateUpdateParameters
-                )
+                handleDatePickerDialogPositiveResult(result.data)
             }
             DialogResult.Negative,
             DialogResult.Cancel -> {
                 // 処理なし
             }
         }
-        clearPendingSortConditionDateUpdateParameters()
     }
 
-    private fun handleDatePickerDialogPositiveResult(
-        yearMonth: YearMonth,
-        parameters: SortConditionDateUpdateParameters?
-    ) {
+    private fun handleDatePickerDialogPositiveResult(yearMonth: YearMonth) {
         val sortConditionDate =
             yearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth())
         updateSortConditionDate(sortConditionDate)
-        cancelPreviousLoadJob()
-        diaryListLoadJob =
-            launchWithUnexpectedErrorHandler {
-                parameters?.let {
-                    loadNewDiaryList(it.currentList, sortConditionDate)
-                } ?: throw IllegalStateException()
-            }
     }
 
     fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
@@ -476,7 +468,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
-        isLoadingOnScrolled = isLoading
+        _isLoadingOnScrolled.value = isLoading
     }
 
     private fun updateSortConditionDate(date: LocalDate?) {
@@ -557,16 +549,6 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    private fun updatePendingSortConditionDateUpdateParameters(
-        currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
-    ) {
-        pendingSortConditionDateUpdateParameters = SortConditionDateUpdateParameters(currentList)
-    }
-
-    private fun clearPendingSortConditionDateUpdateParameters() {
-        pendingSortConditionDateUpdateParameters = null
-    }
-
     private fun updatePendingDiaryDeleteParameters(
         id: DiaryId,
         currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
@@ -578,10 +560,6 @@ internal class DiaryListViewModel @Inject constructor(
     private fun clearPendingDiaryDeleteParameters() {
         pendingDiaryDeleteParameters = null
     }
-
-    private data class SortConditionDateUpdateParameters(
-        val currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
-    )
 
     private data class DiaryDeleteParameters(
         val id: DiaryId,
