@@ -114,22 +114,22 @@ internal class WordSearchViewModel @Inject internal constructor(
         viewModelScope.launch {
             uiState.distinctUntilChanged { oldState, newState ->
                 oldState.searchWord == newState.searchWord
-            }.collectLatest {
-                try {
+            }.map {
+                Pair(it.wordSearchResultList, it.searchWord)
+            }.collectLatest { (wordSearchResultList, searchWord) ->
+                withUnexpectedErrorHandler {
                     if (isRestoringFromProcessDeath) {
                         updateIsRestoringFromProcessDeath(false)
-                        refreshWordSearchResultList(it)
-                        return@collectLatest
+                        refreshWordSearchResultList(wordSearchResultList, searchWord)
+                        return@withUnexpectedErrorHandler
                     }
 
-                    if (it.searchWord.isEmpty()) {
+                    if (searchWord.isEmpty()) {
                         emitUiEvent(WordSearchEvent.ShowKeyboard)
                         clearWordSearchResultList()
                     } else {
-                        loadNewWordSearchResultList(it)
+                        loadNewWordSearchResultList(wordSearchResultList, searchWord)
                     }
-                } catch (e: Exception) {
-                    emitUnexpectedAppMessage(e)
                 }
             }
         }
@@ -184,11 +184,15 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (isLoadingOnScrolled) return
         updateIsLoadingOnScrolled(true)
 
-        val currentUiState = currentUiState
+        val currentResultList = currentUiState.wordSearchResultList
+        val searchWord = currentUiState.searchWord
         cancelPreviousLoadJob()
         wordSearchResultListLoadJob =
             launchWithUnexpectedErrorHandler {
-                loadAdditionWordSearchResultList(currentUiState)
+                loadAdditionWordSearchResultList(
+                    currentResultList,
+                    searchWord
+                )
             }
     }
 
@@ -202,11 +206,15 @@ internal class WordSearchViewModel @Inject internal constructor(
         updateNeedsRefreshWordSearchResultList(false)
         if (!isReadyForOperation) return
 
-        val currentUiState = currentUiState
+        val currentResultList = currentUiState.wordSearchResultList
+        val currentSearchWord = currentUiState.searchWord
         cancelPreviousLoadJob()
         wordSearchResultListLoadJob =
             launchWithUnexpectedErrorHandler {
-                refreshWordSearchResultList(currentUiState)
+                refreshWordSearchResultList(
+                    currentResultList,
+                    currentSearchWord
+                )
             }
     }
 
@@ -220,10 +228,14 @@ internal class WordSearchViewModel @Inject internal constructor(
         if (!job.isCompleted) job.cancel()
     }
 
-    private suspend fun loadNewWordSearchResultList(currentUiState: WordSearchUiState) {
+    private suspend fun loadNewWordSearchResultList(
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
+        searchWord: String
+    ) {
         executeLoadWordSearchResultList(
             { updateToWordSearchResultListNewLoadState() },
-            currentUiState,
+            currentResultList,
+            searchWord,
             { _, searchWord ->
                 loadNewWordSearchResultListUseCase(searchWord)
             },
@@ -242,10 +254,14 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
     }
 
-    private suspend fun loadAdditionWordSearchResultList(currentUiState: WordSearchUiState) {
+    private suspend fun loadAdditionWordSearchResultList(
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
+        searchWord: String
+    ) {
         executeLoadWordSearchResultList(
             { updateToWordSearchResultListAdditionLoadState() },
-            currentUiState,
+            currentResultList,
+            searchWord,
             { currentList, searchWord ->
                 loadAdditionWordSearchResultListUseCase(currentList, searchWord)
             },
@@ -264,10 +280,14 @@ internal class WordSearchViewModel @Inject internal constructor(
         )
     }
 
-    private suspend fun refreshWordSearchResultList(currentUiState: WordSearchUiState) {
+    private suspend fun refreshWordSearchResultList(
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
+        searchWord: String
+    ) {
         executeLoadWordSearchResultList(
             { updateToWordSearchResultListRefreshState() },
-            currentUiState,
+            currentResultList,
+            searchWord,
             { currentList, searchWord ->
                 refreshWordSearchResultListUseCase(currentList, searchWord)
             },
@@ -288,14 +308,15 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private suspend fun <E : UseCaseException> executeLoadWordSearchResultList(
         updateToLoadingUiState: suspend () -> Unit,
-        currentUiState: WordSearchUiState,
+        currentResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>,
+        searchWord: String,
         executeLoad: suspend (
             currentResultList: DiaryYearMonthList<DiaryDayListItem.WordSearchResult>,
             searchWord: SearchWord
         ) -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, E>,
         emitAppMessageOnFailure: suspend (E) -> Unit
     ) {
-        val searchWord = SearchWord(currentUiState.searchWord)
+        val searchWord = SearchWord(searchWord)
 
         val logMsg = "ワード検索結果読込"
         Log.i(logTag, "${logMsg}_開始")
@@ -324,7 +345,6 @@ internal class WordSearchViewModel @Inject internal constructor(
                 }
             }
 
-            val currentResultList = currentUiState.wordSearchResultList
             when (val result = executeLoad(currentResultList.toDomainModel(), searchWord)) {
                 is UseCaseResult.Success -> {
                     val updateResultList = result.value.toUiModel()
