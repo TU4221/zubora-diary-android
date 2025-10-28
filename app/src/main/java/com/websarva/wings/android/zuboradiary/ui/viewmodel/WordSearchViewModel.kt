@@ -423,7 +423,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                 wordSearchResultList = list,
 
                 isProcessing = false,
-                isInputDisabled = true,
+                isInputDisabled = false,
                 isIdle = false,
                 isRefreshing = false,
                 hasWordSearchCompleted = true,
