@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
@@ -35,12 +36,18 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryItemTitleEditViewModel @Inject constructor(
+    handle: SavedStateHandle,
     private val loadDiaryItemTitleSelectionHistoryListUseCase: LoadDiaryItemTitleSelectionHistoryListUseCase,
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
 ) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditUiState>(
     DiaryItemTitleEditUiState()
 ) {
+
+    companion object {
+        // 呼び出し元のFragmentから受け取る引数のキー
+        private const val DIARY_ITEM_TITLE_ARGUMENT_KEY = "diary_item_title"
+    }
 
     override val isProgressIndicatorVisible =
         uiState
@@ -57,6 +64,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private var pendingHistoryItemDeleteParameters: HistoryItemDeleteParameters? = null
 
     init {
+        setUpTitle(handle)
         setUpTitleSelectionHistoryList()
     }
 
@@ -74,6 +82,15 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
 
     override fun createUnexpectedAppMessage(e: Exception): DiaryItemTitleEditAppMessage {
         return DiaryItemTitleEditAppMessage.Unexpected(e)
+    }
+
+    private fun setUpTitle(handle: SavedStateHandle) {
+        val diaryItemTitleSelection =
+            handle.get<DiaryItemTitleSelectionUi>(DIARY_ITEM_TITLE_ARGUMENT_KEY)
+                ?: throw IllegalArgumentException()
+        val itemNumberInt = diaryItemTitleSelection.itemNumber
+        val itemTitle = diaryItemTitleSelection.title
+        updateItemNumberAndTitle(itemNumberInt, itemTitle)
     }
 
     private fun setUpTitleSelectionHistoryList() {
@@ -166,13 +183,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val textString = text.toString()
         updateTitle(textString)
         clearNewDiaryItemTitleErrorMessage(textString)
-    }
-
-    // Fragmentからの結果受取処理
-    fun onDiaryItemTitleDataReceived(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
-        val itemNumberInt = diaryItemTitleSelection.itemNumber
-        val itemTitle = diaryItemTitleSelection.title
-        updateItemNumberAndTitle(itemNumberInt, itemTitle)
     }
 
     fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(

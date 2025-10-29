@@ -60,7 +60,6 @@ class DiaryItemTitleEditDialog :
         super.onViewCreated(view, savedInstanceState)
 
         observeUiState()
-        receiveDiaryItemTitleEditData()
         setUpItemTitleSelectionHistory()
     }
 
@@ -117,14 +116,6 @@ class DiaryItemTitleEditDialog :
                 itemTitleSelectionHistoryListAdapter.submitList(it.itemList)
             }
         }
-    }
-
-    // EditDiaryFragmentからデータ受取
-    private fun receiveDiaryItemTitleEditData() {
-        val diaryItemTitle =
-            DiaryItemTitleEditDialogArgs.fromBundle(requireArguments()).diaryItemTitle
-        mainViewModel
-            .onDiaryItemTitleDataReceived(diaryItemTitle)
     }
 
     private fun setUpItemTitleSelectionHistory() {
