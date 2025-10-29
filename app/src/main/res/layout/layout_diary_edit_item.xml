@@ -15,6 +15,9 @@
             name="onTitleClick"
             type="android.view.View.OnClickListener" />
         <variable
+            name="onTitleTextChanged"
+            type="androidx.databinding.adapters.TextViewBindingAdapter.OnTextChanged" />
+        <variable
             name="comment"
             type="java.lang.String" />
         <variable
@@ -95,6 +98,7 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="@style/AppTextInputEditTextTextAppearance"
                     android:text="@{title}"
+                    android:onTextChanged="@{onTitleTextChanged}"
                     android:onClick="@{onTitleClick}"
                     android:textSize="@dimen/layout_diary_edit_item_text_size"
                     android:hint="@string/layout_diary_edit_item_title_hint"

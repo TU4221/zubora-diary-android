@@ -258,6 +258,7 @@
                             app:itemNumber="@{@string/fragment_diary_edit_item_1}"
                             app:title="@{viewModel.uiState.editingDiary.itemTitles.get(1)}"
                             app:onTitleClick="@{() -> viewModel.onItemTitleInputFieldClick(1)}"
+                            app:onTitleTextChanged="@{(s, start, before, count) -> viewModel.onItemTitleTextChanged(1, s)}"
                             app:comment="@{viewModel.uiState.editingDiary.itemComments.get(1)}"
                             app:onCommentTextChanged="@{(s, start, before, count) -> viewModel.onItemCommentTextChanged(1, s)}"
                             app:onItemDeleteButtonClick="@{() -> viewModel.onItemDeleteButtonClick(1)}" />
@@ -268,6 +269,7 @@
                             app:itemNumber="@{@string/fragment_diary_edit_item_2}"
                             app:title="@{viewModel.uiState.editingDiary.itemTitles.get(2)}"
                             app:onTitleClick="@{() -> viewModel.onItemTitleInputFieldClick(2)}"
+                            app:onTitleTextChanged="@{(s, start, before, count) -> viewModel.onItemTitleTextChanged(2, s)}"
                             app:comment="@{viewModel.uiState.editingDiary.itemComments.get(2)}"
                             app:onCommentTextChanged="@{(s, start, before, count) -> viewModel.onItemCommentTextChanged(2, s)}"
                             app:onItemDeleteButtonClick="@{() -> viewModel.onItemDeleteButtonClick(2)}" />
@@ -278,6 +280,7 @@
                             app:itemNumber="@{@string/fragment_diary_edit_item_3}"
                             app:title="@{viewModel.uiState.editingDiary.itemTitles.get(3)}"
                             app:onTitleClick="@{() -> viewModel.onItemTitleInputFieldClick(3)}"
+                            app:onTitleTextChanged="@{(s, start, before, count) -> viewModel.onItemTitleTextChanged(3, s)}"
                             app:comment="@{viewModel.uiState.editingDiary.itemComments.get(3)}"
                             app:onCommentTextChanged="@{(s, start, before, count) -> viewModel.onItemCommentTextChanged(3, s)}"
                             app:onItemDeleteButtonClick="@{() -> viewModel.onItemDeleteButtonClick(3)}" />
@@ -288,6 +291,7 @@
                             app:itemNumber="@{@string/fragment_diary_edit_item_4}"
                             app:title="@{viewModel.uiState.editingDiary.itemTitles.get(4)}"
                             app:onTitleClick="@{() -> viewModel.onItemTitleInputFieldClick(4)}"
+                            app:onTitleTextChanged="@{(s, start, before, count) -> viewModel.onItemTitleTextChanged(4, s)}"
                             app:comment="@{viewModel.uiState.editingDiary.itemComments.get(4)}"
                             app:onCommentTextChanged="@{(s, start, before, count) -> viewModel.onItemCommentTextChanged(4, s)}"
                             app:onItemDeleteButtonClick="@{() -> viewModel.onItemDeleteButtonClick(4)}" />
@@ -299,6 +303,7 @@
                             app:itemNumber="@{@string/fragment_diary_edit_item_5}"
                             app:title="@{viewModel.uiState.editingDiary.itemTitles.get(5)}"
                             app:onTitleClick="@{() -> viewModel.onItemTitleInputFieldClick(5)}"
+                            app:onTitleTextChanged="@{(s, start, before, count) -> viewModel.onItemTitleTextChanged(5, s)}"
                             app:comment="@{viewModel.uiState.editingDiary.itemComments.get(5)}"
                             app:onCommentTextChanged="@{(s, start, before, count) -> viewModel.onItemCommentTextChanged(5, s)}"
                             app:onItemDeleteButtonClick="@{() -> viewModel.onItemDeleteButtonClick(5)}"

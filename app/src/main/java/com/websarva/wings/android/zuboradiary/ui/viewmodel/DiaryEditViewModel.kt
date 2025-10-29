@@ -370,6 +370,13 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
+    fun onItemTitleTextChanged(itemNumberInt: Int, text: CharSequence) {
+        updateItemTitle(
+            itemNumberInt,
+            text.toString()
+        )
+    }
+
     fun onItemAdditionButtonClick() {
         if (!isReadyForOperation) return
 
@@ -1222,6 +1229,17 @@ internal class DiaryEditViewModel @Inject constructor(
         updateUiState {
             it.copy(
                 numVisibleDiaryItems = num
+            )
+        }
+    }
+
+    private fun updateItemTitle(itemNumberInt: Int, title: String) {
+        updateUiState {
+            it.copy(
+                editingDiary =
+                    it.editingDiary.copy(
+                        itemTitles = it.editingDiary.itemTitles + (itemNumberInt to title)
+                    )
             )
         }
     }
