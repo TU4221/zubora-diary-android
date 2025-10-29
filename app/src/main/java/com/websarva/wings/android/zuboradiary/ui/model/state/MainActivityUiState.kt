@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state
 
 import android.os.Parcelable
+import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

@@ -9,7 +9,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.PendingNavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
+import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job

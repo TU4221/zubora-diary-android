@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
-import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
+import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel

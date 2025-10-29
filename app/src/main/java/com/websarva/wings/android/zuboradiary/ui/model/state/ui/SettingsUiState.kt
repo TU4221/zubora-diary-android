@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
-import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.parcelize.Parcelize
 import java.time.DayOfWeek
 import java.time.LocalTime

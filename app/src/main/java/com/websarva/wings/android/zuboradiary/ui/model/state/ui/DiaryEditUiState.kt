@@ -7,7 +7,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionHistoryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
-import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 

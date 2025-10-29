@@ -4,7 +4,6 @@ import android.os.Parcelable
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
-import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
