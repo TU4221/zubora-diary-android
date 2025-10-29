@@ -41,12 +41,21 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
 ) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditUiState>(
-    DiaryItemTitleEditUiState()
+    handle.get<DiaryItemTitleEditUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
+        DiaryItemTitleEditUiState().copy(
+            itemNumber = savedUiState.itemNumber,
+            title = savedUiState.title,
+            titleValidationResult = savedUiState.titleValidationResult,
+        )
+    } ?: DiaryItemTitleEditUiState()
 ) {
 
     companion object {
         // 呼び出し元のFragmentから受け取る引数のキー
         private const val DIARY_ITEM_TITLE_ARGUMENT_KEY = "diary_item_title"
+
+        // ViewModel状態保存キー
+        private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
     override val isProgressIndicatorVisible =
@@ -66,6 +75,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     init {
         setUpTitle(handle)
         setUpTitleSelectionHistoryList()
+        observeDerivedUiStateChanges(handle)
     }
 
     override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): DiaryItemTitleEditEvent {
@@ -85,6 +95,8 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private fun setUpTitle(handle: SavedStateHandle) {
+        if (handle.contains(SAVED_UI_STATE_KEY)) return
+
         val diaryItemTitleSelection =
             handle.get<DiaryItemTitleSelectionUi>(DIARY_ITEM_TITLE_ARGUMENT_KEY)
                 ?: throw IllegalArgumentException()
@@ -123,6 +135,13 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             LoadState.Idle // TODO:仮で設定(LoadState.ErrorのErrorTypeが設定できない為)
         ).distinctUntilChanged().onEach {
             updateToTitleSelectionHistoryListLoadCompletedState(it)
+        }.launchIn(viewModelScope)
+    }
+
+    private fun observeDerivedUiStateChanges(handle: SavedStateHandle) {
+        uiState.onEach {
+            Log.d(logTag, it.toString())
+            handle[SAVED_UI_STATE_KEY] = it
         }.launchIn(viewModelScope)
     }
 
