@@ -6,6 +6,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 internal sealed class InputTextValidationResult : Parcelable {
     data object Valid : InputTextValidationResult()
+    data object Invalid : InputTextValidationResult()
     data object InvalidEmpty : InputTextValidationResult()
     data object InvalidInitialCharUnmatched : InputTextValidationResult()
 }

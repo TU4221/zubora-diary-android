@@ -30,6 +30,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
@@ -45,7 +46,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         DiaryItemTitleEditUiState().copy(
             itemNumber = savedUiState.itemNumber,
             title = savedUiState.title,
-            titleValidationResult = savedUiState.titleValidationResult,
         )
     } ?: DiaryItemTitleEditUiState()
 ) {
@@ -143,6 +143,22 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             Log.d(logTag, it.toString())
             handle[SAVED_UI_STATE_KEY] = it
         }.launchIn(viewModelScope)
+
+        uiState.mapNotNull {
+            val result = validateInputTextUseCase(it.title).value
+            when (result) {
+                InputTextValidationResult.Valid,
+                InputTextValidationResult.Invalid,
+                InputTextValidationResult.InvalidInitialCharUnmatched -> result
+
+                // 空の時は選択ボタン押下時にエラーを表示するようにする。
+                InputTextValidationResult.InvalidEmpty -> null
+            }
+        }.catchUnexpectedError(
+            InputTextValidationResult.Invalid
+        ).distinctUntilChanged().onEach { validationResult ->
+            updateTitleInputTextValidationResult(validationResult)
+        }.launchIn(viewModelScope)
     }
 
     // BackPressed(戻るボタン)処理
@@ -201,7 +217,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     fun onItemTitleTextChanged(text: CharSequence) {
         val textString = text.toString()
         updateTitle(textString)
-        clearNewDiaryItemTitleErrorMessage(textString)
     }
 
     fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(
@@ -253,21 +268,12 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                     DiaryItemTitleEditEvent.CompleteEdit(diaryItemTitleSelection)
                 )
             }
-            InputTextValidationResult.InvalidEmpty -> {
-                updateTitleInputTextValidationResult(result)
-            }
+            InputTextValidationResult.Invalid,
+            InputTextValidationResult.InvalidEmpty,
             InputTextValidationResult.InvalidInitialCharUnmatched -> {
                 updateTitleInputTextValidationResult(result)
             }
         }
-    }
-
-    private fun clearNewDiaryItemTitleErrorMessage(itemTitle: String) {
-        if (currentUiState.titleValidationResult == InputTextValidationResult.Valid) return
-
-        updateTitleInputTextValidationResult(
-            validateInputTextUseCase(itemTitle).value
-        )
     }
 
     private suspend fun deleteDiaryItemTitleSelectionHistory(

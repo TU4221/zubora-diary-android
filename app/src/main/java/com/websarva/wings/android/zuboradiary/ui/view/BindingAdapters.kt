@@ -57,6 +57,7 @@ internal object BindingAdapters {
         layout.error =
             when (result) {
                 InputTextValidationResult.Valid -> null
+                InputTextValidationResult.Invalid -> ""
                 InputTextValidationResult.InvalidEmpty -> {
                     context.getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty)
                 }
