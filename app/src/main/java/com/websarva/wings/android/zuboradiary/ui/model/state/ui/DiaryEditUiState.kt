@@ -30,6 +30,6 @@ internal data class DiaryEditUiState(
     val isDiaryItemAdditionEnabled: Boolean = false,
 
     // ProcessingState
-    val isProcessing: Boolean = false,
-    val isInputDisabled: Boolean = false
+    override val isProcessing: Boolean = false,
+    override val isInputDisabled: Boolean = false
 ) : UiState, Parcelable

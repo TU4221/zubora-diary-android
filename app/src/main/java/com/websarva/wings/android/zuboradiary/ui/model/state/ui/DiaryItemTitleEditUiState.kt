@@ -17,6 +17,6 @@ internal data class DiaryItemTitleEditUiState(
     val titleValidationState: InputTextValidationState = InputTextValidationState.Valid,
 
     // ProcessingState
-    val isProcessing: Boolean = false,
-    val isInputDisabled: Boolean = false
+    override val isProcessing: Boolean = false,
+    override val isInputDisabled: Boolean = false
 ) : UiState, Parcelable

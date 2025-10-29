@@ -17,6 +17,6 @@ internal data class DiaryShowUiState(
     override val numVisibleDiaryItems: Int = 1,
 
     // ProcessingState
-    val isProcessing: Boolean = false,
-    val isInputDisabled: Boolean = false
+    override val isProcessing: Boolean = false,
+    override val isInputDisabled: Boolean = false
 ) : UiState, DiaryUiState, Parcelable
