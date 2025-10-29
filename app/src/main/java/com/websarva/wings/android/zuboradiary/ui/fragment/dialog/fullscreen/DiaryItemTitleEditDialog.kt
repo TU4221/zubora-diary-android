@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEd
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diaryitemtitle.DiaryItemTitleSelectionHistoryListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemTitleDeleteDialogFragment
@@ -19,11 +18,13 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditE
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
-import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 
 @AndroidEntryPoint
 class DiaryItemTitleEditDialog :
@@ -43,6 +44,8 @@ class DiaryItemTitleEditDialog :
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryItemTitleEditViewModel by viewModels()
 
+    private lateinit var itemTitleSelectionHistoryListAdapter: DiaryItemTitleSelectionHistoryListAdapter
+
     override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup?
     ): DialogDiaryItemTitleEditBinding {
@@ -56,9 +59,8 @@ class DiaryItemTitleEditDialog :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        observeUiState()
         receiveDiaryItemTitleEditData()
-        setUpToolBar()
-        setUpItemTitleInputField()
         setUpItemTitleSelectionHistory()
     }
 
@@ -105,6 +107,18 @@ class DiaryItemTitleEditDialog :
         }
     }
 
+    private fun observeUiState() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState.map {
+                it.titleSelectionHistoriesLoadState
+            }.mapNotNull {
+                (it as? LoadState.Success)?.data
+            }.distinctUntilChanged().collectLatest {
+                itemTitleSelectionHistoryListAdapter.submitList(it.itemList)
+            }
+        }
+    }
+
     // EditDiaryFragmentからデータ受取
     private fun receiveDiaryItemTitleEditData() {
         val diaryItemTitle =
@@ -113,70 +127,20 @@ class DiaryItemTitleEditDialog :
             .onDiaryItemTitleDataReceived(diaryItemTitle)
     }
 
-    private fun setUpToolBar() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.itemNumber.filterNotNull().collectLatest { itemNumber ->
-                val toolbarTitle =
-                    getString(
-                        R.string.fragment_diary_item_title_edit_toolbar_title,
-                        itemNumber.toString()
-                    )
-                binding.materialToolbarTopAppBar.title = toolbarTitle
-            }
-        }
-    }
-
-    private fun setUpItemTitleInputField() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.itemTitle.collectLatest {
-                mainViewModel.onItemTitleChanged(it)
-            }
-        }
-
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.itemTitleInputTextValidationResult.collectLatest {
-                binding.textInputLayoutNewItemTitle.error =
-                    when (it) {
-                        InputTextValidationResult.Valid -> {
-                            null
-                        }
-                        InputTextValidationResult.InvalidEmpty -> {
-                            getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty)
-                        }
-                        InputTextValidationResult.InvalidInitialCharUnmatched -> {
-                            getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched)
-                        }
-                    }
-            }
-        }
-    }
-
     private fun setUpItemTitleSelectionHistory() {
-        val itemTitleSelectionHistoryListAdapter =
+        itemTitleSelectionHistoryListAdapter =
             DiaryItemTitleSelectionHistoryListAdapter(
                 binding.recyclerItemTitleSelectionHistory,
                 themeColor
-            )
-        itemTitleSelectionHistoryListAdapter.build()
-        itemTitleSelectionHistoryListAdapter.registerOnItemClickListener { item: DiaryItemTitleSelectionHistoryListItemUi ->
-            mainViewModel.onDiaryItemTitleSelectionHistoryListItemClick(item)
-        }
-        itemTitleSelectionHistoryListAdapter
-            .registerOnItemSwipeListener { item: DiaryItemTitleSelectionHistoryListItemUi ->
-                mainViewModel.onDiaryItemTitleSelectionHistoryListItemSwipe(item)
-            }
-
-        // 選択履歴読込・表示
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.itemTitleSelectionHistoryList
-                .collectLatest { value: DiaryItemTitleSelectionHistoryListUi ->
-                    val adapter =
-                        checkNotNull(
-                            binding.recyclerItemTitleSelectionHistory.adapter
-                        ) as DiaryItemTitleSelectionHistoryListAdapter
-                    adapter.submitList(value.itemList)
+            ).apply {
+                build()
+                registerOnItemClickListener { item: DiaryItemTitleSelectionHistoryListItemUi ->
+                    mainViewModel.onDiaryItemTitleSelectionHistoryListItemClick(item)
                 }
-        }
+                registerOnItemSwipeListener { item: DiaryItemTitleSelectionHistoryListItemUi ->
+                    mainViewModel.onDiaryItemTitleSelectionHistoryListItemSwipe(item)
+                }
+            }
     }
 
     // DiaryItemTitleEditDialogを閉じる

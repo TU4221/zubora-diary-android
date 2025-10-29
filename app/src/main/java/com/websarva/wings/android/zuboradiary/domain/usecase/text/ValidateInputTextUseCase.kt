@@ -5,6 +5,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
+// TODO:戻り値がUiModelの為修正する
 /**
  * 入力されたテキストの有効性を検証するユースケース。
  *

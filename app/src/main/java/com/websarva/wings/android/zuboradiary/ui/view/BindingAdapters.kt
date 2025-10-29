@@ -13,6 +13,9 @@ import androidx.core.view.updateLayoutParams
 import androidx.core.view.updatePadding
 import androidx.databinding.BindingAdapter
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.textfield.TextInputLayout
+import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
 import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
@@ -43,6 +46,25 @@ internal object BindingAdapters {
         view: AutoCompleteTextView,
         listener: AdapterView.OnItemClickListener?) {
         view.onItemClickListener = listener
+    }
+
+    @JvmStatic
+    @BindingAdapter("textValidation")
+    fun setTextValidation(
+        layout: TextInputLayout,
+        result: InputTextValidationResult?) {
+        val context = layout.context
+        layout.error =
+            when (result) {
+                InputTextValidationResult.Valid -> null
+                InputTextValidationResult.InvalidEmpty -> {
+                    context.getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty)
+                }
+                InputTextValidationResult.InvalidInitialCharUnmatched -> {
+                    context.getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched)
+                }
+                null -> null
+            }
     }
 
     /**

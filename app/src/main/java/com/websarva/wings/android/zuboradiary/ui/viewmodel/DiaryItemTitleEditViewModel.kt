@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.util.Log
+import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
-import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputTextUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
@@ -20,15 +19,18 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.state.DiaryItemTitleEditState
-import com.websarva.wings.android.zuboradiary.ui.utils.requireValue
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
+import com.websarva.wings.android.zuboradiary.ui.model.state.ErrorType
+import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
+import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryItemTitleEditUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 @HiltViewModel
@@ -36,53 +38,26 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val loadDiaryItemTitleSelectionHistoryListUseCase: LoadDiaryItemTitleSelectionHistoryListUseCase,
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
-) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditState>(
-    DiaryItemTitleEditState.Idle
+) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditUiState>(
+    DiaryItemTitleEditUiState()
 ) {
 
     override val isProgressIndicatorVisible =
         uiState
-            .map { state ->
-                when (state) {
-                    DiaryItemTitleEditState.LoadingSelectionHistory -> true
-
-                    DiaryItemTitleEditState.Idle,
-                    DiaryItemTitleEditState.NoSelectionHistory,
-                    DiaryItemTitleEditState.ShowingSelectionHistory -> false
-                }
+            .map {
+                it.isProcessing
             }.stateInWhileSubscribed(
                 false
             )
 
-    private val _itemNumber = MutableStateFlow<DiaryItemNumber?>(null)
-    val itemNumber get() =
-        _itemNumber.map { it?.value }.stateInWhileSubscribed(_itemNumber.value?.value)
-
-    private val _itemTitle = MutableStateFlow("")
-    val itemTitle get() = _itemTitle.asStateFlow()
-    val itemTitleForBinding get() = _itemTitle
-
-    private val _itemTitleInputTextValidationResult =
-        MutableStateFlow<InputTextValidationResult>(InputTextValidationResult.Valid)
-    val itemTitleInputTextValidationResult
-        get() = _itemTitleInputTextValidationResult.asStateFlow()
-
-    val isNewItemTitleSelectionEnabled =
-        _itemTitleInputTextValidationResult
-            .map { it == InputTextValidationResult.Valid }
-            .stateInWhileSubscribed(
-                _itemTitleInputTextValidationResult.value
-                        == InputTextValidationResult.Valid
-            )
-
-    private val initialItemTitleSelectionHistoryList = DiaryItemTitleSelectionHistoryListUi(emptyList())
-    lateinit var itemTitleSelectionHistoryList: StateFlow<DiaryItemTitleSelectionHistoryListUi>
+    private val currentUiState
+        get() = uiState.value
 
     // キャッシュパラメータ
     private var pendingHistoryItemDeleteParameters: HistoryItemDeleteParameters? = null
 
     init {
-        setUpItemTitleSelectionHistoryList()
+        setUpTitleSelectionHistoryList()
     }
 
     override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): DiaryItemTitleEditEvent {
@@ -101,6 +76,39 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         return DiaryItemTitleEditAppMessage.Unexpected(e)
     }
 
+    private fun setUpTitleSelectionHistoryList() {
+        loadDiaryItemTitleSelectionHistoryListUseCase().onStart {
+            updateToTitleSelectionHistoryListLoadingState()
+        }.map {
+            when (it) {
+                is UseCaseResult.Success -> {
+                    if (it.value.isEmpty) {
+                        LoadState.Empty
+                    } else {
+                        LoadState.Success(it.value.toUiModel())
+                    }
+                }
+                is UseCaseResult.Failure -> {
+                    when (it.exception) {
+                        is DiaryItemTitleSelectionHistoryLoadException.LoadFailure -> {
+                            emitAppMessageEvent(
+                                DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadFailure
+                            )
+                        }
+                        is DiaryItemTitleSelectionHistoryLoadException.Unknown -> {
+                            emitUnexpectedAppMessage(it.exception)
+                        }
+                    }
+                    LoadState.Error(ErrorType.Unexpected(it.exception))
+                }
+            }
+        }.catchUnexpectedError(
+            LoadState.Idle // TODO:仮で設定(LoadState.ErrorのErrorTypeが設定できない為)
+        ).distinctUntilChanged().onEach {
+            updateToTitleSelectionHistoryListLoadCompletedState(it)
+        }.launchIn(viewModelScope)
+    }
+
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         launchWithUnexpectedErrorHandler {
@@ -116,15 +124,15 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     fun onNewDiaryItemTitleSelectionButtonClick() {
-        val itemNumber = _itemNumber.requireValue()
-        val itemTitle = _itemTitle.value
+        val itemNumber = currentUiState.itemNumber
+        val itemTitle = currentUiState.title
         launchWithUnexpectedErrorHandler {
             completeItemTitleEdit(itemNumber, itemTitle = itemTitle)
         }
     }
 
     fun onDiaryItemTitleSelectionHistoryListItemClick(item: DiaryItemTitleSelectionHistoryListItemUi) {
-        val itemNumber = _itemNumber.requireValue()
+        val itemNumber = currentUiState.itemNumber
         val itemId = item.id
         val itemTitle = item.title
         launchWithUnexpectedErrorHandler {
@@ -153,13 +161,18 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
+    // View状態処理
+    fun onItemTitleTextChanged(text: CharSequence) {
+        val textString = text.toString()
+        updateTitle(textString)
+        clearNewDiaryItemTitleErrorMessage(textString)
+    }
+
     // Fragmentからの結果受取処理
     fun onDiaryItemTitleDataReceived(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
-        val itemNumber = DiaryItemNumber(diaryItemTitleSelection.itemNumber)
-        updateItemNumber(itemNumber)
-
+        val itemNumberInt = diaryItemTitleSelection.itemNumber
         val itemTitle = diaryItemTitleSelection.title
-        updateItemTitle(itemTitle)
+        updateItemNumberAndTitle(itemNumberInt, itemTitle)
     }
 
     fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(
@@ -197,74 +210,33 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    // StateFlow値変更時処理
-    fun onItemTitleChanged(title: String) {
-        clearNewDiaryItemTitleErrorMessage(title)
-    }
-
     // データ処理
-    private fun setUpItemTitleSelectionHistoryList() {
-        val logMsg = "日記項目タイトル選択履歴読込"
-        Log.i(logTag, "${logMsg}_開始")
-
-        updateUiState(DiaryItemTitleEditState.LoadingSelectionHistory)
-        itemTitleSelectionHistoryList =
-            loadDiaryItemTitleSelectionHistoryListUseCase()
-                .map {
-                    when (it) {
-                        is UseCaseResult.Success -> {
-                            if (it.value.isEmpty) {
-                                updateUiState(DiaryItemTitleEditState.NoSelectionHistory)
-                            } else {
-                                updateUiState(DiaryItemTitleEditState.ShowingSelectionHistory)
-                            }
-                            it.value.toUiModel()
-                        }
-                        is UseCaseResult.Failure -> {
-                            when (it.exception) {
-                                is DiaryItemTitleSelectionHistoryLoadException.LoadFailure -> {
-                                    emitAppMessageEvent(
-                                        DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadFailure
-                                    )
-                                }
-                                is DiaryItemTitleSelectionHistoryLoadException.Unknown -> {
-                                    emitUnexpectedAppMessage(it.exception)
-                                }
-                            }
-                            initialItemTitleSelectionHistoryList
-                        }
-                    }
-                }.stateInWhileSubscribed(
-                    initialItemTitleSelectionHistoryList
-                )
-    }
-
     private suspend fun completeItemTitleEdit(
-        itemNumber: DiaryItemNumber,
+        itemNumberInt: Int,
         itemId: DiaryItemTitleSelectionHistoryId = DiaryItemTitleSelectionHistoryId.generate(),
         itemTitle: String
     ) {
         when (val result = validateInputTextUseCase(itemTitle).value) {
             InputTextValidationResult.Valid -> {
                 val diaryItemTitleSelection =
-                    DiaryItemTitleSelectionUi(itemNumber.value, itemId.value, itemTitle)
+                    DiaryItemTitleSelectionUi(itemNumberInt, itemId.value, itemTitle)
                 emitUiEvent(
                     DiaryItemTitleEditEvent.CompleteEdit(diaryItemTitleSelection)
                 )
             }
             InputTextValidationResult.InvalidEmpty -> {
-                updateItemTitleInputTextValidationResult(result)
+                updateTitleInputTextValidationResult(result)
             }
             InputTextValidationResult.InvalidInitialCharUnmatched -> {
-                updateItemTitleInputTextValidationResult(result)
+                updateTitleInputTextValidationResult(result)
             }
         }
     }
 
     private fun clearNewDiaryItemTitleErrorMessage(itemTitle: String) {
-        if (_itemTitleInputTextValidationResult.value == InputTextValidationResult.Valid) return
+        if (currentUiState.titleValidationResult == InputTextValidationResult.Valid) return
 
-        updateItemTitleInputTextValidationResult(
+        updateTitleInputTextValidationResult(
             validateInputTextUseCase(itemTitle).value
         )
     }
@@ -296,16 +268,51 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    private fun updateItemNumber(itemNumber: DiaryItemNumber?) {
-        _itemNumber.value = itemNumber
+    private fun updateItemNumberAndTitle(itemNumberInt: Int, title: String) {
+        updateUiState {
+            it.copy(
+                itemNumber = itemNumberInt,
+                title = title
+            )
+        }
     }
 
-    private fun updateItemTitle(itemTitle: String) {
-        _itemTitle.value = itemTitle
+    private fun updateTitle(itemTitle: String) {
+        updateUiState {
+            it.copy(
+                title = itemTitle
+            )
+        }
     }
 
-    private fun updateItemTitleInputTextValidationResult(result: InputTextValidationResult) {
-        _itemTitleInputTextValidationResult.value = result
+    private fun updateTitleInputTextValidationResult(result: InputTextValidationResult) {
+        updateUiState {
+            it.copy(
+                titleValidationResult = result
+            )
+        }
+    }
+
+    private fun updateToTitleSelectionHistoryListLoadingState() {
+        updateUiState {
+            it.copy(
+                titleSelectionHistoriesLoadState = LoadState.Loading,
+                isProcessing = true,
+                isInputDisabled = true
+            )
+        }
+    }
+
+    private fun updateToTitleSelectionHistoryListLoadCompletedState(
+        loadState: LoadState<DiaryItemTitleSelectionHistoryListUi>
+    ) {
+        updateUiState {
+            it.copy(
+                titleSelectionHistoriesLoadState = loadState,
+                isProcessing = false,
+                isInputDisabled = false
+            )
+        }
     }
 
     private fun updatePendingHistoryItemDeleteParameters(

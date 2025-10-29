@@ -141,6 +141,21 @@ internal object DiaryUiBindingAdapters {
     }
 
     @JvmStatic
+    @BindingAdapter("diaryItemNumberText")
+    fun setDiaryItemNumberText(toolbar: Toolbar, number: Int) {
+        val dateText =
+            toolbar.context.getString(
+                R.string.fragment_diary_item_title_edit_toolbar_title,
+                number.toString()
+            )
+        toolbar.title?.let {
+            if (it.toString() == dateText) return
+        }
+
+        toolbar.title = dateText
+    }
+
+    @JvmStatic
     @BindingAdapter(
         value = [
             "diaryItemNumber",

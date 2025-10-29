@@ -1,6 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.model.result
 
-internal sealed class InputTextValidationResult {
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
+internal sealed class InputTextValidationResult : Parcelable {
     data object Valid : InputTextValidationResult()
     data object InvalidEmpty : InputTextValidationResult()
     data object InvalidInitialCharUnmatched : InputTextValidationResult()
