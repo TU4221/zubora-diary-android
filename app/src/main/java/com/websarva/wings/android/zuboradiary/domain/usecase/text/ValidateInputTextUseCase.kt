@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.text
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationState
+import com.websarva.wings.android.zuboradiary.ui.model.state.InputTextValidationState
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 // TODO:戻り値がUiModelの為修正する

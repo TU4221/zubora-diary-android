@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
-import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationState
+import com.websarva.wings.android.zuboradiary.ui.model.state.InputTextValidationState
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.parcelize.Parcelize
