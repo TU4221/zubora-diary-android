@@ -2,10 +2,9 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.text
 
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.ui.model.state.InputTextValidationState
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.domain.model.common.InputTextValidation
 
-// TODO:戻り値がUiModelの為修正する
 /**
  * 入力されたテキストの有効性を検証するユースケース。
  *
@@ -19,26 +18,26 @@ internal class ValidateInputTextUseCase {
      * ユースケースを実行し、入力されたテキストの有効性を検証する。
      *
      * @param inputText 検証するテキスト文字列。
-     * @return 検証結果 ([InputTextValidationState]) を [UseCaseResult.Success] に格納して返す。
+     * @return 検証結果 ([InputTextValidation]) を [UseCaseResult.Success] に格納して返す。
      *   このユースケースは常に成功するため、[UseCaseResult.Failure] を返すことはない。
      */
     operator fun invoke(
         inputText: String
-    ): UseCaseResult.Success<InputTextValidationState> {
+    ): UseCaseResult.Success<InputTextValidation> {
         Log.i(logTag, "${logMsg}開始 (入力テキスト: \"$inputText\")")
 
         val validateResult =
             // 空欄
             if (inputText.isEmpty()) {
-                InputTextValidationState.InvalidEmpty
+                InputTextValidation.Empty
 
                 // 先頭が空白文字(\\s)
             } else if (inputText.matches("\\s+.*".toRegex())) {
-                InputTextValidationState.InvalidInitialCharUnmatched
+                InputTextValidation.InitialCharUnmatched
 
                 // 有効
             } else {
-                InputTextValidationState.Valid
+                InputTextValidation.Valid
             }
 
         Log.i(logTag, "${logMsg}完了 (結果: $validateResult)")

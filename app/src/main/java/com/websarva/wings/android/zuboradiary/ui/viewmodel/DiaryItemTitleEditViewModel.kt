@@ -22,6 +22,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.domain.model.common.InputTextValidation
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.ErrorType
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
@@ -147,12 +148,11 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         uiState.mapNotNull {
             val state = validateInputTextUseCase(it.title).value
             when (state) {
-                InputTextValidationState.Valid,
-                InputTextValidationState.Invalid,
-                InputTextValidationState.InvalidInitialCharUnmatched -> state
+                InputTextValidation.Valid,
+                InputTextValidation.InitialCharUnmatched -> state.toUiModel()
 
                 // 空の時は選択ボタン押下時にエラーを表示するようにする。
-                InputTextValidationState.InvalidEmpty -> null
+                InputTextValidation.Empty -> null
             }
         }.catchUnexpectedError(
             InputTextValidationState.Invalid
@@ -261,17 +261,16 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         itemTitle: String
     ) {
         when (val state = validateInputTextUseCase(itemTitle).value) {
-            InputTextValidationState.Valid -> {
+            InputTextValidation.Valid -> {
                 val diaryItemTitleSelection =
                     DiaryItemTitleSelectionUi(itemNumberInt, itemId.value, itemTitle)
                 emitUiEvent(
                     DiaryItemTitleEditEvent.CompleteEdit(diaryItemTitleSelection)
                 )
             }
-            InputTextValidationState.Invalid,
-            InputTextValidationState.InvalidEmpty,
-            InputTextValidationState.InvalidInitialCharUnmatched -> {
-                updateTitleValidationState(state)
+            InputTextValidation.Empty,
+            InputTextValidation.InitialCharUnmatched -> {
+                updateTitleValidationState(state.toUiModel())
             }
         }
     }
