@@ -5,7 +5,7 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationState" />
         <import type="com.websarva.wings.android.zuboradiary.ui.model.state.LoadState" />
         <variable
             name="viewModel"
@@ -67,7 +67,7 @@
                     app:counterEnabled="true"
                     app:counterMaxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
                     app:errorEnabled="true"
-                    app:textValidation="@{viewModel.uiState.titleValidationResult}" >
+                    app:textValidationState="@{viewModel.uiState.titleValidationState}" >
 
                     <com.websarva.wings.android.zuboradiary.ui.view.custom.ImeActionHandlingTextInputEditText
                         style="@style/AppImeDoneActionHandlingTextInputEditTextStyle"
@@ -92,7 +92,7 @@
                     android:layout_gravity="center_horizontal"
                     android:text="@string/fragment_diary_item_title_edit_new_item_title_selection_button"
                     android:textSize="@dimen/fragment_diary_item_title_edit_text_size"
-                    android:enabled="@{viewModel.uiState.titleValidationResult instanceof InputTextValidationResult.Valid}"
+                    android:enabled="@{viewModel.uiState.titleValidationState instanceof InputTextValidationState.Valid}"
                     android:onClick="@{() -> viewModel.onNewDiaryItemTitleSelectionButtonClick()}" />
 
             </LinearLayout>

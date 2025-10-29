@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
-import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationState
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.UiState
 import kotlinx.parcelize.Parcelize
@@ -15,7 +15,7 @@ internal data class DiaryItemTitleEditUiState(
     val titleSelectionHistoriesLoadState: LoadState<DiaryItemTitleSelectionHistoryListUi> = LoadState.Idle,
 
     // UiState
-    val titleValidationResult: InputTextValidationResult = InputTextValidationResult.Valid,
+    val titleValidationState: InputTextValidationState = InputTextValidationState.Valid,
 
     // ProcessingState
     val isProcessing: Boolean = false,

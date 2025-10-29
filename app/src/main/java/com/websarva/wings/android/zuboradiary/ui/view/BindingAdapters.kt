@@ -15,7 +15,7 @@ import androidx.databinding.BindingAdapter
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationState
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
 import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
@@ -49,19 +49,20 @@ internal object BindingAdapters {
     }
 
     @JvmStatic
-    @BindingAdapter("textValidation")
+    @BindingAdapter("textValidationState")
     fun setTextValidation(
         layout: TextInputLayout,
-        result: InputTextValidationResult?) {
+        state: InputTextValidationState?
+    ) {
         val context = layout.context
         layout.error =
-            when (result) {
-                InputTextValidationResult.Valid -> null
-                InputTextValidationResult.Invalid -> ""
-                InputTextValidationResult.InvalidEmpty -> {
+            when (state) {
+                InputTextValidationState.Valid -> null
+                InputTextValidationState.Invalid -> ""
+                InputTextValidationState.InvalidEmpty -> {
                     context.getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty)
                 }
-                InputTextValidationResult.InvalidInitialCharUnmatched -> {
+                InputTextValidationState.InvalidInitialCharUnmatched -> {
                     context.getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched)
                 }
                 null -> null

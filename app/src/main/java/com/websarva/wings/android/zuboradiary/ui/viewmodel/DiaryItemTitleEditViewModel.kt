@@ -15,7 +15,7 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
-import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.InputTextValidationState
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -145,19 +145,19 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         uiState.mapNotNull {
-            val result = validateInputTextUseCase(it.title).value
-            when (result) {
-                InputTextValidationResult.Valid,
-                InputTextValidationResult.Invalid,
-                InputTextValidationResult.InvalidInitialCharUnmatched -> result
+            val state = validateInputTextUseCase(it.title).value
+            when (state) {
+                InputTextValidationState.Valid,
+                InputTextValidationState.Invalid,
+                InputTextValidationState.InvalidInitialCharUnmatched -> state
 
                 // 空の時は選択ボタン押下時にエラーを表示するようにする。
-                InputTextValidationResult.InvalidEmpty -> null
+                InputTextValidationState.InvalidEmpty -> null
             }
         }.catchUnexpectedError(
-            InputTextValidationResult.Invalid
+            InputTextValidationState.Invalid
         ).distinctUntilChanged().onEach { validationResult ->
-            updateTitleInputTextValidationResult(validationResult)
+            updateTitleValidationState(validationResult)
         }.launchIn(viewModelScope)
     }
 
@@ -260,18 +260,18 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         itemId: DiaryItemTitleSelectionHistoryId = DiaryItemTitleSelectionHistoryId.generate(),
         itemTitle: String
     ) {
-        when (val result = validateInputTextUseCase(itemTitle).value) {
-            InputTextValidationResult.Valid -> {
+        when (val state = validateInputTextUseCase(itemTitle).value) {
+            InputTextValidationState.Valid -> {
                 val diaryItemTitleSelection =
                     DiaryItemTitleSelectionUi(itemNumberInt, itemId.value, itemTitle)
                 emitUiEvent(
                     DiaryItemTitleEditEvent.CompleteEdit(diaryItemTitleSelection)
                 )
             }
-            InputTextValidationResult.Invalid,
-            InputTextValidationResult.InvalidEmpty,
-            InputTextValidationResult.InvalidInitialCharUnmatched -> {
-                updateTitleInputTextValidationResult(result)
+            InputTextValidationState.Invalid,
+            InputTextValidationState.InvalidEmpty,
+            InputTextValidationState.InvalidInitialCharUnmatched -> {
+                updateTitleValidationState(state)
             }
         }
     }
@@ -320,10 +320,10 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    private fun updateTitleInputTextValidationResult(result: InputTextValidationResult) {
+    private fun updateTitleValidationState(result: InputTextValidationState) {
         updateUiState {
             it.copy(
-                titleValidationResult = result
+                titleValidationState = result
             )
         }
     }
