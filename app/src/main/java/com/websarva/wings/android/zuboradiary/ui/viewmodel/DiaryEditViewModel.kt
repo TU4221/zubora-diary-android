@@ -50,7 +50,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionHistoryUi
-import com.websarva.wings.android.zuboradiary.ui.model.state.ErrorType
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryEditUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.DiaryUiStateHelper
@@ -745,8 +744,7 @@ internal class DiaryEditViewModel @Inject constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 if (previousState.originalDiaryLoadState == LoadState.Idle) {
-                    // TODO:ErrorTypeは仮。全体で必要になったら検討。
-                    updateToDiaryLoadErrorState(ErrorType.Failure(result.exception))
+                    updateToDiaryLoadErrorState()
 
                     // MEMO:連続するUIイベント（エラー表示と画面遷移）は、監視開始前に発行されると
                     //      取りこぼされる可能性がある。これを防ぐため、間に確認ダイアログを挟み、
@@ -1337,10 +1335,10 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun updateToDiaryLoadErrorState(errorType: ErrorType) {
+    private fun updateToDiaryLoadErrorState() {
         updateUiState {
             it.copy(
-                originalDiaryLoadState = LoadState.Error(errorType),
+                originalDiaryLoadState = LoadState.Error,
                 isProcessing = false,
                 isInputDisabled = false
             )

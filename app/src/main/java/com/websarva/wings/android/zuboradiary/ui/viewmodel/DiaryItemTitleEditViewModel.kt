@@ -24,7 +24,6 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.common.InputTextValidation
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
-import com.websarva.wings.android.zuboradiary.ui.model.state.ErrorType
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryItemTitleEditUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -129,11 +128,11 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                             emitUnexpectedAppMessage(it.exception)
                         }
                     }
-                    LoadState.Error(ErrorType.Unexpected(it.exception))
+                    LoadState.Error
                 }
             }
         }.catchUnexpectedError(
-            LoadState.Idle // TODO:仮で設定(LoadState.ErrorのErrorTypeが設定できない為)
+            LoadState.Error
         ).distinctUntilChanged().onEach {
             updateToTitleSelectionHistoryListLoadCompletedState(it)
         }.launchIn(viewModelScope)

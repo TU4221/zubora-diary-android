@@ -17,7 +17,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
-import com.websarva.wings.android.zuboradiary.ui.model.state.ErrorType
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryShowUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
@@ -229,11 +228,11 @@ internal class DiaryShowViewModel @Inject constructor(
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 when (result.exception) {
                     is DiaryLoadByIdException.LoadFailure -> {
-                        updateToDiaryLoadErrorState(ErrorType.Failure(result.exception))
+                        updateToDiaryLoadErrorState()
                         emitUiEvent(DiaryShowEvent.NavigateDiaryLoadFailureDialog(date))
                     }
                     is DiaryLoadByIdException.Unknown -> {
-                        updateToDiaryLoadErrorState(ErrorType.Unexpected(result.exception))
+                        updateToDiaryLoadErrorState()
                         emitUnexpectedAppMessage(result.exception)
                     }
                 }
@@ -301,10 +300,10 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    private fun updateToDiaryLoadErrorState(errorType: ErrorType) {
+    private fun updateToDiaryLoadErrorState() {
         updateUiState {
             it.copy(
-                diaryLoadState = LoadState.Error(errorType),
+                diaryLoadState = LoadState.Error,
                 isProcessing = false,
                 isInputDisabled = true
             )

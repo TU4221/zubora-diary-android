@@ -7,7 +7,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByDateException
 import com.websarva.wings.android.zuboradiary.ui.model.message.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -15,7 +14,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
-import com.websarva.wings.android.zuboradiary.ui.model.state.ErrorType
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.CalendarUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
@@ -262,20 +260,7 @@ internal class CalendarViewModel @Inject constructor(
             }
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
-                val errorType =
-                    when (val exception = result.exception) {
-                        is DiaryLoadByDateException.LoadFailure -> {
-                            emitAppMessageEvent(
-                                CalendarAppMessage.DiaryLoadFailure
-                            )
-                            ErrorType.Failure(exception)
-                        }
-                        is DiaryLoadByDateException.Unknown -> {
-                            emitUnexpectedAppMessage(exception)
-                            ErrorType.Unexpected(exception)
-                        }
-                    }
-                updateToDiaryLoadErrorState(errorType)
+                updateToDiaryLoadErrorState()
             }
         }
     }
@@ -341,10 +326,10 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    private fun updateToDiaryLoadErrorState(errorType: ErrorType) {
+    private fun updateToDiaryLoadErrorState() {
         updateUiState {
             it.copy(
-                diaryLoadState = LoadState.Error(errorType),
+                diaryLoadState = LoadState.Error,
                 isProcessing = false,
                 isInputDisabled = false
             )

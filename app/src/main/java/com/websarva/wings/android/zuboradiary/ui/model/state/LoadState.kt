@@ -33,8 +33,6 @@ internal sealed class LoadState<out T : Parcelable> : Parcelable {
 
     /**
      * データの読み込みが失敗した状態。
-     *
-     * @property errorType エラーの種類。
      */
-    data class Error(val errorType: ErrorType) : LoadState<Nothing>()
+    data object Error : LoadState<Nothing>()
 }
