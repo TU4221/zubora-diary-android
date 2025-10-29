@@ -22,4 +22,4 @@ internal data class CalendarUiState(
     // ProcessingState
     override val isProcessing: Boolean = false,
     override val isInputDisabled: Boolean = false
-) : UiState, DiaryUiState, Parcelable
+) : UiState, BaseDiaryShowUiState, Parcelable

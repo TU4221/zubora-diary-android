@@ -19,4 +19,4 @@ internal data class DiaryShowUiState(
     // ProcessingState
     override val isProcessing: Boolean = false,
     override val isInputDisabled: Boolean = false
-) : UiState, DiaryUiState, Parcelable
+) : UiState, BaseDiaryShowUiState, Parcelable
