@@ -41,6 +41,10 @@ import kotlinx.coroutines.flow.map
 @AndroidEntryPoint
 class MainActivity : LoggingActivity() {
 
+    companion object {
+        private const val SAVED_STATE_THEME_COLOR = "saved_state_theme_color"
+    }
+
     private var _binding: ActivityMainBinding? = null
     private val binding get() = checkNotNull(_binding)
     private var isMainActivityLayoutInflated = false
@@ -70,10 +74,18 @@ class MainActivity : LoggingActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
         setUpEdgeToEdge()
+        restoreThemeColor(savedInstanceState)
         super.onCreate(savedInstanceState)
 
         setUpUi()
         setUpFragmentLifeCycleCallBacks()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        if (::themeColor.isInitialized) {
+            outState.putParcelable(SAVED_STATE_THEME_COLOR, themeColor)
+        }
     }
 
     // MEMO:EdgeToEdge対応。下記ページ参照。
@@ -84,6 +96,19 @@ class MainActivity : LoggingActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
         }
+    }
+
+    private fun restoreThemeColor(savedInstanceState: Bundle?) {
+        val savedThemeColor = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            savedInstanceState?.getParcelable(
+                SAVED_STATE_THEME_COLOR,
+                ThemeColorUi::class.java
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            savedInstanceState?.getParcelable(SAVED_STATE_THEME_COLOR)
+        }
+        savedThemeColor?.let { themeColor = it }
     }
 
     private fun setUpUi() {
