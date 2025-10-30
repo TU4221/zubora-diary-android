@@ -18,7 +18,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDataDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDiariesDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllSettingsInitializationDialogFragment
@@ -28,6 +27,8 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.Reminder
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -42,7 +43,6 @@ import java.time.DayOfWeek
 @AndroidEntryPoint
 class SettingsFragment :
     BaseFragment<FragmentSettingsBinding, SettingsEvent>(),
-    ReselectableFragment,
     RequiresBottomNavigation {
 
     override val destinationId = R.id.navigation_settings_fragment
@@ -113,6 +113,7 @@ class SettingsFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        observeUiEventFromActivity()
         observeUiState()
     }
 
@@ -261,6 +262,21 @@ class SettingsFragment :
                     }
                 }
             }
+        }
+    }
+
+    private fun observeUiEventFromActivity() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainActivityViewModel.fragmentUiEvent
+                .collect { value: ConsumableEvent<FragmentUiEvent> ->
+                    val event = value.getContentIfNotHandled()
+                    event ?: return@collect
+                    when (event) {
+                        FragmentUiEvent.ProcessOnBottomNavigationItemReselect -> {
+                            scrollToTop()
+                        }
+                    }
+                }
         }
     }
 
@@ -508,10 +524,6 @@ class SettingsFragment :
         val isAccessLocationGranted = requireContext().isAccessLocationGranted()
         mainViewModel
             .onEnsureWeatherInfoFetchSettingMatchesPermission(isAccessLocationGranted)
-    }
-
-    override fun onBottomNavigationItemReselected() {
-        scrollToTop()
     }
 
     private fun scrollToTop() {

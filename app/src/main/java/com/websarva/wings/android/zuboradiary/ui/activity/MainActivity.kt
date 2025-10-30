@@ -24,9 +24,8 @@ import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityUiEvent
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
@@ -184,11 +183,11 @@ class MainActivity : LoggingActivity() {
     private fun setUpUiEvent() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainActivityViewModel.uiEvent
-                    .collectLatest { value: ConsumableEvent<MainActivityEvent> ->
+                mainActivityViewModel.activityUiEvent
+                    .collectLatest { value: ConsumableEvent<MainActivityUiEvent> ->
                         val event = value.getContentIfNotHandled() ?: return@collectLatest
                         when (event) {
-                            MainActivityEvent.NavigateStartTabFragment -> navigateBottomNavigationStartTabFragment()
+                            MainActivityUiEvent.NavigateStartTabFragment -> navigateBottomNavigationStartTabFragment()
                         }
                     }
             }
@@ -285,11 +284,8 @@ class MainActivity : LoggingActivity() {
                 onNavDestinationSelected(menuItem, navController)
             }
             setOnItemReselectedListener {
-                val currentFragment = currentFragment
-                if (currentFragment !is ReselectableFragment) return@setOnItemReselectedListener
-
                 Log.i(logTag, "ボトムナビゲーション_リセレクト")
-                currentFragment.onBottomNavigationItemReselected()
+                mainActivityViewModel.onBottomNavigationItemReselect()
             }
         }
     }

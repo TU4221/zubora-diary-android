@@ -24,11 +24,12 @@ import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBi
 import com.websarva.wings.android.zuboradiary.ui.theme.CalendarThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -43,7 +44,6 @@ import java.util.stream.Stream
 @AndroidEntryPoint
 class CalendarFragment :
     BaseFragment<FragmentCalendarBinding, CalendarEvent>(),
-    ReselectableFragment,
     RequiresBottomNavigation {
 
     override val destinationId = R.id.navigation_calendar_fragment
@@ -69,6 +69,7 @@ class CalendarFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        observeUiEventFromActivity()
         observeUiState()
         setUpCalendar()
     }
@@ -118,6 +119,21 @@ class CalendarFragment :
                     }
                 }
             }
+        }
+    }
+
+    private fun observeUiEventFromActivity() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainActivityViewModel.fragmentUiEvent
+                .collect { value: ConsumableEvent<FragmentUiEvent> ->
+                    val event = value.getContentIfNotHandled()
+                    event ?: return@collect
+                    when (event) {
+                        FragmentUiEvent.ProcessOnBottomNavigationItemReselect -> {
+                            onBottomNavigationItemReselected()
+                        }
+                    }
+                }
         }
     }
 
@@ -478,7 +494,7 @@ class CalendarFragment :
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
-    override fun onBottomNavigationItemReselected() {
+    private fun onBottomNavigationItemReselected() {
         if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
             scrollToTop()
             return

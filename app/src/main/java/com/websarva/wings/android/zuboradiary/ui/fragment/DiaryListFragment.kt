@@ -14,12 +14,13 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryList
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
+import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -30,7 +31,6 @@ import java.time.Year
 @AndroidEntryPoint
 class DiaryListFragment :
     BaseFragment<FragmentDiaryListBinding, DiaryListEvent>(),
-    ReselectableFragment,
     RequiresBottomNavigation {
 
     override val destinationId = R.id.navigation_diary_list_fragment
@@ -57,6 +57,7 @@ class DiaryListFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        observeUiEventFromActivity()
         observeUiState() // TODO:BaseFragmentに抽象メソッド作成
         observeDiaryListLoadingState()
         setUpToolBar()
@@ -115,6 +116,21 @@ class DiaryListFragment :
                     }
                 }
             }
+        }
+    }
+
+    private fun observeUiEventFromActivity() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainActivityViewModel.fragmentUiEvent
+                .collect { value: ConsumableEvent<FragmentUiEvent> ->
+                    val event = value.getContentIfNotHandled()
+                    event ?: return@collect
+                    when (event) {
+                        FragmentUiEvent.ProcessOnBottomNavigationItemReselect -> {
+                            scrollDiaryListToFirstPosition()
+                        }
+                    }
+                }
         }
     }
 
@@ -221,10 +237,6 @@ class DiaryListFragment :
         val directions =
             DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
         navigateFragmentWithRetry(NavigationCommand.To(directions))
-    }
-
-    override fun onBottomNavigationItemReselected() {
-        scrollDiaryListToFirstPosition()
     }
 
     private fun scrollDiaryListToFirstPosition() {

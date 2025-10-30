@@ -6,8 +6,9 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
-import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.MainActivityUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,8 +33,11 @@ internal class MainActivityViewModel @Inject constructor(
         private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
-    private val _uiEvent = MutableSharedFlow<ConsumableEvent<MainActivityEvent>>(replay = 1)
-    val uiEvent get() = _uiEvent.asSharedFlow()
+    private val _activityUiEvent = MutableSharedFlow<ConsumableEvent<MainActivityUiEvent>>(replay = 1)
+    val activityUiEvent get() = _activityUiEvent.asSharedFlow()
+
+    private val _fragmentUiEvent = MutableSharedFlow<ConsumableEvent<FragmentUiEvent>>(replay = 1)
+    val fragmentUiEvent get() = _fragmentUiEvent.asSharedFlow()
 
     private val _uiState = MutableStateFlow(
         handle.get<MainActivityUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
@@ -101,12 +105,24 @@ internal class MainActivityViewModel @Inject constructor(
 
     fun onNavigateBackFromBottomNavigationTab() {
         viewModelScope.launch {
-            updateUiEvent(MainActivityEvent.NavigateStartTabFragment)
+            updateActivityUiEvent(MainActivityUiEvent.NavigateStartTabFragment)
         }
     }
 
-    private suspend fun updateUiEvent(event: MainActivityEvent) {
-        _uiEvent.emit(
+    fun onBottomNavigationItemReselect() {
+        viewModelScope.launch {
+            updateFragmentUiEvent(FragmentUiEvent.ProcessOnBottomNavigationItemReselect)
+        }
+    }
+
+    private suspend fun updateActivityUiEvent(event: MainActivityUiEvent) {
+        _activityUiEvent.emit(
+            ConsumableEvent(event)
+        )
+    }
+
+    private suspend fun updateFragmentUiEvent(event: FragmentUiEvent) {
+        _fragmentUiEvent.emit(
             ConsumableEvent(event)
         )
     }
