@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.os.Bundle
 import android.transition.Transition
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +12,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
@@ -67,7 +69,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setUpFragmentTransitionEffect()
+        setUpVisibleFragmentTransitionEffect()
 
         val themeColorInflater = fragmentHelper.createThemeColorInflater(inflater, themeColor)
         _binding = createViewBinding(themeColorInflater, requireNotNull(container))
@@ -81,7 +83,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): T
 
-    private fun setUpFragmentTransitionEffect() {
+    private fun setUpVisibleFragmentTransitionEffect() {
         // FROM:遷移元 TO:遷移先
         // FROM - TO の TO として現れるアニメーション
 
@@ -89,38 +91,53 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         //      NavigationStartFragment(DiaryListFragment)はReenterTransitionで設定されたエフェクトが処理される。
         //      遷移元FragmentのエフェクトはMainActivityクラスにて設定。
         val enterTransitionType: Transition =
-            if (mainActivityViewModel.uiState.value.wasSelectedTab) {
-                MaterialFadeThrough()
+            if (mainActivityViewModel.wasSelectedTab.value) {
+                MaterialFadeThrough().apply {
+                    addListener(
+                        createTransitionLogListener("Enter_MaterialFadeThrough")
+                    )
+                }
             } else {
-                MaterialSharedAxis(MaterialSharedAxis.X, true)
+                MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+                    addListener(
+                        createTransitionLogListener("Enter_MaterialSharedAxis.X")
+                    )
+                }
             }
         enterTransition = enterTransitionType
 
         // FROM - TO の FROM として消えるアニメーション
-        exitTransition = MaterialSharedAxis(
-            MaterialSharedAxis.X,
-            true
-        )
+        exitTransition = MaterialSharedAxis(MaterialSharedAxis.X, true).apply {
+            addListener(
+                createTransitionLogListener("Exit_MaterialSharedAxis.X")
+            )
+        }
 
         // TO - FROM の FROM として現れるアニメーション
         val reenterTransitionType: Transition =
-            if (mainActivityViewModel.uiState.value.wasSelectedTab) {
-                MaterialFadeThrough()
+            if (mainActivityViewModel.wasSelectedTab.value) {
+                MaterialFadeThrough().apply {
+                    addListener(
+                        createTransitionLogListener("Reenter_MaterialFadeThrough")
+                    )
+                }
             } else {
-                MaterialSharedAxis(
-                    MaterialSharedAxis.X,
-                    false
-                )
+                MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
+                    addListener(
+                        createTransitionLogListener("Reenter_MaterialSharedAxis.X")
+                    )
+                }
             }
         reenterTransition = reenterTransitionType
 
         // TO - FROM の TO として消えるアニメーション
-        returnTransition = MaterialSharedAxis(
-            MaterialSharedAxis.X,
-            false
-        )
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.X, false).apply {
+            addListener(
+                createTransitionLogListener("Return_MaterialSharedAxis.X")
+            )
+        }
 
-        mainActivityViewModel.onFragmentTransitionSetupCompleted()
+        mainActivityViewModel.onVisibleFragmentTransitionSetupCompleted()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -251,6 +268,59 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
     private fun registerOnBackPressedCallback() {
         fragmentHelper.registerOnBackPressedCallback(this, mainViewModel)
+    }
+
+    override fun onPause() {
+        setUpInvisibleFragmentTransitionEffect()
+        super.onPause()
+    }
+
+    private fun setUpInvisibleFragmentTransitionEffect() {
+        if (mainActivityViewModel.wasSelectedTab.value) {
+            exitTransition =
+                MaterialFadeThrough().apply {
+                    addListener(
+                        createTransitionLogListener("Exit_MaterialFadeThrough")
+                    )
+                }
+            returnTransition =
+                MaterialFadeThrough().apply {
+                    addListener(
+                        createTransitionLogListener("Return_MaterialFadeThrough")
+                    )
+                }
+        }
+        mainActivityViewModel.onInvisibleFragmentTransitionSetupCompleted()
+    }
+
+    private fun createTransitionLogListener(transitionName: String): Transition.TransitionListener {
+        return object : Transition.TransitionListener {
+            override fun onTransitionStart(transition: Transition) {
+                Log.d(logTag, "${this@BaseFragment.javaClass.simpleName}: $transitionName - START")
+            }
+
+            override fun onTransitionEnd(transition: Transition) {
+                Log.d(logTag, "${this@BaseFragment.javaClass.simpleName}: $transitionName - END")
+                transition.removeListener(this)
+            }
+
+            override fun onTransitionCancel(transition: Transition) {
+                Log.d(logTag, "${this@BaseFragment.javaClass.simpleName}: $transitionName - CANCEL")
+                transition.removeListener(this)
+            }
+
+            override fun onTransitionPause(transition: Transition) {
+                // 必要に応じて実装
+            }
+
+            override fun onTransitionResume(transition: Transition) {
+                // 必要に応じて実装
+            }
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
     }
 
     override fun onDestroyView() {

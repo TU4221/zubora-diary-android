@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -49,6 +50,21 @@ internal class MainActivityViewModel @Inject constructor(
     )
     val uiState get() = _uiState.asStateFlow()
 
+    private val _wasBottomNavigationTabSelected = MutableStateFlow(false)
+    val wasSelectedTab get() = _wasBottomNavigationTabSelected.asStateFlow()
+
+    private val _wasVisibleFragmentTransitionSetupCompleted = MutableStateFlow(false)
+
+    private val _wasInvisibleFragmentTransitionSetupCompleted = MutableStateFlow(false)
+
+    private val wasFragmentTransitionSetupCompletedFlow =
+        combine(
+            _wasVisibleFragmentTransitionSetupCompleted,
+            _wasInvisibleFragmentTransitionSetupCompleted
+        ) { wasVisibleFragmentCompleted, wasInvisibleFragmentCompleted ->
+            wasVisibleFragmentCompleted && wasInvisibleFragmentCompleted
+        }
+
     init {
         observeDerivedUiStateChanges(handle)
     }
@@ -73,6 +89,14 @@ internal class MainActivityViewModel @Inject constructor(
                     )
                 }
             }.launchIn(viewModelScope)
+
+        wasFragmentTransitionSetupCompletedFlow.onEach {
+            if (it) {
+                updateWasBottomNavigationTabSelected(false)
+                _wasVisibleFragmentTransitionSetupCompleted.update { false }
+                _wasInvisibleFragmentTransitionSetupCompleted.update { false }
+            }
+        }.launchIn(viewModelScope)
     }
 
     fun onRequestBottomNavigationVisibleChange(isVisible: Boolean) {
@@ -96,11 +120,15 @@ internal class MainActivityViewModel @Inject constructor(
     }
 
     fun onBottomNavigationItemSelect() {
-        updateWasSelectedTab(true)
+        updateWasBottomNavigationTabSelected(true)
     }
 
-    fun onFragmentTransitionSetupCompleted() {
-        updateWasSelectedTab(false)
+    fun onVisibleFragmentTransitionSetupCompleted() {
+        markVisibleFragmentTransitionSetupCompleted()
+    }
+
+    fun onInvisibleFragmentTransitionSetupCompleted() {
+        markInvisibleFragmentTransitionSetupCompleted()
     }
 
     fun onNavigateBackFromBottomNavigationTab() {
@@ -131,14 +159,6 @@ internal class MainActivityViewModel @Inject constructor(
         _uiState.update {
             it.copy(
                 isInputDisabled = isDisabled
-            )
-        }
-    }
-
-    private fun updateWasSelectedTab(wasSelected: Boolean) {
-        _uiState.update {
-            it.copy(
-                wasSelectedTab = wasSelected
             )
         }
     }
@@ -177,5 +197,19 @@ internal class MainActivityViewModel @Inject constructor(
                 isInputDisabled = true
             )
         }
+    }
+
+    private fun updateWasBottomNavigationTabSelected(wasSelected: Boolean) {
+        _wasBottomNavigationTabSelected.update { wasSelected }
+    }
+
+    private fun markVisibleFragmentTransitionSetupCompleted() {
+        if (!_wasBottomNavigationTabSelected.value) return
+        _wasVisibleFragmentTransitionSetupCompleted.update { true }
+    }
+
+    private fun markInvisibleFragmentTransitionSetupCompleted() {
+        if (!_wasBottomNavigationTabSelected.value) return
+        _wasInvisibleFragmentTransitionSetupCompleted.update { true }
     }
 }

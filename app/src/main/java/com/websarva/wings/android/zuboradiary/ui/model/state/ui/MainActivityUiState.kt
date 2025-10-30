@@ -11,7 +11,6 @@ internal data class MainActivityUiState(
 
     // UiState
     val isBottomNavigationVisible: Boolean = false,
-    val wasSelectedTab: Boolean = false,
 
     // ProcessingState
     override val isProcessing: Boolean = false,
