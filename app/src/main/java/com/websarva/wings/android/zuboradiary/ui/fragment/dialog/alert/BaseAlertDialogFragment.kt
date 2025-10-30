@@ -5,30 +5,16 @@ import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.utils.alertDialogThemeResId
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
-import com.websarva.wings.android.zuboradiary.ui.utils.firstNotNull
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.DialogViewModel
-import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
+import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 
-@AndroidEntryPoint
 abstract class BaseAlertDialogFragment : DialogFragment() {
 
-    // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
-    //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
-    //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
-    @Suppress("unused", "RedundantSuppression")
-    private val viewModel: DialogViewModel by viewModels()
-
     private val themeColor
-        get() = runBlocking(Dispatchers.Main.immediate) {
-            viewModel.themeColor.firstNotNull()
-        }
+        get() = (requireActivity() as MainActivity).themeColor
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         Log.d(logTag, "onCreateDialog()")

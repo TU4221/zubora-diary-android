@@ -18,9 +18,7 @@ import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
 import com.websarva.wings.android.zuboradiary.ui.utils.asPrimaryColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColorInt
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<FragmentOpenSourceLicensesBinding>() {
 
     override fun createViewBinding(

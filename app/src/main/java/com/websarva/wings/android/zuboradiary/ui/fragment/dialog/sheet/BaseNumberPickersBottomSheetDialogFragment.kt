@@ -12,9 +12,7 @@ import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPi
 import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceVariantColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.numberPickerBottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
-import dagger.hilt.android.AndroidEntryPoint
 
-@AndroidEntryPoint
 abstract class BaseNumberPickersBottomSheetDialogFragment
     : BaseBottomSheetDialogFragment<DialogFragmentNumberPickersBinding>() {
 

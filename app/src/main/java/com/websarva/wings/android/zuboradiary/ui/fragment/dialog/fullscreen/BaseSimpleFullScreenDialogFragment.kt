@@ -5,18 +5,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
-import com.websarva.wings.android.zuboradiary.ui.utils.firstNotNull
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.DialogViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlin.getValue
 
 abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
 
@@ -24,18 +19,10 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
     private var _binding: T? = null
     internal val binding get() = checkNotNull(_binding)
 
-    // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
-    //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
-    //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
-    @Suppress("unused", "RedundantSuppression")
-    internal val viewModel: DialogViewModel by viewModels()
-
     internal val fragmentHelper = FragmentHelper()
 
     internal val themeColor
-        get() = runBlocking(Dispatchers.Main.immediate) {
-            viewModel.themeColor.firstNotNull()
-        }
+        get() = (requireActivity() as MainActivity).themeColor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
