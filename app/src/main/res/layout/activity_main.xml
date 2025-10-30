@@ -69,7 +69,7 @@
         <include
             layout="@layout/layout_full_screen_circular_progress_indicator"
             android:id="@+id/include_progress_indicator"
-            app:visibility="@{viewModel.isProgressIndicatorVisible ? View.VISIBLE : View.INVISIBLE}" />
+            app:visibility="@{viewModel.uiState.isProcessing ? View.VISIBLE : View.INVISIBLE}" />
 
     </FrameLayout>
 </layout>

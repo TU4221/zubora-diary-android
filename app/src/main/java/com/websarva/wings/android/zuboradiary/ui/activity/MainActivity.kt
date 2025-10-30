@@ -27,9 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomN
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ReselectableFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityEvent
-import com.websarva.wings.android.zuboradiary.ui.model.state.MainActivityUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -37,6 +35,8 @@ import kotlinx.coroutines.launch
 import androidx.core.view.size
 import androidx.core.view.get
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
 @AndroidEntryPoint
@@ -46,6 +46,8 @@ class MainActivity : LoggingActivity() {
     private val binding get() = checkNotNull(_binding)
     private var isMainActivityLayoutInflated = false
     private var shouldJumpToInitialState = true
+    internal lateinit var themeColor: ThemeColorUi
+        private set
 
     private val navHostFragment: NavHostFragment
         get() =
@@ -65,29 +67,14 @@ class MainActivity : LoggingActivity() {
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     private val mainActivityViewModel: MainActivityViewModel by viewModels()
-    @Suppress("unused", "RedundantSuppression")
-    private val settingsViewModel: SettingsViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
         setUpEdgeToEdge()
         super.onCreate(savedInstanceState)
 
+        setUpUi()
         setUpFragmentLifeCycleCallBacks()
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsViewModel.uiState.map { it.themeColor }.filterNotNull()
-                    .collectLatest { value: ThemeColorUi ->
-                        if (isMainActivityLayoutInflated) return@collectLatest
-                        setUpMainActivityBinding(value)
-                        isMainActivityLayoutInflated = true
-                        setUpUiEvent()
-                        setUpUiState()
-                        setUpThemeColor()
-                        setUpNavigation()
-                    }
-            }
-        }
     }
 
     // MEMO:EdgeToEdge対応。下記ページ参照。
@@ -97,6 +84,18 @@ class MainActivity : LoggingActivity() {
         enableEdgeToEdge()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
+        }
+    }
+
+    private fun setUpUi() {
+        lifecycleScope.launch {
+            themeColor =
+                mainActivityViewModel.uiState.map { it.themeColor }.filterNotNull().first()
+            setUpMainActivityBinding()
+            isMainActivityLayoutInflated = true
+            setUpUiEvent()
+            observeUiState()
+            setUpNavigation()
         }
     }
 
@@ -115,7 +114,7 @@ class MainActivity : LoggingActivity() {
 
             registerFragmentLifecycleCallbacks(
                 BottomNavigationStateSwitchCallbacks { isVisible ->
-                    mainActivityViewModel.onRequestBottomNavigationStateChange(isVisible)
+                    mainActivityViewModel.onRequestBottomNavigationVisibleChange(isVisible)
                 },
                 true
             )
@@ -172,7 +171,7 @@ class MainActivity : LoggingActivity() {
         }
     }
 
-    private fun setUpMainActivityBinding(themeColor: ThemeColorUi) {
+    private fun setUpMainActivityBinding() {
         val themeColorInflater = ThemeColorInflaterCreator().create(layoutInflater, themeColor)
         _binding =
             ActivityMainBinding.inflate(themeColorInflater).apply {
@@ -196,27 +195,42 @@ class MainActivity : LoggingActivity() {
         }
     }
 
-    private fun setUpUiState() {
+    private fun observeUiState() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mainActivityViewModel.uiState
-                    .collectLatest { state ->
-                        switchBottomNavigationState(state)
-                        switchBottomNavigationEnabled(state)
+                    .map { it.themeColor }.filterNotNull().distinctUntilChanged().collect {
+                        themeColor = it
+                        switchThemeColor(it)
+                    }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainActivityViewModel.uiState
+                    .map { it.isBottomNavigationVisible }.distinctUntilChanged().collect {
+                        switchBottomNavigationState(it)
+                    }
+            }
+        }
+
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainActivityViewModel.uiState
+                    .map { it.isInputDisabled }.distinctUntilChanged().collect {
+                        switchBottomNavigationEnabled(!it)
                     }
             }
         }
     }
 
-    private fun switchBottomNavigationState(state: MainActivityUiState) {
+    private fun switchBottomNavigationState(isShowed: Boolean) {
         val motionResId =
-            when (state) {
-                is MainActivityUiState.ShowingBottomNavigation -> {
-                    R.id.motion_scene_bottom_navigation_visible_state
-                }
-                is MainActivityUiState.HidingBottomNavigation -> {
-                    R.id.motion_scene_bottom_navigation_invisible_state
-                }
+            if (isShowed) {
+                R.id.motion_scene_bottom_navigation_visible_state
+            } else {
+                R.id.motion_scene_bottom_navigation_invisible_state
             }
 
         if (shouldJumpToInitialState) {
@@ -232,22 +246,11 @@ class MainActivity : LoggingActivity() {
         }
     }
 
-    private fun switchBottomNavigationEnabled(state: MainActivityUiState) {
+    private fun switchBottomNavigationEnabled(isEnabled: Boolean) {
         val menu = binding.bottomNavigation.menu
         val size = menu.size
         for (i in 0 until size) {
-            menu[i].isEnabled = state.isBottomNavigationEnabled
-        }
-    }
-
-    private fun setUpThemeColor() {
-        lifecycleScope.launch {
-            repeatOnLifecycle(Lifecycle.State.STARTED) {
-                settingsViewModel.uiState.map { it.themeColor }.filterNotNull()
-                    .collectLatest { themeColor: ThemeColorUi ->
-                        switchThemeColor(themeColor)
-                    }
-            }
+            menu[i].isEnabled = isEnabled
         }
     }
 
@@ -276,6 +279,7 @@ class MainActivity : LoggingActivity() {
 
         bottomNavigationView.apply {
             setOnItemSelectedListener { menuItem: MenuItem ->
+                Log.i(logTag, "ボトムナビゲーション_セレクト")
                 mainActivityViewModel.onBottomNavigationItemSelect()
                 setUpFragmentTransitionOnTabSelection()
                 onNavDestinationSelected(menuItem, navController)

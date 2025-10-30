@@ -11,6 +11,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
+import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -53,7 +54,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     private val fragmentHelper = FragmentHelper()
 
     internal val themeColor
-        get() = settingsViewModel.uiState.value.themeColor!!
+        get() = (requireActivity() as MainActivity).themeColor
 
     internal fun launchAndRepeatOnViewLifeCycleStarted(
         block: suspend CoroutineScope.() -> Unit
@@ -88,7 +89,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         //      NavigationStartFragment(DiaryListFragment)はReenterTransitionで設定されたエフェクトが処理される。
         //      遷移元FragmentのエフェクトはMainActivityクラスにて設定。
         val enterTransitionType: Transition =
-            if (mainActivityViewModel.wasSelectedTab.value) {
+            if (mainActivityViewModel.uiState.value.wasSelectedTab) {
                 MaterialFadeThrough()
             } else {
                 MaterialSharedAxis(MaterialSharedAxis.X, true)
@@ -103,7 +104,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
         // TO - FROM の FROM として現れるアニメーション
         val reenterTransitionType: Transition =
-            if (mainActivityViewModel.wasSelectedTab.value) {
+            if (mainActivityViewModel.uiState.value.wasSelectedTab) {
                 MaterialFadeThrough()
             } else {
                 MaterialSharedAxis(
@@ -195,7 +196,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     private fun setUpProgressIndicator() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.isProgressIndicatorVisible.collectLatest {
-                mainActivityViewModel.onFragmentProgressVisibilityChanged(it)
+                mainActivityViewModel.onFragmentProgressStateChanged(it)
             }
         }
     }
