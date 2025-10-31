@@ -202,8 +202,6 @@ class CalendarFragment :
         val format = getString(R.string.fragment_calendar_month_header_format)
         binding.calendar.monthHeaderBinder =
             CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor, format)
-
-        binding.calendar.setOnClickListener {  }
     }
 
     private class CalendarMonthDayBinder(
