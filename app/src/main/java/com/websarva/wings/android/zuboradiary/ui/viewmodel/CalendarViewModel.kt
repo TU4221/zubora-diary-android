@@ -12,6 +12,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingLoadException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
@@ -26,6 +29,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -33,11 +37,13 @@ import javax.inject.Inject
 internal class CalendarViewModel @Inject constructor(
     handle: SavedStateHandle,
     diaryUiStateHelper: DiaryUiStateHelper,
+    private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
 ) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarUiState>(
     handle.get<CalendarUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
         CalendarUiState().copy(
+            calendarStartDayOfWeek = savedUiState.calendarStartDayOfWeek,
             selectedDate = savedUiState.selectedDate,
             previousSelectedDate = savedUiState.previousSelectedDate
         )
@@ -72,6 +78,7 @@ internal class CalendarViewModel @Inject constructor(
     init {
         observeDerivedUiStateChanges(handle, diaryUiStateHelper)
         observeUiStateChanges()
+        observeCalendarStartDayOfWeekSetting()
     }
 
     private fun observeDerivedUiStateChanges(
@@ -112,6 +119,38 @@ internal class CalendarViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+    }
+
+    private fun observeCalendarStartDayOfWeekSetting() {
+        loadCalendarStartDayOfWeekSettingUseCase()
+            .onEach {
+                when (it) {
+                    is UseCaseResult.Success -> { /*処理なし*/ }
+                    is UseCaseResult.Failure -> {
+                        when (it.exception) {
+                            is CalendarStartDayOfWeekSettingLoadException.LoadFailure -> {
+                                emitAppMessageEvent(CalendarAppMessage.SettingsLoadFailure)
+                            }
+                            is CalendarStartDayOfWeekSettingLoadException.Unknown -> {
+                                emitUnexpectedAppMessage(it.exception)
+                            }
+                        }
+                    }
+                }
+            }.map {
+                when (it) {
+                    is UseCaseResult.Success -> it.value.dayOfWeek
+                    is UseCaseResult.Failure -> it.exception.fallbackSetting.dayOfWeek
+                }
+            }.catchUnexpectedError(
+                CalendarStartDayOfWeekSetting.default().dayOfWeek
+            ).distinctUntilChanged().onEach { value: DayOfWeek ->
+                updateUiState {
+                    it.copy(
+                        calendarStartDayOfWeek = value
+                    )
+                }
+            }.launchIn(viewModelScope)
     }
 
     private fun observeUiStateChanges() {

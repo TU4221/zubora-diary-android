@@ -145,6 +145,14 @@ class CalendarFragment :
                     updateCalendarSelectedDate(selectedDate, previousSelectedDate)
             }
         }
+
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState
+                .map { it.calendarStartDayOfWeek }
+                .distinctUntilChanged().collect {
+                    binding.calendar.notifyCalendarChanged()
+                }
+        }
     }
 
     private fun updateCalendarSelectedDate(
@@ -172,18 +180,17 @@ class CalendarFragment :
     }
 
     private fun createDayOfWeekList(): List<DayOfWeek> {
-        val firstDayOfWeek = settingsViewModel.uiState.value.calendarStartDayOfWeek!!
-
         val daysOfWeek = DayOfWeek.entries.toTypedArray()
-        val firstDayOfWeekListPos = firstDayOfWeek.value
+        val startDayOfWeek = mainViewModel.uiState.value.calendarStartDayOfWeek
+        val startDayOfWeekListPos = startDayOfWeek.value
         // 開始曜日を先頭に並び替え
         val firstList =
             Arrays.stream(daysOfWeek)
-                .skip((firstDayOfWeekListPos - 1).toLong())
+                .skip((startDayOfWeekListPos - 1).toLong())
                 .collect(Collectors.toList())
         val secondList =
             Arrays.stream(daysOfWeek)
-                .limit((firstDayOfWeekListPos - 1).toLong())
+                .limit((startDayOfWeekListPos - 1).toLong())
                 .collect(Collectors.toList())
         return Stream
             .concat(firstList.stream(), secondList.stream())
@@ -221,7 +228,7 @@ class CalendarFragment :
                     if (calendarDay.position == DayPosition.MonthDate) {
                         onDateClick(calendarDay.date)
                     }
-                }.let {  }
+                }
 
                 // 数値設定
                 val day = calendarDay.date.dayOfMonth.toString()

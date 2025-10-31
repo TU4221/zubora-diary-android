@@ -302,6 +302,7 @@
     <!-- CalendarAppMessage -->
     <string name="dialog_calendar_app_message_diary_load_failure">@string/dialog_app_message_diary_load_failure</string>
     <string name="dialog_calendar_app_message_diary_info_load_failure">@string/dialog_app_message_diary_info_load_failure</string>
+    <string name="dialog_calendar_app_message_calendar_settings_load_failure">カレンダー設定の読込に失敗しました。</string>
     <!-- SettingsAppMessage -->
     <string name="dialog_settings_app_message_setting_load_failure">@string/dialog_app_message_setting_load_failure</string>
     <string name="dialog_settings_app_message_settings_not_loaded_retry_restart">設定の読み込みに失敗しています。アプリを再起動してください。</string>
