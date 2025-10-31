@@ -1,8 +1,10 @@
 package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
@@ -71,6 +73,7 @@ internal class MainActivityViewModel @Inject constructor(
 
     private fun observeDerivedUiStateChanges(handle: SavedStateHandle) {
         uiState.onEach {
+            Log.d(logTag, it.toString())
             handle[SAVED_UI_STATE_KEY] = it
         }.launchIn(viewModelScope)
 
@@ -97,18 +100,36 @@ internal class MainActivityViewModel @Inject constructor(
                 _wasInvisibleFragmentTransitionSetupCompleted.update { false }
             }
         }.launchIn(viewModelScope)
+
+        combine(
+            _uiState.map { it.isInputDisabled },
+            _uiState.map { it.isNavigating }
+        ) { isInputDisabled, isNavigating ->
+            !isInputDisabled && !isNavigating
+        }.distinctUntilChanged().onEach { isBottomNavigationEnabled ->
+            _uiState.update {
+                it.copy(
+                    isBottomNavigationEnabled = isBottomNavigationEnabled
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
-    fun onRequestBottomNavigationVisibleChange(isVisible: Boolean) {
-        if (isVisible) {
+    fun onFragmentViewReady(needsBottomNavigation: Boolean) {
+        if (needsBottomNavigation) {
             updateToBottomNavigationVisibleState()
         } else {
             updateToBottomNavigationInvisibleState()
         }
     }
 
-    fun onRequestBottomNavigationEnabledChange(isEnabled: Boolean) {
-        updateIsInputDisabled(!isEnabled)
+    fun onFragmentViewResumed() {
+        updateIsNavigating(false)
+    }
+
+    fun onFragmentViewPause() {
+        if (!_wasBottomNavigationTabSelected.value) return
+        updateIsNavigating(true)
     }
 
     fun onFragmentProgressStateChanged(isProcessing: Boolean) {
@@ -155,10 +176,10 @@ internal class MainActivityViewModel @Inject constructor(
         )
     }
 
-    private fun updateIsInputDisabled(isDisabled: Boolean) {
+    private fun updateIsNavigating(isNavigating: Boolean) {
         _uiState.update {
             it.copy(
-                isInputDisabled = isDisabled
+                isNavigating = isNavigating
             )
         }
     }

@@ -14,6 +14,7 @@ import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -142,6 +143,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mainActivityViewModel.onFragmentViewReady(this is RequiresBottomNavigation)
 
         initializeFragmentResultReceiver()
         setUpUiEvent()
@@ -270,7 +272,13 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         fragmentHelper.registerOnBackPressedCallback(this, mainViewModel)
     }
 
+    override fun onResume() {
+        super.onResume()
+        mainActivityViewModel.onFragmentViewResumed()
+    }
+
     override fun onPause() {
+        mainActivityViewModel.onFragmentViewPause()
         setUpInvisibleFragmentTransitionEffect()
         super.onPause()
     }

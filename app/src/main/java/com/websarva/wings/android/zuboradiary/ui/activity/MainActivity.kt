@@ -4,13 +4,9 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.MenuItem
-import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -22,7 +18,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityUiEvent
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
@@ -65,7 +60,6 @@ class MainActivity : LoggingActivity() {
         super.onCreate(savedInstanceState)
 
         setUpUi()
-        setUpFragmentLifeCycleCallBacks()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -107,78 +101,6 @@ class MainActivity : LoggingActivity() {
             setUpUiEvent()
             observeUiState()
             setUpNavigation()
-        }
-    }
-
-    private fun setUpFragmentLifeCycleCallBacks() {
-        // MEMO:Bindingインフレート後にCallbacksを登録していたが、インフレートのタイミングでFragmentが作成され
-        //      Resume状態となる為、下記方法でインフレート前からCallbacksが処理されるように対応。
-        //      また、"recursive = true"の理由は、NavHostFragmentからFragmentManagerを取得してCallBacksを
-        //      登録しようとするにはコードが複雑になり、設定変更等によるアプリ再起動時を考慮すると登録タイミングが複雑になる為。
-        supportFragmentManager.apply {
-            registerFragmentLifecycleCallbacks(
-                BottomNavigationEnabledSwitchCallbacks { isEnabled ->
-                    mainActivityViewModel.onRequestBottomNavigationEnabledChange(isEnabled)
-                },
-                true
-            )
-
-            registerFragmentLifecycleCallbacks(
-                BottomNavigationStateSwitchCallbacks { isVisible ->
-                    mainActivityViewModel.onRequestBottomNavigationVisibleChange(isVisible)
-                },
-                true
-            )
-        }
-    }
-
-    // MEMO:タブ選択で下記の様な画面遷移を行う時、Bを表示中にタブ選択でAを表示させようとすると、
-    //      BのFragmentが消えた後、AのFragmentが表示されない不具合が生じる。
-    //      (何も表示されない状態)
-    //      これを回避するために、遷移先のFragmentが表示しきるまで、タブ選択できないようにする。
-    //      Fragment A → B → A
-    private class BottomNavigationEnabledSwitchCallbacks(
-        private val processEnabledBottomNavigation: (isEnabled: Boolean) -> Unit
-    ) : FragmentManager.FragmentLifecycleCallbacks() {
-
-        override fun onFragmentResumed(fm: FragmentManager, f: Fragment) {
-            super.onFragmentPaused(fm, f)
-            if (f.parentFragment !is NavHostFragment) return
-
-            if (isFragmentWithBottomNavigation(f)) {
-                processEnabledBottomNavigation(true)
-            }
-        }
-
-        override fun onFragmentPaused(fm: FragmentManager, f: Fragment) {
-            super.onFragmentPaused(fm, f)
-            if (f.parentFragment !is NavHostFragment) return
-
-            if (isFragmentWithBottomNavigation(f)) {
-                processEnabledBottomNavigation(false)
-            }
-        }
-
-        private fun isFragmentWithBottomNavigation(f: Fragment): Boolean {
-            return f is RequiresBottomNavigation
-        }
-    }
-
-    private class BottomNavigationStateSwitchCallbacks(
-        private val processVisibleBottomNavigation: (isVisible: Boolean) -> Unit
-    ) : FragmentManager.FragmentLifecycleCallbacks() {
-        override fun onFragmentViewCreated(
-            fm: FragmentManager,
-            f: Fragment,
-            v: View,
-            savedInstanceState: Bundle?
-        ) {
-            super.onFragmentViewCreated(fm, f, v, savedInstanceState)
-            if (f.parentFragment !is NavHostFragment) return
-
-            if (f is DialogFragment) return
-
-            processVisibleBottomNavigation(f is RequiresBottomNavigation)
         }
     }
 
@@ -229,8 +151,8 @@ class MainActivity : LoggingActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mainActivityViewModel.uiState
-                    .map { it.isInputDisabled }.distinctUntilChanged().collect {
-                        switchBottomNavigationEnabled(!it)
+                    .map { it.isBottomNavigationEnabled }.distinctUntilChanged().collect {
+                        switchBottomNavigationEnabled(it)
                     }
             }
         }
