@@ -9,37 +9,37 @@ abstract class LoggingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         application
-        Log.d(logTag, "onCreate()")
+        Log.d(logTag, "ActivityLifeCycle_onCreate()")
         super.onCreate(savedInstanceState)
     }
 
     override fun onRestart() {
-        Log.d(logTag, "onRestart()")
+        Log.d(logTag, "ActivityLifeCycle_onRestart()")
         super.onRestart()
     }
 
     override fun onStart() {
-        Log.d(logTag, "onStart()")
+        Log.d(logTag, "ActivityLifeCycle_onStart()")
         super.onStart()
     }
 
     override fun onResume() {
-        Log.d(logTag, "onResume()")
+        Log.d(logTag, "ActivityLifeCycle_onResume()")
         super.onResume()
     }
 
     override fun onPause() {
-        Log.d(logTag, "onPause()")
+        Log.d(logTag, "ActivityLifeCycle_onPause()")
         super.onPause()
     }
 
     override fun onStop() {
-        Log.d(logTag, "onStop()")
+        Log.d(logTag, "ActivityLifeCycle_onStop()")
         super.onStop()
     }
 
     override fun onDestroy() {
-        Log.d(logTag, "onDestroy()")
+        Log.d(logTag, "ActivityLifeCycle_onDestroy()")
         super.onDestroy()
     }
 }

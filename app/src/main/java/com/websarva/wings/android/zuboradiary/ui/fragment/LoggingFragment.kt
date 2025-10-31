@@ -11,49 +11,49 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
 abstract class LoggingFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(logTag, "onCreate()")
+        Log.d(logTag, "FragmentLifeCycle_onCreate()")
         super.onCreate(savedInstanceState)
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        Log.d(logTag, "onCreateView()")
+        Log.d(logTag, "FragmentLifeCycle_onCreateView()")
         return super.onCreateView(inflater, container, savedInstanceState)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        Log.d(logTag, "onViewCreated()")
+        Log.d(logTag, "FragmentLifeCycle_onViewCreated()")
         super.onViewCreated(view, savedInstanceState)
     }
 
     override fun onStart() {
-        Log.d(logTag, "onStart()")
+        Log.d(logTag, "FragmentLifeCycle_onStart()")
         super.onStart()
     }
 
     override fun onResume() {
-        Log.d(logTag, "onResume()")
+        Log.d(logTag, "FragmentLifeCycle_onResume()")
         super.onResume()
     }
 
     override fun onPause() {
-        Log.d(logTag, "onPause()")
+        Log.d(logTag, "FragmentLifeCycle_onPause()")
         super.onPause()
     }
 
     override fun onStop() {
-        Log.d(logTag, "onStop()")
+        Log.d(logTag, "FragmentLifeCycle_onStop()")
         super.onStop()
     }
 
     override fun onDestroyView() {
-        Log.d(logTag, "onDestroyView()")
+        Log.d(logTag, "FragmentLifeCycle_onDestroyView()")
         super.onDestroyView()
     }
 
     override fun onDestroy() {
-        Log.d(logTag, "onDestroy()")
+        Log.d(logTag, "FragmentLifeCycle_onDestroy()")
         super.onDestroy()
     }
 }
