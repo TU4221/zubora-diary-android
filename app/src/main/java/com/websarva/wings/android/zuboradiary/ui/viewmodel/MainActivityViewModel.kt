@@ -7,10 +7,12 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeColorSettingUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingLoadException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.message.MainActivityAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.MainActivityUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -78,7 +80,24 @@ internal class MainActivityViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
         loadThemeColorSettingUseCase()
-            .map {
+            .onEach {
+                when (it) {
+                    is UseCaseResult.Success -> { /*処理なし*/ }
+                    is UseCaseResult.Failure -> {
+                        val appMessage = when (it.exception) {
+                            is ThemeColorSettingLoadException.LoadFailure -> {
+                                MainActivityAppMessage.SettingsLoadFailure
+                            }
+                            is ThemeColorSettingLoadException.Unknown -> {
+                                MainActivityAppMessage.Unexpected(it.exception)
+                            }
+                        }
+                        updateActivityUiEvent(
+                            MainActivityUiEvent.NavigateAppMessage(appMessage)
+                        )
+                    }
+                }
+            }.map {
                 when (it) {
                     is UseCaseResult.Success -> it.value.themeColor.toUiModel()
                     is UseCaseResult.Failure -> {

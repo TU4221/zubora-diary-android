@@ -292,6 +292,8 @@
     <string name="dialog_app_message_setting_load_failure">設定の読込に失敗しました。</string>
     <string name="dialog_app_message_unexpected_error">予期せぬ問題が発生しました。時間をおいてもう一度お試しください。</string>
     <string name="dialog_app_message_developer_unexpected_error">開発者向けメッセージ:\n予期せぬ例外が発生しました。\n\nエラーコード: %s</string>
+    <!-- MainActivityAppMessage -->
+    <string name="dialog_main_activity_app_message_setting_load_failure">@string/dialog_app_message_setting_load_failure</string>
     <!-- DiaryListAppMessage -->
     <string name="dialog_diary_list_app_message_diary_list_load_failure">日記リストの読込に失敗しました。</string>
     <string name="dialog_diary_list_app_message_diary_delete_failure">@string/dialog_app_message_diary_delete_failure</string>

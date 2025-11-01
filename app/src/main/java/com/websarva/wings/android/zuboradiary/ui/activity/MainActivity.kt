@@ -27,7 +27,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import androidx.core.view.size
 import androidx.core.view.get
+import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -121,7 +123,12 @@ class MainActivity : LoggingActivity() {
                     .collectLatest { value: ConsumableEvent<MainActivityUiEvent> ->
                         val event = value.getContentIfNotHandled() ?: return@collectLatest
                         when (event) {
-                            MainActivityUiEvent.NavigateStartTabFragment -> navigateBottomNavigationStartTabFragment()
+                            is MainActivityUiEvent.NavigateAppMessage -> {
+                                navigateAppMessageDialog(event.message)
+                            }
+                            MainActivityUiEvent.NavigateStartTabFragment -> {
+                                navigateBottomNavigationStartTabFragment()
+                            }
                         }
                     }
             }
@@ -232,6 +239,18 @@ class MainActivity : LoggingActivity() {
             selectedItemId =
                 menu[0].itemId // 初期メニューアイテム(アプリ起動で最初に選択されているアイテム)
         }
+    }
+
+    private fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val navHostFragment =
+            checkNotNull(
+                supportFragmentManager.findFragmentById(R.id.fragment_nav_host)
+            ) as NavHostFragment
+        val navController = navHostFragment.navController
+        val action =
+            MobileNavigationDirections
+                .actionActivityToAppMessageDialog(appMessage)
+        navController.navigate(action)
     }
 
     override fun onDestroy() {
