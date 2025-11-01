@@ -55,6 +55,15 @@ class MainActivity : LoggingActivity() {
     @Suppress("unused", "RedundantSuppression")
     private val mainActivityViewModel: MainActivityViewModel by viewModels()
 
+    private val navController by lazy {
+        // MEMO:Activity#findNavController()でNavControllerを取得する場合、
+        //      アプリ設定(権限等)変更時でのアプリ再起動時にNavControllerの取得に失敗する為、
+        //      NavHostFragmentから取得する。
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_nav_host) as NavHostFragment
+        navHostFragment.navController
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
         setUpEdgeToEdge()
@@ -207,14 +216,6 @@ class MainActivity : LoggingActivity() {
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
         val bottomNavigationView = binding.bottomNavigation
-        val navHostFragment =
-            checkNotNull(
-                supportFragmentManager.findFragmentById(R.id.fragment_nav_host)
-            ) as NavHostFragment
-        // MEMO:Activity#findNavController()でNavControllerを取得する場合、
-        //      アプリ設定(権限等)変更時でのアプリ再起動時にNavControllerの取得に失敗する為、
-        //      NavHostFragmentから取得する。
-        val navController = navHostFragment.navController
         setupWithNavController(bottomNavigationView, navController)
 
         bottomNavigationView.apply {
@@ -242,14 +243,7 @@ class MainActivity : LoggingActivity() {
     }
 
     private fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val navHostFragment =
-            checkNotNull(
-                supportFragmentManager.findFragmentById(R.id.fragment_nav_host)
-            ) as NavHostFragment
-        val navController = navHostFragment.navController
-        val action =
-            MobileNavigationDirections
-                .actionActivityToAppMessageDialog(appMessage)
+        val action = MobileNavigationDirections.actionActivityToAppMessageDialog(appMessage)
         navController.navigate(action)
     }
 
