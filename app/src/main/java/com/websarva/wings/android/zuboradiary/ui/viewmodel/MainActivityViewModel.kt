@@ -92,7 +92,7 @@ internal class MainActivityViewModel @Inject constructor(
                                 MainActivityAppMessage.Unexpected(it.exception)
                             }
                         }
-                        updateActivityUiEvent(
+                        emitActivityUiEvent(
                             MainActivityUiEvent.NavigateAppMessage(appMessage)
                         )
                     }
@@ -173,23 +173,23 @@ internal class MainActivityViewModel @Inject constructor(
 
     fun onNavigateBackFromBottomNavigationTab() {
         viewModelScope.launch {
-            updateActivityUiEvent(MainActivityUiEvent.NavigateStartTabFragment)
+            emitActivityUiEvent(MainActivityUiEvent.NavigateStartTabFragment)
         }
     }
 
     fun onBottomNavigationItemReselect() {
         viewModelScope.launch {
-            updateFragmentUiEvent(FragmentUiEvent.ProcessOnBottomNavigationItemReselect)
+            emitFragmentUiEvent(FragmentUiEvent.ProcessOnBottomNavigationItemReselect)
         }
     }
 
-    private suspend fun updateActivityUiEvent(event: MainActivityUiEvent) {
+    private suspend fun emitActivityUiEvent(event: MainActivityUiEvent) {
         _activityUiEvent.emit(
             ConsumableEvent(event)
         )
     }
 
-    private suspend fun updateFragmentUiEvent(event: FragmentUiEvent) {
+    private suspend fun emitFragmentUiEvent(event: FragmentUiEvent) {
         _fragmentUiEvent.emit(
             ConsumableEvent(event)
         )
