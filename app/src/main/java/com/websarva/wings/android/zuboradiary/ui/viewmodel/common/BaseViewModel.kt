@@ -53,8 +53,6 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     private val _uiState = MutableStateFlow(initialViewUiState)
     val uiState get() = _uiState.asStateFlow()
 
-    abstract val isProgressIndicatorVisible:StateFlow<Boolean>
-
     // 表示保留中Navigation
     private val _pendingNavigationCommandList =
         MutableStateFlow(emptyList<PendingNavigationCommand>())

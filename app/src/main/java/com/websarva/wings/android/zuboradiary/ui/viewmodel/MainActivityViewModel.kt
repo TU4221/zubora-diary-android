@@ -152,7 +152,7 @@ internal class MainActivityViewModel @Inject constructor(
         updateIsNavigating(true)
     }
 
-    fun onFragmentProgressStateChanged(isProcessing: Boolean) {
+    fun onFragmentProcessingStateChanged(isProcessing: Boolean) {
         if (isProcessing) {
             updateToProcessingState()
         } else {

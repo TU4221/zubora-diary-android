@@ -27,6 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
 
 abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
@@ -146,7 +147,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         initializeFragmentResultReceiver()
         setUpUiEvent()
         setUpPendingNavigationCollector()
-        setUpProgressIndicator()
+        observeProcessingState()
         if (!isNavigationStartFragment) registerOnBackPressedCallback()
     }
 
@@ -222,10 +223,10 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
             )
     }
 
-    private fun setUpProgressIndicator() {
+    private fun observeProcessingState() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.isProgressIndicatorVisible.collectLatest {
-                mainActivityViewModel.onFragmentProgressStateChanged(it)
+            mainViewModel.uiState.map { it.isProcessing }.collectLatest {
+                mainActivityViewModel.onFragmentProcessingStateChanged(it)
             }
         }
     }

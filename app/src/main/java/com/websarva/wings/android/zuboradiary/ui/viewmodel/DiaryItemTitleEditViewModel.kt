@@ -56,14 +56,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
-    override val isProgressIndicatorVisible =
-        uiState
-            .map {
-                it.isProcessing
-            }.stateInWhileSubscribed(
-                false
-            )
-
     private val currentUiState
         get() = uiState.value
 

@@ -73,14 +73,6 @@ internal class DiaryListViewModel @Inject constructor(
         private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
-    override val isProgressIndicatorVisible =
-        uiState
-            .map {
-                it.isProcessing
-            }.stateInWhileSubscribed(
-                false
-            )
-
     private val isReadyForOperation
         get() = !currentUiState.isInputDisabled
 

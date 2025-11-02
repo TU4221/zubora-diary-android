@@ -45,15 +45,6 @@ internal class DiaryShowViewModel @Inject constructor(
         private const val DATE_ARGUMENT_KEY = "load_diary_date"
     }
 
-    override val isProgressIndicatorVisible =
-        uiState
-            .map { state ->
-                state.isProcessing
-            }
-            .stateInWhileSubscribed(
-                false
-            )
-
     private val isReadyForOperation
         get() = !currentUiState.isInputDisabled
                 && (currentUiState.diaryLoadState is LoadState.Success)

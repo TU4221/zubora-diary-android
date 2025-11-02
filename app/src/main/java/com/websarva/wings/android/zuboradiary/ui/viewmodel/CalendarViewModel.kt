@@ -53,14 +53,6 @@ internal class CalendarViewModel @Inject constructor(
         private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
-    override val isProgressIndicatorVisible =
-        uiState
-            .map { state ->
-                state.isProcessing
-            }.stateInWhileSubscribed(
-                false
-            )
-
     private val isReadyForOperation
         get() = !currentUiState.isInputDisabled
                 && (currentUiState.diaryLoadState is LoadState.Success
