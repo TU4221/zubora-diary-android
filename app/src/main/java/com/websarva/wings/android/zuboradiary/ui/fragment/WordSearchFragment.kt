@@ -11,11 +11,11 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -68,17 +68,15 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
             WordSearchEvent.ShowKeyboard -> {
                 showKeyboard()
             }
-            is WordSearchEvent.CommonEvent -> {
-                when(event.wrappedEvent) {
-                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        navigatePreviousFragmentOnce()
-                    }
-                    is CommonUiEvent.NavigateAppMessage -> {
-                        navigateAppMessageDialog(event.wrappedEvent.message)
-                    }
-                }
-            }
         }
+    }
+
+    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
+        navigatePreviousFragmentOnce()
+    }
+
+    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
+        navigateAppMessageDialog(appMessage)
     }
 
     private fun observeUiState() {

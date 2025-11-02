@@ -39,7 +39,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.utils.asString
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
@@ -273,17 +272,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
             is DiaryEditEvent.SelectImage -> {
                 openDocumentResultLauncher.launch(arrayOf("image/*"))
             }
-            is DiaryEditEvent.CommonEvent -> {
-                when(event.wrappedEvent) {
-                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        navigatePreviousFragmentOnce(KEY_RESULT, event.wrappedEvent.result)
-                    }
-                    is CommonUiEvent.NavigateAppMessage -> {
-                        navigateAppMessageDialog(event.wrappedEvent.message)
-                    }
-                }
-            }
         }
+    }
+
+    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
+        navigatePreviousFragmentOnce(KEY_RESULT, result)
+    }
+
+    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
+        navigateAppMessageDialog(appMessage)
     }
 
     private fun observeUiState() {

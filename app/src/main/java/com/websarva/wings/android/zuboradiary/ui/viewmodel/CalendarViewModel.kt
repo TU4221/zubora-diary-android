@@ -9,7 +9,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDa
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
 import com.websarva.wings.android.zuboradiary.ui.model.message.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
@@ -161,18 +160,6 @@ internal class CalendarViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): CalendarEvent {
-        return CalendarEvent.CommonEvent(
-            CommonUiEvent.NavigatePreviousFragment(result)
-        )
-    }
-
-    override fun createAppMessageEvent(appMessage: CalendarAppMessage): CalendarEvent {
-        return CalendarEvent.CommonEvent(
-            CommonUiEvent.NavigateAppMessage(appMessage)
-        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): CalendarAppMessage {

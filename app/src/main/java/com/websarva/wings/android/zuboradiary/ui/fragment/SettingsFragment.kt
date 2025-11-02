@@ -26,12 +26,12 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.Permissio
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import dagger.hilt.android.AndroidEntryPoint
@@ -252,17 +252,15 @@ class SettingsFragment :
             is SettingsEvent.ShowApplicationDetailsSettings -> {
                 showApplicationDetailsSettings()
             }
-            is SettingsEvent.CommonEvent -> {
-                when(event.wrappedEvent) {
-                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
-                    }
-                    is CommonUiEvent.NavigateAppMessage -> {
-                        navigateAppMessageDialog(event.wrappedEvent.message)
-                    }
-                }
-            }
         }
+    }
+
+    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
+        mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
+    }
+
+    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
+        navigateAppMessageDialog(appMessage)
     }
 
     private fun observeUiEventFromActivity() {

@@ -13,6 +13,4 @@ sealed class CalendarEvent : UiEvent {
         val date: LocalDate,
         val isVisible: Boolean
     ) : CalendarEvent()
-
-    internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : CalendarEvent()
 }

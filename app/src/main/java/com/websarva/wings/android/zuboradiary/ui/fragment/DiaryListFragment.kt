@@ -15,13 +15,13 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -106,17 +106,15 @@ class DiaryListFragment :
             is DiaryListEvent.NavigateDiaryDeleteDialog -> {
                 navigateDiaryDeleteDialog(event.date)
             }
-            is DiaryListEvent.CommonEvent -> {
-                when(event.wrappedEvent) {
-                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        navigatePreviousFragmentOnce()
-                    }
-                    is CommonUiEvent.NavigateAppMessage -> {
-                        navigateAppMessageDialog(event.wrappedEvent.message)
-                    }
-                }
-            }
         }
+    }
+
+    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
+        navigatePreviousFragmentOnce()
+    }
+
+    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
+        navigateAppMessageDialog(appMessage)
     }
 
     private fun observeUiEventFromActivity() {

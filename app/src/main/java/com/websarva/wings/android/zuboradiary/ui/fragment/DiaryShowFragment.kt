@@ -12,9 +12,9 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBindi
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
@@ -92,18 +92,15 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
             is DiaryShowEvent.NavigatePreviousFragmentOnDiaryLoadFailed -> {
                 navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
             }
-
-            is DiaryShowEvent.CommonEvent -> {
-                when(event.wrappedEvent) {
-                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        navigatePreviousFragmentOnce(KEY_RESULT, event.wrappedEvent.result)
-                    }
-                    is CommonUiEvent.NavigateAppMessage -> {
-                        navigateAppMessageDialog(event.wrappedEvent.message)
-                    }
-                }
-            }
         }
+    }
+
+    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
+        navigatePreviousFragmentOnce(KEY_RESULT, result)
+    }
+
+    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
+        navigateAppMessageDialog(appMessage)
     }
 
     private fun setUpToolBar() {

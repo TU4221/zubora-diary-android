@@ -27,6 +27,4 @@ sealed class SettingsEvent : UiEvent {
     internal data class TurnPasscodeLockSettingSwitch(val isChecked: Boolean) : SettingsEvent()
     internal data class TurnWeatherInfoFetchSettingSwitch(val isChecked: Boolean) : SettingsEvent()
     internal data object ShowApplicationDetailsSettings : SettingsEvent()
-
-    internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : SettingsEvent()
 }

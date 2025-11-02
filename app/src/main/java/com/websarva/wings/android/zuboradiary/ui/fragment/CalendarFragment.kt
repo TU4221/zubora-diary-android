@@ -25,11 +25,11 @@ import com.websarva.wings.android.zuboradiary.ui.theme.CalendarThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -109,17 +109,15 @@ class CalendarFragment :
             is CalendarEvent.RefreshCalendarDayDotVisibility -> {
                 updateCalendarDayDotVisibility(event.date, event.isVisible)
             }
-            is CalendarEvent.CommonEvent -> {
-                when(event.wrappedEvent) {
-                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
-                    }
-                    is CommonUiEvent.NavigateAppMessage -> {
-                        navigateAppMessageDialog(event.wrappedEvent.message)
-                    }
-                }
-            }
         }
+    }
+
+    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
+        mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
+    }
+
+    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
+        navigateAppMessageDialog(appMessage)
     }
 
     private fun observeUiEventFromActivity() {

@@ -27,11 +27,9 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
@@ -141,18 +139,6 @@ internal class DiaryListViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): DiaryListEvent {
-        return DiaryListEvent.CommonEvent(
-            CommonUiEvent.NavigatePreviousFragment(result)
-        )
-    }
-
-    override fun createAppMessageEvent(appMessage: DiaryListAppMessage): DiaryListEvent {
-        return DiaryListEvent.CommonEvent(
-            CommonUiEvent.NavigateAppMessage(appMessage)
-        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): DiaryListAppMessage {

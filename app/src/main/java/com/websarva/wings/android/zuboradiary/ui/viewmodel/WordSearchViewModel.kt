@@ -19,10 +19,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Wor
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListRefreshException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.WordSearchAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
@@ -133,18 +131,6 @@ internal class WordSearchViewModel @Inject internal constructor(
                 }
             }
         }
-    }
-
-    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): WordSearchEvent {
-        return WordSearchEvent.CommonEvent(
-            CommonUiEvent.NavigatePreviousFragment(result)
-        )
-    }
-
-    override fun createAppMessageEvent(appMessage: WordSearchAppMessage): WordSearchEvent {
-        return WordSearchEvent.CommonEvent(
-            CommonUiEvent.NavigateAppMessage(appMessage)
-        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): WordSearchAppMessage {

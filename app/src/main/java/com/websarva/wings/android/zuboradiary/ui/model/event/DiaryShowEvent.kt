@@ -13,6 +13,4 @@ sealed class DiaryShowEvent : UiEvent {
     internal data class NavigatePreviousFragmentOnDiaryLoadFailed(
         val result: FragmentResult.None = FragmentResult.None
     ) : DiaryShowEvent()
-
-    internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : DiaryShowEvent()
 }

@@ -10,7 +10,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryById
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByIdException
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -114,18 +113,6 @@ internal class DiaryShowViewModel @Inject constructor(
         launchWithUnexpectedErrorHandler {
             loadSavedDiary(id, date)
         }
-    }
-
-    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): DiaryShowEvent {
-        return DiaryShowEvent.CommonEvent(
-            CommonUiEvent.NavigatePreviousFragment(result)
-        )
-    }
-
-    override fun createAppMessageEvent(appMessage: DiaryShowAppMessage): DiaryShowEvent {
-        return DiaryShowEvent.CommonEvent(
-            CommonUiEvent.NavigateAppMessage(appMessage)
-        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): DiaryShowAppMessage {

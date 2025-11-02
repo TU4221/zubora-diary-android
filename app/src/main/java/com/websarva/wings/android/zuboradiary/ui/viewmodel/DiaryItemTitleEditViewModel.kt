@@ -16,10 +16,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEdi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.InputTextValidationState
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.common.InputTextValidation
@@ -76,18 +74,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         setUpTitle(handle)
         setUpTitleSelectionHistoryList()
         observeDerivedUiStateChanges(handle)
-    }
-
-    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): DiaryItemTitleEditEvent {
-        return DiaryItemTitleEditEvent.CommonEvent(
-            CommonUiEvent.NavigatePreviousFragment(result)
-        )
-    }
-
-    override fun createAppMessageEvent(appMessage: DiaryItemTitleEditAppMessage): DiaryItemTitleEditEvent {
-        return DiaryItemTitleEditEvent.CommonEvent(
-            CommonUiEvent.NavigateAppMessage(appMessage)
-        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): DiaryItemTitleEditAppMessage {

@@ -12,6 +12,4 @@ sealed class DiaryListEvent : UiEvent {
         val oldestYear: Year
     ) : DiaryListEvent()
     internal data class NavigateDiaryDeleteDialog(val date: LocalDate) : DiaryListEvent()
-
-    internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : DiaryListEvent()
 }

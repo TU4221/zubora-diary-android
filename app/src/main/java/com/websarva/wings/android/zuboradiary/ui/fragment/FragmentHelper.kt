@@ -86,6 +86,24 @@ internal class FragmentHelper {
         }
     }
 
+    // TODO:Ui層のアクセス修飾子をpublicに変更してから、引数onCommonUiEventReceivedをCommonUiEventHandlerに変更して分岐処理を本メソッドに記述
+    fun <E: UiEvent> setUpCommonUiEvent(
+        fragment: Fragment,
+        mainViewModel: BaseViewModel<E, out AppMessage, out UiState>,
+        onCommonUiEventReceived: (CommonUiEvent) -> Unit
+    ) {
+        launchAndRepeatOnViewLifeCycleStarted(fragment) {
+            mainViewModel.commonUiEvent
+                .collect { value: ConsumableEvent<CommonUiEvent> ->
+                    val event = value.getContentIfNotHandled()
+                    Log.d(logTag, "Common_UiEvent_Collect(): $event")
+                    event ?: return@collect
+
+                    onCommonUiEventReceived(event)
+                }
+        }
+    }
+
     fun setUpSettingsUiEvent(
         fragment: Fragment,
         mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
@@ -100,7 +118,8 @@ internal class FragmentHelper {
                     val event = value.getContentIfNotHandled()
                     Log.d(logTag, "SettingsUiEvent_Collect(): $event")
                     event ?: return@collect
-                    when (event) {
+                    // TODO: BaseFragmentからSettingsViewModel削除予定の為下記コメントアウトでビルドエラー回避
+                    /*when (event) {
                         is SettingsEvent.CommonEvent -> {
                             when (event.wrappedEvent) {
                                 is CommonUiEvent.NavigateAppMessage -> {
@@ -114,7 +133,7 @@ internal class FragmentHelper {
                         else -> {
                             throw IllegalArgumentException()
                         }
-                    }
+                    }*/
                 }
         }
     }

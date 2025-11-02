@@ -46,7 +46,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionHistoryUi
@@ -239,18 +238,6 @@ internal class DiaryEditViewModel @Inject constructor(
                     emitUiEvent(DiaryEditEvent.UpdateDiaryItemLayout(value))
                 }
         }
-    }
-
-    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): DiaryEditEvent {
-        return DiaryEditEvent.CommonEvent(
-            CommonUiEvent.NavigatePreviousFragment(result)
-        )
-    }
-
-    override fun createAppMessageEvent(appMessage: DiaryEditAppMessage): DiaryEditEvent {
-        return DiaryEditEvent.CommonEvent(
-            CommonUiEvent.NavigateAppMessage(appMessage)
-        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): DiaryEditAppMessage {

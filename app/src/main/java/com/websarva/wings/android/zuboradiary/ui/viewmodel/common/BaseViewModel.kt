@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.PendingNavigat
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -45,6 +46,9 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     private val _uiEvent = MutableSharedFlow<ConsumableEvent<E>>(replay = 1)
     val uiEvent get() = _uiEvent.asSharedFlow()
 
+    private val _commonUiEvent = MutableSharedFlow<ConsumableEvent<CommonUiEvent>>(replay = 1)
+    val commonUiEvent get() = _commonUiEvent.asSharedFlow()
+
     private val _uiState = MutableStateFlow(initialViewUiState)
     val uiState get() = _uiState.asStateFlow()
 
@@ -62,22 +66,20 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
         )
     }
 
-    protected abstract fun createNavigatePreviousFragmentEvent(
-        result: FragmentResult<*> = FragmentResult.None
-    ): E
+    private suspend fun emitCommonUiEvent(event: CommonUiEvent) {
+        _commonUiEvent.emit(
+            ConsumableEvent(event)
+        )
+    }
 
     protected suspend fun emitNavigatePreviousFragmentEvent(
         result: FragmentResult<*> = FragmentResult.None
     ) {
-        val navigatePreviousFragmentEvent = createNavigatePreviousFragmentEvent(result)
-        emitUiEvent(navigatePreviousFragmentEvent)
+        emitCommonUiEvent(CommonUiEvent.NavigatePreviousFragment(result))
     }
 
-    protected abstract fun createAppMessageEvent(appMessage: M): E
-
     protected suspend fun emitAppMessageEvent(appMessage: M) {
-        val appMessageEvent = createAppMessageEvent(appMessage)
-        emitUiEvent(appMessageEvent)
+        emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
     }
 
     protected abstract fun createUnexpectedAppMessage(e: Exception): M

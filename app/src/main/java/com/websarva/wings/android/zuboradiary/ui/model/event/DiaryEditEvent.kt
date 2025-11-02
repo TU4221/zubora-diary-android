@@ -23,6 +23,4 @@ sealed class DiaryEditEvent : UiEvent {
     internal data object CheckAccessLocationPermissionBeforeWeatherInfoFetch : DiaryEditEvent()
     internal data object ItemAddition : DiaryEditEvent()
     internal data object SelectImage : DiaryEditEvent()
-
-    internal data class CommonEvent(val wrappedEvent: CommonUiEvent) : DiaryEditEvent()
 }

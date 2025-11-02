@@ -42,10 +42,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.SettingsAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.SettingsUiState
@@ -112,18 +110,6 @@ internal class SettingsViewModel @Inject constructor(
 
     init {
         setUpSettingsValue(handle)
-    }
-
-    override fun createNavigatePreviousFragmentEvent(result: FragmentResult<*>): SettingsEvent {
-        return SettingsEvent.CommonEvent(
-            CommonUiEvent.NavigatePreviousFragment(result)
-        )
-    }
-
-    override fun createAppMessageEvent(appMessage: SettingsAppMessage): SettingsEvent {
-        return SettingsEvent.CommonEvent(
-            CommonUiEvent.NavigateAppMessage(appMessage)
-        )
     }
 
     override fun createUnexpectedAppMessage(e: Exception): SettingsAppMessage {

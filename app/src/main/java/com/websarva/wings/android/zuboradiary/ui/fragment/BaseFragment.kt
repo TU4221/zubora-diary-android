@@ -15,6 +15,7 @@ import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -180,6 +181,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
     private fun setUpUiEvent() {
         setUpMainUiEvent()
+        setUpCommonUiEvent()
         setUpSettingsUiEvent()
     }
 
@@ -193,6 +195,27 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     }
 
     internal abstract fun onMainUiEventReceived(event: E)
+
+    private fun setUpCommonUiEvent() {
+        fragmentHelper
+            .setUpCommonUiEvent(
+                this,
+                mainViewModel
+            ) { event ->
+                when (event) {
+                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
+                        onNavigatePreviousFragmentEventReceived(event.result)
+                    }
+                    is CommonUiEvent.NavigateAppMessage -> {
+                        onNavigateAppMessageEventReceived(event.message)
+                    }
+                }
+            }
+    }
+
+    internal abstract fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>)
+
+    internal abstract fun onNavigateAppMessageEventReceived(appMessage: AppMessage)
 
     private fun setUpSettingsUiEvent() {
         fragmentHelper.setUpSettingsUiEvent(
