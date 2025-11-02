@@ -13,7 +13,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -21,7 +20,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
@@ -100,40 +98,6 @@ internal class FragmentHelper {
                     event ?: return@collect
 
                     onCommonUiEventReceived(event)
-                }
-        }
-    }
-
-    fun setUpSettingsUiEvent(
-        fragment: Fragment,
-        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
-        settingsViewModel: SettingsViewModel,
-        onAppMessageNavigationUiEventReceived: (AppMessage) -> Unit
-    ) {
-        if (mainViewModel == settingsViewModel) return
-
-        launchAndRepeatOnViewLifeCycleStarted(fragment) {
-            settingsViewModel.uiEvent
-                .collect { value: ConsumableEvent<SettingsEvent> ->
-                    val event = value.getContentIfNotHandled()
-                    Log.d(logTag, "SettingsUiEvent_Collect(): $event")
-                    event ?: return@collect
-                    // TODO: BaseFragmentからSettingsViewModel削除予定の為下記コメントアウトでビルドエラー回避
-                    /*when (event) {
-                        is SettingsEvent.CommonEvent -> {
-                            when (event.wrappedEvent) {
-                                is CommonUiEvent.NavigateAppMessage -> {
-                                    onAppMessageNavigationUiEventReceived(event.wrappedEvent.message)
-                                }
-                                else -> {
-                                    throw IllegalArgumentException()
-                                }
-                            }
-                        }
-                        else -> {
-                            throw IllegalArgumentException()
-                        }
-                    }*/
                 }
         }
     }

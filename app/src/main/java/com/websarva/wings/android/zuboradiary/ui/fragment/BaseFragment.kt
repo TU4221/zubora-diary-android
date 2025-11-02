@@ -25,7 +25,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 
@@ -42,8 +41,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     internal val mainActivityViewModel: MainActivityViewModel by activityViewModels()
-    @Suppress("unused", "RedundantSuppression")
-    internal val settingsViewModel: SettingsViewModel by activityViewModels()
 
     internal abstract val destinationId: Int
     private val isNavigationStartFragment: Boolean
@@ -182,7 +179,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     private fun setUpUiEvent() {
         setUpMainUiEvent()
         setUpCommonUiEvent()
-        setUpSettingsUiEvent()
     }
 
     private fun setUpMainUiEvent() {
@@ -216,15 +212,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     internal abstract fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>)
 
     internal abstract fun onNavigateAppMessageEventReceived(appMessage: AppMessage)
-
-    private fun setUpSettingsUiEvent() {
-        fragmentHelper.setUpSettingsUiEvent(
-            this,
-            mainViewModel,
-            settingsViewModel,
-            ::navigateAppMessageDialog
-        )
-    }
 
     private fun setUpPendingNavigationCollector() {
         fragmentHelper

@@ -55,8 +55,6 @@ import java.time.DayOfWeek
 import java.time.LocalTime
 import javax.inject.Inject
 
-// TODO:現状、SettingsFragment以外にもSettingsViewModelを共有している為、これを廃止し、各ViewModelで必要な設定値を取得するように修正
-//      ダイアログ等にも共通のViewModelを用意する。
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
     handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
