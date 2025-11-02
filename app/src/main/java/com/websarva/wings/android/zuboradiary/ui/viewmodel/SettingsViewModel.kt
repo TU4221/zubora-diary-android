@@ -137,6 +137,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
+    // TODO:全てcatchUnexpectedError()を呼び出してない
     private fun setUpThemeColorSettingValue() {
         loadThemeColorSettingUseCase()
             .map {
