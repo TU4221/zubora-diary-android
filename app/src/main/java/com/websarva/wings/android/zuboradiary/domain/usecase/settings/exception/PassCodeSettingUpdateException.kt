@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception
 
 import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdatePasscodeLockSettingUseCase
 
@@ -53,7 +54,7 @@ internal sealed class PassCodeSettingUpdateException(
     ) : PassCodeSettingUpdateException(
         "予期せぬエラーが発生しました。",
         cause
-    )
+    ), UseCaseUnknownException
 
     companion object {
         /**

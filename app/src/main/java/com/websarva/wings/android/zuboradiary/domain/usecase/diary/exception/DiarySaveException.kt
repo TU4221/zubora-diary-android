@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.SaveDiaryUseCase
 import java.time.LocalDate
@@ -47,5 +48,5 @@ internal sealed class DiarySaveException(
     ) : DiarySaveException(
         "予期せぬエラーが発生しました。",
         cause
-    )
+    ), UseCaseUnknownException
 }

@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import java.time.LocalDate
@@ -57,5 +58,5 @@ internal sealed class DiaryDeleteException (
     ) : DiaryDeleteException(
         "予期せぬエラーが発生しました。",
         cause
-    )
+    ), UseCaseUnknownException
 }

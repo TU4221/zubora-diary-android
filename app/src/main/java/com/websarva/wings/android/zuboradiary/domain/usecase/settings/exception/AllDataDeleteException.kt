@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception
 
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
 
@@ -72,5 +73,5 @@ internal sealed class AllDataDeleteException(
     ) : AllDataDeleteException(
         "予期せぬエラーが発生しました。",
         cause
-    )
+    ), UseCaseUnknownException
 }

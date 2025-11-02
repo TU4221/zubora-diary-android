@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.exception
 
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.weatherinfo.FetchWeatherInfoUseCase
 import java.time.LocalDate
@@ -73,5 +74,5 @@ internal sealed class WeatherInfoFetchException(
     ) : WeatherInfoFetchException(
         "予期せぬエラーが発生しました。",
         cause
-    )
+    ), UseCaseUnknownException
 }

@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception
 
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
-import com.websarva.wings.android.zuboradiary.domain.usecase.UnknownException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeColorSettingUseCase
 
@@ -44,5 +44,5 @@ internal sealed class ThemeColorSettingLoadException (
         fallbackSetting,
         "予期せぬエラーが発生しました。",
         cause
-    ), UnknownException
+    ), UseCaseUnknownException
 }

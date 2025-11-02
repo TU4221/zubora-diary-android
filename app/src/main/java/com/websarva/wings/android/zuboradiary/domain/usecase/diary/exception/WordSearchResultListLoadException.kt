@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception
 
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadWordSearchResultListUseCase
 
@@ -36,5 +37,5 @@ internal sealed class WordSearchResultListLoadException(
     ) : WordSearchResultListLoadException(
         "予期せぬエラーが発生しました。",
         cause
-    )
+    ), UseCaseUnknownException
 }

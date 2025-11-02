@@ -7,4 +7,4 @@ package com.websarva.wings.android.zuboradiary.domain.usecase
  * このインターフェースを実装する例外は、アプリ全体で共通の
  *「予期せぬエラー」として扱われるべきであることを示す。
  */
-internal interface UnknownException
+internal interface UseCaseUnknownException

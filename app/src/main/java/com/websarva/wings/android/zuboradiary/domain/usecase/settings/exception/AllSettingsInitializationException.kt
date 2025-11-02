@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception
 
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
 
@@ -48,5 +49,5 @@ internal sealed class AllSettingsInitializationException(
     ) : AllSettingsInitializationException(
         "予期せぬエラーが発生しました。",
         cause
-    )
+    ), UseCaseUnknownException
 }

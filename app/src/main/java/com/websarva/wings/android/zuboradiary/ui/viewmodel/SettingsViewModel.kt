@@ -41,7 +41,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
-import com.websarva.wings.android.zuboradiary.domain.usecase.UnknownException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.SettingsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -245,7 +245,7 @@ internal class SettingsViewModel @Inject constructor(
                 hasSettingsLoadFailure = true
             )
         }
-        if (exception is UnknownException) {
+        if (exception is UseCaseUnknownException) {
             emitUnexpectedAppMessage(exception)
         } else {
             emitAppMessageEvent(SettingsAppMessage.SettingLoadFailure)
