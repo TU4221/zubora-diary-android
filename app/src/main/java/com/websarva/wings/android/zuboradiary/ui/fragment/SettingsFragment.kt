@@ -118,7 +118,7 @@ class SettingsFragment :
         super.onViewCreated(view, savedInstanceState)
 
         observeUiEventFromActivity()
-        observeUiState()
+        observeViewColor()
     }
 
     override fun initializeFragmentResultReceiver() {
@@ -282,7 +282,7 @@ class SettingsFragment :
         }
     }
 
-    private fun observeUiState() {
+    private fun observeViewColor() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState
                 .map { it.themeColor }.filterNotNull().distinctUntilChanged().collect {

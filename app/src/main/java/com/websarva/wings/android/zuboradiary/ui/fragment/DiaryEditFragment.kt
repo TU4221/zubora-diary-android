@@ -284,27 +284,40 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     private fun observeUiState() {
+        observeToolbarMenuState()
+        observeWeather1DropdownAdapter()
+        observeWeather2DropdownAdapter()
+        observeConditionDropdownAdapter()
+    }
+
+    private fun observeToolbarMenuState() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState
                 .map { it.isNewDiary }.distinctUntilChanged().collect {
-                    updateToolbarMenuState(it)
+                    updateToolbarMenuState(!it) // isNewDiaryがfalseの時に有効
                 }
         }
+    }
 
+    private fun observeWeather1DropdownAdapter() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState
                 .map { it.weather1Options }.distinctUntilChanged().collect {
                     updateWeather1DropdownAdapter(it)
                 }
         }
+    }
 
+    private fun observeWeather2DropdownAdapter() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState
                 .map { it.weather2Options }.distinctUntilChanged().collect {
                     updateWeather2DropdownAdapter(it)
                 }
         }
+    }
 
+    private fun observeConditionDropdownAdapter() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState
                 .map { it.conditionOptions }.distinctUntilChanged().collect {

@@ -58,7 +58,7 @@ class DiaryItemTitleEditDialog :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observeUiState()
+        observeItemTitleSelectionHistoryListItem()
         setUpItemTitleSelectionHistory()
     }
 
@@ -103,7 +103,7 @@ class DiaryItemTitleEditDialog :
         navigateAppMessageDialog(appMessage)
     }
 
-    private fun observeUiState() {
+    private fun observeItemTitleSelectionHistoryListItem() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.map {
                 it.titleSelectionHistoriesLoadState

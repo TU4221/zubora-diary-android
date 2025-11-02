@@ -136,18 +136,26 @@ class CalendarFragment :
     }
 
     private fun observeUiState() {
+        observeSelectedDate()
+        observeCalendarStartDayOfWeek()
+    }
+
+    private fun observeSelectedDate() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState
                 .map { Pair(it.selectedDate, it.previousSelectedDate) }
                 .distinctUntilChanged().collect { (selectedDate, previousSelectedDate) ->
                     updateCalendarSelectedDate(selectedDate, previousSelectedDate)
-            }
+                }
         }
+    }
 
+    private fun observeCalendarStartDayOfWeek() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState
                 .map { it.calendarStartDayOfWeek }
                 .distinctUntilChanged().collect {
+                    // 週の開始曜日が変わった場合は、カレンダー全体を再構成する必要がある
                     binding.calendar.notifyCalendarChanged()
                 }
         }

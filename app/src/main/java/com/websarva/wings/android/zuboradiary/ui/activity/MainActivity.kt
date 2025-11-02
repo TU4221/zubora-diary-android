@@ -109,7 +109,7 @@ class MainActivity : LoggingActivity() {
                 mainActivityViewModel.uiState.map { it.themeColor }.filterNotNull().first()
             setUpMainActivityBinding()
             isMainActivityLayoutInflated = true
-            setUpUiEvent()
+            observeUiEvent()
             observeUiState()
             setUpNavigation()
         }
@@ -125,7 +125,7 @@ class MainActivity : LoggingActivity() {
         setContentView(binding.root)
     }
 
-    private fun setUpUiEvent() {
+    private fun observeUiEvent() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mainActivityViewModel.activityUiEvent

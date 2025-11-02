@@ -145,7 +145,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
         mainActivityViewModel.onFragmentViewReady(this is RequiresBottomNavigation)
 
         initializeFragmentResultReceiver()
-        setUpUiEvent()
+        observeUiEvent()
         setUpPendingNavigationCollector()
         observeProcessingState()
         if (!isNavigationStartFragment) registerOnBackPressedCallback()
@@ -177,12 +177,12 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
             )
     }
 
-    private fun setUpUiEvent() {
-        setUpMainUiEvent()
-        setUpCommonUiEvent()
+    private fun observeUiEvent() {
+        observeMainUiEvent()
+        observeCommonUiEvent()
     }
 
-    private fun setUpMainUiEvent() {
+    private fun observeMainUiEvent() {
         fragmentHelper
             .setUpMainUiEvent(
                 this,
@@ -193,7 +193,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
     internal abstract fun onMainUiEventReceived(event: E)
 
-    private fun setUpCommonUiEvent() {
+    private fun observeCommonUiEvent() {
         fragmentHelper
             .setUpCommonUiEvent(
                 this,

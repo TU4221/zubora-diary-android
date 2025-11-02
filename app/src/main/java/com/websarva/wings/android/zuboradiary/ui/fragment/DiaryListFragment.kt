@@ -58,8 +58,7 @@ class DiaryListFragment :
         super.onViewCreated(view, savedInstanceState)
 
         observeUiEventFromActivity()
-        observeUiState() // TODO:BaseFragmentに抽象メソッド作成
-        observeDiaryListLoadingState()
+        observeUiState()
         setUpToolBar()
         setUpDiaryList()
 
@@ -133,6 +132,11 @@ class DiaryListFragment :
     }
 
     private fun observeUiState() {
+        observeDiaryListItem()
+        observeDiaryListSwipeEnabled()
+    }
+
+    private fun observeDiaryListItem() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState
                 .map { it.diaryList }.distinctUntilChanged().collect {
@@ -141,7 +145,7 @@ class DiaryListFragment :
         }
     }
 
-    private fun observeDiaryListLoadingState() {
+    private fun observeDiaryListSwipeEnabled() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.isLoadingOnScrolled.collect {
                 updateDiaryListSwipeEnabled(!it)

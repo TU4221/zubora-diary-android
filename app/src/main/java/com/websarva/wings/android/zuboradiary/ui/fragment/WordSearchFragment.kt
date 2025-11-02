@@ -49,7 +49,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observeUiState()
+        observeWordSearchResultListItem()
         setUpWordSearchResultListAdapter()
         setUpFloatingActionButton()
 
@@ -79,7 +79,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         navigateAppMessageDialog(appMessage)
     }
 
-    private fun observeUiState() {
+    private fun observeWordSearchResultListItem() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState
                 .map { it.wordSearchResultList }.distinctUntilChanged().collect {
