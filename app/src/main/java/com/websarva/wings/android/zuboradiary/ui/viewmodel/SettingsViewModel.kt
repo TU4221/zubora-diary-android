@@ -37,7 +37,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.SettingsAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
@@ -71,7 +71,7 @@ internal class SettingsViewModel @Inject constructor(
     private val updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase,
     private val deleteAllDiariesUseCase: DeleteAllDiariesUseCase,
     private val deleteAllDataUseCase: DeleteAllDataUseCase,
-) : BaseViewModel<SettingsEvent, SettingsAppMessage, SettingsUiState>(
+) : BaseViewModel<SettingsUiEvent, SettingsAppMessage, SettingsUiState>(
     handle.get<SettingsUiState>(SAVED_UI_STATE_KEY)?.copy(
         isProcessing = false,
         isInputDisabled = false
@@ -266,7 +266,7 @@ internal class SettingsViewModel @Inject constructor(
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                SettingsEvent.NavigateThemeColorPickerDialog
+                SettingsUiEvent.NavigateThemeColorPickerDialog
             )
         }
     }
@@ -277,7 +277,7 @@ internal class SettingsViewModel @Inject constructor(
         val dayOfWeek = currentUiState.calendarStartDayOfWeek ?: return
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                SettingsEvent.NavigateCalendarStartDayPickerDialog(dayOfWeek)
+                SettingsUiEvent.NavigateCalendarStartDayPickerDialog(dayOfWeek)
             )
         }
     }
@@ -291,7 +291,7 @@ internal class SettingsViewModel @Inject constructor(
         if (settingValue == null || !canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
                 emitUiEvent(
-                    SettingsEvent.TurnReminderNotificationSettingSwitch(!isChecked)
+                    SettingsUiEvent.TurnReminderNotificationSettingSwitch(!isChecked)
                 )
             }
             return
@@ -302,11 +302,11 @@ internal class SettingsViewModel @Inject constructor(
                 // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     emitUiEvent(
-                        SettingsEvent.CheckPostNotificationsPermission
+                        SettingsUiEvent.CheckPostNotificationsPermission
                     )
                 } else {
                     emitUiEvent(
-                        SettingsEvent.NavigateReminderNotificationTimePickerDialog
+                        SettingsUiEvent.NavigateReminderNotificationTimePickerDialog
                     )
                 }
             } else {
@@ -325,7 +325,7 @@ internal class SettingsViewModel @Inject constructor(
         if (settingValue == null || !canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
                 emitUiEvent(
-                    SettingsEvent.TurnPasscodeLockSettingSwitch(!isChecked)
+                    SettingsUiEvent.TurnPasscodeLockSettingSwitch(!isChecked)
                 )
             }
             return
@@ -345,7 +345,7 @@ internal class SettingsViewModel @Inject constructor(
         if (settingValue == null || !canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
                 emitUiEvent(
-                    SettingsEvent.TurnWeatherInfoFetchSettingSwitch(!isChecked)
+                    SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch(!isChecked)
                 )
             }
             return
@@ -354,7 +354,7 @@ internal class SettingsViewModel @Inject constructor(
         launchWithUnexpectedErrorHandler {
             if (isChecked) {
                 emitUiEvent(
-                    SettingsEvent.CheckAccessLocationPermission
+                    SettingsUiEvent.CheckAccessLocationPermission
                 )
             } else {
                 saveWeatherInfoFetch(false)
@@ -367,7 +367,7 @@ internal class SettingsViewModel @Inject constructor(
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                SettingsEvent.NavigateAllDiariesDeleteDialog
+                SettingsUiEvent.NavigateAllDiariesDeleteDialog
             )
         }
     }
@@ -377,7 +377,7 @@ internal class SettingsViewModel @Inject constructor(
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                SettingsEvent.NavigateAllSettingsInitializationDialog
+                SettingsUiEvent.NavigateAllSettingsInitializationDialog
             )
         }
     }
@@ -387,7 +387,7 @@ internal class SettingsViewModel @Inject constructor(
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                SettingsEvent.NavigateAllDataDeleteDialog
+                SettingsUiEvent.NavigateAllDataDeleteDialog
             )
         }
     }
@@ -397,7 +397,7 @@ internal class SettingsViewModel @Inject constructor(
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                SettingsEvent.NavigateOpenSourceLicensesFragment
+                SettingsUiEvent.NavigateOpenSourceLicensesFragment
             )
         }
     }
@@ -461,7 +461,7 @@ internal class SettingsViewModel @Inject constructor(
     private fun handleReminderNotificationSettingDialogNegativeResult() {
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                SettingsEvent.TurnReminderNotificationSettingSwitch(false)
+                SettingsUiEvent.TurnReminderNotificationSettingSwitch(false)
             )
         }
     }
@@ -535,7 +535,7 @@ internal class SettingsViewModel @Inject constructor(
     private fun handlePermissionDialogPositiveResult() {
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                SettingsEvent.ShowApplicationDetailsSettings
+                SettingsUiEvent.ShowApplicationDetailsSettings
             )
         }
     }
@@ -546,11 +546,11 @@ internal class SettingsViewModel @Inject constructor(
         launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 emitUiEvent(
-                    SettingsEvent.NavigateReminderNotificationTimePickerDialog
+                    SettingsUiEvent.NavigateReminderNotificationTimePickerDialog
                 )
             } else {
                 emitUiEvent(
-                    SettingsEvent.CheckShouldShowRequestPostNotificationsPermissionRationale
+                    SettingsUiEvent.CheckShouldShowRequestPostNotificationsPermissionRationale
                 )
             }
         }
@@ -561,14 +561,14 @@ internal class SettingsViewModel @Inject constructor(
         launchWithUnexpectedErrorHandler {
             if (shouldShowRequest) {
                 emitUiEvent(
-                    SettingsEvent.ShowRequestPostNotificationsPermissionRationale
+                    SettingsUiEvent.ShowRequestPostNotificationsPermissionRationale
                 )
             } else {
                 emitUiEvent(
-                    SettingsEvent.TurnReminderNotificationSettingSwitch(false)
+                    SettingsUiEvent.TurnReminderNotificationSettingSwitch(false)
                 )
                 emitUiEvent(
-                    SettingsEvent.NavigateNotificationPermissionDialog
+                    SettingsUiEvent.NavigateNotificationPermissionDialog
                 )
             }
         }
@@ -579,11 +579,11 @@ internal class SettingsViewModel @Inject constructor(
         launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 emitUiEvent(
-                    SettingsEvent.NavigateReminderNotificationTimePickerDialog
+                    SettingsUiEvent.NavigateReminderNotificationTimePickerDialog
                 )
             } else {
                 emitUiEvent(
-                    SettingsEvent.TurnReminderNotificationSettingSwitch(false)
+                    SettingsUiEvent.TurnReminderNotificationSettingSwitch(false)
                 )
             }
         }
@@ -595,7 +595,7 @@ internal class SettingsViewModel @Inject constructor(
                 saveWeatherInfoFetch(true)
             } else {
                 emitUiEvent(
-                    SettingsEvent.CheckShouldShowRequestAccessLocationPermissionRationale
+                    SettingsUiEvent.CheckShouldShowRequestAccessLocationPermissionRationale
                 )
             }
         }
@@ -605,14 +605,14 @@ internal class SettingsViewModel @Inject constructor(
         launchWithUnexpectedErrorHandler {
             if (shouldShowRequest) {
                 emitUiEvent(
-                    SettingsEvent.ShowRequestAccessLocationPermissionRationale
+                    SettingsUiEvent.ShowRequestAccessLocationPermissionRationale
                 )
             } else {
                 emitUiEvent(
-                    SettingsEvent.TurnWeatherInfoFetchSettingSwitch(false)
+                    SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch(false)
                 )
                 emitUiEvent(
-                    SettingsEvent.NavigateLocationPermissionDialog
+                    SettingsUiEvent.NavigateLocationPermissionDialog
                 )
             }
         }
@@ -624,7 +624,7 @@ internal class SettingsViewModel @Inject constructor(
                 saveWeatherInfoFetch(true)
             } else {
                 emitUiEvent(
-                    SettingsEvent.TurnWeatherInfoFetchSettingSwitch(false)
+                    SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch(false)
                 )
             }
         }
@@ -724,7 +724,7 @@ internal class SettingsViewModel @Inject constructor(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                emitUiEvent(SettingsEvent.TurnReminderNotificationSettingSwitch(false))
+                emitUiEvent(SettingsUiEvent.TurnReminderNotificationSettingSwitch(false))
                 when (result.exception) {
                     is ReminderNotificationSettingUpdateException.SettingUpdateFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
@@ -750,7 +750,7 @@ internal class SettingsViewModel @Inject constructor(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                emitUiEvent(SettingsEvent.TurnReminderNotificationSettingSwitch(true))
+                emitUiEvent(SettingsUiEvent.TurnReminderNotificationSettingSwitch(true))
                 when (result.exception) {
                     is ReminderNotificationSettingUpdateException.SettingUpdateFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
@@ -785,7 +785,7 @@ internal class SettingsViewModel @Inject constructor(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                emitUiEvent(SettingsEvent.TurnPasscodeLockSettingSwitch(!value))
+                emitUiEvent(SettingsUiEvent.TurnPasscodeLockSettingSwitch(!value))
                 when (result.exception) {
                     is PassCodeSettingUpdateException.UpdateFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
@@ -811,7 +811,7 @@ internal class SettingsViewModel @Inject constructor(
                 // 処理なし
             }
             is UseCaseResult.Failure -> {
-                emitUiEvent(SettingsEvent.TurnWeatherInfoFetchSettingSwitch(!value))
+                emitUiEvent(SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch(!value))
                 when (result.exception) {
                     is WeatherInfoFetchSettingUpdateException.UpdateFailure -> {
                         emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)

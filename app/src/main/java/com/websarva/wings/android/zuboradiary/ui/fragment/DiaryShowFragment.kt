@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBindi
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
@@ -20,7 +20,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 
 @AndroidEntryPoint
-class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>() {
+class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEvent>() {
 
     internal companion object {
         // Navigation関係
@@ -75,21 +75,21 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowEvent>
         }
     }
 
-    override fun onMainUiEventReceived(event: DiaryShowEvent) {
+    override fun onMainUiEventReceived(event: DiaryShowUiEvent) {
         when (event) {
-            is DiaryShowEvent.NavigateDiaryEditFragment -> {
+            is DiaryShowUiEvent.NavigateDiaryEditFragment -> {
                 navigateDiaryEditFragment(event.id, event.date)
             }
-            is DiaryShowEvent.NavigateDiaryLoadFailureDialog -> {
+            is DiaryShowUiEvent.NavigateDiaryLoadFailureDialog -> {
                 navigateDiaryLoadFailureDialog(event.date)
             }
-            is DiaryShowEvent.NavigateDiaryDeleteDialog -> {
+            is DiaryShowUiEvent.NavigateDiaryDeleteDialog -> {
                 navigateDiaryDeleteDialog(event.date)
             }
-            is DiaryShowEvent.NavigatePreviousFragmentOnDiaryDeleted -> {
+            is DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryDeleted -> {
                 navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
             }
-            is DiaryShowEvent.NavigatePreviousFragmentOnDiaryLoadFailed -> {
+            is DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryLoadFailed -> {
                 navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
             }
         }

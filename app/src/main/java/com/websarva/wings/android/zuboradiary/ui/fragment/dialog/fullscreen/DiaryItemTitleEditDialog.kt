@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diaryitemtitle
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemTitleDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
@@ -27,7 +27,7 @@ import kotlinx.coroutines.flow.mapNotNull
 
 @AndroidEntryPoint
 class DiaryItemTitleEditDialog :
-    BaseFullScreenDialogFragment<DialogDiaryItemTitleEditBinding, DiaryItemTitleEditEvent>() {
+    BaseFullScreenDialogFragment<DialogDiaryItemTitleEditBinding, DiaryItemTitleEditUiEvent>() {
 
     internal companion object {
         // Navigation関係
@@ -75,21 +75,21 @@ class DiaryItemTitleEditDialog :
         }
     }
 
-    override fun onMainUiEventReceived(event: DiaryItemTitleEditEvent) {
+    override fun onMainUiEventReceived(event: DiaryItemTitleEditUiEvent) {
         when (event) {
-            DiaryItemTitleEditEvent.CloseSwipedItem -> {
+            DiaryItemTitleEditUiEvent.CloseSwipedItem -> {
                 val adapter =
                     checkNotNull(
                         binding.recyclerItemTitleSelectionHistory.adapter
                     ) as DiaryItemTitleSelectionHistoryListAdapter
                 adapter.closeSwipedItem()
             }
-            is DiaryItemTitleEditEvent.CompleteEdit -> {
+            is DiaryItemTitleEditUiEvent.CompleteEdit -> {
                 completeItemTitleEdit(
                     event.diaryItemTitleSelection
                 )
             }
-            is DiaryItemTitleEditEvent.NavigateSelectionHistoryItemDeleteDialog -> {
+            is DiaryItemTitleEditUiEvent.NavigateSelectionHistoryItemDeleteDialog -> {
                 navigateDiaryItemTitleDeleteDialog(event.itemTitle)
             }
         }

@@ -27,7 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
-import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
@@ -60,7 +60,7 @@ internal class DiaryListViewModel @Inject constructor(
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
     private val loadDiaryListStartYearMonthPickerDateRangeUseCase: LoadDiaryListStartYearMonthPickerDateRangeUseCase,
     private val buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
-) : BaseViewModel<DiaryListEvent, DiaryListAppMessage, DiaryListUiState>(
+) : BaseViewModel<DiaryListUiEvent, DiaryListAppMessage, DiaryListUiState>(
     handle.get<DiaryListUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
         DiaryListUiState().copy(
             diaryList = savedUiState.diaryList,
@@ -140,7 +140,7 @@ internal class DiaryListViewModel @Inject constructor(
     // Viewクリック処理
     fun onWordSearchMenuClick() {
         launchWithUnexpectedErrorHandler {
-            emitUiEvent(DiaryListEvent.NavigateWordSearchFragment)
+            emitUiEvent(DiaryListUiEvent.NavigateWordSearchFragment)
         }
     }
 
@@ -152,7 +152,7 @@ internal class DiaryListViewModel @Inject constructor(
             val newestYear = Year.of(newestDiaryDate.year)
             val oldestYear = Year.of(oldestDiaryDate.year)
             emitUiEvent(
-                DiaryListEvent.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
+                DiaryListUiEvent.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
             )
         }
     }
@@ -161,7 +161,7 @@ internal class DiaryListViewModel @Inject constructor(
         val id = item.id
         val date = item.date
         launchWithUnexpectedErrorHandler {
-            emitUiEvent(DiaryListEvent.NavigateDiaryShowFragment(id, date))
+            emitUiEvent(DiaryListUiEvent.NavigateDiaryShowFragment(id, date))
         }
     }
 
@@ -179,7 +179,7 @@ internal class DiaryListViewModel @Inject constructor(
                 sortConditionDate
             )
             emitUiEvent(
-                DiaryListEvent.NavigateDiaryDeleteDialog(date)
+                DiaryListUiEvent.NavigateDiaryDeleteDialog(date)
             )
         }
     }
@@ -187,7 +187,7 @@ internal class DiaryListViewModel @Inject constructor(
     fun onDiaryEditButtonClick() {
         launchWithUnexpectedErrorHandler {
             val today = LocalDate.now()
-            emitUiEvent(DiaryListEvent.NavigateDiaryEditFragment(date = today))
+            emitUiEvent(DiaryListUiEvent.NavigateDiaryEditFragment(date = today))
         }
     }
 

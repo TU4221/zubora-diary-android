@@ -28,9 +28,9 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.Reminder
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
@@ -45,7 +45,7 @@ import kotlin.getValue
 
 @AndroidEntryPoint
 class SettingsFragment :
-    BaseFragment<FragmentSettingsBinding, SettingsEvent>(),
+    BaseFragment<FragmentSettingsBinding, SettingsUiEvent>(),
     RequiresBottomNavigation {
 
     override val destinationId = R.id.navigation_settings_fragment
@@ -191,69 +191,69 @@ class SettingsFragment :
         }
     }
 
-    override fun onMainUiEventReceived(event: SettingsEvent) {
+    override fun onMainUiEventReceived(event: SettingsUiEvent) {
         when (event) {
-            is SettingsEvent.NavigateThemeColorPickerDialog -> {
+            is SettingsUiEvent.NavigateThemeColorPickerDialog -> {
                 navigateThemeColorPickerDialog()
             }
-            is SettingsEvent.NavigateCalendarStartDayPickerDialog -> {
+            is SettingsUiEvent.NavigateCalendarStartDayPickerDialog -> {
                 navigateCalendarStartDayPickerDialog(event.dayOfWeek)
             }
-            is SettingsEvent.NavigateReminderNotificationTimePickerDialog -> {
+            is SettingsUiEvent.NavigateReminderNotificationTimePickerDialog -> {
                 navigateReminderNotificationTimePickerDialog()
             }
-            is SettingsEvent.NavigateNotificationPermissionDialog -> {
+            is SettingsUiEvent.NavigateNotificationPermissionDialog -> {
                 navigateNotificationPermissionDialog()
             }
-            is SettingsEvent.NavigateLocationPermissionDialog -> {
+            is SettingsUiEvent.NavigateLocationPermissionDialog -> {
                 navigateLocationPermissionDialog()
             }
-            is SettingsEvent.NavigateAllDiariesDeleteDialog -> {
+            is SettingsUiEvent.NavigateAllDiariesDeleteDialog -> {
                 navigateAllDiariesDeleteDialog()
             }
-            is SettingsEvent.NavigateAllSettingsInitializationDialog -> {
+            is SettingsUiEvent.NavigateAllSettingsInitializationDialog -> {
                 navigateAllSettingsInitializationDialog()
             }
-            is SettingsEvent.NavigateAllDataDeleteDialog -> {
+            is SettingsUiEvent.NavigateAllDataDeleteDialog -> {
                 navigateAllDataDeleteDialog()
             }
-            is SettingsEvent.NavigateOpenSourceLicensesFragment -> {
+            is SettingsUiEvent.NavigateOpenSourceLicensesFragment -> {
                 navigateOpenSourceLicensesFragment()
             }
-            is SettingsEvent.CheckPostNotificationsPermission -> {
+            is SettingsUiEvent.CheckPostNotificationsPermission -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     checkPostNotificationsPermission()
                 }
             }
-            is SettingsEvent.CheckShouldShowRequestPostNotificationsPermissionRationale -> {
+            is SettingsUiEvent.CheckShouldShowRequestPostNotificationsPermissionRationale -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     checkShouldShowRequestPostNotificationsPermissionRationale()
                 }
             }
-            is SettingsEvent.ShowRequestPostNotificationsPermissionRationale -> {
+            is SettingsUiEvent.ShowRequestPostNotificationsPermissionRationale -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     showRequestPostNotificationsPermissionRationale()
                 }
             }
-            is SettingsEvent.CheckAccessLocationPermission -> {
+            is SettingsUiEvent.CheckAccessLocationPermission -> {
                 checkAccessLocationPermission()
             }
-            is SettingsEvent.CheckShouldShowRequestAccessLocationPermissionRationale -> {
+            is SettingsUiEvent.CheckShouldShowRequestAccessLocationPermissionRationale -> {
                 checkShouldShowRequestAccessLocationPermissionRationale()
             }
-            is SettingsEvent.ShowRequestAccessLocationPermissionRationale -> {
+            is SettingsUiEvent.ShowRequestAccessLocationPermissionRationale -> {
                 showRequestAccessLocationPermissionRationale()
             }
-            is SettingsEvent.TurnReminderNotificationSettingSwitch -> {
+            is SettingsUiEvent.TurnReminderNotificationSettingSwitch -> {
                 binding.includeReminderNotificationSetting.materialSwitch.isChecked = event.isChecked
             }
-            is SettingsEvent.TurnPasscodeLockSettingSwitch -> {
+            is SettingsUiEvent.TurnPasscodeLockSettingSwitch -> {
                 binding.includePasscodeLockSetting.materialSwitch.isChecked = event.isChecked
             }
-            is SettingsEvent.TurnWeatherInfoFetchSettingSwitch -> {
+            is SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch -> {
                 binding.includeWeatherInfoFetchSetting.materialSwitch.isChecked = event.isChecked
             }
-            is SettingsEvent.ShowApplicationDetailsSettings -> {
+            is SettingsUiEvent.ShowApplicationDetailsSettings -> {
                 showApplicationDetailsSettings()
             }
         }
@@ -269,12 +269,12 @@ class SettingsFragment :
 
     private fun observeUiEventFromActivity() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainActivityViewModel.fragmentUiEvent
-                .collect { value: ConsumableEvent<FragmentUiEvent> ->
+            mainActivityViewModel.activityCallbackUiEvent
+                .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
                     val event = value.getContentIfNotHandled()
                     event ?: return@collect
                     when (event) {
-                        FragmentUiEvent.ProcessOnBottomNavigationItemReselect -> {
+                        ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
                             scrollToTop()
                         }
                     }

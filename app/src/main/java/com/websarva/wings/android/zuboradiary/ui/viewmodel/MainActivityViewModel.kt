@@ -11,7 +11,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.message.CommonAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.message.MainActivityAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.MainActivityUiState
@@ -42,8 +42,9 @@ internal class MainActivityViewModel @Inject constructor(
     private val _activityUiEvent = MutableSharedFlow<ConsumableEvent<MainActivityUiEvent>>(replay = 1)
     val activityUiEvent get() = _activityUiEvent.asSharedFlow()
 
-    private val _fragmentUiEvent = MutableSharedFlow<ConsumableEvent<FragmentUiEvent>>(replay = 1)
-    val fragmentUiEvent get() = _fragmentUiEvent.asSharedFlow()
+    private val _activityCallbackUiEvent =
+        MutableSharedFlow<ConsumableEvent<ActivityCallbackUiEvent>>(replay = 1)
+    val activityCallbackUiEvent get() = _activityCallbackUiEvent.asSharedFlow()
 
     private val _uiState = MutableStateFlow(
         handle.get<MainActivityUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
@@ -180,7 +181,7 @@ internal class MainActivityViewModel @Inject constructor(
 
     fun onBottomNavigationItemReselect() {
         viewModelScope.launch {
-            emitFragmentUiEvent(FragmentUiEvent.ProcessOnBottomNavigationItemReselect)
+            emitActivityCallbackUiEvent(ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect)
         }
     }
 
@@ -190,8 +191,8 @@ internal class MainActivityViewModel @Inject constructor(
         )
     }
 
-    private suspend fun emitFragmentUiEvent(event: FragmentUiEvent) {
-        _fragmentUiEvent.emit(
+    private suspend fun emitActivityCallbackUiEvent(event: ActivityCallbackUiEvent) {
+        _activityCallbackUiEvent.emit(
             ConsumableEvent(event)
         )
     }

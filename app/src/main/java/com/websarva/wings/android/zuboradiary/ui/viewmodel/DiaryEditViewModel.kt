@@ -42,7 +42,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.CheckWeath
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
@@ -83,7 +83,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val cacheDiaryImageUseCase: CacheDiaryImageUseCase,
     private val clearDiaryImageCacheFileUseCase: ClearDiaryImageCacheFileUseCase
-) : BaseViewModel<DiaryEditEvent, DiaryEditAppMessage, DiaryEditUiState>(
+) : BaseViewModel<DiaryEditUiEvent, DiaryEditAppMessage, DiaryEditUiState>(
     handle.get<DiaryEditUiState>(SAVED_UI_STATE_KEY)?.copy(
         isProcessing = false,
         isInputDisabled = false
@@ -224,7 +224,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 .distinctUntilChanged()
                 .collectLatest { value: Int ->
                     Log.d("20251022", "DiaryEditUiState.numVisibleDiaryItems: $value")
-                    emitUiEvent(DiaryEditEvent.UpdateDiaryItemLayout(value))
+                    emitUiEvent(DiaryEditUiEvent.UpdateDiaryItemLayout(value))
                 }
         }
     }
@@ -273,7 +273,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 originalDiaryDate
             )
             emitUiEvent(
-                DiaryEditEvent.NavigateDiaryDeleteDialog(originalDiaryDate)
+                DiaryEditUiEvent.NavigateDiaryDeleteDialog(originalDiaryDate)
             )
         }
 
@@ -298,7 +298,7 @@ internal class DiaryEditViewModel @Inject constructor(
         launchWithUnexpectedErrorHandler {
             updatePendingDiaryDateUpdateParameters(originalDate, isNewDiary)
             emitUiEvent(
-                DiaryEditEvent.NavigateDatePickerDialog(date)
+                DiaryEditUiEvent.NavigateDatePickerDialog(date)
             )
         }
     }
@@ -331,7 +331,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                DiaryEditEvent.NavigateDiaryItemTitleEditFragment(
+                DiaryEditUiEvent.NavigateDiaryItemTitleEditFragment(
                     DiaryItemTitleSelectionUi(
                         itemNumberInt,
                         itemTitleId,
@@ -371,7 +371,7 @@ internal class DiaryEditViewModel @Inject constructor(
         launchWithUnexpectedErrorHandler {
             updatePendingDiaryItemDeleteParameters(itemNumber)
             emitUiEvent(
-                DiaryEditEvent.NavigateDiaryItemDeleteDialog(itemNumberInt)
+                DiaryEditUiEvent.NavigateDiaryItemDeleteDialog(itemNumberInt)
             )
         }
     }
@@ -381,7 +381,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                DiaryEditEvent.NavigateDiaryImageDeleteDialog
+                DiaryEditUiEvent.NavigateDiaryImageDeleteDialog
             )
         }
     }
@@ -506,7 +506,7 @@ internal class DiaryEditViewModel @Inject constructor(
             DialogResult.Cancel -> {
                 launchWithUnexpectedErrorHandler {
                     emitUiEvent(
-                        DiaryEditEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed()
+                        DiaryEditUiEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed()
                     )
                 }
             }
@@ -729,7 +729,7 @@ internal class DiaryEditViewModel @Inject constructor(
                     //      取りこぼされる可能性がある。これを防ぐため、間に確認ダイアログを挟み、
                     //      ユーザーの応答を待ってから画面遷移を実行する。
                     emitUiEvent(
-                        DiaryEditEvent.NavigateDiaryLoadFailureDialog(date)
+                        DiaryEditUiEvent.NavigateDiaryLoadFailureDialog(date)
                     )
                 } else {
                     updateUiState { previousState }
@@ -762,7 +762,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 updateToIdleState()
                 clearDiaryImageCacheFile()
                 emitUiEvent(
-                    DiaryEditEvent
+                    DiaryEditUiEvent
                         .NavigateDiaryShowFragment(diary.id.value, diary.date)
                 )
             }
@@ -800,7 +800,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 updateToIdleState()
                 clearDiaryImageCacheFile()
                 emitUiEvent(
-                    DiaryEditEvent
+                    DiaryEditUiEvent
                         .NavigatePreviousFragmentOnDiaryDelete(
                             FragmentResult.Some(date)
                         )
@@ -837,7 +837,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 if (result.value) {
                     updatePendingDiaryLoadParameters(date, previousDate)
                     emitUiEvent(
-                        DiaryEditEvent.NavigateDiaryLoadDialog(date)
+                        DiaryEditUiEvent.NavigateDiaryLoadDialog(date)
                     )
                 } else {
                     fetchWeatherInfo(date, previousDate)
@@ -877,7 +877,7 @@ internal class DiaryEditViewModel @Inject constructor(
                         isNewDiary
                     )
                     emitUiEvent(
-                        DiaryEditEvent.NavigateDiaryUpdateDialog(diary.date)
+                        DiaryEditUiEvent.NavigateDiaryUpdateDialog(diary.date)
                     )
                 } else {
                     saveDiary(
@@ -921,7 +921,7 @@ internal class DiaryEditViewModel @Inject constructor(
         if (shouldRequest) {
             updatePendingWeatherInfoFetchParameters(date)
             emitUiEvent(
-                DiaryEditEvent.NavigateWeatherInfoFetchDialog(date)
+                DiaryEditUiEvent.NavigateWeatherInfoFetchDialog(date)
             )
         } else {
             val shouldLoad = shouldFetchWeatherInfoUseCase(date, previousDate).value
@@ -934,7 +934,7 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private suspend fun checkPermissionBeforeWeatherInfoFetch() {
         emitUiEvent(
-            DiaryEditEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch
+            DiaryEditUiEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch
         )
     }
 
@@ -997,7 +997,7 @@ internal class DiaryEditViewModel @Inject constructor(
     // MEMO:日記項目追加処理完了時のUi更新(編集中)は日記項目追加完了イベントメソッドにて処理
     private suspend fun addDiaryItem() {
         updateToInputDisabledState()
-        emitUiEvent(DiaryEditEvent.ItemAddition)
+        emitUiEvent(DiaryEditUiEvent.ItemAddition)
         val numVisibleItems = currentUiState.numVisibleDiaryItems
         val additionItemNumber = numVisibleItems + 1
         updateUiState {
@@ -1019,7 +1019,7 @@ internal class DiaryEditViewModel @Inject constructor(
             deleteItem(itemNumber)
         } else {
             emitUiEvent(
-                DiaryEditEvent.TransitionDiaryItemToInvisibleState(itemNumber.value)
+                DiaryEditUiEvent.TransitionDiaryItemToInvisibleState(itemNumber.value)
             )
         }
     }
@@ -1072,7 +1072,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private suspend fun selectImage(diaryId: DiaryId) {
         updateToProcessingState()
         updatePendingDiaryImageUpdateParameters(diaryId)
-        emitUiEvent(DiaryEditEvent.SelectImage)
+        emitUiEvent(DiaryEditUiEvent.SelectImage)
     }
 
     private suspend fun deleteImage() {
@@ -1142,7 +1142,7 @@ internal class DiaryEditViewModel @Inject constructor(
         if (shouldRequest) {
             updatePendingPreviousNavigationParameter(originalDiary.date)
             emitUiEvent(
-                DiaryEditEvent.NavigateExitWithoutDiarySaveConfirmationDialog
+                DiaryEditUiEvent.NavigateExitWithoutDiarySaveConfirmationDialog
             )
         } else {
             clearDiaryImageCacheFile()

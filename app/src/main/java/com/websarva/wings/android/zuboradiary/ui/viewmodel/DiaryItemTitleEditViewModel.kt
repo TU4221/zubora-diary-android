@@ -16,7 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryItemTitleEdi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.InputTextValidationState
-import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
@@ -39,7 +39,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val loadDiaryItemTitleSelectionHistoryListUseCase: LoadDiaryItemTitleSelectionHistoryListUseCase,
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
-) : BaseViewModel<DiaryItemTitleEditEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditUiState>(
+) : BaseViewModel<DiaryItemTitleEditUiEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditUiState>(
     handle.get<DiaryItemTitleEditUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
         DiaryItemTitleEditUiState().copy(
             itemNumber = savedUiState.itemNumber,
@@ -175,7 +175,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 DiaryItemTitle(itemTitle)
             )
             emitUiEvent(
-                DiaryItemTitleEditEvent
+                DiaryItemTitleEditUiEvent
                     .NavigateSelectionHistoryItemDeleteDialog(
                         itemTitle
                     )
@@ -219,7 +219,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private fun handleDiaryItemTitleSelectionHistoryDeleteDialogNegativeResult() {
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                DiaryItemTitleEditEvent.CloseSwipedItem
+                DiaryItemTitleEditUiEvent.CloseSwipedItem
             )
         }
     }
@@ -235,7 +235,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                 val diaryItemTitleSelection =
                     DiaryItemTitleSelectionUi(itemNumberInt, itemId.value, itemTitle)
                 emitUiEvent(
-                    DiaryItemTitleEditEvent.CompleteEdit(diaryItemTitleSelection)
+                    DiaryItemTitleEditUiEvent.CompleteEdit(diaryItemTitleSelection)
                 )
             }
             InputTextValidation.Empty,

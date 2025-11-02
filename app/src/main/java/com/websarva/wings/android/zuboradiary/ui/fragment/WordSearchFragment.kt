@@ -11,7 +11,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -23,7 +23,7 @@ import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
 @AndroidEntryPoint
-class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEvent>() {
+class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiEvent>() {
 
     override val destinationId = R.id.navigation_word_search_fragment
 
@@ -60,12 +60,12 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchEve
         // 処理なし
     }
 
-    override fun onMainUiEventReceived(event: WordSearchEvent) {
+    override fun onMainUiEventReceived(event: WordSearchUiEvent) {
         when (event) {
-            is WordSearchEvent.NavigateDiaryShowFragment -> {
+            is WordSearchUiEvent.NavigateDiaryShowFragment -> {
                 navigateDiaryShowFragment(event.id, event.date)
             }
-            WordSearchEvent.ShowKeyboard -> {
+            WordSearchUiEvent.ShowKeyboard -> {
                 showKeyboard()
             }
         }

@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Wor
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultListRefreshException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.WordSearchAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
@@ -44,7 +44,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val loadNewWordSearchResultListUseCase: LoadNewWordSearchResultListUseCase,
     private val loadAdditionWordSearchResultListUseCase: LoadAdditionWordSearchResultListUseCase,
     private val refreshWordSearchResultListUseCase: RefreshWordSearchResultListUseCase
-) : BaseViewModel<WordSearchEvent, WordSearchAppMessage, WordSearchUiState>(
+) : BaseViewModel<WordSearchUiEvent, WordSearchAppMessage, WordSearchUiState>(
     handle.get<WordSearchUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
         WordSearchUiState().copy(
             searchWord = savedUiState.searchWord,
@@ -109,7 +109,7 @@ internal class WordSearchViewModel @Inject internal constructor(
                     }
 
                     if (searchWord.isEmpty()) {
-                        emitUiEvent(WordSearchEvent.ShowKeyboard)
+                        emitUiEvent(WordSearchUiEvent.ShowKeyboard)
                         clearWordSearchResultList()
                     } else {
                         loadNewWordSearchResultList(wordSearchResultList, searchWord)
@@ -138,7 +138,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         val date = item.date
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                WordSearchEvent.NavigateDiaryShowFragment(id, date)
+                WordSearchUiEvent.NavigateDiaryShowFragment(id, date)
             )
         }
     }

@@ -24,11 +24,11 @@ import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarHeaderBi
 import com.websarva.wings.android.zuboradiary.ui.theme.CalendarThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -43,7 +43,7 @@ import java.util.stream.Stream
 
 @AndroidEntryPoint
 class CalendarFragment :
-    BaseFragment<FragmentCalendarBinding, CalendarEvent>(),
+    BaseFragment<FragmentCalendarBinding, CalendarUiEvent>(),
     RequiresBottomNavigation {
 
     override val destinationId = R.id.navigation_calendar_fragment
@@ -95,18 +95,18 @@ class CalendarFragment :
         }
     }
 
-    override fun onMainUiEventReceived(event: CalendarEvent) {
+    override fun onMainUiEventReceived(event: CalendarUiEvent) {
         when (event) {
-            is CalendarEvent.NavigateDiaryEditFragment -> {
+            is CalendarUiEvent.NavigateDiaryEditFragment -> {
                 navigateDiaryEditFragment(event.id, event.date)
             }
-            is CalendarEvent.ScrollCalendar -> {
+            is CalendarUiEvent.ScrollCalendar -> {
                 scrollCalendar(event.date)
             }
-            is CalendarEvent.SmoothScrollCalendar -> {
+            is CalendarUiEvent.SmoothScrollCalendar -> {
                 smoothScrollCalendar(event.date)
             }
-            is CalendarEvent.RefreshCalendarDayDotVisibility -> {
+            is CalendarUiEvent.RefreshCalendarDayDotVisibility -> {
                 updateCalendarDayDotVisibility(event.date, event.isVisible)
             }
         }
@@ -122,12 +122,12 @@ class CalendarFragment :
 
     private fun observeUiEventFromActivity() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainActivityViewModel.fragmentUiEvent
-                .collect { value: ConsumableEvent<FragmentUiEvent> ->
+            mainActivityViewModel.activityCallbackUiEvent
+                .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
                     val event = value.getContentIfNotHandled()
                     event ?: return@collect
                     when (event) {
-                        FragmentUiEvent.ProcessOnBottomNavigationItemReselect -> {
+                        ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
                             onBottomNavigationItemReselected()
                         }
                     }

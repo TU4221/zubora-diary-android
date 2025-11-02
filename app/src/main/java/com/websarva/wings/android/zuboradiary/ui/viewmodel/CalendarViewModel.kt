@@ -8,7 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExis
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
 import com.websarva.wings.android.zuboradiary.ui.model.message.CalendarAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
@@ -39,7 +39,7 @@ internal class CalendarViewModel @Inject constructor(
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
-) : BaseViewModel<CalendarEvent, CalendarAppMessage, CalendarUiState>(
+) : BaseViewModel<CalendarUiEvent, CalendarAppMessage, CalendarUiState>(
     handle.get<CalendarUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
         CalendarUiState().copy(
             calendarStartDayOfWeek = savedUiState.calendarStartDayOfWeek,
@@ -189,7 +189,7 @@ internal class CalendarViewModel @Inject constructor(
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                CalendarEvent.NavigateDiaryEditFragment(id, date)
+                CalendarUiEvent.NavigateDiaryEditFragment(id, date)
             )
         }
     }
@@ -204,7 +204,7 @@ internal class CalendarViewModel @Inject constructor(
             //      下記条件でカレンダースクロールのみ処理。
             if (selectedDate == today) {
                 emitUiEvent(
-                    CalendarEvent.SmoothScrollCalendar(today)
+                    CalendarUiEvent.SmoothScrollCalendar(today)
                 )
             }
 
@@ -244,9 +244,9 @@ internal class CalendarViewModel @Inject constructor(
         val action =
             if (shouldSmoothScroll) {
                 updateShouldSmoothScroll(false)
-                CalendarEvent.SmoothScrollCalendar(date)
+                CalendarUiEvent.SmoothScrollCalendar(date)
             } else {
-                CalendarEvent.ScrollCalendar(date)
+                CalendarUiEvent.ScrollCalendar(date)
             }
         emitUiEvent(action)
 
@@ -278,7 +278,7 @@ internal class CalendarViewModel @Inject constructor(
 
     private suspend fun refreshCalendarDayDot(date: LocalDate) {
         emitUiEvent(
-            CalendarEvent.RefreshCalendarDayDotVisibility(date, existsSavedDiary(date))
+            CalendarUiEvent.RefreshCalendarDayDotVisibility(date, existsSavedDiary(date))
         )
     }
 

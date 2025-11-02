@@ -34,7 +34,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryUpda
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ExitWithoutDiarySaveDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.WeatherInfoFetchDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
-import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
@@ -49,7 +49,7 @@ import java.time.LocalDate
 import kotlin.collections.map
 
 @AndroidEntryPoint
-class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>() {
+class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEvent>() {
 
     internal companion object {
         // Navigation関係
@@ -216,60 +216,60 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditEvent>
         }
     }
 
-    override fun onMainUiEventReceived(event: DiaryEditEvent) {
+    override fun onMainUiEventReceived(event: DiaryEditUiEvent) {
         when (event) {
-            is DiaryEditEvent.NavigateDiaryShowFragment -> {
+            is DiaryEditUiEvent.NavigateDiaryShowFragment -> {
                 navigateDiaryShowFragment(event.id, event.date)
             }
-            is DiaryEditEvent.NavigateDiaryItemTitleEditFragment -> {
+            is DiaryEditUiEvent.NavigateDiaryItemTitleEditFragment -> {
                 navigateDiaryItemTitleEditFragment(event.diaryItemTitleSelection)
             }
-            is DiaryEditEvent.NavigateDiaryLoadDialog -> {
+            is DiaryEditUiEvent.NavigateDiaryLoadDialog -> {
                 navigateDiaryLoadDialog(event.date)
             }
-            is DiaryEditEvent.NavigateDiaryLoadFailureDialog -> {
+            is DiaryEditUiEvent.NavigateDiaryLoadFailureDialog -> {
                 navigateDiaryLoadFailureDialog(event.date)
             }
-            is DiaryEditEvent.NavigateDiaryUpdateDialog -> {
+            is DiaryEditUiEvent.NavigateDiaryUpdateDialog -> {
                 navigateDiaryUpdateDialog(event.date)
             }
-            is DiaryEditEvent.NavigateDiaryDeleteDialog -> {
+            is DiaryEditUiEvent.NavigateDiaryDeleteDialog -> {
                 navigateDiaryDeleteDialog(event.date)
             }
-            is DiaryEditEvent.NavigateDatePickerDialog -> {
+            is DiaryEditUiEvent.NavigateDatePickerDialog -> {
                 navigateDatePickerDialog(event.date)
             }
-            is DiaryEditEvent.NavigateWeatherInfoFetchDialog -> {
+            is DiaryEditUiEvent.NavigateWeatherInfoFetchDialog -> {
                 navigateWeatherInfoFetchDialog(event.date)
             }
-            is DiaryEditEvent.NavigateDiaryItemDeleteDialog -> {
+            is DiaryEditUiEvent.NavigateDiaryItemDeleteDialog -> {
                 navigateDiaryItemDeleteDialog(event.itemNumber)
             }
-            DiaryEditEvent.NavigateDiaryImageDeleteDialog -> {
+            DiaryEditUiEvent.NavigateDiaryImageDeleteDialog -> {
                 navigateDiaryImageDeleteDialog()
             }
-            is DiaryEditEvent.NavigateExitWithoutDiarySaveConfirmationDialog -> {
+            is DiaryEditUiEvent.NavigateExitWithoutDiarySaveConfirmationDialog -> {
                 navigateExitWithoutDiarySaveConfirmationDialog()
             }
-            is DiaryEditEvent.NavigatePreviousFragmentOnDiaryDelete -> {
+            is DiaryEditUiEvent.NavigatePreviousFragmentOnDiaryDelete -> {
                 navigatePreviousFragmentOnDiaryDelete(event.result)
             }
-            is DiaryEditEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed -> {
+            is DiaryEditUiEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed -> {
                 navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
             }
-            is DiaryEditEvent.UpdateDiaryItemLayout -> {
+            is DiaryEditUiEvent.UpdateDiaryItemLayout -> {
                 setUpItemsLayout(event.numVisibleItems)
             }
-            is DiaryEditEvent.TransitionDiaryItemToInvisibleState -> {
+            is DiaryEditUiEvent.TransitionDiaryItemToInvisibleState -> {
                 transitionDiaryItemToInvisible(event.itemNumber, false)
             }
-            is DiaryEditEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch -> {
+            is DiaryEditUiEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch -> {
                 checkAccessLocationPermissionBeforeWeatherInfoFetch()
             }
-            is DiaryEditEvent.ItemAddition -> {
+            is DiaryEditUiEvent.ItemAddition -> {
                 shouldTransitionItemMotionLayout = true
             }
-            is DiaryEditEvent.SelectImage -> {
+            is DiaryEditUiEvent.SelectImage -> {
                 openDocumentResultLauncher.launch(arrayOf("image/*"))
             }
         }
