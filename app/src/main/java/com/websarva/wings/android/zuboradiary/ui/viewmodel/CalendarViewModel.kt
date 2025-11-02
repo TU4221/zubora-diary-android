@@ -53,13 +53,10 @@ internal class CalendarViewModel @Inject constructor(
         private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
-    private val isReadyForOperation
+    override val isReadyForOperation
         get() = !currentUiState.isInputDisabled
                 && (currentUiState.diaryLoadState is LoadState.Success
                         || currentUiState.diaryLoadState is LoadState.Empty)
-
-    private val currentUiState
-        get() = uiState.value
 
     private val diaryFlow =
         uiState.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }

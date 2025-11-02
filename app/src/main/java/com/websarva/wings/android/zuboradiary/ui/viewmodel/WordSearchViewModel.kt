@@ -58,12 +58,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
-    private val isReadyForOperation
-        get() = !currentUiState.isInputDisabled
-
-    private val currentUiState
-        get() = uiState.value
-
     private val initialWordSearchResultListLoadJob: Job? = null
     private var wordSearchResultListLoadJob: Job? = initialWordSearchResultListLoadJob // キャンセル用
 

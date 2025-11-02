@@ -45,12 +45,9 @@ internal class DiaryShowViewModel @Inject constructor(
         private const val DATE_ARGUMENT_KEY = "load_diary_date"
     }
 
-    private val isReadyForOperation
+    override val isReadyForOperation
         get() = !currentUiState.isInputDisabled
                 && (currentUiState.diaryLoadState is LoadState.Success)
-
-    private val currentUiState
-        get() = uiState.value
 
     private val diary
         get() = (currentUiState.diaryLoadState as LoadState.Success).data

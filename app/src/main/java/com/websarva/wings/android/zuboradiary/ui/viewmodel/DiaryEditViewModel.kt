@@ -100,13 +100,9 @@ internal class DiaryEditViewModel @Inject constructor(
         private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
-    private val isReadyForOperation
+    override val isReadyForOperation
         get() = !currentUiState.isInputDisabled
                 && currentUiState.originalDiaryLoadState is LoadState.Success
-
-    // TODO:BaseViewModelに用意
-    private val currentUiState
-        get() = uiState.value
 
     private val originalDiary
         get() = (currentUiState.originalDiaryLoadState as LoadState.Success).data

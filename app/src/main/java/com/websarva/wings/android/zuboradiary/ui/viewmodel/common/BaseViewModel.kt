@@ -40,6 +40,12 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     private val _uiState = MutableStateFlow(initialViewUiState)
     val uiState get() = _uiState.asStateFlow()
 
+    protected val currentUiState
+        get() = _uiState.value
+
+    protected open val isReadyForOperation
+        get() = !currentUiState.isInputDisabled
+
     // 表示保留中Navigation
     private val _pendingNavigationCommandList =
         MutableStateFlow(emptyList<PendingNavigationCommand>())

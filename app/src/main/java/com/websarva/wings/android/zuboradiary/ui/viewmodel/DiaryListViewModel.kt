@@ -73,12 +73,6 @@ internal class DiaryListViewModel @Inject constructor(
         private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
-    private val isReadyForOperation
-        get() = !currentUiState.isInputDisabled
-
-    private val currentUiState
-        get() = uiState.value
-
     private var diaryListLoadJob: Job? = null // キャンセル用
 
     private var isRestoringFromProcessDeath: Boolean = false

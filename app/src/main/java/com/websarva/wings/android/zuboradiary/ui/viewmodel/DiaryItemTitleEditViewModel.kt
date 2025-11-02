@@ -56,9 +56,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         private const val SAVED_UI_STATE_KEY = "uiState"
     }
 
-    private val currentUiState
-        get() = uiState.value
-
     // キャッシュパラメータ
     private var pendingHistoryItemDeleteParameters: HistoryItemDeleteParameters? = null
 
