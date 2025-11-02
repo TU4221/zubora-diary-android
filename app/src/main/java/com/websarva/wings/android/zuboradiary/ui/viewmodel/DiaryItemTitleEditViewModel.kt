@@ -76,10 +76,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         observeDerivedUiStateChanges(handle)
     }
 
-    override fun createUnexpectedAppMessage(e: Exception): DiaryItemTitleEditAppMessage {
-        return DiaryItemTitleEditAppMessage.Unexpected(e)
-    }
-
     private fun setUpTitle(handle: SavedStateHandle) {
         if (handle.contains(SAVED_UI_STATE_KEY)) return
 

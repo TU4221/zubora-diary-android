@@ -141,10 +141,6 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    override fun createUnexpectedAppMessage(e: Exception): DiaryListAppMessage {
-        return DiaryListAppMessage.Unexpected(e)
-    }
-
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         // MEMO:DiaListFragmentはスタートフラグメントに該当するため、

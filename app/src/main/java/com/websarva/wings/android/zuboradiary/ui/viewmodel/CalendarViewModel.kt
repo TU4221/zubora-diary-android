@@ -162,10 +162,6 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    override fun createUnexpectedAppMessage(e: Exception): CalendarAppMessage {
-        return CalendarAppMessage.Unexpected(e)
-    }
-
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         if (!isReadyForOperation) return

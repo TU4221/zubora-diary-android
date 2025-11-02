@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception
 
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
+import com.websarva.wings.android.zuboradiary.domain.usecase.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadReminderNotificationSettingUseCase
 
@@ -43,5 +44,5 @@ internal sealed class ReminderNotificationSettingLoadException (
         fallbackSetting,
         "予期せぬエラーが発生しました。",
         cause
-    )
+    ), UnknownException
 }

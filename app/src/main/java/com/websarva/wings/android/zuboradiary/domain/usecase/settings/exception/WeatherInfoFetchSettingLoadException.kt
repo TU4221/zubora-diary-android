@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception
 
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
+import com.websarva.wings.android.zuboradiary.domain.usecase.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadWeatherInfoFetchSettingUseCase
 
@@ -43,5 +44,5 @@ internal sealed class WeatherInfoFetchSettingLoadException (
         fallbackSetting,
         "予期せぬエラーが発生しました。",
         cause
-    )
+    ), UnknownException
 }

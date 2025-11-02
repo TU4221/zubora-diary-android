@@ -29,15 +29,10 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateThem
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PassCodeSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PasscodeLockSettingLoadException
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingUpdateException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
@@ -46,6 +41,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.domain.usecase.UnknownException
+import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.SettingsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -112,10 +109,6 @@ internal class SettingsViewModel @Inject constructor(
         setUpSettingsValue(handle)
     }
 
-    override fun createUnexpectedAppMessage(e: Exception): SettingsAppMessage {
-        return SettingsAppMessage.Unexpected(e)
-    }
-
     private fun setUpSettingsValue(handle: SavedStateHandle) {
         uiState.onEach {
             handle[SAVED_UI_STATE_KEY] = it
@@ -144,15 +137,7 @@ internal class SettingsViewModel @Inject constructor(
                 when (it) {
                     is UseCaseResult.Success -> it.value.themeColor
                     is UseCaseResult.Failure -> {
-                        val failureMessage = when (it.exception) {
-                            is ThemeColorSettingLoadException.LoadFailure -> {
-                                SettingsAppMessage.SettingLoadFailure
-                            }
-                            is ThemeColorSettingLoadException.Unknown -> {
-                                SettingsAppMessage.Unexpected(it.exception)
-                            }
-                        }
-                        handleSettingLoadFailure(failureMessage)
+                        handleSettingLoadFailure(it.exception)
                         it.exception.fallbackSetting.themeColor
                     }
                 }
@@ -171,15 +156,7 @@ internal class SettingsViewModel @Inject constructor(
                 when (it) {
                     is UseCaseResult.Success -> it.value.dayOfWeek
                     is UseCaseResult.Failure -> {
-                        val failureMessage = when (it.exception) {
-                            is CalendarStartDayOfWeekSettingLoadException.LoadFailure -> {
-                                SettingsAppMessage.SettingLoadFailure
-                            }
-                            is CalendarStartDayOfWeekSettingLoadException.Unknown -> {
-                                SettingsAppMessage.Unexpected(it.exception)
-                            }
-                        }
-                        handleSettingLoadFailure(failureMessage)
+                        handleSettingLoadFailure(it.exception)
                         it.exception.fallbackSetting.dayOfWeek
                     }
                 }
@@ -198,15 +175,7 @@ internal class SettingsViewModel @Inject constructor(
                 when (it) {
                     is UseCaseResult.Success -> { it.value }
                     is UseCaseResult.Failure -> {
-                        val failureMessage = when (it.exception) {
-                            is ReminderNotificationSettingLoadException.LoadFailure -> {
-                                SettingsAppMessage.SettingLoadFailure
-                            }
-                            is ReminderNotificationSettingLoadException.Unknown -> {
-                                SettingsAppMessage.Unexpected(it.exception)
-                            }
-                        }
-                        handleSettingLoadFailure(failureMessage)
+                        handleSettingLoadFailure(it.exception)
                         it.exception.fallbackSetting
                     }
                 }
@@ -230,15 +199,7 @@ internal class SettingsViewModel @Inject constructor(
                 when (it) {
                     is UseCaseResult.Success -> { it.value }
                     is UseCaseResult.Failure -> {
-                        val failureMessage = when (it.exception) {
-                            is PasscodeLockSettingLoadException.LoadFailure -> {
-                                SettingsAppMessage.SettingLoadFailure
-                            }
-                            is PasscodeLockSettingLoadException.Unknown -> {
-                                SettingsAppMessage.Unexpected(it.exception)
-                            }
-                        }
-                        handleSettingLoadFailure(failureMessage)
+                        handleSettingLoadFailure(it.exception)
                         it.exception.fallbackSetting
                     }
                 }
@@ -262,15 +223,7 @@ internal class SettingsViewModel @Inject constructor(
                 when (it) {
                     is UseCaseResult.Success -> it.value
                     is UseCaseResult.Failure -> {
-                        val failureMessage = when (it.exception) {
-                            is WeatherInfoFetchSettingLoadException.LoadFailure -> {
-                                SettingsAppMessage.SettingLoadFailure
-                            }
-                            is WeatherInfoFetchSettingLoadException.Unknown -> {
-                                SettingsAppMessage.Unexpected(it.exception)
-                            }
-                        }
-                        handleSettingLoadFailure(failureMessage)
+                        handleSettingLoadFailure(it.exception)
                         it.exception.fallbackSetting
                     }
                 }
@@ -283,7 +236,7 @@ internal class SettingsViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    private suspend fun handleSettingLoadFailure(failureMessage: SettingsAppMessage) {
+    private suspend fun handleSettingLoadFailure(exception: UseCaseException) {
         val currentUiState = uiState.value
         if (currentUiState.hasSettingsLoadFailure) return
 
@@ -292,10 +245,10 @@ internal class SettingsViewModel @Inject constructor(
                 hasSettingsLoadFailure = true
             )
         }
-        if (failureMessage is SettingsAppMessage.Unexpected) {
-            emitUnexpectedAppMessage(failureMessage.exception)
+        if (exception is UnknownException) {
+            emitUnexpectedAppMessage(exception)
         } else {
-            emitAppMessageEvent(failureMessage)
+            emitAppMessageEvent(SettingsAppMessage.SettingLoadFailure)
         }
     }
 

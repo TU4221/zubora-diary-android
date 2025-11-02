@@ -115,10 +115,6 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    override fun createUnexpectedAppMessage(e: Exception): DiaryShowAppMessage {
-        return DiaryShowAppMessage.Unexpected(e)
-    }
-
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         if (!isReadyForOperation) return

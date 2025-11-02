@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.FragmentUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.message.CommonAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.message.MainActivityAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.MainActivityUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -89,7 +90,7 @@ internal class MainActivityViewModel @Inject constructor(
                                 MainActivityAppMessage.SettingsLoadFailure
                             }
                             is ThemeColorSettingLoadException.Unknown -> {
-                                MainActivityAppMessage.Unexpected(it.exception)
+                                CommonAppMessage.Unexpected(it.exception)
                             }
                         }
                         emitActivityUiEvent(

@@ -13,21 +13,4 @@ internal sealed class MainActivityAppMessage : AppMessage {
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_main_activity_app_message_setting_load_failure
     }
-
-    class Unexpected(val exception: Exception) : MainActivityAppMessage() {
-        @IgnoredOnParcel
-        private val delegate = UnexpectedMessageDelegate(exception)
-
-        @IgnoredOnParcel
-        override val dialogTitleStringResId: Int
-            get() = delegate.dialogTitleStringResId
-
-        @IgnoredOnParcel
-        override val dialogMessageStringResId: Int
-            get() = delegate.dialogMessageStringResId
-
-        @IgnoredOnParcel
-        override val dialogMessageArgs: Array<Any>
-            get() = delegate.dialogMessageArgs
-    }
 }

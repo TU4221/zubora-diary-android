@@ -69,21 +69,4 @@ internal sealed class SettingsAppMessage : AppMessage {
         @IgnoredOnParcel
         override val dialogMessageStringResId: Int = R.string.dialog_settings_app_message_all_data_delete_failure
     }
-
-    class Unexpected(val exception: Exception) : SettingsAppMessage() {
-        @IgnoredOnParcel
-        private val delegate = UnexpectedMessageDelegate(exception)
-
-        @IgnoredOnParcel
-        override val dialogTitleStringResId: Int
-            get() = delegate.dialogTitleStringResId
-
-        @IgnoredOnParcel
-        override val dialogMessageStringResId: Int
-            get() = delegate.dialogMessageStringResId
-
-        @IgnoredOnParcel
-        override val dialogMessageArgs: Array<Any>
-            get() = delegate.dialogMessageArgs
-    }
 }

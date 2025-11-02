@@ -133,10 +133,6 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    override fun createUnexpectedAppMessage(e: Exception): WordSearchAppMessage {
-        return WordSearchAppMessage.Unexpected(e)
-    }
-
     // BackPressed(戻るボタン)処理
     override fun onBackPressed() {
         launchWithUnexpectedErrorHandler {

@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.message.CommonAppMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -82,11 +83,12 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
         emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
     }
 
-    protected abstract fun createUnexpectedAppMessage(e: Exception): M
-
     protected suspend fun emitUnexpectedAppMessage(e: Exception) {
-        val appMessage = createUnexpectedAppMessage(e)
-        emitAppMessageEvent(appMessage)
+        emitCommonAppMessageEvent(CommonAppMessage.Unexpected(e))
+    }
+
+    private suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
+        emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
     }
 
     /**
