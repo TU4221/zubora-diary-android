@@ -207,7 +207,7 @@ internal class DiaryEditViewModel @Inject constructor(
         editingDiaryFlow.distinctUntilChanged{ old, new ->
             old.itemTitles == new.itemTitles
         }.map {
-            diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
+            diaryUiStateHelper.calculateNumVisibleDiaryItems(it.itemTitles)
         }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
             updateUiState {
                 it.copy(
@@ -239,7 +239,7 @@ internal class DiaryEditViewModel @Inject constructor(
         editingDiaryFlow.distinctUntilChanged{ old, new ->
             old.imageFileName == new.imageFileName
         }.map {
-            diaryUiStateHelper.buildImageFilePath(it)
+            diaryUiStateHelper.buildImageFilePath(it.imageFileName)
         }.catchUnexpectedError(
             FilePathUi.Unavailable
         ).distinctUntilChanged().onEach { path ->

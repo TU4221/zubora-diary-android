@@ -84,7 +84,7 @@ internal class DiaryShowViewModel @Inject constructor(
         diaryFlow.distinctUntilChanged{ old, new ->
             old.weather1 == new.weather1 && old.weather2 == new.weather2
         }.map {
-            diaryUiStateHelper.isWeather2Visible(it)
+            diaryUiStateHelper.isWeather2Visible(it.weather1, it.weather2)
         }.distinctUntilChanged().onEach { isWeather2Visible ->
             updateUiState {
                 it.copy(
@@ -98,7 +98,7 @@ internal class DiaryShowViewModel @Inject constructor(
         diaryFlow.distinctUntilChanged{ old, new ->
             old.itemTitles == new.itemTitles
         }.map {
-            diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
+            diaryUiStateHelper.calculateNumVisibleDiaryItems(it.itemTitles)
         }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
             updateUiState {
                 it.copy(
@@ -112,7 +112,7 @@ internal class DiaryShowViewModel @Inject constructor(
         diaryFlow.distinctUntilChanged{ old, new ->
             old.imageFileName == new.imageFileName
         }.map {
-            diaryUiStateHelper.buildImageFilePath(it)
+            diaryUiStateHelper.buildImageFilePath(it.imageFileName)
         }.catchUnexpectedError(
             FilePathUi.Unavailable
         ).distinctUntilChanged().onEach { path ->

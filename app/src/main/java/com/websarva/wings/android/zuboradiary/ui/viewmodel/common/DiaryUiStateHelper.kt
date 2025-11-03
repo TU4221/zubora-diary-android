@@ -4,7 +4,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileN
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import javax.inject.Inject
 
@@ -15,18 +14,18 @@ internal class DiaryUiStateHelper @Inject constructor(
     private val buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
 ) {
 
-    fun isWeather2Visible(diary: DiaryUi): Boolean {
-        return diary.weather1 != WeatherUi.UNKNOWN && diary.weather2 != WeatherUi.UNKNOWN
+    fun isWeather2Visible(weather1: WeatherUi, weather2: WeatherUi): Boolean {
+        return weather1 != WeatherUi.UNKNOWN && weather2 != WeatherUi.UNKNOWN
     }
 
-    fun calculateNumVisibleDiaryItems(diary: DiaryUi): Int {
-        return diary.itemTitles
+    fun calculateNumVisibleDiaryItems(itemTitles: Map<Int, String?>): Int {
+        return itemTitles
             .toSortedMap().values.toList()
             .indexOfLast { it != null }.let { if (it == -1) 0 else it + 1 }
     }
 
-    suspend fun buildImageFilePath(diary: DiaryUi): FilePathUi? {
-        val fileName = diary.imageFileName ?: return null
+    suspend fun buildImageFilePath(imageFileName: String?): FilePathUi? {
+        val fileName = imageFileName ?: return null
         val result =
             buildDiaryImageFilePathUseCase(
                 DiaryImageFileName(fileName)
