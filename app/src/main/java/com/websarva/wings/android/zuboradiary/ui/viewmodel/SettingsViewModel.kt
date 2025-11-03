@@ -117,20 +117,21 @@ internal class SettingsViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
-    // TODO:全てcatchUnexpectedError()を呼び出してない
     private fun collectThemeColorSetting() {
         loadThemeColorSettingUseCase()
             .onEach {
                 handleSettingLoadResult(it)
             }.map {
                 when (it) {
-                    is UseCaseResult.Success -> it.value.themeColor
-                    is UseCaseResult.Failure -> it.exception.fallbackSetting.themeColor
+                    is UseCaseResult.Success -> it.value
+                    is UseCaseResult.Failure -> it.exception.fallbackSetting
                 }
-            }.distinctUntilChanged().onEach { value: ThemeColor ->
+            }.catchUnexpectedError(
+                ThemeColorSetting.default()
+            ).distinctUntilChanged().onEach { value: ThemeColorSetting ->
                 updateUiState {
                     it.copy(
-                        themeColor = value.toUiModel()
+                        themeColor = value.themeColor.toUiModel()
                     )
                 }
             }.launchIn(viewModelScope)
@@ -142,13 +143,15 @@ internal class SettingsViewModel @Inject constructor(
                 handleSettingLoadResult(it)
             }.map {
                 when (it) {
-                    is UseCaseResult.Success -> it.value.dayOfWeek
-                    is UseCaseResult.Failure -> it.exception.fallbackSetting.dayOfWeek
+                    is UseCaseResult.Success -> it.value
+                    is UseCaseResult.Failure -> it.exception.fallbackSetting
                 }
-            }.distinctUntilChanged().onEach { value: DayOfWeek ->
+            }.catchUnexpectedError(
+                CalendarStartDayOfWeekSetting.default()
+            ).distinctUntilChanged().onEach { value: CalendarStartDayOfWeekSetting ->
                 updateUiState {
                     it.copy(
-                        calendarStartDayOfWeek = value
+                        calendarStartDayOfWeek = value.dayOfWeek
                     )
                 }
             }.launchIn(viewModelScope)
@@ -163,7 +166,9 @@ internal class SettingsViewModel @Inject constructor(
                     is UseCaseResult.Success -> it.value
                     is UseCaseResult.Failure -> it.exception.fallbackSetting
                 }
-            }.distinctUntilChanged().onEach { value: ReminderNotificationSetting ->
+            }.catchUnexpectedError(
+                ReminderNotificationSetting.default()
+            ).distinctUntilChanged().onEach { value: ReminderNotificationSetting ->
                 updateUiState {
                     it.copy(
                         isReminderEnabled = value.isEnabled,
@@ -186,7 +191,9 @@ internal class SettingsViewModel @Inject constructor(
                     is UseCaseResult.Success -> it.value
                     is UseCaseResult.Failure -> it.exception.fallbackSetting
                 }
-            }.onEach { value: PasscodeLockSetting ->
+            }.catchUnexpectedError(
+                PasscodeLockSetting.default()
+            ).distinctUntilChanged().onEach { value: PasscodeLockSetting ->
                 updateUiState {
                     it.copy(
                         isPasscodeLockEnabled = value.isEnabled,
@@ -209,7 +216,9 @@ internal class SettingsViewModel @Inject constructor(
                     is UseCaseResult.Success -> it.value
                     is UseCaseResult.Failure -> it.exception.fallbackSetting
                 }
-            }.distinctUntilChanged().onEach { value ->
+            }.catchUnexpectedError(
+                WeatherInfoFetchSetting.default()
+            ).distinctUntilChanged().onEach { value ->
                 updateUiState {
                     it.copy(
                         isWeatherFetchEnabled = value.isEnabled

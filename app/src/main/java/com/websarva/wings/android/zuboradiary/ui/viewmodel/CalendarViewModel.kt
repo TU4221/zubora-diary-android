@@ -15,6 +15,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStar
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingLoadException
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
+import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.CalendarUiState
@@ -162,7 +163,9 @@ internal class CalendarViewModel @Inject constructor(
             old.imageFileName == new.imageFileName
         }.map {
             diaryUiStateHelper.buildImageFilePath(it)
-        }.distinctUntilChanged().catchUnexpectedError(null).onEach { path ->
+        }.catchUnexpectedError(
+            FilePathUi.Unavailable
+        ).distinctUntilChanged().onEach { path ->
             updateUiState {
                 it.copy(
                     diaryImageFilePath = path

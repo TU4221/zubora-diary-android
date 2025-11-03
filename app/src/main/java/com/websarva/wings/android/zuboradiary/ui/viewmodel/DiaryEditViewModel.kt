@@ -48,6 +48,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionHistoryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryEditUiState
@@ -239,7 +240,9 @@ internal class DiaryEditViewModel @Inject constructor(
             old.imageFileName == new.imageFileName
         }.map {
             diaryUiStateHelper.buildImageFilePath(it)
-        }.distinctUntilChanged().onEach { path ->
+        }.catchUnexpectedError(
+            FilePathUi.Unavailable
+        ).distinctUntilChanged().onEach { path ->
             updateUiState {
                 it.copy(
                     diaryImageFilePath = path

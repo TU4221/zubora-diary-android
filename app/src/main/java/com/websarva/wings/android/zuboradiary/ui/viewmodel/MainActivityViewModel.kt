@@ -12,14 +12,18 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.message.CommonAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.message.MainActivityAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.MainActivityUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -87,17 +91,18 @@ internal class MainActivityViewModel @Inject constructor(
                 when (it) {
                     is UseCaseResult.Success -> { /*処理なし*/ }
                     is UseCaseResult.Failure -> {
-                        val appMessage = when (it.exception) {
+                        when (it.exception) {
                             is ThemeColorSettingLoadException.LoadFailure -> {
-                                MainActivityAppMessage.SettingsLoadFailure
+                                emitActivityUiEvent(
+                                    MainActivityUiEvent.NavigateAppMessage(
+                                        MainActivityAppMessage.SettingsLoadFailure
+                                    )
+                                )
                             }
                             is ThemeColorSettingLoadException.Unknown -> {
-                                CommonAppMessage.Unexpected(it.exception)
+                                emitUnexpectedAppMessage(it.exception)
                             }
                         }
-                        emitActivityUiEvent(
-                            MainActivityUiEvent.NavigateAppMessage(appMessage)
-                        )
                     }
                 }
             }.map {
@@ -107,7 +112,9 @@ internal class MainActivityViewModel @Inject constructor(
                         it.exception.fallbackSetting.themeColor.toUiModel()
                     }
                 }
-            }.distinctUntilChanged().onEach { themeColor ->
+            }.catchUnexpectedError(
+                ThemeColorUi.WHITE
+            ).distinctUntilChanged().onEach { themeColor ->
                 _uiState.update {
                     it.copy(
                         themeColor = themeColor
@@ -198,6 +205,41 @@ internal class MainActivityViewModel @Inject constructor(
         _activityUiEvent.emit(
             ConsumableEvent(event)
         )
+    }
+
+    // TODO:BaseViewModelを実装する?(その場合BaseFragmentViewModelを用意する必要が出てくる。)
+    private suspend fun emitAppMessage(appMessage: AppMessage) {
+        emitActivityUiEvent(
+            MainActivityUiEvent.NavigateAppMessage(appMessage)
+        )
+    }
+
+    // TODO:BaseViewModelを実装する?(その場合BaseFragmentViewModelを用意する必要が出てくる。)
+    private suspend fun emitUnexpectedAppMessage(e: Exception) {
+        emitAppMessage(CommonAppMessage.Unexpected(e))
+    }
+
+    // TODO:BaseViewModelを実装する?(その場合BaseFragmentViewModelを用意する必要が出てくる。)
+    /**
+     * Flowストリーム内の予期せぬ例外をキャッチし、ログ出力とUIへのメッセージ通知を行う。
+     * 例外発生後は、 [fallbackValue] をemitする。
+     *
+     * @param fallbackValue 例外発生時にFlowに流す代替の値。
+     * @param block 例外発生時に加えて実行したい処理ブロック。発生した例外が引数として渡される。
+     * @return エラーハンドリングが適用された新しいFlow。
+     */
+    private fun <T> Flow<T>.catchUnexpectedError(
+        fallbackValue: T,
+        block: suspend (e: Exception) -> Unit = { }
+    ): Flow<T> {
+        return this.catch { e ->
+            if (e !is Exception) throw e
+
+            Log.e(logTag, "Flowストリーム処理中に予期せぬエラーが発生しました。", e)
+            emitUnexpectedAppMessage(e)
+            block(e)
+            emit(fallbackValue)
+        }
     }
 
     private suspend fun emitActivityCallbackUiEvent(event: ActivityCallbackUiEvent) {
