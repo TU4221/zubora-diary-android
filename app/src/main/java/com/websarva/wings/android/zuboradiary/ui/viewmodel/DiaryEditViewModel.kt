@@ -53,12 +53,10 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryEditUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.DiaryUiStateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.inject.Inject
@@ -67,8 +65,8 @@ import kotlin.random.Random
 
 @HiltViewModel
 internal class DiaryEditViewModel @Inject constructor(
-    handle: SavedStateHandle,
-    diaryUiStateHelper: DiaryUiStateHelper,
+    private val handle: SavedStateHandle,
+    private val diaryUiStateHelper: DiaryUiStateHelper,
     private val shouldRequestExitWithoutDiarySaveConfirmationUseCase: ShouldRequestExitWithoutDiarySaveConfirmationUseCase,
     private val shouldRequestDiaryLoadConfirmationUseCase: ShouldRequestDiaryLoadConfirmationUseCase,
     private val shouldRequestDiaryUpdateConfirmationUseCase: ShouldRequestDiaryUpdateConfirmationUseCase,
@@ -107,7 +105,10 @@ internal class DiaryEditViewModel @Inject constructor(
     private val originalDiary
         get() = (currentUiState.originalDiaryLoadState as LoadState.Success).data
 
-    private val editingDiaryFlow = uiState.map { it.editingDiary }
+    private val editingDiaryFlow =
+        uiState.distinctUntilChanged { old, new ->
+            old.editingDiary == new.editingDiary
+        }.map { it.editingDiary }
 
     // キャッシュパラメータ
     private var pendingDiaryLoadParameters: DiaryLoadParameters? = null
@@ -123,12 +124,11 @@ internal class DiaryEditViewModel @Inject constructor(
     var isTesting = false
 
     init {
-        initializeDiaryData(handle)
-        observeDerivedUiStateChanges(handle, diaryUiStateHelper)
-        observeUiStateChanges()
+        initializeDiaryData()
+        collectUiStates()
     }
 
-    private fun initializeDiaryData(handle: SavedStateHandle) {
+    private fun initializeDiaryData() {
         // MEMO:下記条件はアプリ設定変更時のアプリ再起動時の不要初期化対策
         if (handle.contains(SAVED_UI_STATE_KEY)) return
         val id = handle.get<String>(DIARY_ID_ARGUMENT_KEY)?.let { DiaryId(it) }
@@ -142,28 +142,42 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    private fun observeDerivedUiStateChanges(
-        handle: SavedStateHandle,
-        diaryUiStateHelper: DiaryUiStateHelper
-    ) {
+    private fun collectUiStates() {
+        collectUiState()
+        collectWeather2Options()
+        collectWeather2Enabled()
+        collectNumVisibleDiaryItems()
+        collectDiaryItemAdditionEnabled()
+        collectImageFilePath()
+    }
+
+    private fun collectUiState() {
         uiState.onEach {
             Log.d(logTag, it.toString())
             handle[SAVED_UI_STATE_KEY] = it
         }.launchIn(viewModelScope)
+    }
 
-        uiState.map { state ->
+    private fun collectWeather2Options() {
+        uiState.distinctUntilChanged { old, new ->
+            old.editingDiary.weather1 == new.editingDiary.weather1
+        }.map { state ->
             WeatherUi.entries.filter { weather ->
                 weather != state.editingDiary.weather1
             }
-        }.distinctUntilChanged().onEach { selections ->
+        }.distinctUntilChanged().onEach { options ->
             updateUiState {
                 it.copy(
-                    weather2Options = selections
+                    weather2Options = options
                 )
             }
         }.launchIn(viewModelScope)
+    }
 
-        editingDiaryFlow.map { editingDiary ->
+    private fun collectWeather2Enabled() {
+        editingDiaryFlow.distinctUntilChanged{ old, new ->
+            old.weather1 == new.weather1 && old.weather2 == new.weather2
+        }.map { editingDiary ->
             when (editingDiary.weather1) {
                 WeatherUi.UNKNOWN -> false
                 else -> {
@@ -186,8 +200,12 @@ internal class DiaryEditViewModel @Inject constructor(
                 }
             }
         }.launchIn(viewModelScope)
+    }
 
-        editingDiaryFlow.map {
+    private fun collectNumVisibleDiaryItems() {
+        editingDiaryFlow.distinctUntilChanged{ old, new ->
+            old.itemTitles == new.itemTitles
+        }.map {
             diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
         }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
             updateUiState {
@@ -195,9 +213,17 @@ internal class DiaryEditViewModel @Inject constructor(
                     numVisibleDiaryItems = numVisibleDiaryItems
                 )
             }
+            emitUiEvent(
+                DiaryEditUiEvent.UpdateDiaryItemLayout(numVisibleDiaryItems)
+            )
         }.launchIn(viewModelScope)
+    }
 
-        uiState.map {
+    private fun collectDiaryItemAdditionEnabled() {
+        uiState.distinctUntilChanged { old, new ->
+            old.isInputDisabled == new.isInputDisabled
+                    && old.numVisibleDiaryItems == new.numVisibleDiaryItems
+        }.map {
             !it.isInputDisabled && it.numVisibleDiaryItems < DiaryItemNumber.MAX_NUMBER
         }.distinctUntilChanged().onEach { isEnabled ->
             updateUiState {
@@ -206,8 +232,12 @@ internal class DiaryEditViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+    }
 
-        editingDiaryFlow.map {
+    private fun collectImageFilePath() {
+        editingDiaryFlow.distinctUntilChanged{ old, new ->
+            old.imageFileName == new.imageFileName
+        }.map {
             diaryUiStateHelper.buildImageFilePath(it)
         }.distinctUntilChanged().onEach { path ->
             updateUiState {
@@ -216,17 +246,6 @@ internal class DiaryEditViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
-    }
-
-    private fun observeUiStateChanges() {
-        viewModelScope.launch {
-            uiState.map { it.numVisibleDiaryItems }
-                .distinctUntilChanged()
-                .collectLatest { value: Int ->
-                    Log.d("20251022", "DiaryEditUiState.numVisibleDiaryItems: $value")
-                    emitUiEvent(DiaryEditUiEvent.UpdateDiaryItemLayout(value))
-                }
-        }
     }
 
     // BackPressed(戻るボタン)処理

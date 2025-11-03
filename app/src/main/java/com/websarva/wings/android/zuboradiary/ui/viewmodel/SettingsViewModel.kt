@@ -57,7 +57,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
-    handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
+    private val handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
     private val initializeAllSettingsUseCase: InitializeAllSettingsUseCase,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
@@ -90,20 +90,8 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     init {
-        setUpSettingsValue(handle)
-    }
-
-    private fun setUpSettingsValue(handle: SavedStateHandle) {
-        uiState.onEach {
-            handle[SAVED_UI_STATE_KEY] = it
-        }.launchIn(viewModelScope)
-
         updateToProcessingState()
-        setUpThemeColorSettingValue()
-        setUpCalendarStartDayOfWeekSettingValue()
-        setUpReminderNotificationSettingValue()
-        setUpPasscodeLockSettingValue()
-        setUpWeatherInfoFetchSettingValue()
+        collectUiStates()
 
         // MEMO:このViewModelの初期化処理では、各設定の読み込み失敗を個別にハンドリングしているため、
         //      予期せぬ例外のみを処理する共通の`launchWithUnexpectedErrorHandler`は使用せず、
@@ -114,8 +102,23 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
+    private fun collectUiStates() {
+        collectUiState()
+        collectThemeColorSetting()
+        collectCalendarStartDayOfWeekSetting()
+        collectReminderNotificationSetting()
+        collectPasscodeLockSetting()
+        collectWeatherInfoFetchSetting()
+    }
+
+    private fun collectUiState() {
+        uiState.onEach {
+            handle[SAVED_UI_STATE_KEY] = it
+        }.launchIn(viewModelScope)
+    }
+
     // TODO:全てcatchUnexpectedError()を呼び出してない
-    private fun setUpThemeColorSettingValue() {
+    private fun collectThemeColorSetting() {
         loadThemeColorSettingUseCase()
             .map {
                 when (it) {
@@ -134,7 +137,7 @@ internal class SettingsViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    private fun setUpCalendarStartDayOfWeekSettingValue() {
+    private fun collectCalendarStartDayOfWeekSetting() {
         loadCalendarStartDayOfWeekSettingUseCase()
             .map {
                 when (it) {
@@ -153,7 +156,7 @@ internal class SettingsViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    private fun setUpReminderNotificationSettingValue() {
+    private fun collectReminderNotificationSetting() {
         loadReminderNotificationSettingUseCase()
             .map {
                 when (it) {
@@ -177,7 +180,7 @@ internal class SettingsViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    private fun setUpPasscodeLockSettingValue() {
+    private fun collectPasscodeLockSetting() {
         loadPasscodeLockSettingUseCase()
             .map {
                 when (it) {
@@ -201,7 +204,7 @@ internal class SettingsViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    private fun setUpWeatherInfoFetchSettingValue() {
+    private fun collectWeatherInfoFetchSetting() {
         loadWeatherInfoFetchSettingUseCase()
             .map {
                 when (it) {

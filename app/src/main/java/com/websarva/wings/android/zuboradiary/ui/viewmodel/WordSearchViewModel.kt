@@ -39,7 +39,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class WordSearchViewModel @Inject internal constructor(
-    handle: SavedStateHandle,
+    private val handle: SavedStateHandle,
     private val countWordSearchResultsUseCase: CountWordSearchResultsUseCase,
     private val loadNewWordSearchResultListUseCase: LoadNewWordSearchResultListUseCase,
     private val loadAdditionWordSearchResultListUseCase: LoadAdditionWordSearchResultListUseCase,
@@ -68,36 +68,45 @@ internal class WordSearchViewModel @Inject internal constructor(
     private var isLoadingOnScrolled: Boolean = false
 
     init {
-        checkForRestoration(handle)
-        observeDerivedUiStateChanges(handle)
-        observeUiStateChanges()
+        checkForRestoration()
+        collectUiStates()
     }
 
-    private fun checkForRestoration(handle: SavedStateHandle) {
+    private fun checkForRestoration() {
         updateIsRestoringFromProcessDeath(
             handle.contains(SAVED_UI_STATE_KEY)
         )
     }
 
-    private fun observeDerivedUiStateChanges(handle: SavedStateHandle) {
+    private fun collectUiStates() {
+        collectUiState()
+        collectWordSearchState()
+        collectSearchWord()
+    }
+
+    private fun collectUiState() {
         uiState.onEach {
             Log.d(logTag, it.toString())
             handle[SAVED_UI_STATE_KEY] = it
         }.launchIn(viewModelScope)
+    }
 
-        uiState.map { it.searchWord }.distinctUntilChanged().onEach { searchWord ->
+    private fun collectWordSearchState() {
+        uiState.distinctUntilChanged { old, new ->
+            old.searchWord == new.searchWord
+        }.map { it.searchWord.isEmpty() }.onEach { isIdle ->
             updateUiState {
                 it.copy(
-                    isIdle = searchWord.isEmpty()
+                    isIdle = isIdle
                 )
             }
         }.launchIn(viewModelScope)
     }
 
-    private fun observeUiStateChanges() {
+    private fun collectSearchWord() {
         viewModelScope.launch {
-            uiState.distinctUntilChanged { oldState, newState ->
-                oldState.searchWord == newState.searchWord
+            uiState.distinctUntilChanged { old, new ->
+                old.searchWord == new.searchWord
             }.map {
                 Pair(it.wordSearchResultList, it.searchWord)
             }.collectLatest { (wordSearchResultList, searchWord) ->

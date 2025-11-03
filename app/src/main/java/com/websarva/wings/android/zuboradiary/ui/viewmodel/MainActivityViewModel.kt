@@ -31,7 +31,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class MainActivityViewModel @Inject constructor(
-    handle: SavedStateHandle,
+    private val handle: SavedStateHandle,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
 ) : ViewModel() {
 
@@ -63,24 +63,25 @@ internal class MainActivityViewModel @Inject constructor(
 
     private val _wasInvisibleFragmentTransitionSetupCompleted = MutableStateFlow(false)
 
-    private val wasFragmentTransitionSetupCompletedFlow =
-        combine(
-            _wasVisibleFragmentTransitionSetupCompleted,
-            _wasInvisibleFragmentTransitionSetupCompleted
-        ) { wasVisibleFragmentCompleted, wasInvisibleFragmentCompleted ->
-            wasVisibleFragmentCompleted && wasInvisibleFragmentCompleted
-        }
-
     init {
-        observeDerivedUiStateChanges(handle)
+        collectUiStates()
     }
 
-    private fun observeDerivedUiStateChanges(handle: SavedStateHandle) {
-        uiState.onEach {
+    private fun collectUiStates() {
+        collectUiState()
+        collectThemeColorSetting()
+        collectFragmentTransitionSetupCompleted()
+        collectBottomNavigationEnabled()
+    }
+
+    private fun collectUiState() {
+        _uiState.onEach {
             Log.d(logTag, it.toString())
             handle[SAVED_UI_STATE_KEY] = it
         }.launchIn(viewModelScope)
+    }
 
+    private fun collectThemeColorSetting() {
         loadThemeColorSettingUseCase()
             .onEach {
                 when (it) {
@@ -113,20 +114,28 @@ internal class MainActivityViewModel @Inject constructor(
                     )
                 }
             }.launchIn(viewModelScope)
+    }
 
-        wasFragmentTransitionSetupCompletedFlow.onEach {
+    private fun collectFragmentTransitionSetupCompleted() {
+        combine(
+            _wasVisibleFragmentTransitionSetupCompleted,
+            _wasInvisibleFragmentTransitionSetupCompleted
+        ) { wasVisibleFragmentCompleted, wasInvisibleFragmentCompleted ->
+            wasVisibleFragmentCompleted && wasInvisibleFragmentCompleted
+        }.onEach {
             if (it) {
                 updateWasBottomNavigationTabSelected(false)
                 _wasVisibleFragmentTransitionSetupCompleted.update { false }
                 _wasInvisibleFragmentTransitionSetupCompleted.update { false }
             }
         }.launchIn(viewModelScope)
+    }
 
-        combine(
-            _uiState.map { it.isInputDisabled },
-            _uiState.map { it.isNavigating }
-        ) { isInputDisabled, isNavigating ->
-            !isInputDisabled && !isNavigating
+    private fun collectBottomNavigationEnabled() {
+        _uiState.distinctUntilChanged{ old, new ->
+            old.isInputDisabled == new.isInputDisabled && old.isNavigating == new.isNavigating
+        }.map {
+            !it.isInputDisabled && !it.isNavigating
         }.distinctUntilChanged().onEach { isBottomNavigationEnabled ->
             _uiState.update {
                 it.copy(

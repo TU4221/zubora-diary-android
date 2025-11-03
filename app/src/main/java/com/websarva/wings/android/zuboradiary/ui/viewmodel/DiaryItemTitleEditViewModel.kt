@@ -35,7 +35,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryItemTitleEditViewModel @Inject constructor(
-    handle: SavedStateHandle,
+    private val handle: SavedStateHandle,
     private val loadDiaryItemTitleSelectionHistoryListUseCase: LoadDiaryItemTitleSelectionHistoryListUseCase,
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
@@ -60,12 +60,11 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private var pendingHistoryItemDeleteParameters: HistoryItemDeleteParameters? = null
 
     init {
-        setUpTitle(handle)
-        setUpTitleSelectionHistoryList()
-        observeDerivedUiStateChanges(handle)
+        setUpTitle()
+        collectUiStates()
     }
 
-    private fun setUpTitle(handle: SavedStateHandle) {
+    private fun setUpTitle() {
         if (handle.contains(SAVED_UI_STATE_KEY)) return
 
         val diaryItemTitleSelection =
@@ -76,7 +75,39 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         updateItemNumberAndTitle(itemNumberInt, itemTitle)
     }
 
-    private fun setUpTitleSelectionHistoryList() {
+    private fun collectUiStates() {
+        collectUiState()
+        collectTitleValidation()
+        collectTitleSelectionHistoryList()
+    }
+
+    private fun collectUiState() {
+        uiState.onEach {
+            Log.d(logTag, it.toString())
+            handle[SAVED_UI_STATE_KEY] = it
+        }.launchIn(viewModelScope)
+    }
+
+    private fun collectTitleValidation() {
+        uiState.distinctUntilChanged { old, new ->
+            old.title == new.title
+        }.mapNotNull {
+            val state = validateInputTextUseCase(it.title).value
+            when (state) {
+                InputTextValidation.Valid,
+                InputTextValidation.InitialCharUnmatched -> state.toUiModel()
+
+                // 空の時は選択ボタン押下時にエラーを表示するようにする。
+                InputTextValidation.Empty -> null
+            }
+        }.catchUnexpectedError(
+            InputTextValidationState.Invalid
+        ).distinctUntilChanged().onEach { validationResult ->
+            updateTitleValidationState(validationResult)
+        }.launchIn(viewModelScope)
+    }
+
+    private fun collectTitleSelectionHistoryList() {
         loadDiaryItemTitleSelectionHistoryListUseCase().onStart {
             updateToTitleSelectionHistoryListLoadingState()
         }.map {
@@ -106,28 +137,6 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             LoadState.Error
         ).distinctUntilChanged().onEach {
             updateToTitleSelectionHistoryListLoadCompletedState(it)
-        }.launchIn(viewModelScope)
-    }
-
-    private fun observeDerivedUiStateChanges(handle: SavedStateHandle) {
-        uiState.onEach {
-            Log.d(logTag, it.toString())
-            handle[SAVED_UI_STATE_KEY] = it
-        }.launchIn(viewModelScope)
-
-        uiState.mapNotNull {
-            val state = validateInputTextUseCase(it.title).value
-            when (state) {
-                InputTextValidation.Valid,
-                InputTextValidation.InitialCharUnmatched -> state.toUiModel()
-
-                // 空の時は選択ボタン押下時にエラーを表示するようにする。
-                InputTextValidation.Empty -> null
-            }
-        }.catchUnexpectedError(
-            InputTextValidationState.Invalid
-        ).distinctUntilChanged().onEach { validationResult ->
-            updateTitleValidationState(validationResult)
         }.launchIn(viewModelScope)
     }
 

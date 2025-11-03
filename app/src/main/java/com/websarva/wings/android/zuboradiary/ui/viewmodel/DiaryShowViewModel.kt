@@ -31,8 +31,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryShowViewModel @Inject constructor(
-    handle: SavedStateHandle,
-    diaryUiStateHelper: DiaryUiStateHelper,
+    private val handle: SavedStateHandle,
+    private val diaryUiStateHelper: DiaryUiStateHelper,
     private val loadDiaryByIdUseCase: LoadDiaryByIdUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase
 ) : BaseViewModel<DiaryShowUiEvent, DiaryShowAppMessage, DiaryShowUiState>(
@@ -53,18 +53,36 @@ internal class DiaryShowViewModel @Inject constructor(
         get() = (currentUiState.diaryLoadState as LoadState.Success).data
 
     private val diaryFlow =
-        uiState.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
+        uiState.distinctUntilChanged { old, new ->
+            old.diaryLoadState == new.diaryLoadState
+        }.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
     // キャッシュパラメータ
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
 
     init {
-        observeDerivedUiStateChanges(diaryUiStateHelper)
-        initializeDiaryData(handle)
+        initializeDiaryData()
+        collectUiStates()
     }
 
-    private fun observeDerivedUiStateChanges(diaryUiStateHelper: DiaryUiStateHelper) {
-        diaryFlow.map {
+    private fun initializeDiaryData() {
+        val id = handle.get<String>(ID_ARGUMENT_KEY)?.let { DiaryId(it) } ?: throw IllegalArgumentException()
+        val date = handle.get<LocalDate>(DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
+        launchWithUnexpectedErrorHandler {
+            loadSavedDiary(id, date)
+        }
+    }
+
+    private fun collectUiStates() {
+        collectWeather2Visible()
+        collectNumVisibleDiaryItems()
+        collectImageFilePath()
+    }
+
+    private fun collectWeather2Visible() {
+        diaryFlow.distinctUntilChanged{ old, new ->
+            old.weather1 == new.weather1 && old.weather2 == new.weather2
+        }.map {
             diaryUiStateHelper.isWeather2Visible(it)
         }.distinctUntilChanged().onEach { isWeather2Visible ->
             updateUiState {
@@ -73,8 +91,12 @@ internal class DiaryShowViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+    }
 
-        diaryFlow.map {
+    private fun collectNumVisibleDiaryItems() {
+        diaryFlow.distinctUntilChanged{ old, new ->
+            old.itemTitles == new.itemTitles
+        }.map {
             diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
         }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
             updateUiState {
@@ -83,8 +105,12 @@ internal class DiaryShowViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
+    }
 
-        diaryFlow.map {
+    private fun collectImageFilePath() {
+        diaryFlow.distinctUntilChanged{ old, new ->
+            old.imageFileName == new.imageFileName
+        }.map {
             diaryUiStateHelper.buildImageFilePath(it)
         }.catchUnexpectedError(null).distinctUntilChanged().onEach { path ->
             updateUiState {
@@ -93,14 +119,6 @@ internal class DiaryShowViewModel @Inject constructor(
                 )
             }
         }.launchIn(viewModelScope)
-    }
-
-    private fun initializeDiaryData(handle: SavedStateHandle) {
-        val id = handle.get<String>(ID_ARGUMENT_KEY)?.let { DiaryId(it) } ?: throw IllegalArgumentException()
-        val date = handle.get<LocalDate>(DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
-        launchWithUnexpectedErrorHandler {
-            loadSavedDiary(id, date)
-        }
     }
 
     // BackPressed(戻るボタン)処理

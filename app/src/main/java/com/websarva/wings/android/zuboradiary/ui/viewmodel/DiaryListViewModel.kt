@@ -53,7 +53,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class DiaryListViewModel @Inject constructor(
-    handle: SavedStateHandle,
+    private val handle: SavedStateHandle,
     private val loadNewDiaryListUseCase: LoadNewDiaryListUseCase,
     private val loadAdditionDiaryListUseCase: LoadAdditionDiaryListUseCase,
     private val refreshDiaryListUseCase: RefreshDiaryListUseCase,
@@ -86,25 +86,29 @@ internal class DiaryListViewModel @Inject constructor(
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
 
     init {
-        checkForRestoration(handle)
-        observeDerivedUiStateChanges(handle)
-        observeUiStateChanges()
+        checkForRestoration()
+        collectUiStates()
     }
 
-    private fun checkForRestoration(handle: SavedStateHandle) {
+    private fun checkForRestoration() {
         updateIsRestoringFromProcessDeath(
             handle.contains(SAVED_UI_STATE_KEY)
         )
     }
 
-    private fun observeDerivedUiStateChanges(handle: SavedStateHandle) {
+    private fun collectUiStates() {
+        collectUiState()
+        collectDiaryListSortConditionDate()
+    }
+
+    private fun collectUiState() {
         uiState.onEach {
             Log.d(logTag, it.toString())
             handle[SAVED_UI_STATE_KEY] = it
         }.launchIn(viewModelScope)
     }
 
-    private fun observeUiStateChanges() {
+    private fun collectDiaryListSortConditionDate() {
         viewModelScope.launch {
             uiState.distinctUntilChanged { oldState, newState ->
                 oldState.sortConditionDate == newState.sortConditionDate

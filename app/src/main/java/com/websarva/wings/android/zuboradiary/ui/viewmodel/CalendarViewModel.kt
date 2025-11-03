@@ -34,8 +34,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class CalendarViewModel @Inject constructor(
-    handle: SavedStateHandle,
-    diaryUiStateHelper: DiaryUiStateHelper,
+    private val handle: SavedStateHandle,
+    private val diaryUiStateHelper: DiaryUiStateHelper,
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
@@ -59,57 +59,33 @@ internal class CalendarViewModel @Inject constructor(
                         || currentUiState.diaryLoadState is LoadState.Empty)
 
     private val diaryFlow =
-        uiState.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
+        uiState.distinctUntilChanged { old, new ->
+            old.diaryLoadState == new.diaryLoadState
+        }.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
     private var shouldSmoothScroll = false
 
     init {
-        observeDerivedUiStateChanges(handle, diaryUiStateHelper)
-        observeUiStateChanges()
-        observeCalendarStartDayOfWeekSetting()
+        collectUiStates()
     }
 
-    private fun observeDerivedUiStateChanges(
-        handle: SavedStateHandle,
-        diaryUiStateHelper: DiaryUiStateHelper
-    ) {
+    private fun collectUiStates() {
+        collectUiState()
+        collectCalendarStartDayOfWeekSetting()
+        collectSelectedDate()
+        collectWeather2Visible()
+        collectNumVisibleDiaryItems()
+        collectImageFilePath()
+    }
+
+    private fun collectUiState() {
         uiState.onEach {
             Log.d(logTag, it.toString())
             handle[SAVED_UI_STATE_KEY] = it
         }.launchIn(viewModelScope)
-
-        diaryFlow.map {
-            diaryUiStateHelper.isWeather2Visible(it)
-        }.distinctUntilChanged().onEach { isWeather2Visible ->
-            updateUiState {
-                it.copy(
-                    isWeather2Visible = isWeather2Visible
-                )
-            }
-        }.launchIn(viewModelScope)
-
-        diaryFlow.map {
-            diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
-        }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
-            updateUiState {
-                it.copy(
-                    numVisibleDiaryItems = numVisibleDiaryItems
-                )
-            }
-        }.launchIn(viewModelScope)
-
-        diaryFlow.map {
-            diaryUiStateHelper.buildImageFilePath(it)
-        }.distinctUntilChanged().catchUnexpectedError(null).onEach { path ->
-            updateUiState {
-                it.copy(
-                    diaryImageFilePath = path
-                )
-            }
-        }.launchIn(viewModelScope)
     }
 
-    private fun observeCalendarStartDayOfWeekSetting() {
+    private fun collectCalendarStartDayOfWeekSetting() {
         loadCalendarStartDayOfWeekSettingUseCase()
             .onEach {
                 when (it) {
@@ -141,14 +117,58 @@ internal class CalendarViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    private fun observeUiStateChanges() {
+    private fun collectSelectedDate() {
         viewModelScope.launch {
-            uiState.map { it.selectedDate }.distinctUntilChanged().collectLatest {
+            uiState.distinctUntilChanged{ old, new ->
+                old.selectedDate == new.selectedDate
+            }.map { it.selectedDate }.collectLatest {
                 withUnexpectedErrorHandler {
                     prepareDiary(it)
                 }
             }
         }
+    }
+
+    private fun collectWeather2Visible() {
+        diaryFlow.distinctUntilChanged{ old, new ->
+            old.weather1 == new.weather1 && old.weather2 == new.weather2
+        }.map {
+            diaryUiStateHelper.isWeather2Visible(it)
+        }.distinctUntilChanged().onEach { isWeather2Visible ->
+            updateUiState {
+                it.copy(
+                    isWeather2Visible = isWeather2Visible
+                )
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun collectNumVisibleDiaryItems() {
+        diaryFlow.distinctUntilChanged{ old, new ->
+            old.itemTitles == new.itemTitles
+        }.map {
+            diaryUiStateHelper.calculateNumVisibleDiaryItems(it)
+        }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
+            updateUiState {
+                it.copy(
+                    numVisibleDiaryItems = numVisibleDiaryItems
+                )
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun collectImageFilePath() {
+        diaryFlow.distinctUntilChanged{ old, new ->
+            old.imageFileName == new.imageFileName
+        }.map {
+            diaryUiStateHelper.buildImageFilePath(it)
+        }.distinctUntilChanged().catchUnexpectedError(null).onEach { path ->
+            updateUiState {
+                it.copy(
+                    diaryImageFilePath = path
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
     // BackPressed(戻るボタン)処理
