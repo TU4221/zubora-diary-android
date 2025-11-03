@@ -120,13 +120,12 @@ internal class SettingsViewModel @Inject constructor(
     // TODO:全てcatchUnexpectedError()を呼び出してない
     private fun collectThemeColorSetting() {
         loadThemeColorSettingUseCase()
-            .map {
+            .onEach {
+                handleSettingLoadResult(it)
+            }.map {
                 when (it) {
                     is UseCaseResult.Success -> it.value.themeColor
-                    is UseCaseResult.Failure -> {
-                        handleSettingLoadFailure(it.exception)
-                        it.exception.fallbackSetting.themeColor
-                    }
+                    is UseCaseResult.Failure -> it.exception.fallbackSetting.themeColor
                 }
             }.distinctUntilChanged().onEach { value: ThemeColor ->
                 updateUiState {
@@ -139,13 +138,12 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun collectCalendarStartDayOfWeekSetting() {
         loadCalendarStartDayOfWeekSettingUseCase()
-            .map {
+            .onEach {
+                handleSettingLoadResult(it)
+            }.map {
                 when (it) {
                     is UseCaseResult.Success -> it.value.dayOfWeek
-                    is UseCaseResult.Failure -> {
-                        handleSettingLoadFailure(it.exception)
-                        it.exception.fallbackSetting.dayOfWeek
-                    }
+                    is UseCaseResult.Failure -> it.exception.fallbackSetting.dayOfWeek
                 }
             }.distinctUntilChanged().onEach { value: DayOfWeek ->
                 updateUiState {
@@ -158,13 +156,12 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun collectReminderNotificationSetting() {
         loadReminderNotificationSettingUseCase()
-            .map {
+            .onEach {
+                handleSettingLoadResult(it)
+            }.map {
                 when (it) {
-                    is UseCaseResult.Success -> { it.value }
-                    is UseCaseResult.Failure -> {
-                        handleSettingLoadFailure(it.exception)
-                        it.exception.fallbackSetting
-                    }
+                    is UseCaseResult.Success -> it.value
+                    is UseCaseResult.Failure -> it.exception.fallbackSetting
                 }
             }.distinctUntilChanged().onEach { value: ReminderNotificationSetting ->
                 updateUiState {
@@ -182,13 +179,12 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun collectPasscodeLockSetting() {
         loadPasscodeLockSettingUseCase()
-            .map {
+            .onEach {
+                handleSettingLoadResult(it)
+            }.map {
                 when (it) {
-                    is UseCaseResult.Success -> { it.value }
-                    is UseCaseResult.Failure -> {
-                        handleSettingLoadFailure(it.exception)
-                        it.exception.fallbackSetting
-                    }
+                    is UseCaseResult.Success -> it.value
+                    is UseCaseResult.Failure -> it.exception.fallbackSetting
                 }
             }.onEach { value: PasscodeLockSetting ->
                 updateUiState {
@@ -206,13 +202,12 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun collectWeatherInfoFetchSetting() {
         loadWeatherInfoFetchSettingUseCase()
-            .map {
+            .onEach {
+                handleSettingLoadResult(it)
+            }.map {
                 when (it) {
                     is UseCaseResult.Success -> it.value
-                    is UseCaseResult.Failure -> {
-                        handleSettingLoadFailure(it.exception)
-                        it.exception.fallbackSetting
-                    }
+                    is UseCaseResult.Failure -> it.exception.fallbackSetting
                 }
             }.distinctUntilChanged().onEach { value ->
                 updateUiState {
@@ -221,6 +216,13 @@ internal class SettingsViewModel @Inject constructor(
                     )
                 }
             }.launchIn(viewModelScope)
+    }
+
+    private suspend fun handleSettingLoadResult(result: UseCaseResult<*, UseCaseException>) {
+        when (result) {
+            is UseCaseResult.Success -> { /*処理なし*/ }
+            is UseCaseResult.Failure -> handleSettingLoadFailure(result.exception)
+        }
     }
 
     private suspend fun handleSettingLoadFailure(exception: UseCaseException) {

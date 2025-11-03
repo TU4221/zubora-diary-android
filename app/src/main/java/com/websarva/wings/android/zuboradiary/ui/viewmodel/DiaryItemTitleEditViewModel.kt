@@ -110,15 +110,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private fun collectTitleSelectionHistoryList() {
         loadDiaryItemTitleSelectionHistoryListUseCase().onStart {
             updateToTitleSelectionHistoryListLoadingState()
-        }.map {
+        }.onEach {
             when (it) {
-                is UseCaseResult.Success -> {
-                    if (it.value.isEmpty) {
-                        LoadState.Empty
-                    } else {
-                        LoadState.Success(it.value.toUiModel())
-                    }
-                }
+                is UseCaseResult.Success -> { /*処理なし*/ }
                 is UseCaseResult.Failure -> {
                     when (it.exception) {
                         is DiaryItemTitleSelectionHistoryLoadException.LoadFailure -> {
@@ -130,8 +124,18 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                             emitUnexpectedAppMessage(it.exception)
                         }
                     }
-                    LoadState.Error
                 }
+            }
+        }.map {
+            when (it) {
+                is UseCaseResult.Success -> {
+                    if (it.value.isEmpty) {
+                        LoadState.Empty
+                    } else {
+                        LoadState.Success(it.value.toUiModel())
+                    }
+                }
+                is UseCaseResult.Failure -> LoadState.Error
             }
         }.catchUnexpectedError(
             LoadState.Error
