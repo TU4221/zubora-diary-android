@@ -235,7 +235,6 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private suspend fun handleSettingLoadFailure(exception: UseCaseException) {
-        val currentUiState = uiState.value
         if (currentUiState.hasSettingsLoadFailure) return
 
         updateUiState {

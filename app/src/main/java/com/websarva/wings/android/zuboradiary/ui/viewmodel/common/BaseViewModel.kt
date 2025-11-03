@@ -98,7 +98,7 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
         block: suspend CoroutineScope.() -> Unit
     ) : Job {
         return viewModelScope.launch {
-            val initialState = rollbackState ?: _uiState.value
+            val initialState = rollbackState ?: currentUiState
             try {
                 block()
             } catch (e: Exception) {
@@ -111,7 +111,7 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
         rollbackState: S? = null,
         block: suspend () -> Unit
     ) {
-        val initialState = rollbackState ?: _uiState.value
+        val initialState = rollbackState ?: currentUiState
         try {
             block()
         } catch (e: Exception) {
