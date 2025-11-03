@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingLoadException
@@ -15,7 +16,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiE
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.message.CommonAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.message.MainActivityAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.MainActivityUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -107,17 +107,15 @@ internal class MainActivityViewModel @Inject constructor(
                 }
             }.map {
                 when (it) {
-                    is UseCaseResult.Success -> it.value.themeColor.toUiModel()
-                    is UseCaseResult.Failure -> {
-                        it.exception.fallbackSetting.themeColor.toUiModel()
-                    }
+                    is UseCaseResult.Success -> it.value
+                    is UseCaseResult.Failure -> it.exception.fallbackSetting
                 }
             }.catchUnexpectedError(
-                ThemeColorUi.WHITE
-            ).distinctUntilChanged().onEach { themeColor ->
+                ThemeColorSetting.default()
+            ).distinctUntilChanged().onEach { setting ->
                 _uiState.update {
                     it.copy(
-                        themeColor = themeColor
+                        themeColor = setting.themeColor.toUiModel()
                     )
                 }
             }.launchIn(viewModelScope)

@@ -29,7 +29,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.time.DayOfWeek
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -104,15 +103,15 @@ internal class CalendarViewModel @Inject constructor(
                 }
             }.map {
                 when (it) {
-                    is UseCaseResult.Success -> it.value.dayOfWeek
-                    is UseCaseResult.Failure -> it.exception.fallbackSetting.dayOfWeek
+                    is UseCaseResult.Success -> it.value
+                    is UseCaseResult.Failure -> it.exception.fallbackSetting
                 }
             }.catchUnexpectedError(
-                CalendarStartDayOfWeekSetting.default().dayOfWeek
-            ).distinctUntilChanged().onEach { value: DayOfWeek ->
+                CalendarStartDayOfWeekSetting.default()
+            ).distinctUntilChanged().onEach { setting ->
                 updateUiState {
                     it.copy(
-                        calendarStartDayOfWeek = value
+                        calendarStartDayOfWeek = setting.dayOfWeek
                     )
                 }
             }.launchIn(viewModelScope)
