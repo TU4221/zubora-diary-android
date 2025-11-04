@@ -1,8 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary
 
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
-
 /**
  * 日記の日単位のリストアイテムを保持する汎用的なリストクラス。
  *
@@ -13,10 +10,9 @@ import java.io.Serializable as JavaSerializable
  * @property itemList [T] 型のアイテムのリスト。
  * @throws IllegalArgumentException [itemList] が空の場合。
  */
-@Serializable
 internal data class DiaryDayList<T: DiaryDayListItem>(
     val itemList: List<T>
-) : JavaSerializable {
+) {
 
     init {
         require(itemList.isNotEmpty()) { "空のDiaryDayListはインスタンス化できません。" }

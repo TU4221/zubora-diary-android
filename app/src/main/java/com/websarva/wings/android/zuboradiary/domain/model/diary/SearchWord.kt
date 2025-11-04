@@ -1,8 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary
 
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
-
 /**
  * 検索単語を表すバリュークラス。
  *
@@ -10,8 +7,7 @@ import java.io.Serializable as JavaSerializable
  * @throws IllegalArgumentException 検索単語の文字列が空の場合。
  */
 @JvmInline
-@Serializable
-internal value class SearchWord(val value: String) : JavaSerializable {
+internal value class SearchWord(val value: String) {
     init {
         require(value.isNotEmpty()) { "検索単語が空の状態。" }
     }

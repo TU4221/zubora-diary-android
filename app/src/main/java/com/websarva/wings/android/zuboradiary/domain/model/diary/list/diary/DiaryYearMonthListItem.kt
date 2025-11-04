@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary
 
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
 import java.time.YearMonth
 
 /**
@@ -13,8 +11,7 @@ import java.time.YearMonth
  *
  * @param T [DiaryDayListItem] を実装するアイテムの型。これは [Diary] サブクラス内の日記リストの型として使用される。
  */
-@Serializable
-internal sealed class DiaryYearMonthListItem<T : DiaryDayListItem> : JavaSerializable {
+internal sealed class DiaryYearMonthListItem<T : DiaryDayListItem> {
 
     /**
      * 特定の年月に属する日記のリストを表すアイテム。

@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
-import kotlinx.serialization.Serializable
 import java.util.Arrays
 
 /**
@@ -10,7 +9,6 @@ import java.util.Arrays
  *
  * @property number テーマカラーを表す整数値。
  */
-@Serializable
 // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
 //      その為、@Suppress("RedundantSuppression")で警告回避。
 @Suppress("RedundantSuppression")

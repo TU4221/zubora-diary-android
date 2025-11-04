@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
-import kotlinx.serialization.Serializable
-
 /**
  * パスコードロック設定の状態を表す基底クララス。
  *
@@ -10,7 +8,6 @@ import kotlinx.serialization.Serializable
  *
  * @property isEnabled パスコードロックが有効な場合は `true`、無効な場合は `false`。
  */
-@Serializable
 internal sealed class PasscodeLockSetting(
     val isEnabled: Boolean,
 ) : UserSetting {
@@ -21,7 +18,6 @@ internal sealed class PasscodeLockSetting(
      * @property passcode 設定されている4桁の文字列数字のパスコード。
      * @throws IllegalArgumentException [passcode] が4桁の数字でない場合。
      */
-    @Serializable
     data class Enabled(val passcode: String) : PasscodeLockSetting(true) {
         init {
             require(checkLegalArgument(passcode))
@@ -41,7 +37,6 @@ internal sealed class PasscodeLockSetting(
     /**
      * パスコードロックが無効な状態を表すデータオブジェクト。
      */
-    @Serializable
     data object Disabled : PasscodeLockSetting(false)
 
     companion object {

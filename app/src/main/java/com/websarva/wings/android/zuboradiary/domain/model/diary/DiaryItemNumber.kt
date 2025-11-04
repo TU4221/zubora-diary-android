@@ -1,8 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary
 
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
-
 /**
  * 日記の項目番号を表すバリュークラス。
  *
@@ -11,8 +8,7 @@ import java.io.Serializable as JavaSerializable
  * @property value 項目番号を表す整数値。1から5の範囲でなければならない。
  */
 @JvmInline
-@Serializable
-internal value class DiaryItemNumber(val value: Int) : Comparable<DiaryItemNumber>, JavaSerializable {
+internal value class DiaryItemNumber(val value: Int) : Comparable<DiaryItemNumber> {
 
     companion object {
         /** 項目番号の最小値。 */

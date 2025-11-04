@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
-import kotlinx.serialization.Serializable
-
 /**
  * 天気情報取得設定を表すデータクラス。
  *
@@ -9,7 +7,6 @@ import kotlinx.serialization.Serializable
  *
  * @property isEnabled 天気情報の自動取得が有効な場合は `true`、無効な場合は `false`。
  */
-@Serializable
 internal class WeatherInfoFetchSetting(
     val isEnabled: Boolean
 ) : UserSetting {

@@ -1,8 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.common
 
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
-
 /**
  * ファイル名を表す抽象クラス。
  *
@@ -10,8 +7,7 @@ import java.io.Serializable as JavaSerializable
  *
  * **【重要】** このクラスを継承するサブクラスは、自身の`init`ブロック内で必ず [validate] を呼び出すこと。
  */
-@Serializable
-internal abstract class FileName : JavaSerializable {
+internal abstract class FileName {
 
     /**
      * ファイル名。拡張子を含む。

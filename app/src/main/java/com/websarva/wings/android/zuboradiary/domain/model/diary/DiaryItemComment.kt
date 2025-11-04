@@ -1,8 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary
 
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
-
 /**
  * 日記の項目のコメントを表すバリュークラス。
  *
@@ -10,8 +7,7 @@ import java.io.Serializable as JavaSerializable
  * @throws IllegalArgumentException 文字列が50文字を超える場合。
  */
 @JvmInline
-@Serializable
-internal value class DiaryItemComment(val value: String) : JavaSerializable {
+internal value class DiaryItemComment(val value: String) {
     init {
         require(value.length <= 50) {
             "項目のコメントは50文字以内で入力してください。"

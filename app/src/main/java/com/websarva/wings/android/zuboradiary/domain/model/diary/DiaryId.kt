@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary
 
 import com.websarva.wings.android.zuboradiary.domain.model.common.UUIDString
-import kotlinx.serialization.Serializable
 import java.util.UUID
 
 /**
@@ -12,7 +11,6 @@ import java.util.UUID
  * @property value 日記の識別番号。
  * @throws IllegalArgumentException 文字列が有効なUUID形式でない場合。
  */
-@Serializable
 internal data class DiaryId(override val value: String) : UUIDString() {
 
     init {

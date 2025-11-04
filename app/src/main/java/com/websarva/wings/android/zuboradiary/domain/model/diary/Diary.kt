@@ -1,9 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary
 
-import com.websarva.wings.android.zuboradiary.core.serializer.LocalDateSerializer
-import com.websarva.wings.android.zuboradiary.core.serializer.LocalDateTimeSerializer
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -27,12 +23,9 @@ import java.time.LocalDateTime
  * @property imageFileName 日記に添付した画像ファイル名。未添付の場合 `null`。
  */
 @ConsistentCopyVisibility
-@Serializable
 internal data class Diary private constructor(
     val id: DiaryId,
-    @Serializable(with = LocalDateSerializer::class)
     val date: LocalDate,
-    @Serializable(with = LocalDateTimeSerializer::class)
     val log: LocalDateTime,
     val weather1: Weather,
     val weather2: Weather,
@@ -41,7 +34,7 @@ internal data class Diary private constructor(
     val itemTitles: Map<Int, DiaryItemTitle?>,
     val itemComments: Map<Int, DiaryItemComment?>,
     val imageFileName: DiaryImageFileName?
-) : JavaSerializable {
+) {
 
     /**
      * Diaryオブジェクトの内容を比較する。

@@ -1,8 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary
 
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
-
 /**
  * 年月ごとの日記リストアイテムを保持する汎用的なリストクラス。
  *
@@ -15,10 +12,9 @@ import java.io.Serializable as JavaSerializable
  * @property itemList [DiaryYearMonthListItem<T>] 型のアイテムのリスト。デフォルトは空のリスト。
  * @throws IllegalArgumentException [itemList] が空でなく、かつ最後のアイテムが [DiaryYearMonthListItem.Diary] の場合。
  */
-@Serializable
 internal data class DiaryYearMonthList<T: DiaryDayListItem>(
     val itemList: List<DiaryYearMonthListItem<T>> = emptyList()
-) : JavaSerializable {
+) {
 
     /**
      * リストにアイテムが1つ以上含まれているかどうかを示す。

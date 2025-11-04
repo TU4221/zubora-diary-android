@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.common
 
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
 import java.util.UUID
 
 /**
@@ -11,8 +9,7 @@ import java.util.UUID
  *
  * **【重要】** このクラスを継承するサブクラスは、自身の`init`ブロック内で必ず [validate] を呼び出すこと。
  */
-@Serializable
-internal abstract class UUIDString : JavaSerializable {
+internal abstract class UUIDString {
 
     /**
      * UUIDの文字列。

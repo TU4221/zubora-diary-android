@@ -1,8 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary
 
-import com.websarva.wings.android.zuboradiary.core.serializer.LocalDateTimeSerializer
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
 import java.time.LocalDateTime
 
 /**
@@ -15,10 +12,8 @@ import java.time.LocalDateTime
  * @property title 選択または入力された日記項目のタイトル。
  * @property log そのタイトルが選択または入力された日時。
  */
-@Serializable
 internal data class DiaryItemTitleSelectionHistory (
     val id: DiaryItemTitleSelectionHistoryId,
     val title: DiaryItemTitle,
-    @Serializable(with = LocalDateTimeSerializer::class)
     val log: LocalDateTime
-) : JavaSerializable
+)

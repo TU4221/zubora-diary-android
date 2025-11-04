@@ -1,7 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary
 
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
 import java.util.Arrays
 
 /**
@@ -11,14 +9,13 @@ import java.util.Arrays
  *
  * @property number 天気の状態を表す整数値。
  */
-@Serializable
 // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
 //      その為、@Suppress("RedundantSuppression")で警告回避。
 @Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
 internal enum class Weather @Suppress("unused") constructor(
     val number: Int
-) : JavaSerializable {
+) {
 
     /** 不明な天気。 */
     UNKNOWN(0),

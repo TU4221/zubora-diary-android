@@ -4,9 +4,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemComment
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryTitle
-import com.websarva.wings.android.zuboradiary.core.serializer.LocalDateSerializer
-import kotlinx.serialization.Serializable
-import java.io.Serializable as JavaSerializable
 import java.time.LocalDate
 
 /**
@@ -30,10 +27,8 @@ import java.time.LocalDate
  * @property item5Title 5番目のアイテムのタイトル。未記述の場合null。
  * @property item5Comment 5番目のアイテムのコメント。未記述の場合null。
  */
-@Serializable
 internal data class RawWordSearchResultListItem(
     val id: DiaryId,
-    @Serializable(with = LocalDateSerializer::class)
     val date: LocalDate,
     val title: DiaryTitle,
     val item1Title: DiaryItemTitle,
@@ -46,4 +41,4 @@ internal data class RawWordSearchResultListItem(
     val item4Comment: DiaryItemComment?,
     val item5Title: DiaryItemTitle?,
     val item5Comment: DiaryItemComment?
-) : JavaSerializable
+)
