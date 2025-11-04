@@ -95,11 +95,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         uiState.distinctUntilChanged { old, new ->
             old.searchWord == new.searchWord
         }.map { it.searchWord.isEmpty() }.onEach { isIdle ->
-            updateUiState {
-                it.copy(
-                    isIdle = isIdle
-                )
-            }
+            updateIsWordSearchIdle(isIdle)
         }.launchIn(viewModelScope)
     }
 
@@ -366,11 +362,11 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
 
     private fun updateSearchWord(searchWord: String) {
-        updateUiState {
-            it.copy(
-                searchWord = searchWord
-            )
-        }
+        updateUiState { it.copy(searchWord = searchWord) }
+    }
+
+    private fun updateIsWordSearchIdle(isIdle: Boolean) {
+        updateUiState { it.copy(isWordSearchIdle = isIdle) }
     }
 
     private fun updateToIdleState() {

@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiE
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.message.CommonAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.message.MainActivityAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.MainActivityUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -112,12 +113,8 @@ internal class MainActivityViewModel @Inject constructor(
                 }
             }.catchUnexpectedError(
                 ThemeColorSetting.default()
-            ).distinctUntilChanged().onEach { setting ->
-                _uiState.update {
-                    it.copy(
-                        themeColor = setting.themeColor.toUiModel()
-                    )
-                }
+            ).distinctUntilChanged().onEach {
+                updateThemeColor(it.themeColor.toUiModel())
             }.launchIn(viewModelScope)
     }
 
@@ -130,8 +127,8 @@ internal class MainActivityViewModel @Inject constructor(
         }.onEach {
             if (it) {
                 updateWasBottomNavigationTabSelected(false)
-                _wasVisibleFragmentTransitionSetupCompleted.update { false }
-                _wasInvisibleFragmentTransitionSetupCompleted.update { false }
+                updateWasVisibleFragmentTransitionSetupCompleted(false)
+                updateWasInvisibleFragmentTransitionSetupCompleted(false)
             }
         }.launchIn(viewModelScope)
     }
@@ -141,12 +138,8 @@ internal class MainActivityViewModel @Inject constructor(
             old.isInputDisabled == new.isInputDisabled && old.isNavigating == new.isNavigating
         }.map {
             !it.isInputDisabled && !it.isNavigating
-        }.distinctUntilChanged().onEach { isBottomNavigationEnabled ->
-            _uiState.update {
-                it.copy(
-                    isBottomNavigationEnabled = isBottomNavigationEnabled
-                )
-            }
+        }.distinctUntilChanged().onEach { isEnabled ->
+            updateIsBottomNavigationEnabled(isEnabled)
         }.launchIn(viewModelScope)
     }
 
@@ -246,12 +239,16 @@ internal class MainActivityViewModel @Inject constructor(
         )
     }
 
+    private fun updateThemeColor(themeColor: ThemeColorUi) {
+        _uiState.update { it.copy(themeColor = themeColor) }
+    }
+
+    private fun updateIsBottomNavigationEnabled(isEnable: Boolean) {
+        _uiState.update { it.copy(isBottomNavigationEnabled = isEnable) }
+    }
+
     private fun updateIsNavigating(isNavigating: Boolean) {
-        _uiState.update {
-            it.copy(
-                isNavigating = isNavigating
-            )
-        }
+        _uiState.update { it.copy(isNavigating = isNavigating) }
     }
 
     private fun updateToIdleState() {
@@ -294,13 +291,21 @@ internal class MainActivityViewModel @Inject constructor(
         _wasBottomNavigationTabSelected.update { wasSelected }
     }
 
+    private fun updateWasVisibleFragmentTransitionSetupCompleted(wasCompleted: Boolean) {
+        _wasVisibleFragmentTransitionSetupCompleted.update { wasCompleted }
+    }
+
+    private fun updateWasInvisibleFragmentTransitionSetupCompleted(wasCompleted: Boolean) {
+        _wasInvisibleFragmentTransitionSetupCompleted.update { wasCompleted }
+    }
+
     private fun markVisibleFragmentTransitionSetupCompleted() {
         if (!_wasBottomNavigationTabSelected.value) return
-        _wasVisibleFragmentTransitionSetupCompleted.update { true }
+        updateWasVisibleFragmentTransitionSetupCompleted(true)
     }
 
     private fun markInvisibleFragmentTransitionSetupCompleted() {
         if (!_wasBottomNavigationTabSelected.value) return
-        _wasInvisibleFragmentTransitionSetupCompleted.update { true }
+        updateWasInvisibleFragmentTransitionSetupCompleted(true)
     }
 }

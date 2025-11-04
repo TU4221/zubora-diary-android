@@ -86,11 +86,7 @@ internal class DiaryShowViewModel @Inject constructor(
         }.map {
             diaryUiStateHelper.isWeather2Visible(it.weather1, it.weather2)
         }.distinctUntilChanged().onEach { isWeather2Visible ->
-            updateUiState {
-                it.copy(
-                    isWeather2Visible = isWeather2Visible
-                )
-            }
+            updateIsWeather2Visible(isWeather2Visible)
         }.launchIn(viewModelScope)
     }
 
@@ -100,11 +96,7 @@ internal class DiaryShowViewModel @Inject constructor(
         }.map {
             diaryUiStateHelper.calculateNumVisibleDiaryItems(it.itemTitles)
         }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
-            updateUiState {
-                it.copy(
-                    numVisibleDiaryItems = numVisibleDiaryItems
-                )
-            }
+            updateNumVisibleDiaryItems(numVisibleDiaryItems)
         }.launchIn(viewModelScope)
     }
 
@@ -116,11 +108,7 @@ internal class DiaryShowViewModel @Inject constructor(
         }.catchUnexpectedError(
             FilePathUi.Unavailable
         ).distinctUntilChanged().onEach { path ->
-            updateUiState {
-                it.copy(
-                    diaryImageFilePath = path
-                )
-            }
+            updateDiaryImageFilePath(path)
         }.launchIn(viewModelScope)
     }
 
@@ -270,6 +258,18 @@ internal class DiaryShowViewModel @Inject constructor(
         emitNavigatePreviousFragmentEvent(
             FragmentResult.Some(diaryDate)
         )
+    }
+
+    private fun updateIsWeather2Visible(isVisible: Boolean) {
+        updateUiState { it.copy(isWeather2Visible = isVisible) }
+    }
+
+    private fun updateNumVisibleDiaryItems(count: Int) {
+        updateUiState { it.copy(numVisibleDiaryItems = count) }
+    }
+
+    private fun updateDiaryImageFilePath(path: FilePathUi?) {
+        updateUiState { it.copy(diaryImageFilePath = path) }
     }
 
     private fun updateToDiaryLoadingState() {

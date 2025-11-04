@@ -70,9 +70,8 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val diaryItemTitleSelection =
             handle.get<DiaryItemTitleSelectionUi>(DIARY_ITEM_TITLE_ARGUMENT_KEY)
                 ?: throw IllegalArgumentException()
-        val itemNumberInt = diaryItemTitleSelection.itemNumber
-        val itemTitle = diaryItemTitleSelection.title
-        updateItemNumberAndTitle(itemNumberInt, itemTitle)
+        updateItemNumber(diaryItemTitleSelection.itemNumber)
+        updateTitle(diaryItemTitleSelection.title)
     }
 
     private fun collectUiStates() {
@@ -91,7 +90,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private fun collectTitleValidation() {
         uiState.distinctUntilChanged { old, new ->
             old.title == new.title
-        }.mapNotNull {
+        }.mapNotNull { 
             val state = validateInputTextUseCase(it.title).value
             when (state) {
                 InputTextValidation.Valid,
@@ -126,7 +125,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
                     }
                 }
             }
-        }.map {
+        }.map { 
             when (it) {
                 is UseCaseResult.Success -> {
                     if (it.value.isEmpty) {
@@ -285,29 +284,16 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    private fun updateItemNumberAndTitle(itemNumberInt: Int, title: String) {
-        updateUiState {
-            it.copy(
-                itemNumber = itemNumberInt,
-                title = title
-            )
-        }
+    private fun updateItemNumber(itemNumber: Int) {
+        updateUiState { it.copy(itemNumber = itemNumber) }
     }
 
     private fun updateTitle(itemTitle: String) {
-        updateUiState {
-            it.copy(
-                title = itemTitle
-            )
-        }
+        updateUiState { it.copy(title = itemTitle) }
     }
 
     private fun updateTitleValidationState(result: InputTextValidationState) {
-        updateUiState {
-            it.copy(
-                titleValidationState = result
-            )
-        }
+        updateUiState { it.copy(titleValidationState = result) }
     }
 
     private fun updateToTitleSelectionHistoryListLoadingState() {

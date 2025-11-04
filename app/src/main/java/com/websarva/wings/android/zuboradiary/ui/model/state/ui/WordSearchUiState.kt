@@ -13,7 +13,7 @@ internal data class WordSearchUiState(
     val wordSearchResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult> = DiaryYearMonthListUi(),
 
     // UiState
-    val isIdle: Boolean = true,
+    val isWordSearchIdle: Boolean = true,
     val hasWordSearchCompleted: Boolean = false,
     val hasNoWordSearchResults: Boolean = false,
 

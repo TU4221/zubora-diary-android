@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.time.DayOfWeek
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -70,7 +71,7 @@ internal class CalendarViewModel @Inject constructor(
     }
 
     private fun collectUiStates() {
-        collectUiState()
+        collectUiStateForSaveStateToHandle()
         collectCalendarStartDayOfWeekSetting()
         collectSelectedDate()
         collectWeather2Visible()
@@ -78,8 +79,8 @@ internal class CalendarViewModel @Inject constructor(
         collectImageFilePath()
     }
 
-    private fun collectUiState() {
-        uiState.onEach {
+    private fun collectUiStateForSaveStateToHandle() {
+        uiState.onEach { 
             Log.d(logTag, it.toString())
             handle[SAVED_UI_STATE_KEY] = it
         }.launchIn(viewModelScope)
@@ -109,11 +110,7 @@ internal class CalendarViewModel @Inject constructor(
             }.catchUnexpectedError(
                 CalendarStartDayOfWeekSetting.default()
             ).distinctUntilChanged().onEach { setting ->
-                updateUiState {
-                    it.copy(
-                        calendarStartDayOfWeek = setting.dayOfWeek
-                    )
-                }
+                updateCalendarStartDayOfWeek(setting.dayOfWeek)
             }.launchIn(viewModelScope)
     }
 
@@ -121,7 +118,7 @@ internal class CalendarViewModel @Inject constructor(
         viewModelScope.launch {
             uiState.distinctUntilChanged{ old, new ->
                 old.selectedDate == new.selectedDate
-            }.map { it.selectedDate }.collectLatest {
+            }.map { it.selectedDate }.collectLatest { 
                 withUnexpectedErrorHandler {
                     prepareDiary(it)
                 }
@@ -132,44 +129,32 @@ internal class CalendarViewModel @Inject constructor(
     private fun collectWeather2Visible() {
         diaryFlow.distinctUntilChanged{ old, new ->
             old.weather1 == new.weather1 && old.weather2 == new.weather2
-        }.map {
+        }.map { 
             diaryUiStateHelper.isWeather2Visible(it.weather1, it.weather2)
         }.distinctUntilChanged().onEach { isWeather2Visible ->
-            updateUiState {
-                it.copy(
-                    isWeather2Visible = isWeather2Visible
-                )
-            }
+            updateIsWeather2Visible(isWeather2Visible)
         }.launchIn(viewModelScope)
     }
 
     private fun collectNumVisibleDiaryItems() {
         diaryFlow.distinctUntilChanged{ old, new ->
             old.itemTitles == new.itemTitles
-        }.map {
+        }.map { 
             diaryUiStateHelper.calculateNumVisibleDiaryItems(it.itemTitles)
         }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
-            updateUiState {
-                it.copy(
-                    numVisibleDiaryItems = numVisibleDiaryItems
-                )
-            }
+            updateNumVisibleDiaryItems(numVisibleDiaryItems)
         }.launchIn(viewModelScope)
     }
 
     private fun collectImageFilePath() {
         diaryFlow.distinctUntilChanged{ old, new ->
             old.imageFileName == new.imageFileName
-        }.map {
+        }.map { 
             diaryUiStateHelper.buildImageFilePath(it.imageFileName)
         }.catchUnexpectedError(
             FilePathUi.Unavailable
         ).distinctUntilChanged().onEach { path ->
-            updateUiState {
-                it.copy(
-                    diaryImageFilePath = path
-                )
-            }
+            updateDiaryImageFilePath(path)
         }.launchIn(viewModelScope)
     }
 
@@ -325,6 +310,10 @@ internal class CalendarViewModel @Inject constructor(
         shouldSmoothScroll = shouldScroll
     }
 
+    private fun updateCalendarStartDayOfWeek(dayOfWeek: DayOfWeek) {
+        updateUiState { it.copy(calendarStartDayOfWeek = dayOfWeek) }
+    }
+
     private fun updateSelectedDate(date: LocalDate) {
         // MEMO:selectedDateと同日付を選択した時、previousSelectedDateと同値となり、
         //      次に他の日付を選択した時にpreviousSelectedDateのcollectedが起動しなくなる。
@@ -337,6 +326,18 @@ internal class CalendarViewModel @Inject constructor(
                 previousSelectedDate = it.selectedDate
             )
         }
+    }
+
+    private fun updateIsWeather2Visible(isVisible: Boolean) {
+        updateUiState { it.copy(isWeather2Visible = isVisible) }
+    }
+
+    private fun updateNumVisibleDiaryItems(count: Int) {
+        updateUiState { it.copy(numVisibleDiaryItems = count) }
+    }
+
+    private fun updateDiaryImageFilePath(path: FilePathUi?) {
+        updateUiState { it.copy(diaryImageFilePath = path) }
     }
 
     private fun updateToDiaryLoadingState() {

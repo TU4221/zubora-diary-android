@@ -476,11 +476,7 @@ internal class DiaryListViewModel @Inject constructor(
     }
 
     private fun updateSortConditionDate(date: LocalDate?) {
-        updateUiState {
-            it.copy(
-                sortConditionDate = date
-            )
-        }
+        updateUiState { it.copy(sortConditionDate = date) }
     }
 
     private fun updateToIdleState() {

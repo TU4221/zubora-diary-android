@@ -167,11 +167,7 @@ internal class DiaryEditViewModel @Inject constructor(
                 weather != state.editingDiary.weather1
             }
         }.distinctUntilChanged().onEach { options ->
-            updateUiState {
-                it.copy(
-                    weather2Options = options
-                )
-            }
+            updateWeather2Options(options)
         }.launchIn(viewModelScope)
     }
 
@@ -187,18 +183,9 @@ internal class DiaryEditViewModel @Inject constructor(
             }
         }.distinctUntilChanged().onEach { isEnabled ->
             if (isEnabled) {
-                updateUiState {
-                    it.copy(
-                        isWeather2Enabled = isEnabled
-                    )
-                }
+                updateToWeather2EnabledState()
             } else {
-                updateUiState {
-                    it.copy(
-                        editingDiary = it.editingDiary.copy(weather2 = WeatherUi.UNKNOWN),
-                        isWeather2Enabled = isEnabled
-                    )
-                }
+                updateToWeather2DisabledState()
             }
         }.launchIn(viewModelScope)
     }
@@ -209,11 +196,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }.map {
             diaryUiStateHelper.calculateNumVisibleDiaryItems(it.itemTitles)
         }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
-            updateUiState {
-                it.copy(
-                    numVisibleDiaryItems = numVisibleDiaryItems
-                )
-            }
+            updateNumVisibleItems(numVisibleDiaryItems)
             emitUiEvent(
                 DiaryEditUiEvent.UpdateDiaryItemLayout(numVisibleDiaryItems)
             )
@@ -227,11 +210,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }.map {
             !it.isInputDisabled && it.numVisibleDiaryItems < DiaryItemNumber.MAX_NUMBER
         }.distinctUntilChanged().onEach { isEnabled ->
-            updateUiState {
-                it.copy(
-                    isDiaryItemAdditionEnabled = isEnabled
-                )
-            }
+            updateIsDiaryItemAdditionEnabled(isEnabled)
         }.launchIn(viewModelScope)
     }
 
@@ -243,11 +222,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }.catchUnexpectedError(
             FilePathUi.Unavailable
         ).distinctUntilChanged().onEach { path ->
-            updateUiState {
-                it.copy(
-                    diaryImageFilePath = path
-                )
-            }
+            updateDiaryImageFilePath(path)
         }.launchIn(viewModelScope)
     }
 
@@ -1220,11 +1195,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     private fun updateNumVisibleItems(num: Int) {
-        updateUiState {
-            it.copy(
-                numVisibleDiaryItems = num
-            )
-        }
+        updateUiState { it.copy(numVisibleDiaryItems = num) }
     }
 
     private fun updateItemTitle(itemNumberInt: Int, title: String) {
@@ -1287,6 +1258,18 @@ internal class DiaryEditViewModel @Inject constructor(
                 editingDiary = it.editingDiary.copy(log = log)
             )
         }
+    }
+
+    private fun updateWeather2Options(options: List<WeatherUi>) {
+        updateUiState { it.copy(weather2Options = options) }
+    }
+
+    private fun updateIsDiaryItemAdditionEnabled(isEnabled: Boolean) {
+        updateUiState { it.copy(isDiaryItemAdditionEnabled = isEnabled) }
+    }
+
+    private fun updateDiaryImageFilePath(path: FilePathUi?) {
+        updateUiState { it.copy(diaryImageFilePath = path) }
     }
 
     private fun updateToIdleState() {
@@ -1353,6 +1336,19 @@ internal class DiaryEditViewModel @Inject constructor(
                 originalDiaryLoadState = LoadState.Error,
                 isProcessing = false,
                 isInputDisabled = false
+            )
+        }
+    }
+
+    private fun updateToWeather2EnabledState() {
+        updateUiState { it.copy(isWeather2Enabled = true) }
+    }
+
+    private fun updateToWeather2DisabledState() {
+        updateUiState {
+            it.copy(
+                editingDiary = it.editingDiary.copy(weather2 = WeatherUi.UNKNOWN),
+                isWeather2Enabled = false
             )
         }
     }

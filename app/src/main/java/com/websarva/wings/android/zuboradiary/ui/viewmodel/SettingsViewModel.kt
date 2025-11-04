@@ -128,12 +128,8 @@ internal class SettingsViewModel @Inject constructor(
                 }
             }.catchUnexpectedError(
                 ThemeColorSetting.default()
-            ).distinctUntilChanged().onEach { value: ThemeColorSetting ->
-                updateUiState {
-                    it.copy(
-                        themeColor = value.themeColor.toUiModel()
-                    )
-                }
+            ).distinctUntilChanged().onEach {
+                updateThemeColor(it.themeColor.toUiModel())
             }.launchIn(viewModelScope)
     }
 
@@ -148,12 +144,8 @@ internal class SettingsViewModel @Inject constructor(
                 }
             }.catchUnexpectedError(
                 CalendarStartDayOfWeekSetting.default()
-            ).distinctUntilChanged().onEach { value: CalendarStartDayOfWeekSetting ->
-                updateUiState {
-                    it.copy(
-                        calendarStartDayOfWeek = value.dayOfWeek
-                    )
-                }
+            ).distinctUntilChanged().onEach {
+                updateCalendarStartDayOfWeek(it.dayOfWeek)
             }.launchIn(viewModelScope)
     }
 
@@ -168,16 +160,12 @@ internal class SettingsViewModel @Inject constructor(
                 }
             }.catchUnexpectedError(
                 ReminderNotificationSetting.default()
-            ).distinctUntilChanged().onEach { value: ReminderNotificationSetting ->
-                updateUiState {
-                    it.copy(
-                        isReminderEnabled = value.isEnabled,
-                        reminderNotificationTime =
-                            when (value) {
-                                is ReminderNotificationSetting.Enabled -> value.notificationTime
-                                ReminderNotificationSetting.Disabled -> null
-                            }
-                    )
+            ).distinctUntilChanged().onEach {
+                when (it) {
+                    is ReminderNotificationSetting.Enabled -> {
+                        updateToReminderEnabledState(it.notificationTime)
+                    }
+                    ReminderNotificationSetting.Disabled -> updateToReminderDisabledState()
                 }
             }.launchIn(viewModelScope)
     }
@@ -193,16 +181,12 @@ internal class SettingsViewModel @Inject constructor(
                 }
             }.catchUnexpectedError(
                 PasscodeLockSetting.default()
-            ).distinctUntilChanged().onEach { value: PasscodeLockSetting ->
-                updateUiState {
-                    it.copy(
-                        isPasscodeLockEnabled = value.isEnabled,
-                        passcode =
-                            when (value) {
-                                is PasscodeLockSetting.Enabled -> value.passcode
-                                PasscodeLockSetting.Disabled -> null
-                            }
-                    )
+            ).distinctUntilChanged().onEach {
+                when (it) {
+                    is PasscodeLockSetting.Enabled -> {
+                        updateToPasscodeEnabledState(it.passcode)
+                    }
+                    PasscodeLockSetting.Disabled -> updateToPasscodeDisabledState()
                 }
             }.launchIn(viewModelScope)
     }
@@ -218,12 +202,8 @@ internal class SettingsViewModel @Inject constructor(
                 }
             }.catchUnexpectedError(
                 WeatherInfoFetchSetting.default()
-            ).distinctUntilChanged().onEach { value ->
-                updateUiState {
-                    it.copy(
-                        isWeatherFetchEnabled = value.isEnabled
-                    )
-                }
+            ).distinctUntilChanged().onEach {
+                updateIsWeatherFetchEnabled(it.isEnabled)
             }.launchIn(viewModelScope)
     }
 
@@ -237,11 +217,7 @@ internal class SettingsViewModel @Inject constructor(
     private suspend fun handleSettingLoadFailure(exception: UseCaseException) {
         if (currentUiState.hasSettingsLoadFailure) return
 
-        updateUiState {
-            it.copy(
-                hasSettingsLoadFailure = true
-            )
-        }
+        updateToSettingsLoadFailedState()
         if (exception is UseCaseUnknownException) {
             emitUnexpectedAppMessage(exception)
         } else {
@@ -916,6 +892,18 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
+    private fun updateThemeColor(themeColor: ThemeColorUi?) {
+        updateUiState { it.copy(themeColor = themeColor) }
+    }
+
+    private fun updateCalendarStartDayOfWeek(dayOfWeek: DayOfWeek?) {
+        updateUiState { it.copy(calendarStartDayOfWeek = dayOfWeek) }
+    }
+
+    private fun updateIsWeatherFetchEnabled(isEnabled: Boolean?) {
+        updateUiState { it.copy(isWeatherFetchEnabled = isEnabled) }
+    }
+
     private fun updateToIdleState() {
         updateUiState {
             it.copy(
@@ -930,6 +918,46 @@ internal class SettingsViewModel @Inject constructor(
             it.copy(
                 isProcessing = true,
                 isInputDisabled = true
+            )
+        }
+    }
+
+    private fun updateToSettingsLoadFailedState() {
+        updateUiState { it.copy(hasSettingsLoadFailure = true) }
+    }
+
+    private fun updateToReminderEnabledState(notificationTime: LocalTime) {
+        updateUiState {
+            it.copy(
+                isReminderEnabled = true,
+                reminderNotificationTime = notificationTime
+            )
+        }
+    }
+
+    private fun updateToReminderDisabledState() {
+        updateUiState {
+            it.copy(
+                isReminderEnabled = false,
+                reminderNotificationTime = null
+            )
+        }
+    }
+
+    private fun updateToPasscodeEnabledState(passcode: String) {
+        updateUiState {
+            it.copy(
+                isPasscodeLockEnabled = true,
+                passcode = passcode
+            )
+        }
+    }
+
+    private fun updateToPasscodeDisabledState() {
+        updateUiState {
+            it.copy(
+                isPasscodeLockEnabled = false,
+                passcode = null
             )
         }
     }
