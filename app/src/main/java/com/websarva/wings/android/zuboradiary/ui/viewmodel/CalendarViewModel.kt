@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.CalendarUiState
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.DiaryUiStateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.collectLatest
@@ -40,7 +40,7 @@ internal class CalendarViewModel @Inject constructor(
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
-) : BaseViewModel<CalendarUiEvent, CalendarAppMessage, CalendarUiState>(
+) : BaseFragmentViewModel<CalendarUiEvent, CalendarAppMessage, CalendarUiState>(
     handle.get<CalendarUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         CalendarUiState().copy(
             calendarStartDayOfWeek = savedUiState.calendarStartDayOfWeek,

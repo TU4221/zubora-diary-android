@@ -21,7 +21,7 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.WordSearchAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
@@ -44,7 +44,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val loadNewWordSearchResultListUseCase: LoadNewWordSearchResultListUseCase,
     private val loadAdditionWordSearchResultListUseCase: LoadAdditionWordSearchResultListUseCase,
     private val refreshWordSearchResultListUseCase: RefreshWordSearchResultListUseCase
-) : BaseViewModel<WordSearchUiEvent, WordSearchAppMessage, WordSearchUiState>(
+) : BaseFragmentViewModel<WordSearchUiEvent, WordSearchAppMessage, WordSearchUiState>(
     handle.get<WordSearchUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         WordSearchUiState().copy(
             searchWord = savedUiState.searchWord,

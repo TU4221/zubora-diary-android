@@ -12,12 +12,12 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import kotlinx.coroutines.CoroutineScope
 
 abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSimpleFullScreenDialogFragment<T>() {
 
-    internal abstract val mainViewModel: BaseViewModel<E, out AppMessage, out UiState>
+    internal abstract val mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>
 
     internal abstract val destinationId: Int
 

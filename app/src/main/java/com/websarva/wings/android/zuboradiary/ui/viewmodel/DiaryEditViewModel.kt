@@ -46,7 +46,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionHistoryUi
@@ -82,7 +82,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val cacheDiaryImageUseCase: CacheDiaryImageUseCase,
     private val clearDiaryImageCacheFileUseCase: ClearDiaryImageCacheFileUseCase
-) : BaseViewModel<DiaryEditUiEvent, DiaryEditAppMessage, DiaryEditUiState>(
+) : BaseFragmentViewModel<DiaryEditUiEvent, DiaryEditAppMessage, DiaryEditUiState>(
     handle.get<DiaryEditUiState>(SAVED_STATE_UI_KEY)?.copy(
         isProcessing = false,
         isInputDisabled = false

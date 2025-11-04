@@ -23,7 +23,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -35,7 +35,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
     private var _binding: T? = null
     internal val binding get() = checkNotNull(_binding)
 
-    internal abstract val mainViewModel: BaseViewModel<E, out AppMessage, out UiState>
+    internal abstract val mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>
 
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。

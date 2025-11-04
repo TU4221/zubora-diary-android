@@ -18,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.ui.model.state.InputTextValidationState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.common.InputTextValidation
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
@@ -39,7 +39,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val loadDiaryItemTitleSelectionHistoryListUseCase: LoadDiaryItemTitleSelectionHistoryListUseCase,
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
-) : BaseViewModel<DiaryItemTitleEditUiEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditUiState>(
+) : BaseFragmentViewModel<DiaryItemTitleEditUiEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditUiState>(
     handle.get<DiaryItemTitleEditUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         DiaryItemTitleEditUiState().copy(
             itemNumber = savedUiState.itemNumber,

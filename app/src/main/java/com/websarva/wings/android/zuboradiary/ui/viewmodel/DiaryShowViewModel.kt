@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryShowUiState
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.DiaryUiStateHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -36,7 +36,7 @@ internal class DiaryShowViewModel @Inject constructor(
     private val diaryUiStateHelper: DiaryUiStateHelper,
     private val loadDiaryByIdUseCase: LoadDiaryByIdUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase
-) : BaseViewModel<DiaryShowUiEvent, DiaryShowAppMessage, DiaryShowUiState>(
+) : BaseFragmentViewModel<DiaryShowUiEvent, DiaryShowAppMessage, DiaryShowUiState>(
     DiaryShowUiState()
 ) {
 

@@ -39,7 +39,7 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.SettingsAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
@@ -71,7 +71,7 @@ internal class SettingsViewModel @Inject constructor(
     private val updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase,
     private val deleteAllDiariesUseCase: DeleteAllDiariesUseCase,
     private val deleteAllDataUseCase: DeleteAllDataUseCase,
-) : BaseViewModel<SettingsUiEvent, SettingsAppMessage, SettingsUiState>(
+) : BaseFragmentViewModel<SettingsUiEvent, SettingsAppMessage, SettingsUiState>(
     handle.get<SettingsUiState>(SAVED_STATE_UI_KEY)?.copy(
         isProcessing = false,
         isInputDisabled = false

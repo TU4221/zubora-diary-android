@@ -30,7 +30,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonth
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryListUiState
@@ -60,7 +60,7 @@ internal class DiaryListViewModel @Inject constructor(
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
     private val loadDiaryListStartYearMonthPickerDateRangeUseCase: LoadDiaryListStartYearMonthPickerDateRangeUseCase,
     private val buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
-) : BaseViewModel<DiaryListUiEvent, DiaryListAppMessage, DiaryListUiState>(
+) : BaseFragmentViewModel<DiaryListUiEvent, DiaryListAppMessage, DiaryListUiState>(
     handle.get<DiaryListUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         DiaryListUiState().copy(
             diaryList = savedUiState.diaryList,

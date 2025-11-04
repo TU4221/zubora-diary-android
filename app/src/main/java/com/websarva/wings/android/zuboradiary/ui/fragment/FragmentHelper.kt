@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
@@ -69,7 +69,7 @@ internal class FragmentHelper {
 
     fun <E: UiEvent> setUpMainUiEvent(
         fragment: Fragment,
-        mainViewModel: BaseViewModel<E, out AppMessage, out UiState>,
+        mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>,
         onUiEventReceived: (E) -> Unit
     ) {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
@@ -87,7 +87,7 @@ internal class FragmentHelper {
     // TODO:Ui層のアクセス修飾子をpublicに変更してから、引数onCommonUiEventReceivedをCommonUiEventHandlerに変更して分岐処理を本メソッドに記述
     fun <E: UiEvent> setUpCommonUiEvent(
         fragment: Fragment,
-        mainViewModel: BaseViewModel<E, out AppMessage, out UiState>,
+        mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>,
         onCommonUiEventReceived: (CommonUiEvent) -> Unit
     ) {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
@@ -105,7 +105,7 @@ internal class FragmentHelper {
     fun setUpPendingNavigation(
         navController: NavController,
         navDestinationId: Int,
-        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>
+        mainViewModel: BaseFragmentViewModel<out UiEvent, out AppMessage, out UiState>
     ) {
         val navBackStackEntry = navController.getBackStackEntry(navDestinationId)
         navBackStackEntry.lifecycleScope.launch {
@@ -154,7 +154,7 @@ internal class FragmentHelper {
     fun navigateFragmentWithRetry(
         navController: NavController,
         fragmentDestinationId: Int,
-        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
+        mainViewModel: BaseFragmentViewModel<out UiEvent, out AppMessage, out UiState>,
         command: NavigationCommand,
     ) {
         Log.d(logTag, "リトライあり画面遷移開始")
@@ -235,7 +235,7 @@ internal class FragmentHelper {
         fragmentDestinationId: Int,
         resultKey: String?,
         result: FragmentResult<*>,
-        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>,
+        mainViewModel: BaseFragmentViewModel<out UiEvent, out AppMessage, out UiState>,
     ) {
         navigateFragmentWithRetry(
             navController,
@@ -258,7 +258,7 @@ internal class FragmentHelper {
 
     fun registerOnBackPressedCallback(
         fragment: Fragment,
-        mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>
+        mainViewModel: BaseFragmentViewModel<out UiEvent, out AppMessage, out UiState>
     ) {
         fragment.requireActivity().onBackPressedDispatcher
             .addCallback(

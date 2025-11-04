@@ -128,7 +128,7 @@ class MainActivity : LoggingActivity() {
     private fun observeUiEvent() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
-                mainActivityViewModel.activityUiEvent
+                mainActivityViewModel.uiEvent
                     .collectLatest { value: ConsumableEvent<MainActivityUiEvent> ->
                         val event = value.getContentIfNotHandled() ?: return@collectLatest
                         when (event) {
