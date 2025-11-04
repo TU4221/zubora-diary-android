@@ -4,7 +4,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHandler
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.MainUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -15,7 +16,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import kotlinx.coroutines.CoroutineScope
 
-abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSimpleFullScreenDialogFragment<T>() {
+abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
+    : BaseSimpleFullScreenDialogFragment<T>(), MainUiEventHandler<E>, CommonUiEventHandler {
 
     internal abstract val mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>
 
@@ -68,32 +70,18 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
             .setUpMainUiEvent(
                 this,
                 mainViewModel,
-                ::onMainUiEventReceived
+                this
             )
     }
-
-    internal abstract fun onMainUiEventReceived(event: E)
 
     private fun setUpCommonUiEvent() {
         fragmentHelper
             .setUpCommonUiEvent(
                 this,
-                mainViewModel
-            ) { event ->
-                when (event) {
-                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        onNavigatePreviousFragmentEventReceived(event.result)
-                    }
-                    is CommonUiEvent.NavigateAppMessage -> {
-                        onNavigateAppMessageEventReceived(event.message)
-                    }
-                }
-            }
+                mainViewModel,
+                this
+            )
     }
-
-    internal abstract fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>)
-
-    internal abstract fun onNavigateAppMessageEventReceived(appMessage: AppMessage)
 
     private fun setUpPendingNavigationCollector() {
         fragmentHelper

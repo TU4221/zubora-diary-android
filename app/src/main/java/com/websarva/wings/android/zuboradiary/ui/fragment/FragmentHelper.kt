@@ -21,6 +21,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHandler
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.MainUiEventHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -70,7 +72,7 @@ internal class FragmentHelper {
     fun <E: UiEvent> setUpMainUiEvent(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>,
-        onUiEventReceived: (E) -> Unit
+        handler: MainUiEventHandler<E>
     ) {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
             mainViewModel.uiEvent
@@ -79,16 +81,15 @@ internal class FragmentHelper {
                     Log.d(logTag, "UiEvent_Collect(): $event")
                     event ?: return@collect
 
-                    onUiEventReceived(event)
+                    handler.onMainUiEventReceived(event)
                 }
         }
     }
 
-    // TODO:Ui層のアクセス修飾子をpublicに変更してから、引数onCommonUiEventReceivedをCommonUiEventHandlerに変更して分岐処理を本メソッドに記述
     fun <E: UiEvent> setUpCommonUiEvent(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>,
-        onCommonUiEventReceived: (CommonUiEvent) -> Unit
+        handler: CommonUiEventHandler
     ) {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
             mainViewModel.commonUiEvent
@@ -97,7 +98,14 @@ internal class FragmentHelper {
                     Log.d(logTag, "Common_UiEvent_Collect(): $event")
                     event ?: return@collect
 
-                    onCommonUiEventReceived(event)
+                    when (event) {
+                        is CommonUiEvent.NavigatePreviousFragment<*> -> {
+                            handler.onNavigatePreviousFragmentEventReceived(event.result)
+                        }
+                        is CommonUiEvent.NavigateAppMessage -> {
+                            handler.onNavigateAppMessageEventReceived(event.message)
+                        }
+                    }
                 }
         }
     }

@@ -14,8 +14,9 @@ import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHandler
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.MainUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -29,7 +30,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
-abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
+abstract class BaseFragment<T: ViewBinding, E : UiEvent>
+    : LoggingFragment(), MainUiEventHandler<E>, CommonUiEventHandler {
 
     // View関係
     private var _binding: T? = null
@@ -187,32 +189,18 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
             .setUpMainUiEvent(
                 this,
                 mainViewModel,
-                ::onMainUiEventReceived
+                this
             )
     }
-
-    internal abstract fun onMainUiEventReceived(event: E)
 
     private fun observeCommonUiEvent() {
         fragmentHelper
             .setUpCommonUiEvent(
                 this,
-                mainViewModel
-            ) { event ->
-                when (event) {
-                    is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                        onNavigatePreviousFragmentEventReceived(event.result)
-                    }
-                    is CommonUiEvent.NavigateAppMessage -> {
-                        onNavigateAppMessageEventReceived(event.message)
-                    }
-                }
-            }
+                mainViewModel,
+                this
+            )
     }
-
-    internal abstract fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>)
-
-    internal abstract fun onNavigateAppMessageEventReceived(appMessage: AppMessage)
 
     private fun observePendingNavigation() {
         fragmentHelper
