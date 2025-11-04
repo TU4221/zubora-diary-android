@@ -42,8 +42,8 @@ internal class DiaryShowViewModel @Inject constructor(
 
     companion object {
         // 呼び出し元のFragmentから受け取る引数のキー
-        private const val ID_ARGUMENT_KEY = "load_diary_id"
-        private const val DATE_ARGUMENT_KEY = "load_diary_date"
+        private const val ARGUMENT_DIARY_ID_KEY = "diary_id"
+        private const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
     }
 
     override val isReadyForOperation
@@ -67,8 +67,8 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     private fun initializeDiaryData() {
-        val id = handle.get<String>(ID_ARGUMENT_KEY)?.let { DiaryId(it) } ?: throw IllegalArgumentException()
-        val date = handle.get<LocalDate>(DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
+        val id = handle.get<String>(ARGUMENT_DIARY_ID_KEY)?.let { DiaryId(it) } ?: throw IllegalArgumentException()
+        val date = handle.get<LocalDate>(ARGUMENT_DIARY_DATE_KEY) ?: throw IllegalArgumentException()
         launchWithUnexpectedErrorHandler {
             loadSavedDiary(id, date)
         }

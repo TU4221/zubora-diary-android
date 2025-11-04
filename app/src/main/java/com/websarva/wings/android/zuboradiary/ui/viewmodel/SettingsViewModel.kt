@@ -72,7 +72,7 @@ internal class SettingsViewModel @Inject constructor(
     private val deleteAllDiariesUseCase: DeleteAllDiariesUseCase,
     private val deleteAllDataUseCase: DeleteAllDataUseCase,
 ) : BaseViewModel<SettingsUiEvent, SettingsAppMessage, SettingsUiState>(
-    handle.get<SettingsUiState>(SAVED_UI_STATE_KEY)?.copy(
+    handle.get<SettingsUiState>(SAVED_STATE_UI_KEY)?.copy(
         isProcessing = false,
         isInputDisabled = false
     ) ?: SettingsUiState()
@@ -86,7 +86,7 @@ internal class SettingsViewModel @Inject constructor(
     //      このような問題は発生しない。各フラグメントにDateSourceからの読込完了条件をいれるとコルーチンを使用する等の
     //      複雑な処理になるため、SavedStateHandleで対応する。
     companion object {
-        private const val SAVED_UI_STATE_KEY = "uiState"
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 
     init {
@@ -113,7 +113,7 @@ internal class SettingsViewModel @Inject constructor(
 
     private fun collectUiState() {
         uiState.onEach {
-            handle[SAVED_UI_STATE_KEY] = it
+            handle[SAVED_STATE_UI_KEY] = it
         }.launchIn(viewModelScope)
     }
 

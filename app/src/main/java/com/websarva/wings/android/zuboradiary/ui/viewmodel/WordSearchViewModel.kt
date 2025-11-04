@@ -45,7 +45,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val loadAdditionWordSearchResultListUseCase: LoadAdditionWordSearchResultListUseCase,
     private val refreshWordSearchResultListUseCase: RefreshWordSearchResultListUseCase
 ) : BaseViewModel<WordSearchUiEvent, WordSearchAppMessage, WordSearchUiState>(
-    handle.get<WordSearchUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
+    handle.get<WordSearchUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         WordSearchUiState().copy(
             searchWord = savedUiState.searchWord,
             numWordSearchResults = savedUiState.numWordSearchResults,
@@ -55,7 +55,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 ) {
 
     companion object {
-        private const val SAVED_UI_STATE_KEY = "uiState"
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 
     private val initialWordSearchResultListLoadJob: Job? = null
@@ -74,7 +74,7 @@ internal class WordSearchViewModel @Inject internal constructor(
 
     private fun checkForRestoration() {
         updateIsRestoringFromProcessDeath(
-            handle.contains(SAVED_UI_STATE_KEY)
+            handle.contains(SAVED_STATE_UI_KEY)
         )
     }
 
@@ -87,7 +87,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private fun collectUiState() {
         uiState.onEach {
             Log.d(logTag, it.toString())
-            handle[SAVED_UI_STATE_KEY] = it
+            handle[SAVED_STATE_UI_KEY] = it
         }.launchIn(viewModelScope)
     }
 

@@ -41,7 +41,7 @@ internal class CalendarViewModel @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
 ) : BaseViewModel<CalendarUiEvent, CalendarAppMessage, CalendarUiState>(
-    handle.get<CalendarUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
+    handle.get<CalendarUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         CalendarUiState().copy(
             calendarStartDayOfWeek = savedUiState.calendarStartDayOfWeek,
             selectedDate = savedUiState.selectedDate,
@@ -51,7 +51,7 @@ internal class CalendarViewModel @Inject constructor(
 ) {
 
     companion object {
-        private const val SAVED_UI_STATE_KEY = "uiState"
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 
     override val isReadyForOperation
@@ -82,7 +82,7 @@ internal class CalendarViewModel @Inject constructor(
     private fun collectUiStateForSaveStateToHandle() {
         uiState.onEach { 
             Log.d(logTag, it.toString())
-            handle[SAVED_UI_STATE_KEY] = it
+            handle[SAVED_STATE_UI_KEY] = it
         }.launchIn(viewModelScope)
     }
 

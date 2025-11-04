@@ -61,7 +61,7 @@ internal class DiaryListViewModel @Inject constructor(
     private val loadDiaryListStartYearMonthPickerDateRangeUseCase: LoadDiaryListStartYearMonthPickerDateRangeUseCase,
     private val buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
 ) : BaseViewModel<DiaryListUiEvent, DiaryListAppMessage, DiaryListUiState>(
-    handle.get<DiaryListUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
+    handle.get<DiaryListUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         DiaryListUiState().copy(
             diaryList = savedUiState.diaryList,
             sortConditionDate = savedUiState.sortConditionDate
@@ -70,7 +70,7 @@ internal class DiaryListViewModel @Inject constructor(
 ) {
 
     companion object {
-        private const val SAVED_UI_STATE_KEY = "uiState"
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 
     private var diaryListLoadJob: Job? = null // キャンセル用
@@ -92,7 +92,7 @@ internal class DiaryListViewModel @Inject constructor(
 
     private fun checkForRestoration() {
         updateIsRestoringFromProcessDeath(
-            handle.contains(SAVED_UI_STATE_KEY)
+            handle.contains(SAVED_STATE_UI_KEY)
         )
     }
 
@@ -104,7 +104,7 @@ internal class DiaryListViewModel @Inject constructor(
     private fun collectUiState() {
         uiState.onEach {
             Log.d(logTag, it.toString())
-            handle[SAVED_UI_STATE_KEY] = it
+            handle[SAVED_STATE_UI_KEY] = it
         }.launchIn(viewModelScope)
     }
 

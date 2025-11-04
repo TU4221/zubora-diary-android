@@ -83,7 +83,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val cacheDiaryImageUseCase: CacheDiaryImageUseCase,
     private val clearDiaryImageCacheFileUseCase: ClearDiaryImageCacheFileUseCase
 ) : BaseViewModel<DiaryEditUiEvent, DiaryEditAppMessage, DiaryEditUiState>(
-    handle.get<DiaryEditUiState>(SAVED_UI_STATE_KEY)?.copy(
+    handle.get<DiaryEditUiState>(SAVED_STATE_UI_KEY)?.copy(
         isProcessing = false,
         isInputDisabled = false
     ) ?: DiaryEditUiState(editingDiary = Diary.generate().toUiModel())
@@ -91,12 +91,12 @@ internal class DiaryEditViewModel @Inject constructor(
 
     companion object {
         // 呼び出し元のFragmentから受け取る引数のキー
-        private const val DIARY_ID_ARGUMENT_KEY = "load_diary_id"
-        private const val DIARY_DATE_ARGUMENT_KEY = "load_diary_date"
+        private const val ARGUMENT_DIARY_ID_KEY = "diary_id"
+        private const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
 
         // ViewModel状態保存キー
         // MEMO:システムの初期化によるプロセスの終了から(アプリ設定変更からのアプリ再起動時)の復元用
-        private const val SAVED_UI_STATE_KEY = "uiState"
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 
     override val isReadyForOperation
@@ -131,10 +131,10 @@ internal class DiaryEditViewModel @Inject constructor(
 
     private fun initializeDiaryData() {
         // MEMO:下記条件はアプリ設定変更時のアプリ再起動時の不要初期化対策
-        if (handle.contains(SAVED_UI_STATE_KEY)) return
-        val id = handle.get<String>(DIARY_ID_ARGUMENT_KEY)?.let { DiaryId(it) }
+        if (handle.contains(SAVED_STATE_UI_KEY)) return
+        val id = handle.get<String>(ARGUMENT_DIARY_ID_KEY)?.let { DiaryId(it) }
         val date =
-            handle.get<LocalDate>(DIARY_DATE_ARGUMENT_KEY) ?: throw IllegalArgumentException()
+            handle.get<LocalDate>(ARGUMENT_DIARY_DATE_KEY) ?: throw IllegalArgumentException()
         launchWithUnexpectedErrorHandler {
             prepareDiaryEntry(
                 id,
@@ -155,7 +155,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun collectUiState() {
         uiState.onEach {
             Log.d(logTag, it.toString())
-            handle[SAVED_UI_STATE_KEY] = it
+            handle[SAVED_STATE_UI_KEY] = it
         }.launchIn(viewModelScope)
     }
 

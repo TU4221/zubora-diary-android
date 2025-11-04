@@ -40,7 +40,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
 ) : BaseViewModel<DiaryItemTitleEditUiEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditUiState>(
-    handle.get<DiaryItemTitleEditUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
+    handle.get<DiaryItemTitleEditUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         DiaryItemTitleEditUiState().copy(
             itemNumber = savedUiState.itemNumber,
             title = savedUiState.title,
@@ -53,7 +53,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         private const val DIARY_ITEM_TITLE_ARGUMENT_KEY = "diary_item_title"
 
         // ViewModel状態保存キー
-        private const val SAVED_UI_STATE_KEY = "uiState"
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 
     // キャッシュパラメータ
@@ -65,7 +65,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     }
 
     private fun setUpTitle() {
-        if (handle.contains(SAVED_UI_STATE_KEY)) return
+        if (handle.contains(SAVED_STATE_UI_KEY)) return
 
         val diaryItemTitleSelection =
             handle.get<DiaryItemTitleSelectionUi>(DIARY_ITEM_TITLE_ARGUMENT_KEY)
@@ -83,7 +83,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private fun collectUiState() {
         uiState.onEach {
             Log.d(logTag, it.toString())
-            handle[SAVED_UI_STATE_KEY] = it
+            handle[SAVED_STATE_UI_KEY] = it
         }.launchIn(viewModelScope)
     }
 

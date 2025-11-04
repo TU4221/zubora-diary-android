@@ -41,7 +41,7 @@ internal class MainActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     companion object {
-        private const val SAVED_UI_STATE_KEY = "uiState"
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 
     private val _activityUiEvent = MutableSharedFlow<ConsumableEvent<MainActivityUiEvent>>(replay = 1)
@@ -52,7 +52,7 @@ internal class MainActivityViewModel @Inject constructor(
     val activityCallbackUiEvent get() = _activityCallbackUiEvent.asSharedFlow()
 
     private val _uiState = MutableStateFlow(
-        handle.get<MainActivityUiState>(SAVED_UI_STATE_KEY)?.let { savedUiState ->
+        handle.get<MainActivityUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
             MainActivityUiState().copy(
                 themeColor = savedUiState.themeColor,
                 isBottomNavigationVisible = savedUiState.isBottomNavigationVisible
@@ -82,7 +82,7 @@ internal class MainActivityViewModel @Inject constructor(
     private fun collectUiState() {
         _uiState.onEach {
             Log.d(logTag, it.toString())
-            handle[SAVED_UI_STATE_KEY] = it
+            handle[SAVED_STATE_UI_KEY] = it
         }.launchIn(viewModelScope)
     }
 
