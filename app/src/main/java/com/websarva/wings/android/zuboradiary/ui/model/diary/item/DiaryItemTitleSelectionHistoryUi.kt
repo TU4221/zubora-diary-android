@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
 
 @Parcelize
-internal data class DiaryItemTitleSelectionHistoryUi(
+data class DiaryItemTitleSelectionHistoryUi(
     val id: String,
     val title: String,
     val log: LocalDateTime

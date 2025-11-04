@@ -5,7 +5,7 @@ import kotlinx.parcelize.Parcelize
 import java.time.YearMonth
 
 @Parcelize
-internal sealed class DiaryYearMonthListItemUi<T : DiaryDayListItemUi> : Parcelable {
+sealed class DiaryYearMonthListItemUi<T : DiaryDayListItemUi> : Parcelable {
 
     data class Diary<T : DiaryDayListItemUi>(
         val yearMonth: YearMonth,

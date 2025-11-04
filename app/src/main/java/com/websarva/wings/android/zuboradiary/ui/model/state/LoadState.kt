@@ -9,7 +9,7 @@ import kotlinx.parcelize.Parcelize
  * @param T 読み込むデータの型。必ず [android.os.Parcelable] である必要がある。
  */
 @Parcelize
-internal sealed class LoadState<out T : Parcelable> : Parcelable {
+sealed class LoadState<out T : Parcelable> : Parcelable {
     /**
      * 初期状態、またはまだ読み込みが開始されていない状態。
      */

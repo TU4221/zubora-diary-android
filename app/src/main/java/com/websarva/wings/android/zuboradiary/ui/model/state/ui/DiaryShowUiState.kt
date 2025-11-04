@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal data class DiaryShowUiState(
+data class DiaryShowUiState(
     // UiData
     override val diaryLoadState: LoadState<DiaryUi> = LoadState.Idle,
     override val diaryImageFilePath: FilePathUi? = null,

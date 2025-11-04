@@ -7,7 +7,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal data class DiaryItemTitleEditUiState(
+data class DiaryItemTitleEditUiState(
     // UiData
     val itemNumber: Int = 1,
     val title: String = "",

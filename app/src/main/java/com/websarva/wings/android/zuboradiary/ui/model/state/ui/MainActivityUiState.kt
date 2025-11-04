@@ -5,7 +5,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal data class MainActivityUiState(
+data class MainActivityUiState(
     // UiData
     val themeColor: ThemeColorUi? = null,
 

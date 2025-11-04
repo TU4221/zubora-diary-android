@@ -6,7 +6,7 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal sealed class CommonAppMessage : AppMessage {
+sealed class CommonAppMessage : AppMessage {
 
     class Unexpected(val exception: Exception) : CommonAppMessage() {
 

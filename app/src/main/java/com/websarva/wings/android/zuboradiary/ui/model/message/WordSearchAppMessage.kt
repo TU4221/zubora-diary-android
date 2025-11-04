@@ -5,7 +5,7 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal sealed class WordSearchAppMessage : AppMessage {
+sealed class WordSearchAppMessage : AppMessage {
 
     data object SearchResultListLoadFailure : WordSearchAppMessage() {
         @IgnoredOnParcel

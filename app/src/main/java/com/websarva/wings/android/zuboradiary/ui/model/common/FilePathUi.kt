@@ -5,7 +5,7 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal sealed class FilePathUi : Parcelable {
+sealed class FilePathUi : Parcelable {
 
     abstract val path: String
 

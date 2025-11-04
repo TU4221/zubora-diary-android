@@ -5,7 +5,7 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal sealed class MainActivityAppMessage : AppMessage {
+sealed class MainActivityAppMessage : AppMessage {
 
     data object SettingsLoadFailure : MainActivityAppMessage() {
         @IgnoredOnParcel

@@ -5,7 +5,7 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal sealed class DiaryItemTitleEditAppMessage : AppMessage {
+sealed class DiaryItemTitleEditAppMessage : AppMessage {
 
     data object ItemTitleHistoryLoadFailure : DiaryItemTitleEditAppMessage() {
         @IgnoredOnParcel

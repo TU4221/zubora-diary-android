@@ -6,7 +6,7 @@ import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
 @Parcelize
-internal sealed class DiaryDayListItemUi(
+sealed class DiaryDayListItemUi(
     open val id: String,
     open val date: LocalDate
 ) : Parcelable {

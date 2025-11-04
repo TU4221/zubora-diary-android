@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.model.navigation
 
 import java.util.UUID
 
-internal data class PendingNavigationCommand (
+data class PendingNavigationCommand (
     val command: NavigationCommand,
     val id: UUID = UUID.randomUUID(),
     val currentRetryCount: Int = 0,

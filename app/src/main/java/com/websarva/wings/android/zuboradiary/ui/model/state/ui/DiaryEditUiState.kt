@@ -12,7 +12,7 @@ import java.time.LocalDate
 
 // TODO:初期化はstaticメソッドでやる
 @Parcelize
-internal data class DiaryEditUiState(
+data class DiaryEditUiState(
     // UiData
     val originalDiaryLoadState: LoadState<DiaryUi> = LoadState.Idle,
     val editingDiary: DiaryUi,

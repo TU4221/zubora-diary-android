@@ -26,7 +26,7 @@ import java.time.LocalDateTime
  * @property imageFileName 日記に添付した画像ファイル名。未添付の場合 `null`。
  */
 @Parcelize
-internal data class DiaryUi(
+data class DiaryUi(
     val id: String,
     val date: LocalDate,
     val log: LocalDateTime,

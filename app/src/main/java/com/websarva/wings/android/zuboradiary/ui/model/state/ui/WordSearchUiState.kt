@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonth
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal data class WordSearchUiState(
+data class WordSearchUiState(
     // UiData
     val searchWord: String = "",
     val numWordSearchResults: Int = 0,

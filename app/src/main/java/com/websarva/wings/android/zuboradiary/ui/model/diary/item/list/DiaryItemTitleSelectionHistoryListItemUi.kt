@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal data class DiaryItemTitleSelectionHistoryListItemUi(
+data class DiaryItemTitleSelectionHistoryListItemUi(
     val id: String,
     val title: String
 ) : Parcelable

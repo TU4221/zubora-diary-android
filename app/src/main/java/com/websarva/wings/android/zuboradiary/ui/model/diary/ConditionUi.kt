@@ -9,7 +9,7 @@ import java.util.Arrays
 //      その為、@Suppress("RedundantSuppression")で警告回避。
 @Suppress("RedundantSuppression")
 // MEMO:constructorは直接使用されていないが必要な為、@Suppressで警告回避。
-internal enum class ConditionUi @Suppress("unused") constructor(
+enum class ConditionUi @Suppress("unused") constructor(
     val number: Int
 ) : Parcelable {
 

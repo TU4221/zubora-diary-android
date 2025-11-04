@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal data class DiaryItemTitleSelectionHistoryListUi(
+data class DiaryItemTitleSelectionHistoryListUi(
     val itemList: List<DiaryItemTitleSelectionHistoryListItemUi>
 ) : Parcelable {
     val isEmpty

@@ -4,7 +4,7 @@ import android.content.Context
 import android.os.Parcelable
 import androidx.annotation.StringRes
 
-internal sealed interface AppMessage : Parcelable {
+sealed interface AppMessage : Parcelable {
 
     @get:StringRes
     val dialogTitleStringResId: Int

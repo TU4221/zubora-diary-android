@@ -9,7 +9,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 @Parcelize
-internal data class CalendarUiState(
+data class CalendarUiState(
     // UiData
     val calendarStartDayOfWeek: DayOfWeek = DayOfWeek.SUNDAY,
     val selectedDate: LocalDate = LocalDate.now(),

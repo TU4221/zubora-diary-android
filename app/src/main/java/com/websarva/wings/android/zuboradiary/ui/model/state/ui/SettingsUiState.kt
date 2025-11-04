@@ -7,7 +7,7 @@ import java.time.DayOfWeek
 import java.time.LocalTime
 
 @Parcelize
-internal data class SettingsUiState(
+data class SettingsUiState(
     // UiData
     val themeColor: ThemeColorUi? = null,
     val calendarStartDayOfWeek: DayOfWeek? = null,

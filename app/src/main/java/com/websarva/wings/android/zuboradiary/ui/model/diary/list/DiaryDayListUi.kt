@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-internal data class DiaryDayListUi<T: DiaryDayListItemUi>(
+data class DiaryDayListUi<T: DiaryDayListItemUi>(
     val itemList: List<T>
 ) : Parcelable {
 

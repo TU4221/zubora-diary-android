@@ -4,7 +4,7 @@ import java.io.Serializable
 
 // MEMO:Parcelableを実装するとポジティブデータの型(ジェネリクスの型)がParcelableのみしか受け付けなくなるため、
 //      Serializableで対応。
-internal sealed class DialogResult<out T> : NavigationResult, Serializable {
+sealed class DialogResult<out T> : NavigationResult, Serializable {
 
     data class Positive<out T>(
         val data: T

@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.model.event
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 
-internal sealed class CommonUiEvent : UiEvent {
+sealed class CommonUiEvent : UiEvent {
     data class NavigatePreviousFragment<T>(
         val result: FragmentResult<T> = FragmentResult.None
     ) : CommonUiEvent()

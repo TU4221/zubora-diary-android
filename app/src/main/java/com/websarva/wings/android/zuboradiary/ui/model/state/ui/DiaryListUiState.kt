@@ -7,7 +7,7 @@ import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
 @Parcelize
-internal data class DiaryListUiState(
+data class DiaryListUiState(
     // UiData
     val diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard> = DiaryYearMonthListUi(),
     val sortConditionDate: LocalDate? = null,
