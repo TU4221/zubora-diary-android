@@ -10,7 +10,7 @@ class DatePickerDialogFragment : BaseDatePickerDialogFragment() {
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + DatePickerDialogFragment::class.java.name
+        val RESULT_KEY = RESULT_KEY_PREFIX + DatePickerDialogFragment::class.java.name
     }
 
     override fun createInitialDate(): LocalDate {
@@ -18,14 +18,14 @@ class DatePickerDialogFragment : BaseDatePickerDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick(selectedDate: LocalDate) {
-        setResult(KEY_RESULT, DialogResult.Positive(selectedDate))
+        setResult(RESULT_KEY, DialogResult.Positive(selectedDate))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResult(KEY_RESULT, DialogResult.Negative)
+        setResult(RESULT_KEY, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_RESULT, DialogResult.Cancel)
+        setResult(RESULT_KEY, DialogResult.Cancel)
     }
 }

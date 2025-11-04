@@ -11,7 +11,7 @@ class DiaryListDeleteDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryListDeleteDialogFragment::class.java.name
+        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryListDeleteDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
@@ -25,14 +25,14 @@ class DiaryListDeleteDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick() {
-        setResult(KEY_RESULT, DialogResult.Positive(Unit))
+        setResult(RESULT_KEY, DialogResult.Positive(Unit))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResult(KEY_RESULT, DialogResult.Negative)
+        setResult(RESULT_KEY, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_RESULT, DialogResult.Cancel)
+        setResult(RESULT_KEY, DialogResult.Cancel)
     }
 }

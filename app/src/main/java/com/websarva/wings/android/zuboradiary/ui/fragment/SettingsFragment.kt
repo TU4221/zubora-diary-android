@@ -134,7 +134,7 @@ class SettingsFragment :
     // テーマカラー設定ダイアログフラグメントから結果受取
     private fun receiveThemeColorPickerDialogResult() {
         setUpDialogResultReceiver(
-            ThemeColorPickerDialogFragment.KEY_RESULT
+            ThemeColorPickerDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onThemeColorSettingDialogResultReceived(result)
         }
@@ -143,7 +143,7 @@ class SettingsFragment :
     // カレンダー開始曜日設定ダイアログフラグメントから結果受取
     private fun receiveCalendarStartDayPickerDialogResult() {
         setUpDialogResultReceiver(
-            CalendarStartDayPickerDialogFragment.KEY_RESULT
+            CalendarStartDayPickerDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onCalendarStartDayOfWeekSettingDialogResultReceived(result)
         }
@@ -152,7 +152,7 @@ class SettingsFragment :
     // リマインダー通知時間設定ダイアログフラグメントから結果受取
     private fun receiveReminderNotificationTimePickerDialogResult() {
         setUpDialogResultReceiver(
-            ReminderNotificationTimePickerDialogFragment.KEY_RESULT
+            ReminderNotificationTimePickerDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onReminderNotificationSettingDialogResultReceived(result)
         }
@@ -161,7 +161,7 @@ class SettingsFragment :
     // 権限催促ダイアログフラグメントから結果受取
     private fun receivePermissionDialogResult() {
         setUpDialogResultReceiver(
-            PermissionDialogFragment.KEY_RESULT
+            PermissionDialogFragment.RESULT_KEY
         ) { result: DialogResult<Unit> ->
             mainViewModel.onPermissionDialogResultReceived(result)
         }
@@ -169,7 +169,7 @@ class SettingsFragment :
 
     private fun receiveAllDiariesDeleteDialogResult() {
         setUpDialogResultReceiver(
-            AllDiariesDeleteDialogFragment.KEY_RESULT
+            AllDiariesDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onAllDiariesDeleteDialogResultReceived(result)
         }
@@ -177,7 +177,7 @@ class SettingsFragment :
 
     private fun receiveAllSettingsInitializationDialogResult() {
         setUpDialogResultReceiver(
-            AllSettingsInitializationDialogFragment.KEY_RESULT
+            AllSettingsInitializationDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onAllSettingsInitializationDialogResultReceived(result)
         }
@@ -185,7 +185,7 @@ class SettingsFragment :
 
     private fun receiveAllDataDeleteDialogResult() {
         setUpDialogResultReceiver(
-            AllDataDeleteDialogFragment.KEY_RESULT
+            AllDataDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onAllDataDeleteDialogResultReceived(result)
         }

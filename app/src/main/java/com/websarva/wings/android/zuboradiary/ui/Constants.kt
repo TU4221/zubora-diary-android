@@ -13,8 +13,8 @@ package com.websarva.wings.android.zuboradiary.ui
  * class MyFragment : Fragment() {
  *     companion object {
  *         @JvmField
- *         val KEY_RESULT = RESULT_KEY_PREFIX + MyFragment::class.java.name
+ *         val RESULT_KEY = RESULT_KEY_PREFIX + MyFragment::class.java.name
  *     }
  *}
  */
-const val RESULT_KEY_PREFIX = "ResultFrom_"
+const val RESULT_KEY_PREFIX = "result_from_"

@@ -11,7 +11,7 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + StartYearMonthPickerDialogFragment::class.java.name
+        val RESULT_KEY = RESULT_KEY_PREFIX + StartYearMonthPickerDialogFragment::class.java.name
     }
 
     override fun handleOnPositiveButtonClick(
@@ -28,15 +28,15 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
     ) {
         val selectedYearMonth = YearMonth.of(yearPickerValue, monthPickerValue)
 
-        setResult(KEY_RESULT, DialogResult.Positive(selectedYearMonth))
+        setResult(RESULT_KEY, DialogResult.Positive(selectedYearMonth))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResult(KEY_RESULT, DialogResult.Negative)
+        setResult(RESULT_KEY, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_RESULT, DialogResult.Cancel)
+        setResult(RESULT_KEY, DialogResult.Cancel)
     }
 
     override fun setUpNumberPickers() {

@@ -73,7 +73,7 @@ class DiaryListFragment :
     // 日付入力ダイアログフラグメントから結果受取
     private fun setUpDatePickerDialogResultReceiver() {
         setUpDialogResultReceiver(
-            StartYearMonthPickerDialogFragment.KEY_RESULT
+            StartYearMonthPickerDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDatePickerDialogResultReceived(result)
         }
@@ -82,7 +82,7 @@ class DiaryListFragment :
     // 日記削除ダイアログフラグメントから結果受取
     private fun setUpDiaryDeleteDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryListDeleteDialogFragment.KEY_RESULT
+            DiaryListDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryDeleteDialogResultReceived(result)
         }

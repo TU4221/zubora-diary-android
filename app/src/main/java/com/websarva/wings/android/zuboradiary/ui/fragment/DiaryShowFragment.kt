@@ -24,7 +24,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
 
     internal companion object {
         // Navigation関係
-        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
+        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
     }
 
     override val destinationId = R.id.navigation_diary_show_fragment
@@ -60,7 +60,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     // 日記読込失敗確認ダイアログフラグメントからデータ受取
     private fun setUpDiaryLoadFailureDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryLoadFailureDialogFragment.KEY_RESULT
+            DiaryLoadFailureDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryLoadFailureDialogResultReceived(result)
         }
@@ -69,7 +69,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     // 日記削除確認ダイアログフラグメントからデータ受取
     private fun setUpDiaryDeleteDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryDeleteDialogFragment.KEY_RESULT
+            DiaryDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryDeleteDialogResultReceived(result)
         }
@@ -87,16 +87,16 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
                 navigateDiaryDeleteDialog(event.date)
             }
             is DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryDeleted -> {
-                navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
+                navigatePreviousFragmentWithRetry(RESULT_KEY, event.result)
             }
             is DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryLoadFailed -> {
-                navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
+                navigatePreviousFragmentWithRetry(RESULT_KEY, event.result)
             }
         }
     }
 
     override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
-        navigatePreviousFragmentOnce(KEY_RESULT, result)
+        navigatePreviousFragmentOnce(RESULT_KEY, result)
     }
 
     override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {

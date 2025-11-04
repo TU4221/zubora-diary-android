@@ -53,7 +53,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     internal companion object {
         // Navigation関係
-        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
+        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
     }
 
     private val motionLayoutTransitionTime = 500 /*ms*/
@@ -131,7 +131,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     // DiaryItemTitleEditFragmentから編集結果受取
     private fun setUpDiaryItemTitleEditFragmentResultReceiver() {
         setUpFragmentResultReceiver(
-            DiaryItemTitleEditDialog.KEY_RESULT
+            DiaryItemTitleEditDialog.RESULT_KEY
         ) { result: FragmentResult<DiaryItemTitleSelectionUi> ->
             mainViewModel.onItemTitleEditFragmentResultReceived(result)
         }
@@ -140,7 +140,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     // 既存日記読込ダイアログフラグメントから結果受取
     private fun setUpDiaryLoadDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryLoadDialogFragment.KEY_RESULT
+            DiaryLoadDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryLoadDialogResultReceived(result)
         }
@@ -149,7 +149,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     // 日記読込失敗確認ダイアログフラグメントから結果受取
     private fun setUpDiaryLoadFailureDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryLoadFailureDialogFragment.KEY_RESULT
+            DiaryLoadFailureDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryLoadFailureDialogResultReceived(result)
         }
@@ -158,7 +158,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     // 既存日記上書きダイアログフラグメントから結果受取
     private fun setUpDiaryUpdateDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryUpdateDialogFragment.KEY_RESULT
+            DiaryUpdateDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryUpdateDialogResultReceived(result)
         }
@@ -167,7 +167,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     // 既存日記上書きダイアログフラグメントから結果受取
     private fun setUpDiaryDeleteDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryDeleteDialogFragment.KEY_RESULT
+            DiaryDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryDeleteDialogResultReceived(result)
         }
@@ -176,7 +176,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     // 日付入力ダイアログフラグメントからデータ受取
     private fun setUpDatePickerDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DatePickerDialogFragment.KEY_RESULT
+            DatePickerDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDatePickerDialogResultReceived(result)
         }
@@ -185,7 +185,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     // 天気情報読込ダイアログフラグメントから結果受取
     private fun setUpWeatherInfoFetchDialogResultReceiver() {
         setUpDialogResultReceiver(
-            WeatherInfoFetchDialogFragment.KEY_RESULT
+            WeatherInfoFetchDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onWeatherInfoFetchDialogResultReceived(result)
         }
@@ -194,7 +194,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     // 項目削除確認ダイアログフラグメントから結果受取
     private fun setUpDiaryItemDeleteDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryItemDeleteDialogFragment.KEY_RESULT
+            DiaryItemDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryItemDeleteDialogResultReceived(result)
         }
@@ -202,7 +202,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     private fun setUpDiaryImageDeleteDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryImageDeleteDialogFragment.KEY_RESULT
+            DiaryImageDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryImageDeleteDialogResultReceived(result)
         }
@@ -210,7 +210,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     private fun setUpExitWithoutDiarySaveDialogResultReceiver() {
         setUpDialogResultReceiver(
-            ExitWithoutDiarySaveDialogFragment.KEY_RESULT
+            ExitWithoutDiarySaveDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onExitWithoutDiarySaveDialogResultReceived(result)
         }
@@ -255,7 +255,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 navigatePreviousFragmentOnDiaryDelete(event.result)
             }
             is DiaryEditUiEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed -> {
-                navigatePreviousFragmentWithRetry(KEY_RESULT, event.result)
+                navigatePreviousFragmentWithRetry(RESULT_KEY, event.result)
             }
             is DiaryEditUiEvent.UpdateDiaryItemLayout -> {
                 setUpItemsLayout(event.numVisibleItems)
@@ -276,7 +276,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
-        navigatePreviousFragmentOnce(KEY_RESULT, result)
+        navigatePreviousFragmentOnce(RESULT_KEY, result)
     }
 
     override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
@@ -754,7 +754,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             NavigationCommand.PopTo(
                 destinationId,
                 false,
-                KEY_RESULT,
+                RESULT_KEY,
                 result
             )
         )

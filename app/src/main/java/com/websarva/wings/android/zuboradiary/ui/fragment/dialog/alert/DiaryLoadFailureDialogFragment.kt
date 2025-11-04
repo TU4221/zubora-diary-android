@@ -11,7 +11,7 @@ class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryLoadFailureDialogFragment::class.java.name
+        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryLoadFailureDialogFragment::class.java.name
     }
 
     override fun createTitle(): String {
@@ -26,7 +26,7 @@ class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnPositiveButtonClick() {
-        setResult(KEY_RESULT, DialogResult.Positive(Unit))
+        setResult(RESULT_KEY, DialogResult.Positive(Unit))
     }
 
     override fun handleOnNegativeButtonClick() {
@@ -34,7 +34,7 @@ class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_RESULT, DialogResult.Cancel)
+        setResult(RESULT_KEY, DialogResult.Cancel)
     }
 
     override fun customizeDialog(builder: MaterialAlertDialogBuilder) {

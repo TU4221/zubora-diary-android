@@ -29,7 +29,7 @@ class DiaryItemTitleEditDialog :
 
     internal companion object {
         // Navigation関係
-        val KEY_RESULT = RESULT_KEY_PREFIX + DiaryItemTitleEditDialog::class.java.name
+        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryItemTitleEditDialog::class.java.name
     }
 
     override val destinationId = R.id.navigation_diary_item_title_edit_dialog
@@ -67,7 +67,7 @@ class DiaryItemTitleEditDialog :
     // 履歴項目削除確認ダイアログからの結果受取
     private fun setUpDiaryItemTitleDeleteDialogResultReceiver() {
         setUpDialogResultReceiver(
-            DiaryItemTitleDeleteDialogFragment.KEY_RESULT
+            DiaryItemTitleDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(result)
         }
@@ -133,7 +133,7 @@ class DiaryItemTitleEditDialog :
     private fun completeItemTitleEdit(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
         val navBackStackEntry = checkNotNull(findNavController().previousBackStackEntry)
         val savedStateHandle = navBackStackEntry.savedStateHandle
-        savedStateHandle[KEY_RESULT] = FragmentResult.Some(diaryItemTitleSelection)
+        savedStateHandle[RESULT_KEY] = FragmentResult.Some(diaryItemTitleSelection)
         navigatePreviousFragment()
     }
 

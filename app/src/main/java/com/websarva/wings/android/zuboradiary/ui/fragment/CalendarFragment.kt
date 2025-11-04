@@ -81,7 +81,7 @@ class CalendarFragment :
 
     private fun setUpDiaryShowFragmentResultReceiver() {
         setUpFragmentResultReceiver(
-            DiaryShowFragment.KEY_RESULT
+            DiaryShowFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryShowFragmentResultReceived(result)
         }
@@ -89,7 +89,7 @@ class CalendarFragment :
 
     private fun setUpDiaryEditFragmentResultReceiver() {
         setUpFragmentResultReceiver(
-            DiaryEditFragment.KEY_RESULT
+            DiaryEditFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryEditFragmentResultReceived(result)
         }

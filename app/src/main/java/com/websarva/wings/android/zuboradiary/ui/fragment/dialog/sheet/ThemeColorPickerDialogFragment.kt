@@ -11,7 +11,7 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
 
     companion object {
         @JvmField
-        val KEY_RESULT = RESULT_KEY_PREFIX + ThemeColorPickerDialogFragment::class.java.name
+        val RESULT_KEY = RESULT_KEY_PREFIX + ThemeColorPickerDialogFragment::class.java.name
     }
 
     override fun handleOnPositiveButtonClick(
@@ -27,15 +27,15 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
     ) {
         val selectedThemeColor = ThemeColorUi.entries[pickerValue]
 
-        setResult(KEY_RESULT, DialogResult.Positive(selectedThemeColor))
+        setResult(RESULT_KEY, DialogResult.Positive(selectedThemeColor))
     }
 
     override fun handleOnNegativeButtonClick() {
-        setResult(KEY_RESULT, DialogResult.Negative)
+        setResult(RESULT_KEY, DialogResult.Negative)
     }
 
     override fun handleOnCancel() {
-        setResult(KEY_RESULT, DialogResult.Cancel)
+        setResult(RESULT_KEY, DialogResult.Cancel)
     }
 
     override fun setUpNumberPickers() {
