@@ -58,7 +58,7 @@ internal class FragmentHelper {
         //      NavBackStackEntryのライフサイクルを使用。これにより、結果処理後の画面遷移も適切なタイミングで行える。
         navBackStackEntry.lifecycleScope.launch {
             navBackStackEntry.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                result.filterNotNull().collectLatest { value: R ->
+                result.filterNotNull().collect { value: R ->
                     block(value)
 
                     savedStateHandle[key] = null
@@ -102,7 +102,7 @@ internal class FragmentHelper {
         }
     }
 
-    fun setUpPendingNavigationCollector(
+    fun setUpPendingNavigation(
         navController: NavController,
         navDestinationId: Int,
         mainViewModel: BaseViewModel<out UiEvent, out AppMessage, out UiState>

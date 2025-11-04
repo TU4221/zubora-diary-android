@@ -138,17 +138,20 @@ class DiaryListFragment :
 
     private fun observeDiaryListItem() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState
-                .map { it.diaryList }.distinctUntilChanged().collect {
-                    updateDiaryList(it)
-                }
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.diaryList == new.diaryList
+            }.map {
+                it.diaryList
+            }.collect {
+                updateDiaryList(it)
+            }
         }
     }
 
     private fun observeDiaryListSwipeEnabled() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.isLoadingOnScrolled.collect {
-                updateDiaryListSwipeEnabled(!it)
+            mainViewModel.isLoadingOnScrolled.map { !it }.collect {
+                updateDiaryListSwipeEnabled(it)
             }
         }
     }

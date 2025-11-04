@@ -285,44 +285,56 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     private fun observeUiState() {
         observeToolbarMenuState()
-        observeWeather1DropdownAdapter()
-        observeWeather2DropdownAdapter()
-        observeConditionDropdownAdapter()
+        observeWeather1DropdownOptions()
+        observeWeather2DropdownOptions()
+        observeConditionDropdownOptions()
     }
 
     private fun observeToolbarMenuState() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState
-                .map { it.isNewDiary }.distinctUntilChanged().collect {
-                    updateToolbarMenuState(!it) // isNewDiaryがfalseの時に有効
-                }
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.isNewDiary == new.isNewDiary
+            }.map {
+                it.isNewDiary
+            }.collect {
+                updateToolbarMenuState(!it) // isNewDiaryがfalseの時に有効
+            }
         }
     }
 
-    private fun observeWeather1DropdownAdapter() {
+    private fun observeWeather1DropdownOptions() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState
-                .map { it.weather1Options }.distinctUntilChanged().collect {
-                    updateWeather1DropdownAdapter(it)
-                }
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.weather1Options == new.weather1Options
+            }.map {
+                it.weather1Options
+            }.collect {
+                updateWeather1DropdownAdapter(it)
+            }
         }
     }
 
-    private fun observeWeather2DropdownAdapter() {
+    private fun observeWeather2DropdownOptions() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState
-                .map { it.weather2Options }.distinctUntilChanged().collect {
-                    updateWeather2DropdownAdapter(it)
-                }
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.weather2Options == new.weather2Options
+            }.map {
+                it.weather2Options
+            }.collect {
+                updateWeather2DropdownAdapter(it)
+            }
         }
     }
 
-    private fun observeConditionDropdownAdapter() {
+    private fun observeConditionDropdownOptions() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState
-                .map { it.conditionOptions }.distinctUntilChanged().collect {
-                    updateConditionDropdownAdapter(it)
-                }
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.conditionOptions == new.conditionOptions
+            }.map {
+                it.conditionOptions
+            }.collect {
+                updateConditionDropdownAdapter(it)
+            }
         }
     }
 

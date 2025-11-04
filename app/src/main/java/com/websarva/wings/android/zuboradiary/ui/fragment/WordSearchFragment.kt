@@ -81,10 +81,13 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
 
     private fun observeWordSearchResultListItem() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState
-                .map { it.wordSearchResultList }.distinctUntilChanged().collect {
-                    updateWordSearchResultList(it)
-                }
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.wordSearchResultList == new.wordSearchResultList
+            }.map {
+                it.wordSearchResultList
+            }.collect {
+                updateWordSearchResultList(it)
+            }
         }
     }
 

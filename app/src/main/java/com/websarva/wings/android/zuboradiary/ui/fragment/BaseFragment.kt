@@ -26,7 +26,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 
 abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
@@ -146,7 +146,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
         initializeFragmentResultReceiver()
         observeUiEvent()
-        setUpPendingNavigationCollector()
+        observePendingNavigation()
         observeProcessingState()
         if (!isNavigationStartFragment) registerOnBackPressedCallback()
     }
@@ -214,9 +214,9 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
     internal abstract fun onNavigateAppMessageEventReceived(appMessage: AppMessage)
 
-    private fun setUpPendingNavigationCollector() {
+    private fun observePendingNavigation() {
         fragmentHelper
-            .setUpPendingNavigationCollector(
+            .setUpPendingNavigation(
                 findNavController(),
                 destinationId,
                 mainViewModel
@@ -225,7 +225,9 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent> : LoggingFragment() {
 
     private fun observeProcessingState() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.map { it.isProcessing }.collectLatest {
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.isProcessing == new.isProcessing
+            }.map { it.isProcessing }.collect {
                 mainActivityViewModel.onFragmentProcessingStateChanged(it)
             }
         }

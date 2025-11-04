@@ -20,9 +20,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 
 @AndroidEntryPoint
@@ -105,11 +103,11 @@ class DiaryItemTitleEditDialog :
 
     private fun observeItemTitleSelectionHistoryListItem() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.map {
-                it.titleSelectionHistoriesLoadState
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.titleSelectionHistoriesLoadState == new.titleSelectionHistoriesLoadState
             }.mapNotNull {
-                (it as? LoadState.Success)?.data
-            }.distinctUntilChanged().collectLatest {
+                (it.titleSelectionHistoriesLoadState as? LoadState.Success)?.data
+            }.collect {
                 itemTitleSelectionHistoryListAdapter.submitList(it.itemList)
             }
         }

@@ -284,10 +284,13 @@ class SettingsFragment :
 
     private fun observeViewColor() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState
-                .map { it.themeColor }.filterNotNull().distinctUntilChanged().collect {
-                    switchViewColor(it)
-                }
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.themeColor == new.themeColor
+            }.map {
+                it.themeColor
+            }.filterNotNull().collect {
+                switchViewColor(it)
+            }
         }
     }
 

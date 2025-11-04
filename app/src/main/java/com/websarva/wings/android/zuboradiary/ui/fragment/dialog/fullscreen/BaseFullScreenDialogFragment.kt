@@ -97,7 +97,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>: BaseSim
 
     private fun setUpPendingNavigationCollector() {
         fragmentHelper
-            .setUpPendingNavigationCollector(
+            .setUpPendingNavigation(
                 findNavController(),
                 destinationId,
                 mainViewModel

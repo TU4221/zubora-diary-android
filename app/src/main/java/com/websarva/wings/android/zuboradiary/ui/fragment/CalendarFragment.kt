@@ -142,22 +142,27 @@ class CalendarFragment :
 
     private fun observeSelectedDate() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState
-                .map { Pair(it.selectedDate, it.previousSelectedDate) }
-                .distinctUntilChanged().collect { (selectedDate, previousSelectedDate) ->
-                    updateCalendarSelectedDate(selectedDate, previousSelectedDate)
-                }
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.selectedDate == new.selectedDate
+                        && old.previousSelectedDate == new.previousSelectedDate
+            }.map {
+                Pair(it.selectedDate, it.previousSelectedDate)
+            }.collect { (selectedDate, previousSelectedDate) ->
+                updateCalendarSelectedDate(selectedDate, previousSelectedDate)
+            }
         }
     }
 
     private fun observeCalendarStartDayOfWeek() {
         launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState
-                .map { it.calendarStartDayOfWeek }
-                .distinctUntilChanged().collect {
-                    // 週の開始曜日が変わった場合は、カレンダー全体を再構成する必要がある
-                    binding.calendar.notifyCalendarChanged()
-                }
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.calendarStartDayOfWeek == new.calendarStartDayOfWeek
+            }.map {
+                it.calendarStartDayOfWeek
+            }.collect {
+                // 週の開始曜日が変わった場合は、カレンダー全体を再構成する必要がある
+                binding.calendar.notifyCalendarChanged()
+            }
         }
     }
 
