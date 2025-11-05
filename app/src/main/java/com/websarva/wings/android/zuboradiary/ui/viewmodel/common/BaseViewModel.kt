@@ -63,7 +63,7 @@ internal abstract class BaseViewModel<S: UiState, E: UiEvent, M: AppMessage>(
     }
     //endregion
 
-    //region Error Handlers
+    //region Error Handling
     /**
      * 予期せぬ例外のハンドリング付きでコルーチンを起動する。
      *
