@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
-import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -57,54 +56,42 @@ class SettingsFragment :
     override val destinationId = R.id.navigation_settings_fragment
 
     // ActivityResultLauncher関係
-    private lateinit var requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>
-    private lateinit var requestAccessLocationPermissionLauncher: ActivityResultLauncher<Array<String>>
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
+    private val requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String> =
+        registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted: Boolean ->
+
+            // 再確認
+            val recheck = requireContext().isPostNotificationsGranted()
+
+            mainViewModel
+                .onRequestPostNotificationsPermissionRationaleResultReceived(
+                    isGranted && recheck
+                )
+        }
+
+    // 位置情報利用権限取得結果処理
+    private val requestAccessLocationPermissionLauncher: ActivityResultLauncher<Array<String>> =
+        registerForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions()
+        ) { o: Map<String, Boolean> ->
+            val isGrantedAccessFineLocation = o[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+            val isGrantedAccessCoarseLocation = o[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+
+            val isGrantedAll = isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
+
+            // 再確認
+            val recheck = requireContext().isAccessLocationGranted()
+
+            mainViewModel
+                .onRequestAccessLocationPermissionRationaleResultReceived(
+                    isGrantedAll && recheck
+                )
+        }
     //endregion
 
     //region Fragment Lifecycle
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        // ActivityResultLauncher設定
-        // 通知権限取得結果処理
-        // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            requestPostNotificationsPermissionLauncher =
-                registerForActivityResult(
-                    ActivityResultContracts.RequestPermission()
-                ) { isGranted: Boolean ->
-
-                    // 再確認
-                    val recheck = requireContext().isPostNotificationsGranted()
-
-                    mainViewModel
-                        .onRequestPostNotificationsPermissionRationaleResultReceived(
-                            isGranted && recheck
-                        )
-                }
-        }
-
-
-        // 位置情報利用権限取得結果処理
-        requestAccessLocationPermissionLauncher =
-            registerForActivityResult(
-                ActivityResultContracts.RequestMultiplePermissions()
-            ) { o: Map<String, Boolean> ->
-                val isGrantedAccessFineLocation = o[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
-                val isGrantedAccessCoarseLocation = o[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
-
-                val isGrantedAll = isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
-
-                // 再確認
-                val recheck = requireContext().isAccessLocationGranted()
-
-                mainViewModel
-                    .onRequestAccessLocationPermissionRationaleResultReceived(
-                        isGrantedAll && recheck
-                    )
-            }
-    }
-
     override fun onStart() {
         super.onStart()
         initializeReminderNotificationSettingFromPermission()
