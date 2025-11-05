@@ -35,7 +35,7 @@ import javax.inject.Inject
 internal class MainActivityViewModel @Inject constructor(
     private val handle: SavedStateHandle,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
-) : BaseViewModel<MainActivityUiEvent, MainActivityAppMessage, MainActivityUiState>(
+) : BaseViewModel<MainActivityUiState, MainActivityUiEvent, MainActivityAppMessage>(
     handle.get<MainActivityUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         MainActivityUiState().copy(
             themeColor = savedUiState.themeColor,

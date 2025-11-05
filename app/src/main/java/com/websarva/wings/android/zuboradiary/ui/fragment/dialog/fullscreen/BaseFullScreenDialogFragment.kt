@@ -19,7 +19,7 @@ import kotlinx.coroutines.CoroutineScope
 abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
     : BaseSimpleFullScreenDialogFragment<T>(), MainUiEventHandler<E>, CommonUiEventHandler {
 
-    internal abstract val mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>
+    internal abstract val mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>
 
     internal abstract val destinationId: Int
 

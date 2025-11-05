@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 
-internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
+internal abstract class BaseViewModel<S: UiState, E: UiEvent, M: AppMessage>(
     initialViewUiState: S
 ) : ViewModel() {
 

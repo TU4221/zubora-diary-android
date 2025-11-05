@@ -39,7 +39,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     private val loadDiaryItemTitleSelectionHistoryListUseCase: LoadDiaryItemTitleSelectionHistoryListUseCase,
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
-) : BaseFragmentViewModel<DiaryItemTitleEditUiEvent, DiaryItemTitleEditAppMessage, DiaryItemTitleEditUiState>(
+) : BaseFragmentViewModel<DiaryItemTitleEditUiState, DiaryItemTitleEditUiEvent, DiaryItemTitleEditAppMessage>(
     handle.get<DiaryItemTitleEditUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         DiaryItemTitleEditUiState().copy(
             itemNumber = savedUiState.itemNumber,

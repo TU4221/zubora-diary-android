@@ -69,7 +69,7 @@ internal class SettingsViewModel @Inject constructor(
     private val updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase,
     private val deleteAllDiariesUseCase: DeleteAllDiariesUseCase,
     private val deleteAllDataUseCase: DeleteAllDataUseCase,
-) : BaseFragmentViewModel<SettingsUiEvent, SettingsAppMessage, SettingsUiState>(
+) : BaseFragmentViewModel<SettingsUiState, SettingsUiEvent, SettingsAppMessage>(
     SettingsUiState()
 ) {
 

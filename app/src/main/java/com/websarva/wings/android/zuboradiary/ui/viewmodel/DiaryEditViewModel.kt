@@ -82,7 +82,7 @@ internal class DiaryEditViewModel @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val cacheDiaryImageUseCase: CacheDiaryImageUseCase,
     private val clearDiaryImageCacheFileUseCase: ClearDiaryImageCacheFileUseCase
-) : BaseFragmentViewModel<DiaryEditUiEvent, DiaryEditAppMessage, DiaryEditUiState>(
+) : BaseFragmentViewModel<DiaryEditUiState, DiaryEditUiEvent, DiaryEditAppMessage>(
     handle.get<DiaryEditUiState>(SAVED_STATE_UI_KEY)?.copy(
         isProcessing = false,
         isInputDisabled = false

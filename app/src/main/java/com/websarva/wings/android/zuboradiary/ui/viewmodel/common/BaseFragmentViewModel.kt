@@ -17,9 +17,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-internal abstract class BaseFragmentViewModel<E: UiEvent, M: AppMessage, S: UiState>(
+internal abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage>(
     initialViewUiState: S
-) : BaseViewModel<E, M, S>(initialViewUiState) {
+) : BaseViewModel<S, E, M>(initialViewUiState) {
 
     //region Properties
     // 表示保留中Navigation

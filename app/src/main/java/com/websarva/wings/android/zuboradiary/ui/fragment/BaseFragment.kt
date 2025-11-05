@@ -37,7 +37,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     private var _binding: T? = null
     internal val binding get() = checkNotNull(_binding)
 
-    internal abstract val mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>
+    internal abstract val mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>
 
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。

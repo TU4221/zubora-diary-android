@@ -60,7 +60,7 @@ internal class DiaryListViewModel @Inject constructor(
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
     private val loadDiaryListStartYearMonthPickerDateRangeUseCase: LoadDiaryListStartYearMonthPickerDateRangeUseCase,
     private val buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
-) : BaseFragmentViewModel<DiaryListUiEvent, DiaryListAppMessage, DiaryListUiState>(
+) : BaseFragmentViewModel<DiaryListUiState, DiaryListUiEvent, DiaryListAppMessage>(
     handle.get<DiaryListUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         DiaryListUiState().copy(
             diaryList = savedUiState.diaryList,

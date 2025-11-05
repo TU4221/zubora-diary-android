@@ -36,7 +36,7 @@ internal class DiaryShowViewModel @Inject constructor(
     private val diaryUiStateHelper: DiaryUiStateHelper,
     private val loadDiaryByIdUseCase: LoadDiaryByIdUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase
-) : BaseFragmentViewModel<DiaryShowUiEvent, DiaryShowAppMessage, DiaryShowUiState>(
+) : BaseFragmentViewModel<DiaryShowUiState, DiaryShowUiEvent, DiaryShowAppMessage>(
     DiaryShowUiState()
 ) {
 

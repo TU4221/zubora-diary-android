@@ -71,7 +71,7 @@ internal class FragmentHelper {
 
     fun <E: UiEvent> setUpMainUiEvent(
         fragment: Fragment,
-        mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>,
+        mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
         handler: MainUiEventHandler<E>
     ) {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
@@ -88,7 +88,7 @@ internal class FragmentHelper {
 
     fun <E: UiEvent> setUpCommonUiEvent(
         fragment: Fragment,
-        mainViewModel: BaseFragmentViewModel<E, out AppMessage, out UiState>,
+        mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
         handler: CommonUiEventHandler
     ) {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
@@ -113,7 +113,7 @@ internal class FragmentHelper {
     fun setUpPendingNavigation(
         navController: NavController,
         navDestinationId: Int,
-        mainViewModel: BaseFragmentViewModel<out UiEvent, out AppMessage, out UiState>
+        mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
     ) {
         val navBackStackEntry = navController.getBackStackEntry(navDestinationId)
         navBackStackEntry.lifecycleScope.launch {
@@ -162,7 +162,7 @@ internal class FragmentHelper {
     fun navigateFragmentWithRetry(
         navController: NavController,
         fragmentDestinationId: Int,
-        mainViewModel: BaseFragmentViewModel<out UiEvent, out AppMessage, out UiState>,
+        mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>,
         command: NavigationCommand,
     ) {
         Log.d(logTag, "リトライあり画面遷移開始")
@@ -243,7 +243,7 @@ internal class FragmentHelper {
         fragmentDestinationId: Int,
         resultKey: String?,
         result: FragmentResult<*>,
-        mainViewModel: BaseFragmentViewModel<out UiEvent, out AppMessage, out UiState>,
+        mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>,
     ) {
         navigateFragmentWithRetry(
             navController,
@@ -266,7 +266,7 @@ internal class FragmentHelper {
 
     fun registerOnBackPressedCallback(
         fragment: Fragment,
-        mainViewModel: BaseFragmentViewModel<out UiEvent, out AppMessage, out UiState>
+        mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
     ) {
         fragment.requireActivity().onBackPressedDispatcher
             .addCallback(

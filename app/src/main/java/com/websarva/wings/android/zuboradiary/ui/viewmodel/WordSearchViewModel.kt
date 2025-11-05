@@ -44,7 +44,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     private val loadNewWordSearchResultListUseCase: LoadNewWordSearchResultListUseCase,
     private val loadAdditionWordSearchResultListUseCase: LoadAdditionWordSearchResultListUseCase,
     private val refreshWordSearchResultListUseCase: RefreshWordSearchResultListUseCase
-) : BaseFragmentViewModel<WordSearchUiEvent, WordSearchAppMessage, WordSearchUiState>(
+) : BaseFragmentViewModel<WordSearchUiState, WordSearchUiEvent, WordSearchAppMessage>(
     handle.get<WordSearchUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         WordSearchUiState().copy(
             searchWord = savedUiState.searchWord,

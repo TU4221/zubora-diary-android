@@ -40,7 +40,7 @@ internal class CalendarViewModel @Inject constructor(
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
-) : BaseFragmentViewModel<CalendarUiEvent, CalendarAppMessage, CalendarUiState>(
+) : BaseFragmentViewModel<CalendarUiState, CalendarUiEvent, CalendarAppMessage>(
     handle.get<CalendarUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
         CalendarUiState().copy(
             calendarStartDayOfWeek = savedUiState.calendarStartDayOfWeek,
