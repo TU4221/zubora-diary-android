@@ -32,18 +32,37 @@ import java.time.Year
 class DiaryListFragment :
     BaseFragment<FragmentDiaryListBinding, DiaryListUiEvent>(),
     RequiresBottomNavigation {
-
-    override val destinationId = R.id.navigation_diary_list_fragment
-
-    // ViewModel
+        
+    //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryListViewModel by viewModels()
+    
+    override val destinationId = R.id.navigation_diary_list_fragment
 
     private lateinit var diaryListAdapter: DiaryYearMonthListAdapter
+    //endregion
 
+    //region Fragment Lifecycle
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpToolbar()
+        setUpDiaryList()
+
+        mainViewModel.onUiReady()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+
+        mainViewModel.onUiGone()
+    }
+    //endregion
+    
+    //region View Binding Setup
     override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): FragmentDiaryListBinding {
@@ -53,19 +72,10 @@ class DiaryListFragment :
                 viewModel = mainViewModel
             }
     }
+    //endregion
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        observeUiEventFromActivity()
-        observeUiState()
-        setUpToolBar()
-        setUpDiaryList()
-
-        mainViewModel.onUiReady()
-    }
-
-    override fun initializeFragmentResultReceiver() {
+    //region Fragment Result Receiver Setup
+    override fun setUpFragmentResultReceivers() {
         setUpDatePickerDialogResultReceiver()
         setUpDiaryDeleteDialogResultReceiver()
     }
@@ -87,7 +97,9 @@ class DiaryListFragment :
             mainViewModel.onDiaryDeleteDialogResultReceived(result)
         }
     }
+    //endregion
 
+    //region UI Observation Setup
     override fun onMainUiEventReceived(event: DiaryListUiEvent) {
         when (event) {
             is DiaryListUiEvent.NavigateDiaryShowFragment -> {
@@ -116,24 +128,17 @@ class DiaryListFragment :
         navigateAppMessageDialog(appMessage)
     }
 
-    private fun observeUiEventFromActivity() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainActivityViewModel.activityCallbackUiEvent
-                .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
-                    val event = value.getContentIfNotHandled()
-                    event ?: return@collect
-                    when (event) {
-                        ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
-                            scrollDiaryListToFirstPosition()
-                        }
-                    }
-                }
-        }
-    }
+    override fun setUpUiStateObservers() {
+        super.setUpUiStateObservers()
 
-    private fun observeUiState() {
         observeDiaryListItem()
         observeDiaryListSwipeEnabled()
+    }
+
+    override fun setUpUiEventObservers() {
+        super.setUpUiEventObservers()
+
+        observeUiEventFromActivity()
     }
 
     private fun observeDiaryListItem() {
@@ -156,18 +161,24 @@ class DiaryListFragment :
         }
     }
 
-    private fun updateDiaryList(diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
-        diaryListAdapter.submitList(diaryList.itemList) {
-            mainViewModel.onDiaryListUpdateCompleted()
+    private fun observeUiEventFromActivity() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainActivityViewModel.activityCallbackUiEvent
+                .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
+                    val event = value.getContentIfNotHandled()
+                    event ?: return@collect
+                    when (event) {
+                        ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
+                            scrollDiaryListToFirstPosition()
+                        }
+                    }
+                }
         }
     }
+    //endregion
 
-    private fun updateDiaryListSwipeEnabled(isSwipeEnabled: Boolean) {
-        diaryListAdapter.setSwipeEnabled(isSwipeEnabled)
-    }
-
-    // ツールバー設定
-    private fun setUpToolBar() {
+    //region View Setup
+    private fun setUpToolbar() {
         binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
                 // ワード検索フラグメント起動
@@ -179,7 +190,6 @@ class DiaryListFragment :
             }
     }
 
-    // 日記リスト(年月)設定
     private fun setUpDiaryList() {
         diaryListAdapter =
             object : DiaryYearMonthListAdapter(binding.recyclerDiaryList, themeColor) {
@@ -196,7 +206,26 @@ class DiaryListFragment :
                 }
             }
     }
+    //endregion
 
+    //region View Manipulation
+    private fun updateDiaryList(diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
+        diaryListAdapter.submitList(diaryList.itemList) {
+            mainViewModel.onDiaryListUpdateCompleted()
+        }
+    }
+
+    private fun updateDiaryListSwipeEnabled(isSwipeEnabled: Boolean) {
+        diaryListAdapter.setSwipeEnabled(isSwipeEnabled)
+    }
+
+    private fun scrollDiaryListToFirstPosition() {
+        val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
+        listAdapter.scrollToTop()
+    }
+    //endregion
+
+    //region Navigation Helpers
     private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {
         Log.d("20250714", "navigateDiaryEditFragment()")
         val directions =
@@ -243,15 +272,5 @@ class DiaryListFragment :
             DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
-
-    private fun scrollDiaryListToFirstPosition() {
-        val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
-        listAdapter.scrollToTop()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        mainViewModel.onUiGone()
-    }
+    //endregion
 }

@@ -7,7 +7,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
@@ -47,19 +46,22 @@ import kotlin.getValue
 class SettingsFragment :
     BaseFragment<FragmentSettingsBinding, SettingsUiEvent>(),
     RequiresBottomNavigation {
-
-    override val destinationId = R.id.navigation_settings_fragment
-
+        
+    //region Properties
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     override val mainViewModel: SettingsViewModel by activityViewModels()
 
+    override val destinationId = R.id.navigation_settings_fragment
+
     // ActivityResultLauncher関係
     private lateinit var requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String>
     private lateinit var requestAccessLocationPermissionLauncher: ActivityResultLauncher<Array<String>>
+    //endregion
 
+    //region Fragment Lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -103,6 +105,14 @@ class SettingsFragment :
             }
     }
 
+    override fun onStart() {
+        super.onStart()
+        initializeReminderNotificationSettingFromPermission()
+        initializeWeatherInfoFetchSettingFromPermission()
+    }
+    //endregion
+
+    //region View Binding Setup
     override fun createViewBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup
@@ -113,15 +123,10 @@ class SettingsFragment :
                 viewModel = mainViewModel
             }
     }
+    //endregion
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        observeUiEventFromActivity()
-        observeViewColor()
-    }
-
-    override fun initializeFragmentResultReceiver() {
+    //region Fragment Result Receiver Setup
+    override fun setUpFragmentResultReceivers() {
         receiveThemeColorPickerDialogResult()
         receiveCalendarStartDayPickerDialogResult()
         receiveReminderNotificationTimePickerDialogResult()
@@ -190,7 +195,9 @@ class SettingsFragment :
             mainViewModel.onAllDataDeleteDialogResultReceived(result)
         }
     }
+    //endregion
 
+    //region UI Observation Setup
     override fun onMainUiEventReceived(event: SettingsUiEvent) {
         when (event) {
             is SettingsUiEvent.NavigateThemeColorPickerDialog -> {
@@ -267,19 +274,16 @@ class SettingsFragment :
         navigateAppMessageDialog(appMessage)
     }
 
-    private fun observeUiEventFromActivity() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainActivityViewModel.activityCallbackUiEvent
-                .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
-                    val event = value.getContentIfNotHandled()
-                    event ?: return@collect
-                    when (event) {
-                        ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
-                            scrollToTop()
-                        }
-                    }
-                }
-        }
+    override fun setUpUiStateObservers() {
+        super.setUpUiStateObservers()
+
+        observeViewColor()
+    }
+
+    override fun setUpUiEventObservers() {
+        super.setUpUiEventObservers()
+
+        observeUiEventFromActivity()
     }
 
     private fun observeViewColor() {
@@ -294,6 +298,23 @@ class SettingsFragment :
         }
     }
 
+    private fun observeUiEventFromActivity() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainActivityViewModel.activityCallbackUiEvent
+                .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
+                    val event = value.getContentIfNotHandled()
+                    event ?: return@collect
+                    when (event) {
+                        ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
+                            scrollToTop()
+                        }
+                    }
+                }
+        }
+    }
+    //endregion
+
+    //region View Manipulation
     private fun switchViewColor(themeColor: ThemeColorUi) {
         val changer = SettingsThemeColorChanger()
 
@@ -396,6 +417,12 @@ class SettingsFragment :
         )
     }
 
+    private fun scrollToTop() {
+        binding.scrollViewSettings.smoothScrollTo(0, 0)
+    }
+    //endregion
+
+    //region Navigation Helpers
     private fun navigateThemeColorPickerDialog() {
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToThemeColorPickerDialog()
@@ -467,7 +494,9 @@ class SettingsFragment :
         startActivity(intent)
         onStart()
     }
+    //endregion
 
+    //region Permission Handling - Post Notifications
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private fun checkPostNotificationsPermission() {
         val isGranted = requireContext().isPostNotificationsGranted()
@@ -489,6 +518,17 @@ class SettingsFragment :
             .launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
+    // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
+    private fun initializeReminderNotificationSettingFromPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val isPostNotificationsGranted = requireContext().isPostNotificationsGranted()
+            mainViewModel
+                .onEnsureReminderNotificationSettingMatchesPermission(isPostNotificationsGranted)
+        }
+    }
+    //endregion
+
+    //region Permission Handling - Access Location
     private fun checkAccessLocationPermission() {
         val isGranted = requireContext().isAccessLocationGranted()
         mainViewModel.onAccessLocationPermissionChecked(isGranted)
@@ -513,25 +553,11 @@ class SettingsFragment :
         requestAccessLocationPermissionLauncher.launch(requestPermissions)
     }
 
-    override fun onStart() {
-        super.onStart()
-        initializeSettingFromPermission()
-    }
-
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-    private fun initializeSettingFromPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val isPostNotificationsGranted = requireContext().isPostNotificationsGranted()
-            mainViewModel
-                .onEnsureReminderNotificationSettingMatchesPermission(isPostNotificationsGranted)
-        }
-
+    private fun initializeWeatherInfoFetchSettingFromPermission() {
         val isAccessLocationGranted = requireContext().isAccessLocationGranted()
         mainViewModel
             .onEnsureWeatherInfoFetchSettingMatchesPermission(isAccessLocationGranted)
     }
-
-    private fun scrollToTop() {
-        binding.scrollViewSettings.smoothScrollTo(0, 0)
-    }
+    //endregion
 }

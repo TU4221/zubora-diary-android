@@ -22,20 +22,25 @@ import java.time.LocalDate
 @AndroidEntryPoint
 class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEvent>() {
 
-    internal companion object {
-        // Navigation関係
-        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
-    }
-
-    override val destinationId = R.id.navigation_diary_show_fragment
-
-    // ViewModel
+    //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryShowViewModel by viewModels()
 
+    override val destinationId = R.id.navigation_diary_show_fragment
+    //endregion
+
+    //region Fragment Lifecycle
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpToolbar()
+    }
+    //endregion
+
+    //region View Binding Setup
     override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): FragmentDiaryShowBinding {
@@ -45,14 +50,10 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
                 viewModel = mainViewModel
             }
     }
+    //endregion
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        setUpToolBar()
-    }
-
-    override fun initializeFragmentResultReceiver() {
+    //region Fragment Result Receiver Setup
+    override fun setUpFragmentResultReceivers() {
         setUpDiaryLoadFailureDialogResultReceiver()
         setUpDiaryDeleteDialogResultReceiver()
     }
@@ -74,7 +75,9 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
             mainViewModel.onDiaryDeleteDialogResultReceived(result)
         }
     }
+    //endregion
 
+    //region UI Observation Setup
     override fun onMainUiEventReceived(event: DiaryShowUiEvent) {
         when (event) {
             is DiaryShowUiEvent.NavigateDiaryEditFragment -> {
@@ -102,8 +105,10 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
         navigateAppMessageDialog(appMessage)
     }
+    //endregion
 
-    private fun setUpToolBar() {
+    //region View Setup
+    private fun setUpToolbar() {
         binding.materialToolbarTopAppBar.apply {
             setOnMenuItemClickListener { item: MenuItem ->
                 // 日記編集フラグメント起動
@@ -118,7 +123,9 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
             }
         }
     }
+    //endregion
 
+    //region Navigation Helpers
     private fun navigateDiaryEditFragment(id: String, date: LocalDate) {
         val directions =
             DiaryShowFragmentDirections.actionNavigationDiaryShowFragmentToDiaryEditFragment(
@@ -144,5 +151,11 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
         navigateFragmentWithRetry(NavigationCommand.To(directions))
+    }
+    //endregion
+
+    internal companion object {
+        // Navigation関係
+        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
     }
 }

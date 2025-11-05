@@ -51,11 +51,7 @@ import kotlin.collections.map
 @AndroidEntryPoint
 class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEvent>() {
 
-    internal companion object {
-        // Navigation関係
-        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
-    }
-
+    //region Properties
     private val motionLayoutTransitionTime = 500 /*ms*/
 
     private val motionLayoutJumpTime = 1 /*ms*/
@@ -95,7 +91,19 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     ) { uri: Uri? ->
         mainViewModel.onOpenDocumentResultImageUriReceived(uri)
     }
+    //endregion
 
+    //region Fragment Lifecycle
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpFocusViewScroll()
+        setUpToolbar()
+        setUpItemMotionLayouts()
+    }
+    //endregion
+
+    //region View Binding Setup
     override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): FragmentDiaryEditBinding {
@@ -106,16 +114,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun clearViewBindings() {
+        itemMotionLayoutListeners = null
 
-        observeUiState()
-        setUpFocusViewScroll()
-        setUpToolBar()
-        setUpItemInputField()
+        super.clearViewBindings()
     }
+    //endregion
 
-    override fun initializeFragmentResultReceiver() {
+    //region Fragment Result Receiver Setup
+    override fun setUpFragmentResultReceivers() {
         setUpDiaryItemTitleEditFragmentResultReceiver()
         setUpDiaryLoadDialogResultReceiver()
         setUpDiaryLoadFailureDialogResultReceiver()
@@ -215,7 +222,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             mainViewModel.onExitWithoutDiarySaveDialogResultReceived(result)
         }
     }
+    //endregion
 
+    //region UI Observation Setup
     override fun onMainUiEventReceived(event: DiaryEditUiEvent) {
         when (event) {
             is DiaryEditUiEvent.NavigateDiaryShowFragment -> {
@@ -258,7 +267,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 navigatePreviousFragmentWithRetry(RESULT_KEY, event.result)
             }
             is DiaryEditUiEvent.UpdateDiaryItemLayout -> {
-                setUpItemsLayout(event.numVisibleItems)
+                renderItemLayouts(event.numVisibleItems)
             }
             is DiaryEditUiEvent.TransitionDiaryItemToInvisibleState -> {
                 transitionDiaryItemToInvisible(event.itemNumber, false)
@@ -283,7 +292,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         navigateAppMessageDialog(appMessage)
     }
 
-    private fun observeUiState() {
+    override fun setUpUiStateObservers() {
+        super.setUpUiStateObservers()
+
         observeToolbarMenuState()
         observeWeather1DropdownOptions()
         observeWeather2DropdownOptions()
@@ -337,7 +348,61 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             }
         }
     }
+    //endregion
 
+    //region View Setup
+    private fun setUpToolbar() {
+        binding.materialToolbarTopAppBar
+            .setOnMenuItemClickListener { item: MenuItem ->
+                // 日記保存、削除
+                when (item.itemId) {
+                    R.id.diaryEditToolbarOptionSaveDiary -> {
+                        mainViewModel.onDiarySaveMenuClick()
+                        return@setOnMenuItemClickListener true
+                    }
+
+                    R.id.diaryEditToolbarOptionDeleteDiary -> {
+                        mainViewModel.onDiaryDeleteMenuClick()
+                        return@setOnMenuItemClickListener true
+                    }
+
+                    R.id.diaryEditToolbarOptionTest -> {
+                        mainViewModel.test()
+                        return@setOnMenuItemClickListener true
+                    }
+                }
+                false
+            }
+    }
+
+    private fun setUpFocusViewScroll() {
+        KeyboardManager().registerKeyBoredStateListener(this) { isVisible ->
+            if (!isVisible) return@registerKeyBoredStateListener
+            require(isSoftInputAdjustNothing())
+
+            val focusView =
+                this@DiaryEditFragment.view?.findFocus() ?: return@registerKeyBoredStateListener
+
+            val offset = screenHeight / 3
+            val location = IntArray(2)
+            focusView.getLocationOnScreen(location)
+            val positionY = location[1]
+            val scrollAmount = positionY - offset
+
+            binding.nestedScrollFullScreen.smoothScrollBy(0, scrollAmount)
+        }
+    }
+
+    // MEMO:キーボード表示時、ActivityのLayoutが変更されない設定であるかを確認。
+    private fun isSoftInputAdjustNothing(): Boolean {
+        val softInputAdjust =
+            requireActivity().window.attributes.softInputMode and
+                    WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST
+        return softInputAdjust == WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
+    }
+    //endregion
+
+    //region View Manipulation
     private fun updateToolbarMenuState(isDeleteEnabled: Boolean) {
         val menu = binding.materialToolbarTopAppBar.menu
         val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
@@ -380,58 +445,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             )
         binding.autoCompleteTextCondition.setAdapter(adapter)
     }
+    //endregion
 
-    private fun setUpFocusViewScroll() {
-        KeyboardManager().registerKeyBoredStateListener(this) { isVisible ->
-            if (!isVisible) return@registerKeyBoredStateListener
-            require(isSoftInputAdjustNothing())
-
-            val focusView =
-                this@DiaryEditFragment.view?.findFocus() ?: return@registerKeyBoredStateListener
-
-            val offset = screenHeight / 3
-            val location = IntArray(2)
-            focusView.getLocationOnScreen(location)
-            val positionY = location[1]
-            val scrollAmount = positionY - offset
-
-            binding.nestedScrollFullScreen.smoothScrollBy(0, scrollAmount)
-        }
-    }
-
-    // MEMO:キーボード表示時、ActivityのLayoutが変更されない設定であるかを確認。
-    private fun isSoftInputAdjustNothing(): Boolean {
-        val softInputAdjust =
-            requireActivity().window.attributes.softInputMode and
-                    WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST
-        return softInputAdjust == WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
-    }
-
-    private fun setUpToolBar() {
-        binding.materialToolbarTopAppBar
-            .setOnMenuItemClickListener { item: MenuItem ->
-                // 日記保存、削除
-                when (item.itemId) {
-                    R.id.diaryEditToolbarOptionSaveDiary -> {
-                        mainViewModel.onDiarySaveMenuClick()
-                        return@setOnMenuItemClickListener true
-                    }
-
-                    R.id.diaryEditToolbarOptionDeleteDiary -> {
-                        mainViewModel.onDiaryDeleteMenuClick()
-                        return@setOnMenuItemClickListener true
-                    }
-
-                    R.id.diaryEditToolbarOptionTest -> {
-                        mainViewModel.test()
-                        return@setOnMenuItemClickListener true
-                    }
-                }
-                false
-            }
-    }
-
-    private fun setUpItemInputField() {
+    //region Motion Layout Setup
+    private fun setUpItemMotionLayouts() {
         // 項目欄MotionLayout設定
         motionLayoutDiaryEditItems =
             binding.run {
@@ -562,18 +579,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
 
     }
+    //endregion
 
-    private fun selectItemMotionLayout(itemNumber: Int): MotionLayout {
-        val arrayNumber = itemNumber - 1
-        return motionLayoutDiaryEditItems[arrayNumber]
-    }
-
-    private fun selectItemMotionLayoutListener(itemNumber: Int): ItemMotionLayoutListener {
-        val arrayNumber = itemNumber - 1
-        return checkNotNull(itemMotionLayoutListeners)[arrayNumber]
-    }
-
-    private fun setUpItemsLayout(numVisibleItems: Int) {
+    //region Motion Layout Manipulation
+    private fun renderItemLayouts(numVisibleItems: Int) {
         Log.d(logTag, "setUpItemsLayout()_numItems = $numVisibleItems")
 
         // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
@@ -646,12 +655,24 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    private fun selectItemMotionLayout(itemNumber: Int): MotionLayout {
+        val arrayNumber = itemNumber - 1
+        return motionLayoutDiaryEditItems[arrayNumber]
+    }
+
+    private fun selectItemMotionLayoutListener(itemNumber: Int): ItemMotionLayoutListener {
+        val arrayNumber = itemNumber - 1
+        return checkNotNull(itemMotionLayoutListeners)[arrayNumber]
+    }
+
     private fun countVisibleItems(): Int {
         return motionLayoutDiaryEditItems.count { motionLayout ->
             motionLayout.currentState == R.id.motion_scene_edit_diary_item_visible_state
         }
     }
+    //endregion
 
+    //region Navigation Helpers
     private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
         // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
         val containsDiaryShowFragment =
@@ -759,16 +780,18 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             )
         )
     }
+    //endregion
 
+    //region Permission Handling
     private fun checkAccessLocationPermissionBeforeWeatherInfoFetch() {
         mainViewModel.onAccessLocationPermissionChecked(
             requireContext().isAccessLocationGranted()
         )
     }
+    //endregion
 
-    override fun clearViewBindings() {
-        itemMotionLayoutListeners = null
-
-        super.clearViewBindings()
+    internal companion object {
+        // Navigation関係
+        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
     }
 }

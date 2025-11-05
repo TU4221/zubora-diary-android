@@ -46,15 +46,25 @@ class CalendarFragment :
     BaseFragment<FragmentCalendarBinding, CalendarUiEvent>(),
     RequiresBottomNavigation {
 
-    override val destinationId = R.id.navigation_calendar_fragment
-
-    // ViewModel
+    //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: CalendarViewModel by activityViewModels()
 
+    override val destinationId = R.id.navigation_calendar_fragment
+    //endregion
+
+    //region Fragment Lifecycle
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpCalendar()
+    }
+    //endregion
+
+    //region View Binding Setup
     override fun createViewBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup
@@ -65,16 +75,10 @@ class CalendarFragment :
                 viewModel = mainViewModel
             }
     }
+    //endregion
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        observeUiEventFromActivity()
-        observeUiState()
-        setUpCalendar()
-    }
-
-    override fun initializeFragmentResultReceiver() {
+    //region Fragment Result Receiver Setup
+    override fun setUpFragmentResultReceivers() {
         setUpDiaryShowFragmentResultReceiver()
         setUpDiaryEditFragmentResultReceiver()
     }
@@ -94,7 +98,9 @@ class CalendarFragment :
             mainViewModel.onDiaryEditFragmentResultReceived(result)
         }
     }
+    //endregion
 
+    //region UI Observation Setup
     override fun onMainUiEventReceived(event: CalendarUiEvent) {
         when (event) {
             is CalendarUiEvent.NavigateDiaryEditFragment -> {
@@ -120,6 +126,19 @@ class CalendarFragment :
         navigateAppMessageDialog(appMessage)
     }
 
+    override fun setUpUiStateObservers() {
+        super.setUpUiStateObservers()
+
+        observeSelectedDate()
+        observeCalendarStartDayOfWeek()
+    }
+
+    override fun setUpUiEventObservers() {
+        super.setUpUiEventObservers()
+
+        observeUiEventFromActivity()
+    }
+
     private fun observeUiEventFromActivity() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainActivityViewModel.activityCallbackUiEvent
@@ -133,11 +152,6 @@ class CalendarFragment :
                     }
                 }
         }
-    }
-
-    private fun observeUiState() {
-        observeSelectedDate()
-        observeCalendarStartDayOfWeek()
     }
 
     private fun observeSelectedDate() {
@@ -165,19 +179,23 @@ class CalendarFragment :
             }
         }
     }
+    //endregion
 
-    private fun updateCalendarSelectedDate(
-        selectedDate: LocalDate,
-        previousSelectedDate: LocalDate?
-    ) {
-        val calendar = binding.calendar
-        val calendarMonthDayBinder =
-            calendar.dayBinder as CalendarMonthDayBinder
-        calendarMonthDayBinder.updateSelectedDate(selectedDate)
-        calendar.notifyDateChanged(selectedDate) // 今回選択日付更新
-        previousSelectedDate?.let { calendar.notifyDateChanged(it) } // 前回選択日付更新
+    //region View Manipulation
+    private fun onBottomNavigationItemReselected() {
+        if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
+            scrollToTop()
+            return
+        }
+        mainViewModel.onBottomNavigationItemReselect()
     }
 
+    private fun scrollToTop() {
+        binding.nestedScrollFullScreen.smoothScrollTo(0, 0)
+    }
+    //endregion
+
+    //region Calendar View - Setup
     private fun setUpCalendar() {
         val calendar = binding.calendar
 
@@ -392,7 +410,9 @@ class CalendarFragment :
     private class MonthViewContainer(view: View) : ViewContainer(view) {
         val binding: LayoutCalendarHeaderBinding = LayoutCalendarHeaderBinding.bind(view)
     }
+    //endregion
 
+    //region Calendar View - Scroll Handling
     private fun scrollCalendar(date: LocalDate) {
         val targetYearMonth = YearMonth.of(date.year, date.monthValue)
         val visibleMonth = binding.calendar.findFirstVisibleMonth()
@@ -488,13 +508,29 @@ class CalendarFragment :
             calendar.scrollToMonth(targetYearMonth)
         }
     }
+    //endregion
 
+    //region Calendar View - Update Handling
     private fun updateCalendarDayDotVisibility(date: LocalDate, isVisible: Boolean) {
         val calendarMonthDayBinder = binding.calendar.dayBinder as CalendarMonthDayBinder
         calendarMonthDayBinder.updateDayDotVisibilityCache(date, isVisible)
         binding.calendar.notifyDateChanged(date)
     }
 
+    private fun updateCalendarSelectedDate(
+        selectedDate: LocalDate,
+        previousSelectedDate: LocalDate?
+    ) {
+        val calendar = binding.calendar
+        val calendarMonthDayBinder =
+            calendar.dayBinder as CalendarMonthDayBinder
+        calendarMonthDayBinder.updateSelectedDate(selectedDate)
+        calendar.notifyDateChanged(selectedDate) // 今回選択日付更新
+        previousSelectedDate?.let { calendar.notifyDateChanged(it) } // 前回選択日付更新
+    }
+    //endregion
+
+    //region Navigation Helpers
     private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {
         val directions =
             CalendarFragmentDirections.actionNavigationCalendarFragmentToDiaryEditFragment(
@@ -509,16 +545,5 @@ class CalendarFragment :
             CalendarFragmentDirections.actionCalendarFragmentToAppMessageDialog(appMessage)
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
-
-    private fun onBottomNavigationItemReselected() {
-        if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
-            scrollToTop()
-            return
-        }
-        mainViewModel.onBottomNavigationItemReselect()
-    }
-
-    private fun scrollToTop() {
-        binding.nestedScrollFullScreen.smoothScrollTo(0, 0)
-    }
+    //endregion
 }

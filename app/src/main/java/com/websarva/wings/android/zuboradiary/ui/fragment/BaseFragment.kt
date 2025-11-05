@@ -33,6 +33,7 @@ import kotlinx.coroutines.flow.map
 abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     : LoggingFragment(), MainUiEventHandler<E>, CommonUiEventHandler {
 
+    //region Properties
     // View関係
     private var _binding: T? = null
     internal val binding get() = checkNotNull(_binding)
@@ -55,17 +56,13 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
             return destinationId == startDestinationId
         }
 
-    private val fragmentHelper = FragmentHelper()
-
     internal val themeColor
         get() = (requireActivity() as MainActivity).themeColor
 
-    internal fun launchAndRepeatOnViewLifeCycleStarted(
-        block: suspend CoroutineScope.() -> Unit
-    ) {
-        fragmentHelper.launchAndRepeatOnViewLifeCycleStarted(this, block)
-    }
+    private val fragmentHelper = FragmentHelper()
+    //endregion
 
+    //region Fragment Lifecycle
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -78,6 +75,34 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        mainActivityViewModel.onFragmentViewReady(this is RequiresBottomNavigation)
+
+        setUpFragmentResultReceivers()
+        setUpUiObservers()
+        if (!isNavigationStartFragment) registerOnBackPressedCallback()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mainActivityViewModel.onFragmentViewResumed()
+    }
+
+    override fun onPause() {
+        mainActivityViewModel.onFragmentViewPause()
+        setUpInvisibleFragmentTransitionEffect()
+        super.onPause()
+    }
+
+    override fun onDestroyView() {
+        clearViewBindings()
+
+        super.onDestroyView()
+    }
+    //endregion
+
+    //region View Binding Setup
     /**
      * BaseFragment#onCreateView()で呼び出される。
      */
@@ -85,6 +110,12 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): T
 
+    internal open fun clearViewBindings() {
+        _binding = null
+    }
+    //endregion
+
+    //region Fragment Transition Effect Setup
     private fun setUpVisibleFragmentTransitionEffect() {
         // FROM:遷移元 TO:遷移先
         // FROM - TO の TO として現れるアニメーション
@@ -142,21 +173,56 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         mainActivityViewModel.onVisibleFragmentTransitionSetupCompleted()
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        mainActivityViewModel.onFragmentViewReady(this is RequiresBottomNavigation)
-
-        initializeFragmentResultReceiver()
-        observeUiEvent()
-        observePendingNavigation()
-        observeProcessingState()
-        if (!isNavigationStartFragment) registerOnBackPressedCallback()
+    private fun setUpInvisibleFragmentTransitionEffect() {
+        if (mainActivityViewModel.wasSelectedTab.value) {
+            exitTransition =
+                MaterialFadeThrough().apply {
+                    addListener(
+                        createTransitionLogListener("Exit_MaterialFadeThrough")
+                    )
+                }
+            returnTransition =
+                MaterialFadeThrough().apply {
+                    addListener(
+                        createTransitionLogListener("Return_MaterialFadeThrough")
+                    )
+                }
+        }
+        mainActivityViewModel.onInvisibleFragmentTransitionSetupCompleted()
     }
 
+    private fun createTransitionLogListener(transitionName: String): Transition.TransitionListener {
+        return object : Transition.TransitionListener {
+            override fun onTransitionStart(transition: Transition) {
+                Log.d(logTag, "${this@BaseFragment.javaClass.simpleName}: $transitionName - START")
+            }
+
+            override fun onTransitionEnd(transition: Transition) {
+                Log.d(logTag, "${this@BaseFragment.javaClass.simpleName}: $transitionName - END")
+                transition.removeListener(this)
+            }
+
+            override fun onTransitionCancel(transition: Transition) {
+                Log.d(logTag, "${this@BaseFragment.javaClass.simpleName}: $transitionName - CANCEL")
+                transition.removeListener(this)
+            }
+
+            override fun onTransitionPause(transition: Transition) {
+                // 必要に応じて実装
+            }
+
+            override fun onTransitionResume(transition: Transition) {
+                // 必要に応じて実装
+            }
+        }
+    }
+    //endregion
+
+    //region Fragment Result Receiver Setup
     /**
      *  setUpFragmentResultReceiver()、setUpDialogResultReceiver()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
      * */
-    internal abstract fun initializeFragmentResultReceiver()
+    internal abstract fun setUpFragmentResultReceivers()
 
     internal fun <T> setUpFragmentResultReceiver(key: String, block: (FragmentResult<T>) -> Unit) {
         setUpFragmentResultReceiverInternal(key, block)
@@ -178,8 +244,30 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
                 block
             )
     }
+    //endregion
 
-    private fun observeUiEvent() {
+    //region UI Observation Setup
+    private fun setUpUiObservers() {
+        setUpUiStateObservers()
+        setUpUiEventObservers()
+        observePendingNavigation()
+    }
+
+    internal open fun setUpUiStateObservers() {
+        observeProcessingState()
+    }
+
+    private fun observeProcessingState() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.isProcessing == new.isProcessing
+            }.map { it.isProcessing }.collect {
+                mainActivityViewModel.onFragmentProcessingStateChanged(it)
+            }
+        }
+    }
+
+    internal open fun setUpUiEventObservers() {
         observeMainUiEvent()
         observeCommonUiEvent()
     }
@@ -210,17 +298,15 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
                 mainViewModel
             )
     }
+    //endregion
 
-    private fun observeProcessingState() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainViewModel.uiState.distinctUntilChanged { old, new ->
-                old.isProcessing == new.isProcessing
-            }.map { it.isProcessing }.collect {
-                mainActivityViewModel.onFragmentProcessingStateChanged(it)
-            }
-        }
+    //region Back Press Setup
+    private fun registerOnBackPressedCallback() {
+        fragmentHelper.registerOnBackPressedCallback(this, mainViewModel)
     }
+    //endregion
 
+    //region Navigation Helpers
     internal fun navigateFragmentOnce(command: NavigationCommand) {
         fragmentHelper
             .navigateFragmentOnce(
@@ -268,77 +354,13 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     }
 
     internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
+    //endregion
 
-    private fun registerOnBackPressedCallback() {
-        fragmentHelper.registerOnBackPressedCallback(this, mainViewModel)
+    //region Internal Helpers
+    internal fun launchAndRepeatOnViewLifeCycleStarted(
+        block: suspend CoroutineScope.() -> Unit
+    ) {
+        fragmentHelper.launchAndRepeatOnViewLifeCycleStarted(this, block)
     }
-
-    override fun onResume() {
-        super.onResume()
-        mainActivityViewModel.onFragmentViewResumed()
-    }
-
-    override fun onPause() {
-        mainActivityViewModel.onFragmentViewPause()
-        setUpInvisibleFragmentTransitionEffect()
-        super.onPause()
-    }
-
-    private fun setUpInvisibleFragmentTransitionEffect() {
-        if (mainActivityViewModel.wasSelectedTab.value) {
-            exitTransition =
-                MaterialFadeThrough().apply {
-                    addListener(
-                        createTransitionLogListener("Exit_MaterialFadeThrough")
-                    )
-                }
-            returnTransition =
-                MaterialFadeThrough().apply {
-                    addListener(
-                        createTransitionLogListener("Return_MaterialFadeThrough")
-                    )
-                }
-        }
-        mainActivityViewModel.onInvisibleFragmentTransitionSetupCompleted()
-    }
-
-    private fun createTransitionLogListener(transitionName: String): Transition.TransitionListener {
-        return object : Transition.TransitionListener {
-            override fun onTransitionStart(transition: Transition) {
-                Log.d(logTag, "${this@BaseFragment.javaClass.simpleName}: $transitionName - START")
-            }
-
-            override fun onTransitionEnd(transition: Transition) {
-                Log.d(logTag, "${this@BaseFragment.javaClass.simpleName}: $transitionName - END")
-                transition.removeListener(this)
-            }
-
-            override fun onTransitionCancel(transition: Transition) {
-                Log.d(logTag, "${this@BaseFragment.javaClass.simpleName}: $transitionName - CANCEL")
-                transition.removeListener(this)
-            }
-
-            override fun onTransitionPause(transition: Transition) {
-                // 必要に応じて実装
-            }
-
-            override fun onTransitionResume(transition: Transition) {
-                // 必要に応じて実装
-            }
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-    }
-
-    override fun onDestroyView() {
-        clearViewBindings()
-
-        super.onDestroyView()
-    }
-
-    internal open fun clearViewBindings() {
-        _binding = null
-    }
+    //endregion
 }

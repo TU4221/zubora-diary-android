@@ -25,8 +25,7 @@ import java.time.LocalDate
 @AndroidEntryPoint
 class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiEvent>() {
 
-    override val destinationId = R.id.navigation_word_search_fragment
-
+    //region Properties
     // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -34,8 +33,28 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: WordSearchViewModel by viewModels()
 
-    private lateinit var wordSearchResultListAdapter: WordSearchResultYearMonthListAdapter
+    override val destinationId = R.id.navigation_word_search_fragment
 
+    private lateinit var wordSearchResultListAdapter: WordSearchResultYearMonthListAdapter
+    //endregion
+
+    //region Fragment Lifecycle
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setUpWordSearchResultListAdapter()
+        setUpFloatingActionButton()
+
+        mainViewModel.onUiReady()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        mainViewModel.onUiGone()
+    }
+    //endregion
+
+    //region View Binding Setup
     override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): FragmentWordSearchBinding {
@@ -45,21 +64,15 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
                 viewModel = mainViewModel
             }
     }
+    //endregion
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        observeWordSearchResultListItem()
-        setUpWordSearchResultListAdapter()
-        setUpFloatingActionButton()
-
-        mainViewModel.onUiReady()
-    }
-
-    override fun initializeFragmentResultReceiver() {
+    //region Fragment Result Receiver Setup
+    override fun setUpFragmentResultReceivers() {
         // 処理なし
     }
+    //endregion
 
+    //region UI Observation Setup
     override fun onMainUiEventReceived(event: WordSearchUiEvent) {
         when (event) {
             is WordSearchUiEvent.NavigateDiaryShowFragment -> {
@@ -79,6 +92,12 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         navigateAppMessageDialog(appMessage)
     }
 
+    override fun setUpUiStateObservers() {
+        super.setUpUiStateObservers()
+
+        observeWordSearchResultListItem()
+    }
+
     private fun observeWordSearchResultListItem() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
@@ -90,15 +109,9 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
             }
         }
     }
+    //endregion
 
-    private fun updateWordSearchResultList(
-        list: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>
-    ) {
-        wordSearchResultListAdapter.submitList(list.itemList) {
-            mainViewModel.onWordSearchResultListUpdateCompleted()
-        }
-    }
-
+    //region View Setup
     private fun setUpWordSearchResultListAdapter() {
         wordSearchResultListAdapter =
             object : WordSearchResultYearMonthListAdapter(
@@ -138,7 +151,24 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
             }
         })
     }
+    //endregion
 
+    //region View Manipulation
+    private fun updateWordSearchResultList(
+        list: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>
+    ) {
+        wordSearchResultListAdapter.submitList(list.itemList) {
+            mainViewModel.onWordSearchResultListUpdateCompleted()
+        }
+    }
+
+    private fun showKeyboard() {
+        binding.textInputEditTextSearchWord.requestFocus()
+        KeyboardManager().showKeyboard(binding.textInputEditTextSearchWord)
+    }
+    //endregion
+
+    //region Navigation Helpers
     private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
         val directions =
             WordSearchFragmentDirections
@@ -151,14 +181,5 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
             WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
-
-    private fun showKeyboard() {
-        binding.textInputEditTextSearchWord.requestFocus()
-        KeyboardManager().showKeyboard(binding.textInputEditTextSearchWord)
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        mainViewModel.onUiGone()
-    }
+    //endregion
 }
