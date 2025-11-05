@@ -25,9 +25,7 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     initialViewUiState: S
 ) : ViewModel() {
 
-    private val _uiEvent = MutableSharedFlow<ConsumableEvent<E>>(replay = 1)
-    val uiEvent get() = _uiEvent.asSharedFlow()
-
+    //region Properties
     private val _uiState = MutableStateFlow(initialViewUiState)
     val uiState get() = _uiState.asStateFlow()
 
@@ -37,18 +35,35 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     protected open val isReadyForOperation
         get() = !currentUiState.isInputDisabled
 
+    private val _uiEvent = MutableSharedFlow<ConsumableEvent<E>>(replay = 1)
+    val uiEvent get() = _uiEvent.asSharedFlow()
+    //endregion
+
+    //region UI State Update
+    protected open fun updateUiState(state: S) {
+        _uiState.value = state
+    }
+
+    protected open fun updateUiState(function: (S) -> S) {
+        _uiState.update{ function(it) }
+    }
+    //endregion
+
+    //region UI Event Emission
+    protected abstract suspend fun emitAppMessageEvent(appMessage: M)
+
+    protected abstract suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage)
+
+    protected abstract suspend fun emitUnexpectedAppMessage(e: Exception)
+
     protected suspend fun emitUiEvent(event: E) {
         _uiEvent.emit(
             ConsumableEvent(event)
         )
     }
+    //endregion
 
-    protected abstract suspend fun emitAppMessageEvent(appMessage: M)
-
-    protected abstract suspend fun emitUnexpectedAppMessage(e: Exception)
-
-    protected abstract suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage)
-
+    //region Error Handlers
     /**
      * 予期せぬ例外のハンドリング付きでコルーチンを起動する。
      *
@@ -86,16 +101,6 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
         }
     }
 
-    private suspend fun handleUnexpectedError(e: Exception, rollbackState: S) {
-        // コルーチンのキャンセルはエラーではないため、再スローして処理を中断させる
-        if (e is CancellationException) {
-            throw e
-        }
-        Log.e(logTag, "予期せぬエラーが発生", e)
-        updateUiState(rollbackState)
-        emitUnexpectedAppMessage(e)
-    }
-
     /**
      * Flowストリーム内の予期せぬ例外をキャッチし、ログ出力とUIへのメッセージ通知を行う。
      * 例外発生後は、 [fallbackValue] をemitする。
@@ -118,11 +123,14 @@ internal abstract class BaseViewModel<E: UiEvent, M: AppMessage, S: UiState>(
         }
     }
 
-    protected open fun updateUiState(state: S) {
-        _uiState.value = state
+    private suspend fun handleUnexpectedError(e: Exception, rollbackState: S) {
+        // コルーチンのキャンセルはエラーではないため、再スローして処理を中断させる
+        if (e is CancellationException) {
+            throw e
+        }
+        Log.e(logTag, "予期せぬエラーが発生", e)
+        updateUiState(rollbackState)
+        emitUnexpectedAppMessage(e)
     }
-
-    protected open fun updateUiState(function: (S) -> S) {
-        _uiState.update{ function(it) }
-    }
+    //endregion
 }

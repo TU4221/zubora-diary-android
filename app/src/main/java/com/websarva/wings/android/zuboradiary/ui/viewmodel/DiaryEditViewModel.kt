@@ -89,16 +89,8 @@ internal class DiaryEditViewModel @Inject constructor(
     ) ?: DiaryEditUiState(editingDiary = Diary.generate().toUiModel())
 ) {
 
-    companion object {
-        // 呼び出し元のFragmentから受け取る引数のキー
-        private const val ARGUMENT_DIARY_ID_KEY = "diary_id"
-        private const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
 
-        // ViewModel状態保存キー
-        // MEMO:システムの初期化によるプロセスの終了から(アプリ設定変更からのアプリ再起動時)の復元用
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
-    }
-
+    //region Properties
     override val isReadyForOperation
         get() = !currentUiState.isInputDisabled
                 && currentUiState.originalDiaryLoadState is LoadState.Success
@@ -120,10 +112,9 @@ internal class DiaryEditViewModel @Inject constructor(
     private var pendingDiaryImageUpdateParameters: DiaryImageUpdateParameters? = null
     private var pendingWeatherInfoFetchParameters: WeatherInfoFetchParameters? = null
     private var pendingPreviousNavigationParameters: PreviousNavigationParameters? = null
+    //endregion
 
-    // TODO:テスト用の為、最終的に削除
-    var isTesting = false
-
+    //region Initialization
     init {
         initializeDiaryData()
         collectUiStates()
@@ -225,8 +216,9 @@ internal class DiaryEditViewModel @Inject constructor(
             updateDiaryImageFilePath(path)
         }.launchIn(viewModelScope)
     }
+    //endregion
 
-    // BackPressed(戻るボタン)処理
+    //region UI Event Handlers - Action
     override fun onBackPressed() {
         if (!isReadyForOperation) return
 
@@ -392,7 +384,17 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    // Fragmentからの結果受取処理
+    fun onDiaryItemInvisibleStateTransitionCompleted(itemNumberInt: Int) {
+        val itemNumber = DiaryItemNumber(itemNumberInt)
+        deleteItem(itemNumber)
+    }
+
+    fun onDiaryItemVisibleStateTransitionCompleted() {
+        updateToIdleState()
+    }
+    //endregion
+
+    //region UI Event Handlers - Results
     fun onDiaryLoadDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
@@ -612,18 +614,9 @@ internal class DiaryEditViewModel @Inject constructor(
             } ?: throw IllegalStateException()
         }
     }
+    //endregion
 
-    // MotionLayout変更時処理
-    fun onDiaryItemInvisibleStateTransitionCompleted(itemNumberInt: Int) {
-        val itemNumber = DiaryItemNumber(itemNumberInt)
-        deleteItem(itemNumber)
-    }
-
-    fun onDiaryItemVisibleStateTransitionCompleted() {
-        updateToIdleState()
-    }
-
-    // 権限確認後処理
+    //region UI Event Handlers - Permissions
     fun onAccessLocationPermissionChecked(
         isGranted: Boolean
     ) {
@@ -635,8 +628,9 @@ internal class DiaryEditViewModel @Inject constructor(
             } ?: throw IllegalStateException()
         }
     }
+    //endregion
 
-    // データ処理
+    //region Business Logic
     private suspend fun prepareDiaryEntry(
         id: DiaryId?,
         date: LocalDate
@@ -1152,7 +1146,9 @@ internal class DiaryEditViewModel @Inject constructor(
             FragmentResult.Some(originalDiaryDate)
         )
     }
+    //endregion
 
+    //region UI State Update - Property
     private fun updateDate(date: LocalDate) {
         updateUiState {
             it.copy(
@@ -1271,7 +1267,9 @@ internal class DiaryEditViewModel @Inject constructor(
     private fun updateDiaryImageFilePath(path: FilePathUi?) {
         updateUiState { it.copy(diaryImageFilePath = path) }
     }
+    //endregion
 
+    //region UI State Update - State
     private fun updateToIdleState() {
         updateUiState {
             it.copy(
@@ -1352,7 +1350,9 @@ internal class DiaryEditViewModel @Inject constructor(
             )
         }
     }
+    //endregion
 
+    //region Pending Diary Load Parameters
     private fun updatePendingDiaryLoadParameters(date: LocalDate, previousDate: LocalDate?) {
         pendingDiaryLoadParameters = DiaryLoadParameters(date, previousDate)
     }
@@ -1361,6 +1361,13 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryLoadParameters = null
     }
 
+    private data class DiaryLoadParameters(
+        val date: LocalDate,
+        val previousDate: LocalDate?
+    )
+    //endregion
+
+    //region Pending Diary Update Parameters
     private fun updatePendingDiaryUpdateParameters(
         diary: Diary,
         diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
@@ -1380,6 +1387,15 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryUpdateParameters = null
     }
 
+    private data class DiaryUpdateParameters(
+        val diary: Diary,
+        val diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
+        val originalDiary: Diary,
+        val isNewDiary: Boolean
+    )
+    //endregion
+
+    //region Pending Diary Delete Parameters
     private fun updatePendingDiaryDeleteParameters(id: DiaryId, date: LocalDate) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
@@ -1388,6 +1404,13 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryDeleteParameters = null
     }
 
+    private data class DiaryDeleteParameters(
+        val id: DiaryId,
+        val date: LocalDate
+    )
+    //endregion
+
+    //region Pending Diary Date Update Parameters
     private fun updatePendingDiaryDateUpdateParameters(
         originalDate: LocalDate,
         isNewDiary: Boolean
@@ -1399,6 +1422,13 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryDateUpdateParameters = null
     }
 
+    private data class DiaryDateUpdateParameters(
+        val originalDate: LocalDate,
+        val isNewDiary: Boolean
+    )
+    //endregion
+
+    //region Pending Previous Navigation Parameters
     private fun updatePendingPreviousNavigationParameter(originalDiaryDate: LocalDate) {
         pendingPreviousNavigationParameters = PreviousNavigationParameters(originalDiaryDate)
     }
@@ -1407,6 +1437,12 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingPreviousNavigationParameters = null
     }
 
+    private data class DiaryItemDeleteParameters(
+        val itemNumber: DiaryItemNumber
+    )
+    //endregion
+
+    //region Pending Weather Info Fetch Parameters
     private fun updatePendingWeatherInfoFetchParameters(date: LocalDate) {
         pendingWeatherInfoFetchParameters = WeatherInfoFetchParameters(date)
     }
@@ -1415,6 +1451,10 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingWeatherInfoFetchParameters = null
     }
 
+    private data class DiaryImageUpdateParameters(val id: DiaryId)
+    //endregion
+
+    //region Pending Diary Item Delete Parameters
     private fun updatePendingDiaryItemDeleteParameters(itemNumber: DiaryItemNumber) {
         pendingDiaryItemDeleteParameters = DiaryItemDeleteParameters(itemNumber)
     }
@@ -1423,6 +1463,12 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryItemDeleteParameters = null
     }
 
+    private data class WeatherInfoFetchParameters(
+        val date: LocalDate
+    )
+    //endregion
+
+    //region Pending Diary Image Update Parameters
     private fun updatePendingDiaryImageUpdateParameters(diaryId: DiaryId) {
         pendingDiaryImageUpdateParameters = DiaryImageUpdateParameters(diaryId)
     }
@@ -1431,43 +1477,22 @@ internal class DiaryEditViewModel @Inject constructor(
         pendingDiaryImageUpdateParameters = null
     }
 
-    private data class DiaryLoadParameters(
-        val date: LocalDate,
-        val previousDate: LocalDate?
-    )
-
-    private data class DiaryUpdateParameters(
-        val diary: Diary,
-        val diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
-        val originalDiary: Diary,
-        val isNewDiary: Boolean
-    )
-
-    private data class DiaryDeleteParameters(
-        val id: DiaryId,
-        val date: LocalDate
-    )
-
-    private data class DiaryDateUpdateParameters(
-        val originalDate: LocalDate,
-        val isNewDiary: Boolean
-    )
-
-    private data class DiaryItemDeleteParameters(
-        val itemNumber: DiaryItemNumber
-    )
-
-    private data class DiaryImageUpdateParameters(val id: DiaryId)
-
-    private data class WeatherInfoFetchParameters(
-        val date: LocalDate
-    )
-
     private data class PreviousNavigationParameters(
         val originalDiaryDate: LocalDate
     )
+    //endregion
 
+    companion object {
+        private const val ARGUMENT_DIARY_ID_KEY = "diary_id"
+        private const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
+
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
+    }
+
+    //region For Test
     // TODO:テスト用の為、最終的に削除
+    var isTesting = false
+
     // TODO:上手く保存されない。保存ユースケースの条件を変えたため？
     fun test() {
         launchWithUnexpectedErrorHandler {
@@ -1565,7 +1590,6 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    // TODO:テスト用の為、最終的に削除
     private fun generateRandomAlphanumericString(length: Int): String {
         require(length >= 0) { "Length must be non-negative" }
 
@@ -1574,4 +1598,5 @@ internal class DiaryEditViewModel @Inject constructor(
             .map { allowedChars.random() }
             .joinToString("")
     }
+    //endregion
 }

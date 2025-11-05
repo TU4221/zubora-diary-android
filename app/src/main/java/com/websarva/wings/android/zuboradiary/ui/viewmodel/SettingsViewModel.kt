@@ -78,17 +78,7 @@ internal class SettingsViewModel @Inject constructor(
     ) ?: SettingsUiState()
 ) {
 
-    // HACK:SavedStateHandleを使用する理由
-    //      プロセスキルでアプリを再起動した時、ActivityのBinding処理とは関係なしにFragmentの処理が始まり、
-    //      DateSourceからの読込が完了する前(onCreateView()の時点)にViewの設定で設定値を参照してしまい、
-    //      例外が発生してしまう問題が発生。
-    //      通常のアプリ起動だとDateSourceからの読込が完了してからActivityのBinding処理を行うようにしている為、
-    //      このような問題は発生しない。各フラグメントにDateSourceからの読込完了条件をいれるとコルーチンを使用する等の
-    //      複雑な処理になるため、SavedStateHandleで対応する。
-    companion object {
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
-    }
-
+    //region Initialization
     init {
         updateToProcessingState()
         collectUiStates()
@@ -239,8 +229,9 @@ internal class SettingsViewModel @Inject constructor(
             allAreReady
         }
     }
+    //endregion
 
-    // BackPressed(戻るボタン)処理
+    //region UI Event Handlers - Action
     override fun onBackPressed() {
         if (!isReadyForOperation) return
 
@@ -249,7 +240,6 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    // Viewクリック処理
     fun onThemeColorSettingButtonClick() {
         if (!canExecuteOperation()) return
 
@@ -390,8 +380,9 @@ internal class SettingsViewModel @Inject constructor(
             )
         }
     }
+    //endregion
 
-    // Fragmentからの結果受取処理
+    //region UI Event Handlers - Results
     fun onThemeColorSettingDialogResultReceived(result: DialogResult<ThemeColorUi>) {
         when (result) {
             is DialogResult.Positive<ThemeColorUi> -> {
@@ -528,8 +519,9 @@ internal class SettingsViewModel @Inject constructor(
             )
         }
     }
+    //endregion
 
-    // Permission処理
+    //region UI Event Handlers - Permissions
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     fun onPostNotificationsPermissionChecked(isGranted: Boolean) {
         launchWithUnexpectedErrorHandler {
@@ -636,7 +628,9 @@ internal class SettingsViewModel @Inject constructor(
             saveWeatherInfoFetch(false)
         }
     }
+    //endregion
 
+    //region Business Logic
     /**
      * 現在のUI状態に基づいて、設定操作が実行可能かどうかを同期的に判定する。
      * 操作不可能な場合は、必要に応じてユーザーにメッセージを表示する。
@@ -891,7 +885,9 @@ internal class SettingsViewModel @Inject constructor(
             }
         }
     }
+    //endregion
 
+    //region UI State Update
     private fun updateThemeColor(themeColor: ThemeColorUi?) {
         updateUiState { it.copy(themeColor = themeColor) }
     }
@@ -960,5 +956,10 @@ internal class SettingsViewModel @Inject constructor(
                 passcode = null
             )
         }
+    }
+    //endregion
+
+    companion object {
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }

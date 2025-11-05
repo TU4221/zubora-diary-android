@@ -54,10 +54,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     } ?: WordSearchUiState()
 ) {
 
-    companion object {
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
-    }
-
+    //region Properties
     private val initialWordSearchResultListLoadJob: Job? = null
     private var wordSearchResultListLoadJob: Job? = initialWordSearchResultListLoadJob // キャンセル用
 
@@ -66,7 +63,9 @@ internal class WordSearchViewModel @Inject internal constructor(
     private var needsRefreshWordSearchResultList: Boolean = false // MEMO:画面遷移、回転時の更新フラグ
 
     private var isLoadingOnScrolled: Boolean = false
+    //endregion
 
+    //region Initialization
     init {
         checkForRestoration()
         collectUiStates()
@@ -123,8 +122,30 @@ internal class WordSearchViewModel @Inject internal constructor(
             }
         }
     }
+    //endregion
 
-    // BackPressed(戻るボタン)処理
+    //region UI Event Handlers
+    fun onUiReady() {
+        if (!needsRefreshWordSearchResultList) return
+        updateNeedsRefreshWordSearchResultList(false)
+        if (!isReadyForOperation) return
+
+        val currentResultList = currentUiState.wordSearchResultList
+        val currentSearchWord = currentUiState.searchWord
+        cancelPreviousLoadJob()
+        wordSearchResultListLoadJob =
+            launchWithUnexpectedErrorHandler {
+                refreshWordSearchResultList(
+                    currentResultList,
+                    currentSearchWord
+                )
+            }
+    }
+
+    fun onUiGone() {
+        updateNeedsRefreshWordSearchResultList(true)
+    }
+
     override fun onBackPressed() {
         launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
@@ -172,30 +193,9 @@ internal class WordSearchViewModel @Inject internal constructor(
     fun onWordSearchResultListUpdateCompleted() {
         updateIsLoadingOnScrolled(false)
     }
+    //endregion
 
-    // Ui状態処理
-    fun onUiReady() {
-        if (!needsRefreshWordSearchResultList) return
-        updateNeedsRefreshWordSearchResultList(false)
-        if (!isReadyForOperation) return
-
-        val currentResultList = currentUiState.wordSearchResultList
-        val currentSearchWord = currentUiState.searchWord
-        cancelPreviousLoadJob()
-        wordSearchResultListLoadJob =
-            launchWithUnexpectedErrorHandler {
-                refreshWordSearchResultList(
-                    currentResultList,
-                    currentSearchWord
-                )
-            }
-    }
-
-    fun onUiGone() {
-        updateNeedsRefreshWordSearchResultList(true)
-    }
-
-    // データ処理
+    //region Business Logic
     private fun cancelPreviousLoadJob() {
         val job = wordSearchResultListLoadJob ?: return
         if (!job.isCompleted) job.cancel()
@@ -348,19 +348,9 @@ internal class WordSearchViewModel @Inject internal constructor(
             WordSearchUiState()
         }
     }
+    //endregion
 
-    private fun updateIsRestoringFromProcessDeath(bool: Boolean) {
-        isRestoringFromProcessDeath = bool
-    }
-
-    private fun updateNeedsRefreshWordSearchResultList(needsRefresh: Boolean) {
-        needsRefreshWordSearchResultList = needsRefresh
-    }
-
-    private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
-        isLoadingOnScrolled = isLoading
-    }
-
+    //region UI State Update
     private fun updateSearchWord(searchWord: String) {
         updateUiState { it.copy(searchWord = searchWord) }
     }
@@ -440,5 +430,24 @@ internal class WordSearchViewModel @Inject internal constructor(
                 isRefreshing = false
             )
         }
+    }
+    //endregion
+
+    //region Internal State Update
+    private fun updateIsRestoringFromProcessDeath(bool: Boolean) {
+        isRestoringFromProcessDeath = bool
+    }
+
+    private fun updateNeedsRefreshWordSearchResultList(needsRefresh: Boolean) {
+        needsRefreshWordSearchResultList = needsRefresh
+    }
+
+    private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
+        isLoadingOnScrolled = isLoading
+    }
+    //endregion
+
+    companion object {
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }

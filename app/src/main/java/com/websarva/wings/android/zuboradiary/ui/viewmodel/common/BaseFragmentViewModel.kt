@@ -20,44 +20,25 @@ import kotlinx.coroutines.flow.update
 internal abstract class BaseFragmentViewModel<E: UiEvent, M: AppMessage, S: UiState>(
     initialViewUiState: S
 ) : BaseViewModel<E, M, S>(initialViewUiState) {
-    
-    private val logMsgPendingNavi = "保留ナビゲーション_"
 
-    private val _commonUiEvent = MutableSharedFlow<ConsumableEvent<CommonUiEvent>>(replay = 1)
-    val commonUiEvent get() = _commonUiEvent.asSharedFlow()
-
+    //region Properties
     // 表示保留中Navigation
     private val _pendingNavigationCommandList =
         MutableStateFlow(emptyList<PendingNavigationCommand>())
     val pendingNavigationCommandList
         get() = _pendingNavigationCommandList.asStateFlow()
 
-    private suspend fun emitCommonUiEvent(event: CommonUiEvent) {
-        _commonUiEvent.emit(
-            ConsumableEvent(event)
-        )
-    }
+    private val logMsgPendingNavi = "保留ナビゲーション_"
+    
+    private val _commonUiEvent = MutableSharedFlow<ConsumableEvent<CommonUiEvent>>(replay = 1)
+    val commonUiEvent get() = _commonUiEvent.asSharedFlow()
+    //endregion
 
-    protected suspend fun emitNavigatePreviousFragmentEvent(
-        result: FragmentResult<*> = FragmentResult.None
-    ) {
-        emitCommonUiEvent(CommonUiEvent.NavigatePreviousFragment(result))
-    }
-
-    override suspend fun emitAppMessageEvent(appMessage: M) {
-        emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
-    }
-
-    override suspend fun emitUnexpectedAppMessage(e: Exception) {
-        emitCommonAppMessageEvent(CommonAppMessage.Unexpected(e))
-    }
-
-    override suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
-        emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
-    }
-
+    //region UI Event Handlers
     abstract fun onBackPressed()
+    //endregion
 
+    //region Navigation Event Handlers
     fun onFragmentNavigationFailure(command: NavigationCommand) {
         val newPendingCommand = PendingNavigationCommand(command)
         Log.d(
@@ -98,7 +79,9 @@ internal abstract class BaseFragmentViewModel<E: UiEvent, M: AppMessage, S: UiSt
         )
         updatePendingNavigationCommandList { it - command }
     }
+    //endregion
 
+    //region Internal State Update
     private fun updatePendingNavigationCommandList(
         function: (List<PendingNavigationCommand>) -> List<PendingNavigationCommand>
     ) {
@@ -110,4 +93,31 @@ internal abstract class BaseFragmentViewModel<E: UiEvent, M: AppMessage, S: UiSt
         val afterList = _pendingNavigationCommandList.value
         Log.d(logTag, "${logMsgPendingNavi}更新後のリスト: $afterList")
     }
+    //endregion
+
+    //region UI Event Emission
+    override suspend fun emitAppMessageEvent(appMessage: M) {
+        emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
+    }
+
+    override suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
+        emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
+    }
+
+    override suspend fun emitUnexpectedAppMessage(e: Exception) {
+        emitCommonAppMessageEvent(CommonAppMessage.Unexpected(e))
+    }
+
+    protected suspend fun emitNavigatePreviousFragmentEvent(
+        result: FragmentResult<*> = FragmentResult.None
+    ) {
+        emitCommonUiEvent(CommonUiEvent.NavigatePreviousFragment(result))
+    }
+
+    private suspend fun emitCommonUiEvent(event: CommonUiEvent) {
+        _commonUiEvent.emit(
+            ConsumableEvent(event)
+        )
+    }
+    //endregion
 }

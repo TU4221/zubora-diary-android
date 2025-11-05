@@ -40,27 +40,24 @@ internal class DiaryShowViewModel @Inject constructor(
     DiaryShowUiState()
 ) {
 
-    companion object {
-        // 呼び出し元のFragmentから受け取る引数のキー
-        private const val ARGUMENT_DIARY_ID_KEY = "diary_id"
-        private const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
-    }
-
+    //region Properties
     override val isReadyForOperation
         get() = !currentUiState.isInputDisabled
                 && (currentUiState.diaryLoadState is LoadState.Success)
-
-    private val diary
-        get() = (currentUiState.diaryLoadState as LoadState.Success).data
 
     private val diaryFlow =
         uiState.distinctUntilChanged { old, new ->
             old.diaryLoadState == new.diaryLoadState
         }.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
+    private val diary
+        get() = (currentUiState.diaryLoadState as LoadState.Success).data
+
     // キャッシュパラメータ
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
+    //endregion
 
+    //region Initialization
     init {
         initializeDiaryData()
         collectUiStates()
@@ -111,8 +108,9 @@ internal class DiaryShowViewModel @Inject constructor(
             updateDiaryImageFilePath(path)
         }.launchIn(viewModelScope)
     }
+    //endregion
 
-    // BackPressed(戻るボタン)処理
+    //region UI Event Handlers
     override fun onBackPressed() {
         if (!isReadyForOperation) return
 
@@ -191,8 +189,9 @@ internal class DiaryShowViewModel @Inject constructor(
             } ?: throw IllegalStateException()
         }
     }
+    //endregion
 
-    // データ処理
+    //region Business Logic
     private suspend fun loadSavedDiary(id: DiaryId, date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
@@ -253,13 +252,14 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    // FragmentAction関係
     private suspend fun navigatePreviousFragment(diaryDate: LocalDate) {
         emitNavigatePreviousFragmentEvent(
             FragmentResult.Some(diaryDate)
         )
     }
+    //endregion
 
+    //region UI State Update
     private fun updateIsWeather2Visible(isVisible: Boolean) {
         updateUiState { it.copy(isWeather2Visible = isVisible) }
     }
@@ -319,7 +319,9 @@ internal class DiaryShowViewModel @Inject constructor(
             )
         }
     }
+    //endregion
 
+    //region Pending Diary Delete Parameters
     private fun updatePendingDiaryDeleteParameters(id: DiaryId, date: LocalDate) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
@@ -332,4 +334,10 @@ internal class DiaryShowViewModel @Inject constructor(
         val id: DiaryId,
         val date: LocalDate
     )
+    //endregion
+
+    companion object {
+        private const val ARGUMENT_DIARY_ID_KEY = "diary_id"
+        private const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
+    }
 }

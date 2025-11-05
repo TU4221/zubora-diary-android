@@ -69,10 +69,7 @@ internal class DiaryListViewModel @Inject constructor(
     } ?: DiaryListUiState()
 ) {
 
-    companion object {
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
-    }
-
+    //region Properties
     private var diaryListLoadJob: Job? = null // キャンセル用
 
     private var isRestoringFromProcessDeath: Boolean = false
@@ -84,7 +81,9 @@ internal class DiaryListViewModel @Inject constructor(
 
     // キャッシュパラメータ
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
+    //endregion
 
+    //region Initialization
     init {
         checkForRestoration()
         collectUiStates()
@@ -130,8 +129,29 @@ internal class DiaryListViewModel @Inject constructor(
             }
         }
     }
+    //endregion
 
-    // BackPressed(戻るボタン)処理
+    //region UI Event Handlers - Observation
+    fun onUiReady() {
+        if (!needsRefreshDiaryList) return
+        updateNeedsRefreshDiaryList(false)
+        if (!isReadyForOperation) return
+
+        val currentList = currentUiState.diaryList
+        val sortConditionDate = currentUiState.sortConditionDate
+        cancelPreviousLoadJob()
+        diaryListLoadJob =
+            launchWithUnexpectedErrorHandler {
+                refreshDiaryList(currentList, sortConditionDate)
+            }
+    }
+
+    fun onUiGone() {
+        updateNeedsRefreshDiaryList(true)
+    }
+    //endregion
+
+    //region UI Event Handlers - Action
     override fun onBackPressed() {
         // MEMO:DiaListFragmentはスタートフラグメントに該当するため、
         //      BaseFragmentでOnBackPressedCallbackを登録せずにNavigation機能のデフォルト戻る機能を使用する。
@@ -141,7 +161,6 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    // Viewクリック処理
     fun onWordSearchMenuClick() {
         launchWithUnexpectedErrorHandler {
             emitUiEvent(DiaryListUiEvent.NavigateWordSearchFragment)
@@ -195,7 +214,6 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    // View状態処理
     fun onDiaryListEndScrolled() {
         if (_isLoadingOnScrolled.value) return
         updateIsLoadingOnScrolled(true)
@@ -212,27 +230,9 @@ internal class DiaryListViewModel @Inject constructor(
     fun onDiaryListUpdateCompleted() {
         updateIsLoadingOnScrolled(false)
     }
+    //endregion
 
-    // Ui状態処理
-    fun onUiReady() {
-        if (!needsRefreshDiaryList) return
-        updateNeedsRefreshDiaryList(false)
-        if (!isReadyForOperation) return
-
-        val currentList = currentUiState.diaryList
-        val sortConditionDate = currentUiState.sortConditionDate
-        cancelPreviousLoadJob()
-        diaryListLoadJob =
-            launchWithUnexpectedErrorHandler {
-                refreshDiaryList(currentList, sortConditionDate)
-            }
-    }
-
-    fun onUiGone() {
-        updateNeedsRefreshDiaryList(true)
-    }
-
-    // Fragmentからの結果受取処理
+    //region UI Event Handlers - Results
     fun onDatePickerDialogResultReceived(result: DialogResult<YearMonth>) {
         when (result) {
             is DialogResult.Positive<YearMonth> -> {
@@ -276,8 +276,9 @@ internal class DiaryListViewModel @Inject constructor(
             } ?: throw IllegalStateException()
         }
     }
+    //endregion
 
-    // データ処理
+    //region Business Logic
     private fun cancelPreviousLoadJob() {
         val job = diaryListLoadJob ?: return
         if (!job.isCompleted) job.cancel()
@@ -462,19 +463,9 @@ internal class DiaryListViewModel @Inject constructor(
         updateToIdleState()
         return dateRange
     }
+    //endregion
 
-    private fun updateIsRestoringFromProcessDeath(bool: Boolean) {
-        isRestoringFromProcessDeath = bool
-    }
-
-    private fun updateNeedsRefreshDiaryList(shouldUpdate: Boolean) {
-        needsRefreshDiaryList = shouldUpdate
-    }
-
-    private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
-        _isLoadingOnScrolled.value = isLoading
-    }
-
+    //region UI State Update
     private fun updateSortConditionDate(date: LocalDate?) {
         updateUiState { it.copy(sortConditionDate = date) }
     }
@@ -549,7 +540,23 @@ internal class DiaryListViewModel @Inject constructor(
             )
         }
     }
+    //endregion
 
+    //region Internal State Update
+    private fun updateIsRestoringFromProcessDeath(bool: Boolean) {
+        isRestoringFromProcessDeath = bool
+    }
+
+    private fun updateNeedsRefreshDiaryList(shouldUpdate: Boolean) {
+        needsRefreshDiaryList = shouldUpdate
+    }
+
+    private fun updateIsLoadingOnScrolled(isLoading: Boolean) {
+        _isLoadingOnScrolled.value = isLoading
+    }
+    //endregion
+
+    //region Pending Diary Delete Parameters
     private fun updatePendingDiaryDeleteParameters(
         id: DiaryId,
         currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
@@ -567,4 +574,9 @@ internal class DiaryListViewModel @Inject constructor(
         val currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
         val sortConditionDate: LocalDate?
     )
+    //endregion
+
+    companion object {
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
+    }
 }

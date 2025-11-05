@@ -44,21 +44,20 @@ internal class MainActivityViewModel @Inject constructor(
     } ?: MainActivityUiState()
 ) {
 
-    companion object {
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
-    }
-
-    private val _activityCallbackUiEvent =
-        MutableSharedFlow<ConsumableEvent<ActivityCallbackUiEvent>>(replay = 1)
-    val activityCallbackUiEvent get() = _activityCallbackUiEvent.asSharedFlow()
-
+    //region Properties
     private val _wasBottomNavigationTabSelected = MutableStateFlow(false)
     val wasSelectedTab get() = _wasBottomNavigationTabSelected.asStateFlow()
 
     private val _wasVisibleFragmentTransitionSetupCompleted = MutableStateFlow(false)
 
     private val _wasInvisibleFragmentTransitionSetupCompleted = MutableStateFlow(false)
+    
+    private val _activityCallbackUiEvent =
+        MutableSharedFlow<ConsumableEvent<ActivityCallbackUiEvent>>(replay = 1)
+    val activityCallbackUiEvent get() = _activityCallbackUiEvent.asSharedFlow()
+    //endregion
 
+    //region Initialization
     init {
         collectUiStates()
     }
@@ -133,7 +132,27 @@ internal class MainActivityViewModel @Inject constructor(
             updateIsBottomNavigationEnabled(isEnabled)
         }.launchIn(viewModelScope)
     }
+    //endregion
 
+    //region Activity UI Event Handlers
+    fun onBottomNavigationItemSelect() {
+        updateWasBottomNavigationTabSelected(true)
+    }
+
+    fun onBottomNavigationItemReselect() {
+        viewModelScope.launch {
+            emitActivityCallbackUiEvent(ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect)
+        }
+    }
+
+    fun onNavigateBackFromBottomNavigationTab() {
+        viewModelScope.launch {
+            emitUiEvent(MainActivityUiEvent.NavigateStartTabFragment)
+        }
+    }
+    //endregion
+
+    //region Fragment UI Event Handlers
     fun onFragmentViewReady(needsBottomNavigation: Boolean) {
         if (needsBottomNavigation) {
             updateToBottomNavigationVisibleState()
@@ -159,10 +178,6 @@ internal class MainActivityViewModel @Inject constructor(
         }
     }
 
-    fun onBottomNavigationItemSelect() {
-        updateWasBottomNavigationTabSelected(true)
-    }
-
     fun onVisibleFragmentTransitionSetupCompleted() {
         markVisibleFragmentTransitionSetupCompleted()
     }
@@ -170,43 +185,21 @@ internal class MainActivityViewModel @Inject constructor(
     fun onInvisibleFragmentTransitionSetupCompleted() {
         markInvisibleFragmentTransitionSetupCompleted()
     }
+    //endregion
 
-    fun onNavigateBackFromBottomNavigationTab() {
-        viewModelScope.launch {
-            emitUiEvent(MainActivityUiEvent.NavigateStartTabFragment)
-        }
+    //region Business Logic
+    private fun markVisibleFragmentTransitionSetupCompleted() {
+        if (!_wasBottomNavigationTabSelected.value) return
+        updateWasVisibleFragmentTransitionSetupCompleted(true)
     }
 
-    fun onBottomNavigationItemReselect() {
-        viewModelScope.launch {
-            emitActivityCallbackUiEvent(ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect)
-        }
+    private fun markInvisibleFragmentTransitionSetupCompleted() {
+        if (!_wasBottomNavigationTabSelected.value) return
+        updateWasInvisibleFragmentTransitionSetupCompleted(true)
     }
+    //endregion
 
-    override suspend fun emitAppMessageEvent(appMessage: MainActivityAppMessage) {
-        emitUiEvent(
-            MainActivityUiEvent.NavigateAppMessage(appMessage)
-        )
-    }
-
-    override suspend fun emitUnexpectedAppMessage(e: Exception) {
-        emitCommonAppMessageEvent(
-            CommonAppMessage.Unexpected(e)
-        )
-    }
-
-    override suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
-        emitUiEvent(
-            MainActivityUiEvent.NavigateAppMessage(appMessage)
-        )
-    }
-
-    private suspend fun emitActivityCallbackUiEvent(event: ActivityCallbackUiEvent) {
-        _activityCallbackUiEvent.emit(
-            ConsumableEvent(event)
-        )
-    }
-
+    //region UI State Update
     private fun updateThemeColor(themeColor: ThemeColorUi) {
         updateUiState { it.copy(themeColor = themeColor) }
     }
@@ -254,7 +247,9 @@ internal class MainActivityViewModel @Inject constructor(
             )
         }
     }
+    //endregion
 
+    //region Internal State Update
     private fun updateWasBottomNavigationTabSelected(wasSelected: Boolean) {
         _wasBottomNavigationTabSelected.update { wasSelected }
     }
@@ -266,14 +261,35 @@ internal class MainActivityViewModel @Inject constructor(
     private fun updateWasInvisibleFragmentTransitionSetupCompleted(wasCompleted: Boolean) {
         _wasInvisibleFragmentTransitionSetupCompleted.update { wasCompleted }
     }
+    //endregion
 
-    private fun markVisibleFragmentTransitionSetupCompleted() {
-        if (!_wasBottomNavigationTabSelected.value) return
-        updateWasVisibleFragmentTransitionSetupCompleted(true)
+    //region UI Event Emission
+    override suspend fun emitAppMessageEvent(appMessage: MainActivityAppMessage) {
+        emitUiEvent(
+            MainActivityUiEvent.NavigateAppMessage(appMessage)
+        )
     }
 
-    private fun markInvisibleFragmentTransitionSetupCompleted() {
-        if (!_wasBottomNavigationTabSelected.value) return
-        updateWasInvisibleFragmentTransitionSetupCompleted(true)
+    override suspend fun emitUnexpectedAppMessage(e: Exception) {
+        emitCommonAppMessageEvent(
+            CommonAppMessage.Unexpected(e)
+        )
+    }
+
+    override suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
+        emitUiEvent(
+            MainActivityUiEvent.NavigateAppMessage(appMessage)
+        )
+    }
+
+    private suspend fun emitActivityCallbackUiEvent(event: ActivityCallbackUiEvent) {
+        _activityCallbackUiEvent.emit(
+            ConsumableEvent(event)
+        )
+    }
+    //endregion
+
+    companion object {
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }

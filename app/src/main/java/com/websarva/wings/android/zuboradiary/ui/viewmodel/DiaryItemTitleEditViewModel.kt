@@ -48,17 +48,12 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     } ?: DiaryItemTitleEditUiState()
 ) {
 
-    companion object {
-        // 呼び出し元のFragmentから受け取る引数のキー
-        private const val DIARY_ITEM_TITLE_ARGUMENT_KEY = "diary_item_title"
-
-        // ViewModel状態保存キー
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
-    }
-
+    //region Properties
     // キャッシュパラメータ
     private var pendingHistoryItemDeleteParameters: HistoryItemDeleteParameters? = null
+    //endregion
 
+    //region Initialization
     init {
         setUpTitle()
         collectUiStates()
@@ -68,7 +63,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         if (handle.contains(SAVED_STATE_UI_KEY)) return
 
         val diaryItemTitleSelection =
-            handle.get<DiaryItemTitleSelectionUi>(DIARY_ITEM_TITLE_ARGUMENT_KEY)
+            handle.get<DiaryItemTitleSelectionUi>(ARGUMENT_DIARY_ITEM_TITLE_KEY)
                 ?: throw IllegalArgumentException()
         updateItemNumber(diaryItemTitleSelection.itemNumber)
         updateTitle(diaryItemTitleSelection.title)
@@ -142,15 +137,15 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             updateToTitleSelectionHistoryListLoadCompletedState(it)
         }.launchIn(viewModelScope)
     }
+    //endregion
 
-    // BackPressed(戻るボタン)処理
+    //region UI Event Handlers
     override fun onBackPressed() {
         launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
     }
 
-    // Viewクリック処理
     fun onNavigationIconClick() {
         launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
@@ -235,8 +230,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             )
         }
     }
+    //endregion
 
-    // データ処理
+    //region Business Logic
     private suspend fun completeItemTitleEdit(
         itemNumberInt: Int,
         itemId: DiaryItemTitleSelectionHistoryId = DiaryItemTitleSelectionHistoryId.generate(),
@@ -283,7 +279,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             }
         }
     }
+    //endregion
 
+    //region UI State Update
     private fun updateItemNumber(itemNumber: Int) {
         updateUiState { it.copy(itemNumber = itemNumber) }
     }
@@ -317,7 +315,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
             )
         }
     }
+    //endregion
 
+    //region Pending History Item Delete Parameters
     private fun updatePendingHistoryItemDeleteParameters(
         itemId: DiaryItemTitleSelectionHistoryId,
         itemTitle: DiaryItemTitle
@@ -333,4 +333,11 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         val itemId: DiaryItemTitleSelectionHistoryId,
         val itemTitle: DiaryItemTitle
     )
+    //endregion
+
+    companion object {
+        private const val ARGUMENT_DIARY_ITEM_TITLE_KEY = "diary_item_title"
+
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
+    }
 }

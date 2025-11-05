@@ -50,10 +50,7 @@ internal class CalendarViewModel @Inject constructor(
     } ?:CalendarUiState()
 ) {
 
-    companion object {
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
-    }
-
+    //region Properties
     override val isReadyForOperation
         get() = !currentUiState.isInputDisabled
                 && (currentUiState.diaryLoadState is LoadState.Success
@@ -65,7 +62,9 @@ internal class CalendarViewModel @Inject constructor(
         }.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
     private var shouldSmoothScroll = false
+    //endregion
 
+    //region Initialization
     init {
         collectUiStates()
     }
@@ -157,8 +156,9 @@ internal class CalendarViewModel @Inject constructor(
             updateDiaryImageFilePath(path)
         }.launchIn(viewModelScope)
     }
+    //endregion
 
-    // BackPressed(戻るボタン)処理
+    //region UI Event Handlers
     override fun onBackPressed() {
         if (!isReadyForOperation) return
 
@@ -167,9 +167,14 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    // Viewクリック処理
     fun onCalendarDayClick(date: LocalDate) {
         updateSelectedDate(date)
+    }
+
+    fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
+        launchWithUnexpectedErrorHandler {
+            refreshCalendarDayDot(date)
+        }
     }
 
     fun onDiaryEditButtonClick() {
@@ -220,7 +225,6 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    // Fragmentからの結果受取処理
     fun onDiaryShowFragmentResultReceived(result: FragmentResult<LocalDate>) {
         when (result) {
             is FragmentResult.Some -> updateSelectedDate(result.data)
@@ -238,15 +242,9 @@ internal class CalendarViewModel @Inject constructor(
             }
         }
     }
+    //endregion
 
-    // View状態処理
-    fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
-        launchWithUnexpectedErrorHandler {
-            refreshCalendarDayDot(date)
-        }
-    }
-
-    // データ処理
+    //region Business Logic
     private suspend fun prepareDiary(date: LocalDate) {
         val action =
             if (shouldSmoothScroll) {
@@ -305,11 +303,9 @@ internal class CalendarViewModel @Inject constructor(
             }
         }
     }
+    //endregion
 
-    private fun updateShouldSmoothScroll(shouldScroll: Boolean) {
-        shouldSmoothScroll = shouldScroll
-    }
-
+    //region UI State Update
     private fun updateCalendarStartDayOfWeek(dayOfWeek: DayOfWeek) {
         updateUiState { it.copy(calendarStartDayOfWeek = dayOfWeek) }
     }
@@ -378,5 +374,16 @@ internal class CalendarViewModel @Inject constructor(
                 isInputDisabled = false
             )
         }
+    }
+    //endregion
+
+    //region Internal State Update
+    private fun updateShouldSmoothScroll(shouldScroll: Boolean) {
+        shouldSmoothScroll = shouldScroll
+    }
+    //endregion
+
+    companion object {
+        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }
