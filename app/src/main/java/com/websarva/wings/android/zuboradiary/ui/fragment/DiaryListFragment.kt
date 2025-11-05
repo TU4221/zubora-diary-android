@@ -13,12 +13,12 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBindi
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryYearMonthListAdapter
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
-import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -31,7 +31,8 @@ import java.time.Year
 @AndroidEntryPoint
 class DiaryListFragment :
     BaseFragment<FragmentDiaryListBinding, DiaryListUiEvent>(),
-    RequiresBottomNavigation {
+    RequiresBottomNavigation,
+    ActivityCallbackUiEventHandler {
         
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -128,6 +129,14 @@ class DiaryListFragment :
         navigateAppMessageDialog(appMessage)
     }
 
+    override fun onActivityCallbackUiEventReceived(event: ActivityCallbackUiEvent) {
+        when (event) {
+            ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
+                scrollDiaryListToFirstPosition()
+            }
+        }
+    }
+
     override fun setUpUiStateObservers() {
         super.setUpUiStateObservers()
 
@@ -162,18 +171,11 @@ class DiaryListFragment :
     }
 
     private fun observeUiEventFromActivity() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainActivityViewModel.activityCallbackUiEvent
-                .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
-                    val event = value.getContentIfNotHandled()
-                    event ?: return@collect
-                    when (event) {
-                        ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
-                            scrollDiaryListToFirstPosition()
-                        }
-                    }
-                }
-        }
+        fragmentHelper.setUpActivityUiEvent(
+            this,
+            mainActivityViewModel,
+            this
+        )
     }
     //endregion
 

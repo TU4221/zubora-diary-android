@@ -21,14 +21,17 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.MainUiEventHandler
+import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
-internal class FragmentHelper {
+class FragmentHelper {
 
     fun launchAndRepeatOnViewLifeCycleStarted(
         fragment: Fragment,
@@ -69,7 +72,7 @@ internal class FragmentHelper {
         }
     }
 
-    fun <E: UiEvent> setUpMainUiEvent(
+    internal fun <E: UiEvent> setUpMainUiEvent(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
         handler: MainUiEventHandler<E>
@@ -86,7 +89,7 @@ internal class FragmentHelper {
         }
     }
 
-    fun <E: UiEvent> setUpCommonUiEvent(
+    internal fun <E: UiEvent> setUpCommonUiEvent(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
         handler: CommonUiEventHandler
@@ -110,7 +113,24 @@ internal class FragmentHelper {
         }
     }
 
-    fun setUpPendingNavigation(
+    internal fun setUpActivityUiEvent(
+        fragment: Fragment,
+        mainActivityViewModel: MainActivityViewModel,
+        handler: ActivityCallbackUiEventHandler
+    ) {
+        launchAndRepeatOnViewLifeCycleStarted(fragment) {
+            mainActivityViewModel.activityCallbackUiEvent
+                .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
+                    val event = value.getContentIfNotHandled()
+                    Log.d(logTag, "ActivityUiEvent_Collect(): $event")
+                    event ?: return@collect
+
+                    handler.onActivityCallbackUiEventReceived(event)
+                }
+        }
+    }
+
+    internal fun setUpPendingNavigation(
         navController: NavController,
         navDestinationId: Int,
         mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
@@ -159,7 +179,7 @@ internal class FragmentHelper {
         )
     }
 
-    fun navigateFragmentWithRetry(
+    internal fun navigateFragmentWithRetry(
         navController: NavController,
         fragmentDestinationId: Int,
         mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>,
@@ -238,7 +258,7 @@ internal class FragmentHelper {
         )
     }
 
-    fun navigatePreviousFragmentWithRetry(
+    internal fun navigatePreviousFragmentWithRetry(
         navController: NavController,
         fragmentDestinationId: Int,
         resultKey: String?,
@@ -264,7 +284,7 @@ internal class FragmentHelper {
          }
     }
 
-    fun registerOnBackPressedCallback(
+    internal fun registerOnBackPressedCallback(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
     ) {

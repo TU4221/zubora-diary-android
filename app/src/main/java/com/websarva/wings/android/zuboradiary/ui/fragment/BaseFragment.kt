@@ -59,7 +59,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     internal val themeColor
         get() = (requireActivity() as MainActivity).themeColor
 
-    private val fragmentHelper = FragmentHelper()
+    protected val fragmentHelper = FragmentHelper()
     //endregion
 
     //region Fragment Lifecycle

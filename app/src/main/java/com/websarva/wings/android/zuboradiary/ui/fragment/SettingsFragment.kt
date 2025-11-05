@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDataDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDiariesDeleteDialogFragment
@@ -25,7 +26,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.Permissio
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
@@ -44,7 +44,8 @@ import kotlin.getValue
 @AndroidEntryPoint
 class SettingsFragment :
     BaseFragment<FragmentSettingsBinding, SettingsUiEvent>(),
-    RequiresBottomNavigation {
+    RequiresBottomNavigation,
+    ActivityCallbackUiEventHandler {
         
     //region Properties
     // ViewModel
@@ -261,6 +262,14 @@ class SettingsFragment :
         navigateAppMessageDialog(appMessage)
     }
 
+    override fun onActivityCallbackUiEventReceived(event: ActivityCallbackUiEvent) {
+        when (event) {
+            ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
+                scrollToTop()
+            }
+        }
+    }
+
     override fun setUpUiStateObservers() {
         super.setUpUiStateObservers()
 
@@ -286,18 +295,11 @@ class SettingsFragment :
     }
 
     private fun observeUiEventFromActivity() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainActivityViewModel.activityCallbackUiEvent
-                .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
-                    val event = value.getContentIfNotHandled()
-                    event ?: return@collect
-                    when (event) {
-                        ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
-                            scrollToTop()
-                        }
-                    }
-                }
-        }
+        fragmentHelper.setUpActivityUiEvent(
+            this,
+            mainActivityViewModel,
+            this
+        )
     }
     //endregion
 

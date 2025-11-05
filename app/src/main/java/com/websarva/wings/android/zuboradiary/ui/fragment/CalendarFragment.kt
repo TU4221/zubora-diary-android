@@ -27,7 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomN
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
-import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,7 +44,8 @@ import java.util.stream.Stream
 @AndroidEntryPoint
 class CalendarFragment :
     BaseFragment<FragmentCalendarBinding, CalendarUiEvent>(),
-    RequiresBottomNavigation {
+    RequiresBottomNavigation,
+    ActivityCallbackUiEventHandler {
 
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -126,6 +127,14 @@ class CalendarFragment :
         navigateAppMessageDialog(appMessage)
     }
 
+    override fun onActivityCallbackUiEventReceived(event: ActivityCallbackUiEvent) {
+        when (event) {
+            ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
+                processOnBottomNavigationItemReselected()
+            }
+        }
+    }
+
     override fun setUpUiStateObservers() {
         super.setUpUiStateObservers()
 
@@ -137,21 +146,6 @@ class CalendarFragment :
         super.setUpUiEventObservers()
 
         observeUiEventFromActivity()
-    }
-
-    private fun observeUiEventFromActivity() {
-        launchAndRepeatOnViewLifeCycleStarted {
-            mainActivityViewModel.activityCallbackUiEvent
-                .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
-                    val event = value.getContentIfNotHandled()
-                    event ?: return@collect
-                    when (event) {
-                        ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
-                            onBottomNavigationItemReselected()
-                        }
-                    }
-                }
-        }
     }
 
     private fun observeSelectedDate() {
@@ -179,10 +173,18 @@ class CalendarFragment :
             }
         }
     }
+
+    private fun observeUiEventFromActivity() {
+        fragmentHelper.setUpActivityUiEvent(
+            this,
+            mainActivityViewModel,
+            this
+        )
+    }
     //endregion
 
     //region View Manipulation
-    private fun onBottomNavigationItemReselected() {
+    private fun processOnBottomNavigationItemReselected() {
         if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
             scrollToTop()
             return
