@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
@@ -57,7 +56,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 internal class SettingsViewModel @Inject constructor(
-    private val handle: SavedStateHandle, // MEMO:システムの初期化によるプロセスの終了からの復元用
     private val initializeAllSettingsUseCase: InitializeAllSettingsUseCase,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
@@ -72,10 +70,7 @@ internal class SettingsViewModel @Inject constructor(
     private val deleteAllDiariesUseCase: DeleteAllDiariesUseCase,
     private val deleteAllDataUseCase: DeleteAllDataUseCase,
 ) : BaseFragmentViewModel<SettingsUiEvent, SettingsAppMessage, SettingsUiState>(
-    handle.get<SettingsUiState>(SAVED_STATE_UI_KEY)?.copy(
-        isProcessing = false,
-        isInputDisabled = false
-    ) ?: SettingsUiState()
+    SettingsUiState()
 ) {
 
     //region Initialization
@@ -93,18 +88,11 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     private fun collectUiStates() {
-        collectUiState()
         collectThemeColorSetting()
         collectCalendarStartDayOfWeekSetting()
         collectReminderNotificationSetting()
         collectPasscodeLockSetting()
         collectWeatherInfoFetchSetting()
-    }
-
-    private fun collectUiState() {
-        uiState.onEach {
-            handle[SAVED_STATE_UI_KEY] = it
-        }.launchIn(viewModelScope)
     }
 
     private fun collectThemeColorSetting() {
@@ -958,8 +946,4 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
     //endregion
-
-    companion object {
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
-    }
 }
