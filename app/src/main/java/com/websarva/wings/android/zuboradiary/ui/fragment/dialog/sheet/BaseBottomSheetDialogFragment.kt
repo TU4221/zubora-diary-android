@@ -22,9 +22,9 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
 
     //region Properties
     private var _binding: T? = null
-    internal val binding get() = checkNotNull(_binding)
+    protected val binding get() = checkNotNull(_binding)
 
-    internal val themeColor
+    protected val themeColor
         get() = (requireActivity() as MainActivity).themeColor
 
     private val fragmentHelper = FragmentHelper()
@@ -96,14 +96,14 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
     /**
      * BaseBottomSheetDialogFragment.onCancel()で呼び出される。
      */
-    internal abstract fun handleOnCancel()
+    protected abstract fun handleOnCancel()
     //endregion
 
     //region View Binding Setup
     /**
      * BaseBottomSheetDialogFragment#onCreateView()で呼び出される。
      */
-    internal abstract fun createViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
+    protected abstract fun createViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
 
     private fun clearViewBindings() {
         _binding = null
@@ -111,7 +111,7 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
     //endregion
 
     //region Navigation Helpers
-    internal fun navigatePreviousFragment() {
+    protected fun navigatePreviousFragment() {
         findNavController().navigateUp()
     }
     //endregion

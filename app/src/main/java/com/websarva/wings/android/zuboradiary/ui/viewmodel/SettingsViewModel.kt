@@ -55,7 +55,7 @@ import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
-internal class SettingsViewModel @Inject constructor(
+class SettingsViewModel @Inject internal constructor(
     private val initializeAllSettingsUseCase: InitializeAllSettingsUseCase,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
@@ -371,7 +371,7 @@ internal class SettingsViewModel @Inject constructor(
     //endregion
 
     //region UI Event Handlers - Results
-    fun onThemeColorSettingDialogResultReceived(result: DialogResult<ThemeColorUi>) {
+    internal fun onThemeColorSettingDialogResultReceived(result: DialogResult<ThemeColorUi>) {
         when (result) {
             is DialogResult.Positive<ThemeColorUi> -> {
                 handleThemeColorSettingDialogPositiveResult(result.data)
@@ -389,7 +389,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onCalendarStartDayOfWeekSettingDialogResultReceived(result: DialogResult<DayOfWeek>) {
+    internal fun onCalendarStartDayOfWeekSettingDialogResultReceived(result: DialogResult<DayOfWeek>) {
         when (result) {
             is DialogResult.Positive<DayOfWeek> -> {
                 handleCalendarStartDayOfWeekSettingDialogPositiveResult(result.data)
@@ -407,7 +407,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onReminderNotificationSettingDialogResultReceived(result: DialogResult<LocalTime>) {
+    internal fun onReminderNotificationSettingDialogResultReceived(result: DialogResult<LocalTime>) {
         when (result) {
             is DialogResult.Positive<LocalTime> -> {
                 handleReminderNotificationSettingDialogPositiveResult(result.data)
@@ -434,7 +434,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAllDiariesDeleteDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onAllDiariesDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
                 handleAllDiariesDeleteDialogPositiveResult()
@@ -452,7 +452,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAllSettingsInitializationDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onAllSettingsInitializationDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
                 handleAllSettingsInitializationDialogPositiveResult()
@@ -470,7 +470,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAllDataDeleteDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onAllDataDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
                 handleAllDataDeleteDialogPositiveResult()
@@ -488,7 +488,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onPermissionDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onPermissionDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
                 handlePermissionDialogPositiveResult()
@@ -511,7 +511,7 @@ internal class SettingsViewModel @Inject constructor(
 
     //region UI Event Handlers - Permissions
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    fun onPostNotificationsPermissionChecked(isGranted: Boolean) {
+    internal fun onPostNotificationsPermissionChecked(isGranted: Boolean) {
         launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 emitUiEvent(
@@ -526,7 +526,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    fun onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest: Boolean) {
+    internal fun onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest: Boolean) {
         launchWithUnexpectedErrorHandler {
             if (shouldShowRequest) {
                 emitUiEvent(
@@ -544,7 +544,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    fun onRequestPostNotificationsPermissionRationaleResultReceived(isGranted: Boolean) {
+    internal fun onRequestPostNotificationsPermissionRationaleResultReceived(isGranted: Boolean) {
         launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 emitUiEvent(
@@ -558,7 +558,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onAccessLocationPermissionChecked(isGranted: Boolean) {
+    internal fun onAccessLocationPermissionChecked(isGranted: Boolean) {
         launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 saveWeatherInfoFetch(true)
@@ -570,7 +570,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest: Boolean) {
+    internal fun onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest: Boolean) {
         launchWithUnexpectedErrorHandler {
             if (shouldShowRequest) {
                 emitUiEvent(
@@ -587,7 +587,7 @@ internal class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun onRequestAccessLocationPermissionRationaleResultReceived(isGranted: Boolean) {
+    internal fun onRequestAccessLocationPermissionRationaleResultReceived(isGranted: Boolean) {
         launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 saveWeatherInfoFetch(true)
@@ -600,7 +600,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-    fun onEnsureReminderNotificationSettingMatchesPermission(isGranted: Boolean) {
+    internal fun onEnsureReminderNotificationSettingMatchesPermission(isGranted: Boolean) {
         launchWithUnexpectedErrorHandler {
             if (isGranted) return@launchWithUnexpectedErrorHandler
 
@@ -609,7 +609,7 @@ internal class SettingsViewModel @Inject constructor(
     }
 
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
-    fun onEnsureWeatherInfoFetchSettingMatchesPermission(isGranted: Boolean) {
+    internal fun onEnsureWeatherInfoFetchSettingMatchesPermission(isGranted: Boolean) {
         launchWithUnexpectedErrorHandler {
             if (isGranted) return@launchWithUnexpectedErrorHandler
 

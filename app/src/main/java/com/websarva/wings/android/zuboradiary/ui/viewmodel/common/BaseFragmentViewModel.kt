@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-internal abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage>(
+abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> internal constructor(
     initialViewUiState: S
 ) : BaseViewModel<S, E, M>(initialViewUiState) {
 
@@ -25,13 +25,13 @@ internal abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMess
     // 表示保留中Navigation
     private val _pendingNavigationCommandList =
         MutableStateFlow(emptyList<PendingNavigationCommand>())
-    val pendingNavigationCommandList
+    internal val pendingNavigationCommandList
         get() = _pendingNavigationCommandList.asStateFlow()
 
     private val logMsgPendingNavi = "保留ナビゲーション_"
     
     private val _commonUiEvent = MutableSharedFlow<ConsumableEvent<CommonUiEvent>>(replay = 1)
-    val commonUiEvent get() = _commonUiEvent.asSharedFlow()
+    internal val commonUiEvent get() = _commonUiEvent.asSharedFlow()
     //endregion
 
     //region UI Event Handlers
@@ -39,7 +39,7 @@ internal abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMess
     //endregion
 
     //region Navigation Event Handlers
-    fun onFragmentNavigationFailure(command: NavigationCommand) {
+    internal fun onFragmentNavigationFailure(command: NavigationCommand) {
         val newPendingCommand = PendingNavigationCommand(command)
         Log.d(
             logTag,
@@ -48,7 +48,7 @@ internal abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMess
         updatePendingNavigationCommandList { it + newPendingCommand }
     }
 
-    fun onPendingFragmentNavigationComplete(command: PendingNavigationCommand) {
+    internal fun onPendingFragmentNavigationComplete(command: PendingNavigationCommand) {
         Log.d(
             logTag,
             "${logMsgPendingNavi}保留中のナビゲーションが完了。リストから削除。コマンド: $command"
@@ -56,7 +56,7 @@ internal abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMess
         updatePendingNavigationCommandList { it - command }
     }
 
-    fun onPendingFragmentNavigationFailure(command: PendingNavigationCommand) {
+    internal fun onPendingFragmentNavigationFailure(command: PendingNavigationCommand) {
         Log.d(
             logTag,
             "${logMsgPendingNavi}保留中のナビゲーションが再度失敗。リトライ回数を更新。コマンド: $command"
@@ -72,7 +72,7 @@ internal abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMess
         }
     }
 
-    fun onPendingFragmentNavigationRetryLimitReached(command: PendingNavigationCommand) {
+    internal fun onPendingFragmentNavigationRetryLimitReached(command: PendingNavigationCommand) {
         Log.e(
             logTag,
             "${logMsgPendingNavi}保留中のナビゲーションがリトライ回数に到達。コマンド: $command"

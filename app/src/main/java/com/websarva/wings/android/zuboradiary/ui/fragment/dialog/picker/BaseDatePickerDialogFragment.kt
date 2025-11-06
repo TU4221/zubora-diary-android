@@ -54,7 +54,7 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
         return datePicker
     }
 
-    internal abstract fun createInitialDate(): LocalDate
+    protected abstract fun createInitialDate(): LocalDate
 
     private fun setUpOnClickListener(datePicker: MaterialDatePicker<Long>, dummyDialog: Dialog) {
         datePicker.addOnPositiveButtonClickListener { selection: Long ->
@@ -80,9 +80,9 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
         }
     }
 
-    internal abstract fun handleOnPositiveButtonClick(selectedDate: LocalDate)
+    protected abstract fun handleOnPositiveButtonClick(selectedDate: LocalDate)
 
-    internal abstract fun handleOnNegativeButtonClick()
+    protected abstract fun handleOnNegativeButtonClick()
 
-    internal abstract fun handleOnCancel()
+    protected abstract fun handleOnCancel()
 }

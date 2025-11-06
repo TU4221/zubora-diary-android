@@ -29,7 +29,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         return builder.create()
     }
 
-    internal open fun customizeDialog(builder: MaterialAlertDialogBuilder) {
+    protected open fun customizeDialog(builder: MaterialAlertDialogBuilder) {
         val title = createTitle()
         builder.setTitle(title)
 
@@ -57,22 +57,22 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
-    internal abstract fun createTitle(): String
+    protected abstract fun createTitle(): String
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
-    internal abstract fun createMessage(): String
+    protected abstract fun createMessage(): String
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
-    internal abstract fun handleOnPositiveButtonClick()
+    protected abstract fun handleOnPositiveButtonClick()
 
     /**
      * BaseAlertDialogFragment.customizeDialog()で呼び出される。
      */
-    internal abstract fun handleOnNegativeButtonClick()
+    protected abstract fun handleOnNegativeButtonClick()
 
     // ダイアログ枠外タッチ、popBackStack時に処理
     // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
@@ -88,5 +88,5 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     /**
      * BaseAlertDialogFragment.onCancel()で呼び出される。
      */
-    internal abstract fun handleOnCancel()
+    protected abstract fun handleOnCancel()
 }

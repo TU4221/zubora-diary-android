@@ -59,7 +59,7 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
         binding.numberPickerFirst.displayedValues = themeColorList
     }
 
-    companion object {
+    internal companion object {
         val RESULT_KEY = RESULT_KEY_PREFIX + ThemeColorPickerDialogFragment::class.java.name
     }
 }

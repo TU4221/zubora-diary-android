@@ -65,7 +65,7 @@ import kotlin.collections.map
 import kotlin.random.Random
 
 @HiltViewModel
-internal class DiaryEditViewModel @Inject constructor(
+class DiaryEditViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val diaryUiStateHelper: DiaryUiStateHelper,
     private val shouldRequestExitWithoutDiarySaveConfirmationUseCase: ShouldRequestExitWithoutDiarySaveConfirmationUseCase,
@@ -230,7 +230,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // Viewクリック処理
-    fun onDiarySaveMenuClick() {
+    internal fun onDiarySaveMenuClick() {
         if (!isReadyForOperation) return
 
         updateLog(LocalDateTime.now())
@@ -250,7 +250,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryDeleteMenuClick() {
+    internal fun onDiaryDeleteMenuClick() {
         if (!isReadyForOperation) return
         if (currentUiState.isNewDiary) return
 
@@ -384,18 +384,18 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemInvisibleStateTransitionCompleted(itemNumberInt: Int) {
+    internal fun onDiaryItemInvisibleStateTransitionCompleted(itemNumberInt: Int) {
         val itemNumber = DiaryItemNumber(itemNumberInt)
         deleteItem(itemNumber)
     }
 
-    fun onDiaryItemVisibleStateTransitionCompleted() {
+    internal fun onDiaryItemVisibleStateTransitionCompleted() {
         updateToIdleState()
     }
     //endregion
 
     //region UI Event Handlers - Results
-    fun onDiaryLoadDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onDiaryLoadDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
                 handleDiaryLoadDialogPositiveResult(pendingDiaryLoadParameters)
@@ -424,7 +424,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryUpdateDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onDiaryUpdateDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
                 handleDiaryUpdateDialogPositiveResult(pendingDiaryUpdateParameters)
@@ -450,7 +450,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
                 handleDiaryDeleteDialogPositiveResult(pendingDiaryDeleteParameters)
@@ -471,7 +471,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDatePickerDialogResultReceived(result: DialogResult<LocalDate>) {
+    internal fun onDatePickerDialogResultReceived(result: DialogResult<LocalDate>) {
         when (result) {
             is DialogResult.Positive<LocalDate> -> {
                 handleDatePickerDialogPositiveResult(
@@ -498,7 +498,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryLoadFailureDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onDiaryLoadFailureDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit>,
             DialogResult.Negative,
@@ -512,7 +512,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onWeatherInfoFetchDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onWeatherInfoFetchDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
                 handleWeatherInfoFetchDialogPositiveResult()
@@ -530,7 +530,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemDeleteDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onDiaryItemDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
                 handleDiaryItemDeleteDialogPositiveResult(pendingDiaryItemDeleteParameters)
@@ -551,7 +551,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryImageDeleteDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onDiaryImageDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
                 handleDiaryImageDeleteDialogPositiveResult()
@@ -569,7 +569,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onExitWithoutDiarySaveDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onExitWithoutDiarySaveDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive -> {
                 handleExitWithoutDiarySaveDialogPositiveResult(pendingPreviousNavigationParameters)
@@ -593,7 +593,7 @@ internal class DiaryEditViewModel @Inject constructor(
         }
     }
 
-    fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitleSelectionUi>) {
+    internal fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitleSelectionUi>) {
         when (result) {
             is FragmentResult.Some -> {
                 updateItemTitle(result.data)
@@ -605,7 +605,7 @@ internal class DiaryEditViewModel @Inject constructor(
     }
 
     // MEMO:未選択時null
-    fun onOpenDocumentResultImageUriReceived(uri: Uri?) {
+    internal fun onOpenDocumentResultImageUriReceived(uri: Uri?) {
         val parameters = pendingDiaryImageUpdateParameters
         clearPendingDiaryImageUpdateParameters()
         launchWithUnexpectedErrorHandler {
@@ -617,7 +617,7 @@ internal class DiaryEditViewModel @Inject constructor(
     //endregion
 
     //region UI Event Handlers - Permissions
-    fun onAccessLocationPermissionChecked(
+    internal fun onAccessLocationPermissionChecked(
         isGranted: Boolean
     ) {
         val parameters = pendingWeatherInfoFetchParameters
@@ -1482,11 +1482,11 @@ internal class DiaryEditViewModel @Inject constructor(
     )
     //endregion
 
-    companion object {
-        private const val ARGUMENT_DIARY_ID_KEY = "diary_id"
-        private const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
+    private companion object {
+        const val ARGUMENT_DIARY_ID_KEY = "diary_id"
+        const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
 
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
+        const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 
     //region For Test

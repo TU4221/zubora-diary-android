@@ -37,7 +37,7 @@ class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
         builder.setNegativeButton("", null)
     }
 
-    companion object {
+    internal companion object {
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryLoadFailureDialogFragment::class.java.name
     }
 }

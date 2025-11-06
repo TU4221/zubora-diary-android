@@ -34,7 +34,7 @@ import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
 @HiltViewModel
-internal class DiaryItemTitleEditViewModel @Inject constructor(
+class DiaryItemTitleEditViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val loadDiaryItemTitleSelectionHistoryListUseCase: LoadDiaryItemTitleSelectionHistoryListUseCase,
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
@@ -160,7 +160,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryListItemClick(item: DiaryItemTitleSelectionHistoryListItemUi) {
+    internal fun onDiaryItemTitleSelectionHistoryListItemClick(item: DiaryItemTitleSelectionHistoryListItemUi) {
         val itemNumber = currentUiState.itemNumber
         val itemId = item.id
         val itemTitle = item.title
@@ -173,7 +173,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryItemTitleSelectionHistoryListItemSwipe(item: DiaryItemTitleSelectionHistoryListItemUi) {
+    internal fun onDiaryItemTitleSelectionHistoryListItemSwipe(item: DiaryItemTitleSelectionHistoryListItemUi) {
         val itemId = item.id
         val itemTitle = item.title
         launchWithUnexpectedErrorHandler {
@@ -196,7 +196,7 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
         updateTitle(textString)
     }
 
-    fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(
+    internal fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(
         result: DialogResult<Unit>
     ) {
         when (result) {
@@ -335,9 +335,9 @@ internal class DiaryItemTitleEditViewModel @Inject constructor(
     )
     //endregion
 
-    companion object {
-        private const val ARGUMENT_DIARY_ITEM_TITLE_KEY = "diary_item_title"
+    private companion object {
+        const val ARGUMENT_DIARY_ITEM_TITLE_KEY = "diary_item_title"
 
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
+        const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }

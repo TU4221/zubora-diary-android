@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class MainActivityViewModel @Inject constructor(
+class MainActivityViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
 ) : BaseViewModel<MainActivityUiState, MainActivityUiEvent, MainActivityAppMessage>(
@@ -135,17 +135,17 @@ internal class MainActivityViewModel @Inject constructor(
     //endregion
 
     //region Activity UI Event Handlers
-    fun onBottomNavigationItemSelect() {
+    internal fun onBottomNavigationItemSelect() {
         updateWasBottomNavigationTabSelected(true)
     }
 
-    fun onBottomNavigationItemReselect() {
+    internal fun onBottomNavigationItemReselect() {
         viewModelScope.launch {
             emitActivityCallbackUiEvent(ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect)
         }
     }
 
-    fun onNavigateBackFromBottomNavigationTab() {
+    internal fun onNavigateBackFromBottomNavigationTab() {
         viewModelScope.launch {
             emitUiEvent(MainActivityUiEvent.NavigateStartTabFragment)
         }
@@ -153,7 +153,7 @@ internal class MainActivityViewModel @Inject constructor(
     //endregion
 
     //region Fragment UI Event Handlers
-    fun onFragmentViewReady(needsBottomNavigation: Boolean) {
+    internal fun onFragmentViewReady(needsBottomNavigation: Boolean) {
         if (needsBottomNavigation) {
             updateToBottomNavigationVisibleState()
         } else {
@@ -161,16 +161,16 @@ internal class MainActivityViewModel @Inject constructor(
         }
     }
 
-    fun onFragmentViewResumed() {
+    internal fun onFragmentViewResumed() {
         updateIsNavigating(false)
     }
 
-    fun onFragmentViewPause() {
+    internal fun onFragmentViewPause() {
         if (!_wasBottomNavigationTabSelected.value) return
         updateIsNavigating(true)
     }
 
-    fun onFragmentProcessingStateChanged(isProcessing: Boolean) {
+    internal fun onFragmentProcessingStateChanged(isProcessing: Boolean) {
         if (isProcessing) {
             updateToProcessingState()
         } else {
@@ -178,11 +178,11 @@ internal class MainActivityViewModel @Inject constructor(
         }
     }
 
-    fun onVisibleFragmentTransitionSetupCompleted() {
+    internal fun onVisibleFragmentTransitionSetupCompleted() {
         markVisibleFragmentTransitionSetupCompleted()
     }
 
-    fun onInvisibleFragmentTransitionSetupCompleted() {
+    internal fun onInvisibleFragmentTransitionSetupCompleted() {
         markInvisibleFragmentTransitionSetupCompleted()
     }
     //endregion
@@ -289,7 +289,7 @@ internal class MainActivityViewModel @Inject constructor(
     }
     //endregion
 
-    companion object {
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
+    private companion object {
+        const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }

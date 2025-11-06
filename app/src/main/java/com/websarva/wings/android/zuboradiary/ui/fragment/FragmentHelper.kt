@@ -72,7 +72,7 @@ class FragmentHelper {
         }
     }
 
-    internal fun <E: UiEvent> setUpMainUiEvent(
+    fun <E: UiEvent> setUpMainUiEvent(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
         handler: MainUiEventHandler<E>
@@ -89,7 +89,7 @@ class FragmentHelper {
         }
     }
 
-    internal fun <E: UiEvent> setUpCommonUiEvent(
+    fun <E: UiEvent> setUpCommonUiEvent(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
         handler: CommonUiEventHandler
@@ -106,7 +106,7 @@ class FragmentHelper {
         }
     }
 
-    internal fun setUpActivityUiEvent(
+    fun setUpActivityUiEvent(
         fragment: Fragment,
         mainActivityViewModel: MainActivityViewModel,
         handler: ActivityCallbackUiEventHandler
@@ -123,7 +123,7 @@ class FragmentHelper {
         }
     }
 
-    internal fun setUpPendingNavigation(
+    fun setUpPendingNavigation(
         navController: NavController,
         navDestinationId: Int,
         mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
@@ -172,7 +172,7 @@ class FragmentHelper {
         )
     }
 
-    internal fun navigateFragmentWithRetry(
+    fun navigateFragmentWithRetry(
         navController: NavController,
         fragmentDestinationId: Int,
         mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>,
@@ -251,7 +251,7 @@ class FragmentHelper {
         )
     }
 
-    internal fun navigatePreviousFragmentWithRetry(
+    fun navigatePreviousFragmentWithRetry(
         navController: NavController,
         fragmentDestinationId: Int,
         resultKey: String?,
@@ -277,7 +277,7 @@ class FragmentHelper {
          }
     }
 
-    internal fun registerOnBackPressedCallback(
+    fun registerOnBackPressedCallback(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
     ) {

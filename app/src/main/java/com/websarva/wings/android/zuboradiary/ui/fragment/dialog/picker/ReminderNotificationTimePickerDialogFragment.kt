@@ -26,7 +26,7 @@ class ReminderNotificationTimePickerDialogFragment : BaseTimePickerDialogFragmen
         setResult(RESULT_KEY, DialogResult.Cancel)
     }
 
-    companion object {
+    internal companion object {
         val RESULT_KEY = RESULT_KEY_PREFIX + ReminderNotificationTimePickerDialogFragment::class.java.name
     }
 }

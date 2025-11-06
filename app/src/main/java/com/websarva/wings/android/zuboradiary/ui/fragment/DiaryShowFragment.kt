@@ -158,7 +158,6 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     //endregion
 
     internal companion object {
-        // Navigation関係
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
     }
 }

@@ -795,7 +795,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     internal companion object {
-        // Navigation関係
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
     }
 }

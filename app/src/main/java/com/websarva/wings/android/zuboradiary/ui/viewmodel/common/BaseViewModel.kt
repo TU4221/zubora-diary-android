@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.coroutines.cancellation.CancellationException
 
-internal abstract class BaseViewModel<S: UiState, E: UiEvent, M: AppMessage>(
+abstract class BaseViewModel<S: UiState, E: UiEvent, M: AppMessage> internal constructor(
     initialViewUiState: S
 ) : ViewModel() {
 
@@ -36,7 +36,7 @@ internal abstract class BaseViewModel<S: UiState, E: UiEvent, M: AppMessage>(
         get() = !currentUiState.isInputDisabled
 
     private val _uiEvent = MutableSharedFlow<ConsumableEvent<E>>(replay = 1)
-    val uiEvent get() = _uiEvent.asSharedFlow()
+    internal val uiEvent get() = _uiEvent.asSharedFlow()
     //endregion
 
     //region UI State Update

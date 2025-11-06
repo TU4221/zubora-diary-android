@@ -20,9 +20,9 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
     : BaseSimpleFullScreenDialogFragment<T>(), MainUiEventHandler<E>, CommonUiEventHandler {
 
     //region Properties
-    internal abstract val mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>
+    protected abstract val mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>
 
-    internal abstract val destinationId: Int
+    protected abstract val destinationId: Int
     //endregion
 
     //region Fragment Lifecycle
@@ -40,9 +40,9 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
     /**
      *  setUpFragmentResultReceiver()、setUpDialogResultReceiver()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
      * */
-    internal abstract fun setUpFragmentResultReceivers()
+    protected abstract fun setUpFragmentResultReceivers()
 
-    internal fun <T> setUpDialogResultReceiver(key: String, block: (DialogResult<T>) -> Unit) {
+    protected fun <T> setUpDialogResultReceiver(key: String, block: (DialogResult<T>) -> Unit) {
         setUpFragmentResultReceiverInternal(key, block)
     }
 
@@ -101,7 +101,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
     //endregion
 
     //region Navigation Helpers
-    internal fun navigateFragmentOnce(command: NavigationCommand) {
+    protected fun navigateFragmentOnce(command: NavigationCommand) {
         fragmentHelper
             .navigateFragmentOnce(
                 findNavController(),
@@ -110,7 +110,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
             )
     }
 
-    internal fun navigateFragmentWithRetry(command: NavigationCommand) {
+    protected fun navigateFragmentWithRetry(command: NavigationCommand) {
         fragmentHelper
             .navigateFragmentWithRetry(
                 findNavController(),
@@ -120,7 +120,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
             )
     }
 
-    internal fun navigatePreviousFragment(
+    protected fun navigatePreviousFragment(
         resultKey: String? = null,
         result: FragmentResult<*> = FragmentResult.None
     ) {
@@ -133,7 +133,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
             )
     }
 
-    internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
+    protected abstract fun navigateAppMessageDialog(appMessage: AppMessage)
     //endregion
 
     //region Internal Helpers

@@ -17,11 +17,11 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
 
     //region Properties
     private var _binding: T? = null
-    internal val binding get() = checkNotNull(_binding)
+    protected val binding get() = checkNotNull(_binding)
 
-    internal val fragmentHelper = FragmentHelper()
+    protected val fragmentHelper = FragmentHelper()
 
-    internal val themeColor
+    protected val themeColor
         get() = (requireActivity() as MainActivity).themeColor
     //endregion
 
@@ -62,18 +62,18 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
     //endregion
 
     //region View Binding Setup
-    internal abstract fun createViewBinding(
+    protected abstract fun createViewBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup?
     ): T
 
-    internal open fun clearViewBindings() {
+    protected open fun clearViewBindings() {
         _binding = null
     }
     //endregion
 
     //region Navigation Helpers
-    internal fun navigatePreviousFragment() {
+    protected fun navigatePreviousFragment() {
         findNavController().navigateUp()
     }
     //endregion

@@ -78,7 +78,7 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         binding.numberPickerFirst.displayedValues = dayOfWeekList
     }
 
-    companion object {
+    internal companion object {
         val RESULT_KEY = RESULT_KEY_PREFIX + CalendarStartDayPickerDialogFragment::class.java.name
     }
 }

@@ -52,7 +52,7 @@ import java.util.concurrent.CancellationException
 import javax.inject.Inject
 
 @HiltViewModel
-internal class DiaryListViewModel @Inject constructor(
+class DiaryListViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val loadNewDiaryListUseCase: LoadNewDiaryListUseCase,
     private val loadAdditionDiaryListUseCase: LoadAdditionDiaryListUseCase,
@@ -132,7 +132,7 @@ internal class DiaryListViewModel @Inject constructor(
     //endregion
 
     //region UI Event Handlers - Observation
-    fun onUiReady() {
+    internal fun onUiReady() {
         if (!needsRefreshDiaryList) return
         updateNeedsRefreshDiaryList(false)
         if (!isReadyForOperation) return
@@ -146,7 +146,7 @@ internal class DiaryListViewModel @Inject constructor(
             }
     }
 
-    fun onUiGone() {
+    internal fun onUiGone() {
         updateNeedsRefreshDiaryList(true)
     }
     //endregion
@@ -161,7 +161,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    fun onWordSearchMenuClick() {
+    internal fun onWordSearchMenuClick() {
         launchWithUnexpectedErrorHandler {
             emitUiEvent(DiaryListUiEvent.NavigateWordSearchFragment)
         }
@@ -180,7 +180,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryListItemClick(item: DiaryDayListItemUi.Standard) {
+    internal fun onDiaryListItemClick(item: DiaryDayListItemUi.Standard) {
         val id = item.id
         val date = item.date
         launchWithUnexpectedErrorHandler {
@@ -188,7 +188,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryListItemDeleteButtonClick(item: DiaryDayListItemUi.Standard) {
+    internal fun onDiaryListItemDeleteButtonClick(item: DiaryDayListItemUi.Standard) {
         if (!isReadyForOperation) return
 
         val id = item.id
@@ -214,7 +214,7 @@ internal class DiaryListViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryListEndScrolled() {
+    internal fun onDiaryListEndScrolled() {
         if (_isLoadingOnScrolled.value) return
         updateIsLoadingOnScrolled(true)
 
@@ -227,13 +227,13 @@ internal class DiaryListViewModel @Inject constructor(
             }
     }
 
-    fun onDiaryListUpdateCompleted() {
+    internal fun onDiaryListUpdateCompleted() {
         updateIsLoadingOnScrolled(false)
     }
     //endregion
 
     //region UI Event Handlers - Results
-    fun onDatePickerDialogResultReceived(result: DialogResult<YearMonth>) {
+    internal fun onDatePickerDialogResultReceived(result: DialogResult<YearMonth>) {
         when (result) {
             is DialogResult.Positive<YearMonth> -> {
                 handleDatePickerDialogPositiveResult(result.data)
@@ -251,7 +251,7 @@ internal class DiaryListViewModel @Inject constructor(
         updateSortConditionDate(sortConditionDate)
     }
 
-    fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
         Log.d("20251004", "onDiaryDeleteDialogResultReceived")
         when (result) {
             is DialogResult.Positive -> {
@@ -576,7 +576,7 @@ internal class DiaryListViewModel @Inject constructor(
     )
     //endregion
 
-    companion object {
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
+    private companion object {
+        const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }

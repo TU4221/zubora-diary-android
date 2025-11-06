@@ -31,7 +31,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-internal class DiaryShowViewModel @Inject constructor(
+class DiaryShowViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val diaryUiStateHelper: DiaryUiStateHelper,
     private val loadDiaryByIdUseCase: LoadDiaryByIdUseCase,
@@ -121,7 +121,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // Viewクリック処理
-    fun onDiaryEditMenuClick() {
+    internal fun onDiaryEditMenuClick() {
         if (!isReadyForOperation) return
 
         val id = diary.id
@@ -133,7 +133,7 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryDeleteMenuClick() {
+    internal fun onDiaryDeleteMenuClick() {
         if (!isReadyForOperation) return
 
         val id = diary.id
@@ -156,7 +156,7 @@ internal class DiaryShowViewModel @Inject constructor(
     }
 
     // Fragmentからの結果受取処理
-    fun onDiaryLoadFailureDialogResultReceived(result: DialogResult<Unit>) {when (result) {
+    internal fun onDiaryLoadFailureDialogResultReceived(result: DialogResult<Unit>) {when (result) {
             is DialogResult.Positive<Unit>,
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -169,7 +169,7 @@ internal class DiaryShowViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
+    internal fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
                 handleDiaryDeleteDialogPositiveResult(pendingDiaryDeleteParameters)
@@ -336,8 +336,8 @@ internal class DiaryShowViewModel @Inject constructor(
     )
     //endregion
 
-    companion object {
-        private const val ARGUMENT_DIARY_ID_KEY = "diary_id"
-        private const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
+    private companion object {
+        const val ARGUMENT_DIARY_ID_KEY = "diary_id"
+        const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
     }
 }

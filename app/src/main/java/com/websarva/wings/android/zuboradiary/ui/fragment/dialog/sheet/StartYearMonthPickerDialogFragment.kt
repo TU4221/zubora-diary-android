@@ -53,7 +53,7 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
         }
     }
 
-    companion object {
+    internal companion object {
         val RESULT_KEY = RESULT_KEY_PREFIX + StartYearMonthPickerDialogFragment::class.java.name
     }
 }

@@ -52,7 +52,7 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
         return timePicker
     }
 
-    internal abstract fun setUpInitializationTime(builder: MaterialTimePicker.Builder)
+    protected abstract fun setUpInitializationTime(builder: MaterialTimePicker.Builder)
 
     private fun setUpOnClickListener(timePicker: MaterialTimePicker, dummyDialog: Dialog) {
         timePicker.addOnPositiveButtonClickListener { _ ->
@@ -79,9 +79,9 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
         }
     }
 
-    internal abstract fun handleOnPositiveButtonClick(selectedTime: LocalTime)
+    protected abstract fun handleOnPositiveButtonClick(selectedTime: LocalTime)
 
-    internal abstract fun handleOnNegativeButtonClick()
+    protected abstract fun handleOnNegativeButtonClick()
 
-    internal abstract fun handleOnCancel()
+    protected abstract fun handleOnCancel()
 }

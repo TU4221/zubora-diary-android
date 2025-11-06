@@ -38,7 +38,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-internal class WordSearchViewModel @Inject internal constructor(
+class WordSearchViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val countWordSearchResultsUseCase: CountWordSearchResultsUseCase,
     private val loadNewWordSearchResultListUseCase: LoadNewWordSearchResultListUseCase,
@@ -125,7 +125,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     //endregion
 
     //region UI Event Handlers
-    fun onUiReady() {
+    internal fun onUiReady() {
         if (!needsRefreshWordSearchResultList) return
         updateNeedsRefreshWordSearchResultList(false)
         if (!isReadyForOperation) return
@@ -142,7 +142,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             }
     }
 
-    fun onUiGone() {
+    internal fun onUiGone() {
         updateNeedsRefreshWordSearchResultList(true)
     }
 
@@ -159,7 +159,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    fun onWordSearchResultListItemClick(item: DiaryDayListItemUi.WordSearchResult) {
+    internal fun onWordSearchResultListItemClick(item: DiaryDayListItemUi.WordSearchResult) {
         val id = item.id
         val date = item.date
         launchWithUnexpectedErrorHandler {
@@ -174,7 +174,7 @@ internal class WordSearchViewModel @Inject internal constructor(
         updateSearchWord(text.toString())
     }
 
-    fun onWordSearchResultListEndScrolled() {
+    internal fun onWordSearchResultListEndScrolled() {
         if (isLoadingOnScrolled) return
         updateIsLoadingOnScrolled(true)
 
@@ -190,7 +190,7 @@ internal class WordSearchViewModel @Inject internal constructor(
             }
     }
 
-    fun onWordSearchResultListUpdateCompleted() {
+    internal fun onWordSearchResultListUpdateCompleted() {
         updateIsLoadingOnScrolled(false)
     }
     //endregion
@@ -447,7 +447,7 @@ internal class WordSearchViewModel @Inject internal constructor(
     }
     //endregion
 
-    companion object {
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
+    private companion object {
+        const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }

@@ -71,7 +71,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     /**
      * BaseBottomSheetDialogFragment.PositiveButtonClickListener#onClick()で呼び出される。
      */
-    internal abstract fun handleOnPositiveButtonClick(
+    protected abstract fun handleOnPositiveButtonClick(
         firstPickerValue: Int,
         secondPickerValue: Int,
         thirdPickerValue: Int
@@ -80,10 +80,10 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     /**
      * BaseBottomSheetDialogFragment.NegativeButtonClickListener#onClick()で呼び出される。
      */
-    internal abstract fun handleOnNegativeButtonClick()
+    protected abstract fun handleOnNegativeButtonClick()
 
     /**
      * BaseNumberPickersBottomSheetDialogFragment#createDialogView()で呼び出される。
      */
-    internal abstract fun setUpNumberPickers()
+    protected abstract fun setUpNumberPickers()
 }

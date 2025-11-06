@@ -31,7 +31,7 @@ class DiaryItemTitleDeleteDialogFragment : BaseAlertDialogFragment() {
         setResult(RESULT_KEY, DialogResult.Cancel)
     }
 
-    companion object {
+    internal companion object {
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryItemTitleDeleteDialogFragment::class.java.name
     }
 }

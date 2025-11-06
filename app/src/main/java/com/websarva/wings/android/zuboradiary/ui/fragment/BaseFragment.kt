@@ -36,17 +36,17 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     //region Properties
     // View関係
     private var _binding: T? = null
-    internal val binding get() = checkNotNull(_binding)
+    protected val binding get() = checkNotNull(_binding)
 
-    internal abstract val mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>
+    protected abstract val mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>
 
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
-    internal val mainActivityViewModel: MainActivityViewModel by activityViewModels()
+    protected val mainActivityViewModel: MainActivityViewModel by activityViewModels()
 
-    internal abstract val destinationId: Int
+    protected abstract val destinationId: Int
     private val isNavigationStartFragment: Boolean
         get() {
             val topLevelGraph = findNavController().graph
@@ -56,7 +56,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
             return destinationId == startDestinationId
         }
 
-    internal val themeColor
+    protected val themeColor
         get() = (requireActivity() as MainActivity).themeColor
 
     protected val fragmentHelper = FragmentHelper()
@@ -106,11 +106,11 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     /**
      * BaseFragment#onCreateView()で呼び出される。
      */
-    internal abstract fun createViewBinding(
+    protected abstract fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): T
 
-    internal open fun clearViewBindings() {
+    protected open fun clearViewBindings() {
         _binding = null
     }
     //endregion
@@ -222,13 +222,13 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     /**
      *  setUpFragmentResultReceiver()、setUpDialogResultReceiver()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
      * */
-    internal abstract fun setUpFragmentResultReceivers()
+    protected abstract fun setUpFragmentResultReceivers()
 
-    internal fun <T> setUpFragmentResultReceiver(key: String, block: (FragmentResult<T>) -> Unit) {
+    protected fun <T> setUpFragmentResultReceiver(key: String, block: (FragmentResult<T>) -> Unit) {
         setUpFragmentResultReceiverInternal(key, block)
     }
 
-    internal fun <T> setUpDialogResultReceiver(key: String, block: (DialogResult<T>) -> Unit) {
+    protected fun <T> setUpDialogResultReceiver(key: String, block: (DialogResult<T>) -> Unit) {
         setUpFragmentResultReceiverInternal(key, block)
     }
 
@@ -253,7 +253,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         observePendingNavigation()
     }
 
-    internal open fun setUpUiStateObservers() {
+    protected open fun setUpUiStateObservers() {
         observeProcessingState()
     }
 
@@ -267,7 +267,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         }
     }
 
-    internal open fun setUpUiEventObservers() {
+    protected open fun setUpUiEventObservers() {
         observeMainUiEvent()
         observeCommonUiEvent()
     }
@@ -307,7 +307,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     //endregion
 
     //region Navigation Helpers
-    internal fun navigateFragmentOnce(command: NavigationCommand) {
+    protected fun navigateFragmentOnce(command: NavigationCommand) {
         fragmentHelper
             .navigateFragmentOnce(
                 findNavController(),
@@ -316,7 +316,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
             )
     }
 
-    internal fun navigateFragmentWithRetry(command: NavigationCommand) {
+    protected fun navigateFragmentWithRetry(command: NavigationCommand) {
         fragmentHelper
             .navigateFragmentWithRetry(
                 findNavController(),
@@ -326,7 +326,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
             )
     }
 
-    internal fun navigatePreviousFragmentOnce(
+    protected fun navigatePreviousFragmentOnce(
         resultKey: String? = null,
         result: FragmentResult<*> = FragmentResult.None
     ) {
@@ -339,7 +339,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
             )
     }
 
-    internal fun navigatePreviousFragmentWithRetry(
+    protected fun navigatePreviousFragmentWithRetry(
         resultKey: String? = null,
         result: FragmentResult<*> = FragmentResult.None
     ) {
@@ -353,11 +353,11 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
             )
     }
 
-    internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
+    protected abstract fun navigateAppMessageDialog(appMessage: AppMessage)
     //endregion
 
     //region Internal Helpers
-    internal fun launchAndRepeatOnViewLifeCycleStarted(
+    protected fun launchAndRepeatOnViewLifeCycleStarted(
         block: suspend CoroutineScope.() -> Unit
     ) {
         fragmentHelper.launchAndRepeatOnViewLifeCycleStarted(this, block)

@@ -34,7 +34,7 @@ import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
-internal class CalendarViewModel @Inject constructor(
+class CalendarViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val diaryUiStateHelper: DiaryUiStateHelper,
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
@@ -167,11 +167,11 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun onCalendarDayClick(date: LocalDate) {
+    internal fun onCalendarDayClick(date: LocalDate) {
         updateSelectedDate(date)
     }
 
-    fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
+    internal fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
         launchWithUnexpectedErrorHandler {
             refreshCalendarDayDot(date)
         }
@@ -206,7 +206,7 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun onBottomNavigationItemReselect() {
+    internal fun onBottomNavigationItemReselect() {
         if (!isReadyForOperation) return
 
         val selectedDate = currentUiState.selectedDate
@@ -225,7 +225,7 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryShowFragmentResultReceived(result: FragmentResult<LocalDate>) {
+    internal fun onDiaryShowFragmentResultReceived(result: FragmentResult<LocalDate>) {
         when (result) {
             is FragmentResult.Some -> updateSelectedDate(result.data)
             FragmentResult.None -> {
@@ -234,7 +234,7 @@ internal class CalendarViewModel @Inject constructor(
         }
     }
 
-    fun onDiaryEditFragmentResultReceived(result: FragmentResult<LocalDate>) {
+    internal fun onDiaryEditFragmentResultReceived(result: FragmentResult<LocalDate>) {
         when (result) {
             is FragmentResult.Some -> updateSelectedDate(result.data)
             FragmentResult.None -> {
@@ -383,7 +383,7 @@ internal class CalendarViewModel @Inject constructor(
     }
     //endregion
 
-    companion object {
-        private const val SAVED_STATE_UI_KEY = "saved_state_ui"
+    private companion object {
+        const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }
