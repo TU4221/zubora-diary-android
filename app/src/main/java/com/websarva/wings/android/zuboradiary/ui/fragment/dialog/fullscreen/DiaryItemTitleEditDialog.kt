@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
@@ -142,10 +141,10 @@ class DiaryItemTitleEditDialog :
     //region Navigation Helpers
     // DiaryItemTitleEditDialogを閉じる
     private fun completeItemTitleEdit(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
-        val navBackStackEntry = checkNotNull(findNavController().previousBackStackEntry)
-        val savedStateHandle = navBackStackEntry.savedStateHandle
-        savedStateHandle[RESULT_KEY] = FragmentResult.Some(diaryItemTitleSelection)
-        navigatePreviousFragment()
+        navigatePreviousFragment(
+            RESULT_KEY,
+            FragmentResult.Some(diaryItemTitleSelection)
+        )
     }
 
     private fun navigateDiaryItemTitleDeleteDialog(itemTitle: String) {
