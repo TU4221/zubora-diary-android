@@ -10,7 +10,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
-// TODO:初期化はstaticメソッドでやる
 @Parcelize
 data class DiaryEditUiState(
     // UiData

@@ -5,7 +5,6 @@ import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.LocalDateTime
 
-// TODO:未使用だが開発最終に削除する
 /**
  * 日記を表すデータクラス。
  *
