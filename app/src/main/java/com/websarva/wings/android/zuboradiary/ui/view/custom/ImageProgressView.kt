@@ -30,7 +30,6 @@ internal class ImageProgressView @JvmOverloads constructor (
             true
         )
 
-    // ... (既存のプロパティ) ...
     private val defaultIconDrawable: Drawable?
     private val errorIconDrawable: Drawable?
     private val iconColorInt: Int
@@ -44,7 +43,6 @@ internal class ImageProgressView @JvmOverloads constructor (
         )
 
         try {
-            // ... (既存の属性の読み込み) ...
             val defaultIconRes = typedArray.getResourceId(
                 R.styleable.ImageProgressView_defaultIcon,
                 R.drawable.ic_image_24px
@@ -98,7 +96,6 @@ internal class ImageProgressView @JvmOverloads constructor (
         }
     }
 
-    // ... (loadImage, applyDefaultIcon メソッドは変更なし) ...
      fun loadImage(imagePath: String?) {
         val imageView = binding.image
         val progressView = binding.progress
@@ -122,11 +119,15 @@ internal class ImageProgressView @JvmOverloads constructor (
                 // プログレッス可視、カラー設定
                 listener(
                     onStart = {
-                        progressView.visibility = VISIBLE
+                        if (data is File) progressView.visibility = VISIBLE
                     },
-                    onSuccess = { _, _ ->
+                    onSuccess = { request, _ ->
                         progressView.visibility = INVISIBLE
-                        imageView.clearColorFilter()
+                        if (request.data is File) {
+                            imageView.clearColorFilter()
+                        } else {
+                            imageView.setColorFilter(iconColorInt)
+                        }
                     },
                     onError = { _, _ ->
                         progressView.visibility = INVISIBLE
