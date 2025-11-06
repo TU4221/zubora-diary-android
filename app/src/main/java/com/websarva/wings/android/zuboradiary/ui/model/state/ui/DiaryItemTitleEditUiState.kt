@@ -23,9 +23,9 @@ data class DiaryItemTitleEditUiState(
 
     companion object {
         fun fromSavedState(savedUiState: DiaryItemTitleEditUiState): DiaryItemTitleEditUiState {
-            return DiaryItemTitleEditUiState(
-                itemNumber = savedUiState.itemNumber,
-                title = savedUiState.title,
+            return savedUiState.copy(
+                isProcessing = false,
+                isInputDisabled = false
             )
         }
     }

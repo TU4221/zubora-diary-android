@@ -25,10 +25,10 @@ data class WordSearchUiState(
 
     companion object {
         fun fromSavedState(savedUiState: WordSearchUiState): WordSearchUiState {
-            return WordSearchUiState(
-                searchWord = savedUiState.searchWord,
-                numWordSearchResults = savedUiState.numWordSearchResults,
-                wordSearchResultList = savedUiState.wordSearchResultList,
+            return savedUiState.copy(
+                isProcessing = false,
+                isInputDisabled = false,
+                isRefreshing = false
             )
         }
     }

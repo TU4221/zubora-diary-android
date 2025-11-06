@@ -28,10 +28,9 @@ data class CalendarUiState(
 
     companion object {
         fun fromSavedState(savedUiState: CalendarUiState): CalendarUiState {
-            return CalendarUiState(
-                calendarStartDayOfWeek = savedUiState.calendarStartDayOfWeek,
-                selectedDate = savedUiState.selectedDate,
-                previousSelectedDate = savedUiState.previousSelectedDate
+            return savedUiState.copy(
+                isProcessing = false,
+                isInputDisabled = false
             )
         }
     }

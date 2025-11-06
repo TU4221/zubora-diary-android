@@ -23,9 +23,10 @@ data class DiaryListUiState(
 
     companion object {
         fun fromSavedState(savedUiState: DiaryListUiState): DiaryListUiState {
-            return DiaryListUiState(
-                diaryList = savedUiState.diaryList,
-                sortConditionDate = savedUiState.sortConditionDate
+            return savedUiState.copy(
+                isProcessing = false,
+                isInputDisabled = false,
+                isRefreshing = false
             )
         }
     }

@@ -26,9 +26,10 @@ data class MainActivityUiState(
 
     companion object {
         fun fromSavedState(savedUiState: MainActivityUiState): MainActivityUiState {
-            return MainActivityUiState(
-                themeColor = savedUiState.themeColor,
-                isBottomNavigationVisible = savedUiState.isBottomNavigationVisible
+            return  savedUiState.copy(
+                isProcessing = false,
+                isInputDisabled = false,
+                isNavigating = false
             )
         }
     }
