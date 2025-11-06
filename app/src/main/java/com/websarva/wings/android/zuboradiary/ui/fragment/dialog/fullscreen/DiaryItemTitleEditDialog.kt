@@ -28,22 +28,28 @@ import kotlinx.coroutines.flow.mapNotNull
 class DiaryItemTitleEditDialog :
     BaseFullScreenDialogFragment<DialogDiaryItemTitleEditBinding, DiaryItemTitleEditUiEvent>() {
 
-    internal companion object {
-        // Navigation関係
-        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryItemTitleEditDialog::class.java.name
-    }
-
-    override val destinationId = R.id.navigation_diary_item_title_edit_dialog
-
-    // ViewModel
+    //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryItemTitleEditViewModel by viewModels()
 
-    private lateinit var itemTitleSelectionHistoryListAdapter: DiaryItemTitleSelectionHistoryListAdapter
+    override val destinationId = R.id.navigation_diary_item_title_edit_dialog
 
+    private lateinit var itemTitleSelectionHistoryListAdapter: DiaryItemTitleSelectionHistoryListAdapter
+    //endregion
+
+    //region Fragment Lifecycle
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        observeItemTitleSelectionHistoryListItem()
+        setUpItemTitleSelectionHistory()
+    }
+    //endregion
+
+    //region View Binding Setup
     override fun createViewBinding(
         themeColorInflater: LayoutInflater, container: ViewGroup?
     ): DialogDiaryItemTitleEditBinding {
@@ -53,14 +59,9 @@ class DiaryItemTitleEditDialog :
                 viewModel = mainViewModel
             }
     }
+    //endregion
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        observeItemTitleSelectionHistoryListItem()
-        setUpItemTitleSelectionHistory()
-    }
-
+    //region Fragment Result Receiver Setup
     override fun initializeFragmentResultReceiver() {
         setUpDiaryItemTitleDeleteDialogResultReceiver()
     }
@@ -73,7 +74,9 @@ class DiaryItemTitleEditDialog :
             mainViewModel.onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(result)
         }
     }
+    //endregion
 
+    //region UI Observation Setup
     override fun onMainUiEventReceived(event: DiaryItemTitleEditUiEvent) {
         when (event) {
             DiaryItemTitleEditUiEvent.CloseSwipedItem -> {
@@ -116,7 +119,9 @@ class DiaryItemTitleEditDialog :
             }
         }
     }
+    //endregion
 
+    //region View Setup
     private fun setUpItemTitleSelectionHistory() {
         itemTitleSelectionHistoryListAdapter =
             DiaryItemTitleSelectionHistoryListAdapter(
@@ -132,7 +137,9 @@ class DiaryItemTitleEditDialog :
                 }
             }
     }
+    //endregion
 
+    //region Navigation Helpers
     // DiaryItemTitleEditDialogを閉じる
     private fun completeItemTitleEdit(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
         val navBackStackEntry = checkNotNull(findNavController().previousBackStackEntry)
@@ -154,5 +161,11 @@ class DiaryItemTitleEditDialog :
                 appMessage
             )
         navigateFragmentWithRetry(NavigationCommand.To(directions))
+    }
+    //endregion
+
+    internal companion object {
+        // Navigation関係
+        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryItemTitleEditDialog::class.java.name
     }
 }
