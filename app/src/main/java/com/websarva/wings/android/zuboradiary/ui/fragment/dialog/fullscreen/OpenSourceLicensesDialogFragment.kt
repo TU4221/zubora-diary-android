@@ -6,16 +6,21 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
+import androidx.compose.material3.contentColorFor
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.unit.dp
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
+import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.chipPadding
 import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
 import com.mikepenz.aboutlibraries.ui.compose.chipColors
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
+import com.websarva.wings.android.zuboradiary.ui.utils.asErrorColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asPrimaryColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColorInt
 
@@ -45,32 +50,60 @@ class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<Fragm
     private fun setUpAboutLibraries() {
         binding.composeViewAboutLibraries
             .apply {
+                // Compositionの破棄タイミングをFragmentのViewのライフサイクルと連動
                 setViewCompositionStrategy(
                     ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
                 )
-                setContent {
-                    // rememberLibraries を使ってライブラリ情報をロード
-                    val libraries = rememberLibraries()
 
+                setContent {
+                    // ライブラリ情報を読み込み、インスタンス化
+                    val libraries = rememberLibraries()
                     // 新しい LibrariesContainer のシグネチャに合わせて修正
                     LibrariesContainer(
                         libraries = libraries.value, // Libs オブジェクトを渡す
                         modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(16.dp),
+
+
+                        // リスト全体の左右の余白
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+
+                        // 色の設定
                         colors = LibraryDefaults.libraryColors(
                             backgroundColor = Color(themeColor.asSecondaryContainerColorInt(resources)),
                             contentColor = Color(themeColor.asPrimaryColorInt(resources)),
+                            versionChipColors = LibraryDefaults.chipColors(
+                                containerColor = Color(
+                                    themeColor.asSecondaryContainerColorInt(resources)
+                                )
+                            ),
                             licenseChipColors = LibraryDefaults.chipColors(),
+                            fundingChipColors = LibraryDefaults.chipColors(
+                                    containerColor = Color(themeColor.asErrorColorInt(resources)),
+                                    contentColor = contentColorFor(
+                                        Color(themeColor.asErrorColorInt(resources))
+                                    ),
+                                ),
                             dialogConfirmButtonColor = Color(themeColor.asPrimaryColorInt(resources))
                         ),
-                        // itemContentPadding と itemSpacing は padding や dimensions パラメータに統合されたか、
-                        // LibraryDefaults 内で設定するようになった可能性があります。
-                        // LibraryDefaults.libraryPadding() や LibraryDefaults.libraryDimensions() を確認してください。
-                        // もしこれらの引数が直接ない場合は、一旦削除してデフォルトの挙動を確認するか、
-                        // ライブラリのドキュメントで新しい指定方法を確認してください。
-                        // 例として、LibraryDefaults を使った padding の設定例 (実際のAPIと異なる場合があります)
-                        // padding = LibraryDefaults.libraryPadding(content = LibraryDefaults.ContentPadding),
-                        // dimensions = LibraryDefaults.libraryDimensions(itemSpacing = 8.dp)
+
+                        // 各ライブラリ項目の「内部」の余白を設定
+                        padding = LibraryDefaults.libraryPadding(
+                            contentPadding = PaddingValues(16.dp),
+                            namePadding = PaddingValues(0.dp),
+                            versionPadding = chipPadding(
+                                containerPadding = PaddingValues(start = 8.dp)
+                            ),
+                            licensePadding = chipPadding(),
+                            fundingPadding = chipPadding(),
+                            verticalPadding = 2.dp,
+                            licenseDialogContentPadding = 8.dp
+                        ),
+
+                        // 各ライブラリ項目「間」のスペースを設定
+                        dimensions = LibraryDefaults.libraryDimensions(
+                            itemSpacing = 8.dp, // 各項目間の縦のスペース
+                            chipMinHeight = 16.dp
+                        )
                     )
 
                     /*LibrariesContainer(
