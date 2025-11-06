@@ -18,6 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditU
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -93,12 +94,15 @@ class DiaryItemTitleEditDialog :
         }
     }
 
-    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
-        navigatePreviousFragment()
-    }
-
-    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
-        navigateAppMessageDialog(appMessage)
+    override fun onCommonUiEventReceived(event: CommonUiEvent) {
+        when (event) {
+            is CommonUiEvent.NavigatePreviousFragment<*> -> {
+                navigatePreviousFragment()
+            }
+            is CommonUiEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+        }
     }
 
     private fun observeItemTitleSelectionHistoryListItem() {

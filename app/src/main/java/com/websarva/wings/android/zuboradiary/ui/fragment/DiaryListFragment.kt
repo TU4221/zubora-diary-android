@@ -20,8 +20,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -121,12 +121,15 @@ class DiaryListFragment :
         }
     }
 
-    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
-        navigatePreviousFragmentOnce()
-    }
-
-    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
-        navigateAppMessageDialog(appMessage)
+    override fun onCommonUiEventReceived(event: CommonUiEvent) {
+        when (event) {
+            is CommonUiEvent.NavigatePreviousFragment<*> -> {
+                navigatePreviousFragmentOnce()
+            }
+            is CommonUiEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+        }
     }
 
     override fun onActivityCallbackUiEventReceived(event: ActivityCallbackUiEvent) {

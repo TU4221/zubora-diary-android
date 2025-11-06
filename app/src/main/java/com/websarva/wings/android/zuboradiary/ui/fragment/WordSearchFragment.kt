@@ -14,8 +14,8 @@ import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsear
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -84,12 +84,15 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         }
     }
 
-    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
-        navigatePreviousFragmentOnce()
-    }
-
-    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
-        navigateAppMessageDialog(appMessage)
+    override fun onCommonUiEventReceived(event: CommonUiEvent) {
+        when (event) {
+            is CommonUiEvent.NavigatePreviousFragment<*> -> {
+                navigatePreviousFragmentOnce()
+            }
+            is CommonUiEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+        }
     }
 
     override fun setUpUiStateObservers() {

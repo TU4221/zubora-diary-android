@@ -42,6 +42,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -284,12 +285,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
-        navigatePreviousFragmentOnce(RESULT_KEY, result)
-    }
-
-    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
-        navigateAppMessageDialog(appMessage)
+    override fun onCommonUiEventReceived(event: CommonUiEvent) {
+        when (event) {
+            is CommonUiEvent.NavigatePreviousFragment<*> -> {
+                navigatePreviousFragmentOnce(RESULT_KEY, event.result)
+            }
+            is CommonUiEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+        }
     }
 
     override fun setUpUiStateObservers() {

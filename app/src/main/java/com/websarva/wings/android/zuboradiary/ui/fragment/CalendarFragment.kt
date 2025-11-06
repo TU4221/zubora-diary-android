@@ -29,7 +29,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -119,12 +119,15 @@ class CalendarFragment :
         }
     }
 
-    override fun onNavigatePreviousFragmentEventReceived(result: FragmentResult<*>) {
-        mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
-    }
-
-    override fun onNavigateAppMessageEventReceived(appMessage: AppMessage) {
-        navigateAppMessageDialog(appMessage)
+    override fun onCommonUiEventReceived(event: CommonUiEvent) {
+        when (event) {
+            is CommonUiEvent.NavigatePreviousFragment<*> -> {
+                mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
+            }
+            is CommonUiEvent.NavigateAppMessage -> {
+                navigateAppMessageDialog(event.message)
+            }
+        }
     }
 
     override fun onActivityCallbackUiEventReceived(event: ActivityCallbackUiEvent) {
