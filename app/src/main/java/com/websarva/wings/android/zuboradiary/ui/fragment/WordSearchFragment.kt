@@ -66,8 +66,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     }
     //endregion
 
-    //region Fragment Result Receiver Setup
-    override fun setUpFragmentResultReceivers() {
+    //region Fragment Result Observation Setup
+    override fun setUpFragmentResultObservers() {
         // 処理なし
     }
     //endregion

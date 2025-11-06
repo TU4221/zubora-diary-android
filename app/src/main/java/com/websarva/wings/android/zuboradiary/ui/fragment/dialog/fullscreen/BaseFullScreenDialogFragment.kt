@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -29,27 +28,20 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpFragmentResultReceivers()
+        setUpFragmentResultObservers()
         setUpUiEventObservers()
         observePendingNavigation()
         registerOnBackPressedCallback()
     }
     //endregion
 
-    //region Fragment Result Receiver Setup
+    //region Fragment Result Observation Setup
     /**
      *  setUpFragmentResultReceiver()、setUpDialogResultReceiver()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
      * */
-    protected abstract fun setUpFragmentResultReceivers()
+    protected abstract fun setUpFragmentResultObservers()
 
-    protected fun <T> setUpDialogResultReceiver(key: String, block: (DialogResult<T>) -> Unit) {
-        setUpFragmentResultReceiverInternal(key, block)
-    }
-
-    private fun <R: NavigationResult> setUpFragmentResultReceiverInternal(
-        key: String,
-        block: (R) -> Unit
-    ) {
+    protected fun <T> observeDialogResult(key: String, block: (DialogResult<T>) -> Unit) {
         fragmentHelper
             .observeFragmentResult(
                 findNavController(),

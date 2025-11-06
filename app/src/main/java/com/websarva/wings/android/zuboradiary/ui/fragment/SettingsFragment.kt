@@ -113,20 +113,20 @@ class SettingsFragment :
     }
     //endregion
 
-    //region Fragment Result Receiver Setup
-    override fun setUpFragmentResultReceivers() {
-        receiveThemeColorPickerDialogResult()
-        receiveCalendarStartDayPickerDialogResult()
-        receiveReminderNotificationTimePickerDialogResult()
-        receivePermissionDialogResult()
-        receiveAllDiariesDeleteDialogResult()
-        receiveAllSettingsInitializationDialogResult()
-        receiveAllDataDeleteDialogResult()
+    //region Fragment Result Observation Setup
+    override fun setUpFragmentResultObservers() {
+        observeThemeColorPickerDialogResult()
+        observeCalendarStartDayPickerDialogResult()
+        observeReminderNotificationTimePickerDialogResult()
+        observePermissionDialogResult()
+        observeAllDiariesDeleteDialogResult()
+        observeAllSettingsInitializationDialogResult()
+        observeAllDataDeleteDialogResult()
     }
 
     // テーマカラー設定ダイアログフラグメントから結果受取
-    private fun receiveThemeColorPickerDialogResult() {
-        setUpDialogResultReceiver(
+    private fun observeThemeColorPickerDialogResult() {
+        observeDialogResult(
             ThemeColorPickerDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onThemeColorSettingDialogResultReceived(result)
@@ -134,8 +134,8 @@ class SettingsFragment :
     }
 
     // カレンダー開始曜日設定ダイアログフラグメントから結果受取
-    private fun receiveCalendarStartDayPickerDialogResult() {
-        setUpDialogResultReceiver(
+    private fun observeCalendarStartDayPickerDialogResult() {
+        observeDialogResult(
             CalendarStartDayPickerDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onCalendarStartDayOfWeekSettingDialogResultReceived(result)
@@ -143,8 +143,8 @@ class SettingsFragment :
     }
 
     // リマインダー通知時間設定ダイアログフラグメントから結果受取
-    private fun receiveReminderNotificationTimePickerDialogResult() {
-        setUpDialogResultReceiver(
+    private fun observeReminderNotificationTimePickerDialogResult() {
+        observeDialogResult(
             ReminderNotificationTimePickerDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onReminderNotificationSettingDialogResultReceived(result)
@@ -152,32 +152,32 @@ class SettingsFragment :
     }
 
     // 権限催促ダイアログフラグメントから結果受取
-    private fun receivePermissionDialogResult() {
-        setUpDialogResultReceiver(
+    private fun observePermissionDialogResult() {
+        observeDialogResult(
             PermissionDialogFragment.RESULT_KEY
         ) { result: DialogResult<Unit> ->
             mainViewModel.onPermissionDialogResultReceived(result)
         }
     }
 
-    private fun receiveAllDiariesDeleteDialogResult() {
-        setUpDialogResultReceiver(
+    private fun observeAllDiariesDeleteDialogResult() {
+        observeDialogResult(
             AllDiariesDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onAllDiariesDeleteDialogResultReceived(result)
         }
     }
 
-    private fun receiveAllSettingsInitializationDialogResult() {
-        setUpDialogResultReceiver(
+    private fun observeAllSettingsInitializationDialogResult() {
+        observeDialogResult(
             AllSettingsInitializationDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onAllSettingsInitializationDialogResultReceived(result)
         }
     }
 
-    private fun receiveAllDataDeleteDialogResult() {
-        setUpDialogResultReceiver(
+    private fun observeAllDataDeleteDialogResult() {
+        observeDialogResult(
             AllDataDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onAllDataDeleteDialogResultReceived(result)

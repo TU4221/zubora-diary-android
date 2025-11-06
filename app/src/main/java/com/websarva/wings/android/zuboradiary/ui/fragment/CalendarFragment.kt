@@ -78,22 +78,22 @@ class CalendarFragment :
     }
     //endregion
 
-    //region Fragment Result Receiver Setup
-    override fun setUpFragmentResultReceivers() {
-        setUpDiaryShowFragmentResultReceiver()
-        setUpDiaryEditFragmentResultReceiver()
+    //region Fragment Result Observation Setup
+    override fun setUpFragmentResultObservers() {
+        observeDiaryShowFragmentResult()
+        observeDiaryEditFragmentResult()
     }
 
-    private fun setUpDiaryShowFragmentResultReceiver() {
-        setUpFragmentResultReceiver(
+    private fun observeDiaryShowFragmentResult() {
+        observeFragmentResult(
             DiaryShowFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryShowFragmentResultReceived(result)
         }
     }
 
-    private fun setUpDiaryEditFragmentResultReceiver() {
-        setUpFragmentResultReceiver(
+    private fun observeDiaryEditFragmentResult() {
+        observeFragmentResult(
             DiaryEditFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryEditFragmentResultReceived(result)

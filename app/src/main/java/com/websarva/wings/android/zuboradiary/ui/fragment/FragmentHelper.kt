@@ -47,7 +47,7 @@ class FragmentHelper {
         navController: NavController,
         fragmentDestinationId: Int,
         key: String,
-        block: (R) -> Unit
+        onResultReceived: (R) -> Unit
     ) {
         val navBackStackEntry = navController.getBackStackEntry(fragmentDestinationId)
         val savedStateHandle = navBackStackEntry.savedStateHandle
@@ -58,7 +58,7 @@ class FragmentHelper {
         navBackStackEntry.lifecycleScope.launch {
             navBackStackEntry.repeatOnLifecycle(Lifecycle.State.RESUMED) {
                 result.filterNotNull().collect { value: R ->
-                    block(value)
+                    onResultReceived(value)
 
                     savedStateHandle[key] = null
                 }

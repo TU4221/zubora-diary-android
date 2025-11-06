@@ -75,15 +75,15 @@ class DiaryListFragment :
     }
     //endregion
 
-    //region Fragment Result Receiver Setup
-    override fun setUpFragmentResultReceivers() {
-        setUpDatePickerDialogResultReceiver()
-        setUpDiaryDeleteDialogResultReceiver()
+    //region Fragment Result Observation Setup
+    override fun setUpFragmentResultObservers() {
+        observeDatePickerDialogResult()
+        observeDiaryDeleteDialogResult()
     }
 
     // 日付入力ダイアログフラグメントから結果受取
-    private fun setUpDatePickerDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDatePickerDialogResult() {
+        observeDialogResult(
             StartYearMonthPickerDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDatePickerDialogResultReceived(result)
@@ -91,8 +91,8 @@ class DiaryListFragment :
     }
 
     // 日記削除ダイアログフラグメントから結果受取
-    private fun setUpDiaryDeleteDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDiaryDeleteDialogResult() {
+        observeDialogResult(
             DiaryListDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryDeleteDialogResultReceived(result)

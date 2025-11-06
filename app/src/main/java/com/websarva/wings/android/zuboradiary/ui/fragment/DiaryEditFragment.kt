@@ -122,23 +122,23 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
     //endregion
 
-    //region Fragment Result Receiver Setup
-    override fun setUpFragmentResultReceivers() {
-        setUpDiaryItemTitleEditFragmentResultReceiver()
-        setUpDiaryLoadDialogResultReceiver()
-        setUpDiaryLoadFailureDialogResultReceiver()
-        setUpDiaryUpdateDialogResultReceiver()
-        setUpDiaryDeleteDialogResultReceiver()
-        setUpDatePickerDialogResultReceiver()
-        setUpWeatherInfoFetchDialogResultReceiver()
-        setUpDiaryItemDeleteDialogResultReceiver()
-        setUpDiaryImageDeleteDialogResultReceiver()
-        setUpExitWithoutDiarySaveDialogResultReceiver()
+    //region Fragment Result Observation Setup
+    override fun setUpFragmentResultObservers() {
+        observeDiaryItemTitleEditFragmentResult()
+        observeDiaryLoadDialogResult()
+        observeDiaryLoadFailureDialogResult()
+        observeDiaryUpdateDialogResult()
+        observeDiaryDeleteDialogResult()
+        observeDatePickerDialogResult()
+        observeUpWeatherInfoFetchDialogResult()
+        observeDiaryItemDeleteDialogResult()
+        observeDiaryImageDeleteDialogResult()
+        observeExitWithoutDiarySaveDialogResult()
     }
 
     // DiaryItemTitleEditFragmentから編集結果受取
-    private fun setUpDiaryItemTitleEditFragmentResultReceiver() {
-        setUpFragmentResultReceiver(
+    private fun observeDiaryItemTitleEditFragmentResult() {
+        observeFragmentResult(
             DiaryItemTitleEditDialog.RESULT_KEY
         ) { result: FragmentResult<DiaryItemTitleSelectionUi> ->
             mainViewModel.onItemTitleEditFragmentResultReceived(result)
@@ -146,8 +146,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     // 既存日記読込ダイアログフラグメントから結果受取
-    private fun setUpDiaryLoadDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDiaryLoadDialogResult() {
+        observeDialogResult(
             DiaryLoadDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryLoadDialogResultReceived(result)
@@ -155,8 +155,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     // 日記読込失敗確認ダイアログフラグメントから結果受取
-    private fun setUpDiaryLoadFailureDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDiaryLoadFailureDialogResult() {
+        observeDialogResult(
             DiaryLoadFailureDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryLoadFailureDialogResultReceived(result)
@@ -164,8 +164,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
-    private fun setUpDiaryUpdateDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDiaryUpdateDialogResult() {
+        observeDialogResult(
             DiaryUpdateDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryUpdateDialogResultReceived(result)
@@ -173,8 +173,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     // 既存日記上書きダイアログフラグメントから結果受取
-    private fun setUpDiaryDeleteDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDiaryDeleteDialogResult() {
+        observeDialogResult(
             DiaryDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryDeleteDialogResultReceived(result)
@@ -182,8 +182,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     // 日付入力ダイアログフラグメントからデータ受取
-    private fun setUpDatePickerDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDatePickerDialogResult() {
+        observeDialogResult(
             DatePickerDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDatePickerDialogResultReceived(result)
@@ -191,8 +191,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     // 天気情報読込ダイアログフラグメントから結果受取
-    private fun setUpWeatherInfoFetchDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeUpWeatherInfoFetchDialogResult() {
+        observeDialogResult(
             WeatherInfoFetchDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onWeatherInfoFetchDialogResultReceived(result)
@@ -200,24 +200,24 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     // 項目削除確認ダイアログフラグメントから結果受取
-    private fun setUpDiaryItemDeleteDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDiaryItemDeleteDialogResult() {
+        observeDialogResult(
             DiaryItemDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryItemDeleteDialogResultReceived(result)
         }
     }
 
-    private fun setUpDiaryImageDeleteDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDiaryImageDeleteDialogResult() {
+        observeDialogResult(
             DiaryImageDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryImageDeleteDialogResultReceived(result)
         }
     }
 
-    private fun setUpExitWithoutDiarySaveDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeExitWithoutDiarySaveDialogResult() {
+        observeDialogResult(
             ExitWithoutDiarySaveDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onExitWithoutDiarySaveDialogResultReceived(result)

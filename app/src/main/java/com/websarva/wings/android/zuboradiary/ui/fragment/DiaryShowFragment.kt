@@ -52,15 +52,15 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     }
     //endregion
 
-    //region Fragment Result Receiver Setup
-    override fun setUpFragmentResultReceivers() {
-        setUpDiaryLoadFailureDialogResultReceiver()
-        setUpDiaryDeleteDialogResultReceiver()
+    //region Fragment Result Observation Setup
+    override fun setUpFragmentResultObservers() {
+        observeDiaryLoadFailureDialogResult()
+        observeDiaryDeleteDialogResult()
     }
 
     // 日記読込失敗確認ダイアログフラグメントからデータ受取
-    private fun setUpDiaryLoadFailureDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDiaryLoadFailureDialogResult() {
+        observeDialogResult(
             DiaryLoadFailureDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryLoadFailureDialogResultReceived(result)
@@ -68,8 +68,8 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     }
 
     // 日記削除確認ダイアログフラグメントからデータ受取
-    private fun setUpDiaryDeleteDialogResultReceiver() {
-        setUpDialogResultReceiver(
+    private fun observeDiaryDeleteDialogResult() {
+        observeDialogResult(
             DiaryDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryDeleteDialogResultReceived(result)

@@ -79,7 +79,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         super.onViewCreated(view, savedInstanceState)
         mainActivityViewModel.onFragmentViewReady(this is RequiresBottomNavigation)
 
-        setUpFragmentResultReceivers()
+        setUpFragmentResultObservers()
         setUpUiObservers()
         if (!isNavigationStartFragment) registerOnBackPressedCallback()
     }
@@ -218,21 +218,21 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     }
     //endregion
 
-    //region Fragment Result Receiver Setup
+    //region Fragment Result Observation Setup
     /**
-     *  setUpFragmentResultReceiver()、setUpDialogResultReceiver()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
+     *  observeFragmentResult()、observeDialogResult()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
      * */
-    protected abstract fun setUpFragmentResultReceivers()
+    protected abstract fun setUpFragmentResultObservers()
 
-    protected fun <T> setUpFragmentResultReceiver(key: String, block: (FragmentResult<T>) -> Unit) {
-        setUpFragmentResultReceiverInternal(key, block)
+    protected fun <T> observeFragmentResult(key: String, block: (FragmentResult<T>) -> Unit) {
+        executeFragmentResultObservation(key, block)
     }
 
-    protected fun <T> setUpDialogResultReceiver(key: String, block: (DialogResult<T>) -> Unit) {
-        setUpFragmentResultReceiverInternal(key, block)
+    protected fun <T> observeDialogResult(key: String, block: (DialogResult<T>) -> Unit) {
+        executeFragmentResultObservation(key, block)
     }
 
-    private fun <R : NavigationResult> setUpFragmentResultReceiverInternal(
+    private fun <R : NavigationResult> executeFragmentResultObservation(
         key: String,
         block: (R) -> Unit
     ) {

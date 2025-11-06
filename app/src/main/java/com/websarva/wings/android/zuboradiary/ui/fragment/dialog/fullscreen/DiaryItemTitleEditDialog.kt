@@ -60,14 +60,14 @@ class DiaryItemTitleEditDialog :
     }
     //endregion
 
-    //region Fragment Result Receiver Setup
-    override fun setUpFragmentResultReceivers() {
+    //region Fragment Result Observation Setup
+    override fun setUpFragmentResultObservers() {
         setUpDiaryItemTitleDeleteDialogResultReceiver()
     }
 
     // 履歴項目削除確認ダイアログからの結果受取
     private fun setUpDiaryItemTitleDeleteDialogResultReceiver() {
-        setUpDialogResultReceiver(
+        observeDialogResult(
             DiaryItemTitleDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(result)
