@@ -140,4 +140,22 @@ internal data class DiaryYearMonthList<T: DiaryDayListItem>(
             applyNoDiaryMessageAsLastItem(itemList)
         )
     }
+
+    companion object {
+        fun initialLoadingDiaryList(): DiaryYearMonthList<DiaryDayListItem.Standard> {
+            return DiaryYearMonthList(
+                listOf(
+                    DiaryYearMonthListItem.ProgressIndicator()
+                )
+            )
+        }
+
+        fun initialLoadingWordSearchResult(): DiaryYearMonthList<DiaryDayListItem.WordSearchResult> {
+            return DiaryYearMonthList(
+                listOf(
+                    DiaryYearMonthListItem.ProgressIndicator()
+                )
+            )
+        }
+    }
 }

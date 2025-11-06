@@ -8,7 +8,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthListItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.CountWordSearchResultsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionWordSearchResultListUseCase
@@ -367,11 +366,7 @@ class WordSearchViewModel @Inject internal constructor(
 
     private fun updateToWordSearchResultListNewLoadState() {
         val list =
-            DiaryYearMonthList<DiaryDayListItem.WordSearchResult>(
-                listOf(
-                    DiaryYearMonthListItem.ProgressIndicator()
-                )
-            ).toUiModel()
+            DiaryYearMonthList.initialLoadingWordSearchResult().toUiModel()
         updateUiState {
             it.copy(
                 wordSearchResultList = list,

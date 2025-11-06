@@ -10,7 +10,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SavedDiaryDateRange
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
-import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthListItem
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadAdditionDiaryListUseCase
@@ -488,11 +487,7 @@ class DiaryListViewModel @Inject internal constructor(
 
     private suspend fun updateToDiaryListNewLoadState() {
         val list =
-            DiaryYearMonthList<DiaryDayListItem.Standard>(
-                listOf(
-                    DiaryYearMonthListItem.ProgressIndicator()
-                )
-            ).let { mapDiaryListUiModel(it) }
+            mapDiaryListUiModel(DiaryYearMonthList.initialLoadingDiaryList())
         updateUiState {
             it.copy(
                 diaryList = list,
