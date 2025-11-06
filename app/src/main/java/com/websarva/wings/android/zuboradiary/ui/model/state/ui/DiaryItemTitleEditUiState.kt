@@ -19,4 +19,14 @@ data class DiaryItemTitleEditUiState(
     // ProcessingState
     override val isProcessing: Boolean = false,
     override val isInputDisabled: Boolean = false
-) : UiState, Parcelable
+) : UiState, Parcelable {
+
+    companion object {
+        fun fromSavedState(savedUiState: DiaryItemTitleEditUiState): DiaryItemTitleEditUiState {
+            return DiaryItemTitleEditUiState(
+                itemNumber = savedUiState.itemNumber,
+                title = savedUiState.title,
+            )
+        }
+    }
+}

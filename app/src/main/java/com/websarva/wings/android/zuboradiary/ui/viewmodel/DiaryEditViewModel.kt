@@ -83,10 +83,9 @@ class DiaryEditViewModel @Inject internal constructor(
     private val cacheDiaryImageUseCase: CacheDiaryImageUseCase,
     private val clearDiaryImageCacheFileUseCase: ClearDiaryImageCacheFileUseCase
 ) : BaseFragmentViewModel<DiaryEditUiState, DiaryEditUiEvent, DiaryEditAppMessage>(
-    handle.get<DiaryEditUiState>(SAVED_STATE_UI_KEY)?.copy(
-        isProcessing = false,
-        isInputDisabled = false
-    ) ?: DiaryEditUiState(editingDiary = Diary.generate().toUiModel())
+    handle.get<DiaryEditUiState>(SAVED_STATE_UI_KEY)?.let {
+        DiaryEditUiState.fromSavedState(it)
+    } ?: DiaryEditUiState(editingDiary = Diary.generate().toUiModel())
 ) {
 
 

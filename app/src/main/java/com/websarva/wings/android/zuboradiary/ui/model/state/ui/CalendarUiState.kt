@@ -24,4 +24,15 @@ data class CalendarUiState(
     // ProcessingState
     override val isProcessing: Boolean = false,
     override val isInputDisabled: Boolean = false
-) : UiState, BaseDiaryShowUiState, Parcelable
+) : UiState, BaseDiaryShowUiState, Parcelable {
+
+    companion object {
+        fun fromSavedState(savedUiState: CalendarUiState): CalendarUiState {
+            return CalendarUiState(
+                calendarStartDayOfWeek = savedUiState.calendarStartDayOfWeek,
+                selectedDate = savedUiState.selectedDate,
+                previousSelectedDate = savedUiState.previousSelectedDate
+            )
+        }
+    }
+}

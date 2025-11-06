@@ -41,12 +41,8 @@ class CalendarViewModel @Inject internal constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
 ) : BaseFragmentViewModel<CalendarUiState, CalendarUiEvent, CalendarAppMessage>(
-    handle.get<CalendarUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
-        CalendarUiState().copy(
-            calendarStartDayOfWeek = savedUiState.calendarStartDayOfWeek,
-            selectedDate = savedUiState.selectedDate,
-            previousSelectedDate = savedUiState.previousSelectedDate
-        )
+    handle.get<CalendarUiState>(SAVED_STATE_UI_KEY)?.let {
+        CalendarUiState.fromSavedState(it)
     } ?:CalendarUiState()
 ) {
 

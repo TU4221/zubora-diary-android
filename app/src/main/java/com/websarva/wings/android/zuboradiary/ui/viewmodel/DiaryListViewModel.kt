@@ -61,11 +61,8 @@ class DiaryListViewModel @Inject internal constructor(
     private val loadDiaryListStartYearMonthPickerDateRangeUseCase: LoadDiaryListStartYearMonthPickerDateRangeUseCase,
     private val buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
 ) : BaseFragmentViewModel<DiaryListUiState, DiaryListUiEvent, DiaryListAppMessage>(
-    handle.get<DiaryListUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
-        DiaryListUiState().copy(
-            diaryList = savedUiState.diaryList,
-            sortConditionDate = savedUiState.sortConditionDate
-        )
+    handle.get<DiaryListUiState>(SAVED_STATE_UI_KEY)?.let {
+        DiaryListUiState.fromSavedState(it)
     } ?: DiaryListUiState()
 ) {
 

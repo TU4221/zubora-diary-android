@@ -36,11 +36,8 @@ class MainActivityViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
 ) : BaseViewModel<MainActivityUiState, MainActivityUiEvent, MainActivityAppMessage>(
-    handle.get<MainActivityUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
-        MainActivityUiState().copy(
-            themeColor = savedUiState.themeColor,
-            isBottomNavigationVisible = savedUiState.isBottomNavigationVisible
-        )
+    handle.get<MainActivityUiState>(SAVED_STATE_UI_KEY)?.let {
+        MainActivityUiState.fromSavedState(it)
     } ?: MainActivityUiState()
 ) {
 

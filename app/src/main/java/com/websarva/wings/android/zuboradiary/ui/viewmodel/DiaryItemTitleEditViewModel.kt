@@ -40,11 +40,8 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
 ) : BaseFragmentViewModel<DiaryItemTitleEditUiState, DiaryItemTitleEditUiEvent, DiaryItemTitleEditAppMessage>(
-    handle.get<DiaryItemTitleEditUiState>(SAVED_STATE_UI_KEY)?.let { savedUiState ->
-        DiaryItemTitleEditUiState().copy(
-            itemNumber = savedUiState.itemNumber,
-            title = savedUiState.title,
-        )
+    handle.get<DiaryItemTitleEditUiState>(SAVED_STATE_UI_KEY)?.let {
+        DiaryItemTitleEditUiState.fromSavedState(it)
     } ?: DiaryItemTitleEditUiState()
 ) {
 

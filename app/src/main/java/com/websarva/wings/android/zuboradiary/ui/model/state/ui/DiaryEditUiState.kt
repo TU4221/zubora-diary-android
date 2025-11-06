@@ -32,4 +32,14 @@ data class DiaryEditUiState(
     // ProcessingState
     override val isProcessing: Boolean = false,
     override val isInputDisabled: Boolean = false
-) : UiState, Parcelable
+) : UiState, Parcelable {
+
+    companion object {
+        fun fromSavedState(savedUiState: DiaryEditUiState): DiaryEditUiState {
+            return savedUiState.copy(
+                isProcessing = false,
+                isInputDisabled = false
+            )
+        }
+    }
+}

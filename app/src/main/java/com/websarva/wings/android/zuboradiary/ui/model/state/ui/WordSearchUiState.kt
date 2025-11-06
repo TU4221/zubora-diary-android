@@ -21,4 +21,15 @@ data class WordSearchUiState(
     override val isProcessing: Boolean = false,
     override val isInputDisabled: Boolean = false,
     val isRefreshing: Boolean = false
-) : UiState, Parcelable
+) : UiState, Parcelable {
+
+    companion object {
+        fun fromSavedState(savedUiState: WordSearchUiState): WordSearchUiState {
+            return WordSearchUiState(
+                searchWord = savedUiState.searchWord,
+                numWordSearchResults = savedUiState.numWordSearchResults,
+                wordSearchResultList = savedUiState.wordSearchResultList,
+            )
+        }
+    }
+}
