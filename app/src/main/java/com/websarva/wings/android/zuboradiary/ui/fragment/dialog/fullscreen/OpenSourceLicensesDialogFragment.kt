@@ -6,8 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextFieldDefaults.contentPadding
 import androidx.compose.material3.contentColorFor
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,12 +17,12 @@ import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
 import com.mikepenz.aboutlibraries.ui.compose.chipColors
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
-import com.websarva.wings.android.zuboradiary.databinding.FragmentOpenSourceLicensesBinding
+import com.websarva.wings.android.zuboradiary.databinding.DialogOpenSourceLicensesBinding
 import com.websarva.wings.android.zuboradiary.ui.utils.asErrorColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asPrimaryColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColorInt
 
-class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<FragmentOpenSourceLicensesBinding>() {
+class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<DialogOpenSourceLicensesBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -35,8 +33,8 @@ class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<Fragm
     override fun createViewBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup?
-    ): FragmentOpenSourceLicensesBinding {
-        return FragmentOpenSourceLicensesBinding.inflate(themeColorInflater, container, false)
+    ): DialogOpenSourceLicensesBinding {
+        return DialogOpenSourceLicensesBinding.inflate(themeColorInflater, container, false)
     }
 
     private fun setUpToolBar() {
