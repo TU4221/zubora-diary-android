@@ -25,6 +25,9 @@
     <style name="AppToolbarNavBackStyle" parent="AppToolbarStyle">
         <item name="navigationIcon">@drawable/ic_arrow_back_24px</item>
     </style>
+    <style name="AppToolbarNavCloseStyle" parent="AppToolbarStyle">
+        <item name="navigationIcon">@drawable/ic_close_24px</item>
+    </style>
     <!-- MEMO:AppのThemeがLightモードの為、PopupMenuの文字が背景と同色になってしまい見えなくなる。対策として下記Style用意-->
     <style name="AppToolbarPopupMenuStyle" parent="Widget.Material3.PopupMenu">
         <item name="android:textColor">@color/text_color_on_surface</item>
