@@ -12,7 +12,7 @@ import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.utils.bottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 import com.websarva.wings.android.zuboradiary.core.utils.logTag

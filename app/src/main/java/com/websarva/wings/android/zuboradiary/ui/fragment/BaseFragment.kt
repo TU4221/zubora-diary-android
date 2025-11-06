@@ -15,6 +15,7 @@ import com.google.android.material.transition.platform.MaterialSharedAxis
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHandler
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.MainUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage

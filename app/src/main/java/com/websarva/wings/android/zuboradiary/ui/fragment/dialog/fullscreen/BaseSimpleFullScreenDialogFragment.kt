@@ -9,7 +9,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
-import com.websarva.wings.android.zuboradiary.ui.fragment.FragmentHelper
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 

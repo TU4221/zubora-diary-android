@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.fragment
+package com.websarva.wings.android.zuboradiary.ui.fragment.common
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -9,23 +9,20 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.websarva.wings.android.zuboradiary.BuildConfig
-import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
-import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
-import com.websarva.wings.android.zuboradiary.core.utils.logTag
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHandler
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.MainUiEventHandler
-import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
+import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
