@@ -8,11 +8,6 @@ import java.time.LocalTime
 
 class ReminderNotificationTimePickerDialogFragment : BaseTimePickerDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + ReminderNotificationTimePickerDialogFragment::class.java.name
-    }
-
     override fun setUpInitializationTime(builder: MaterialTimePicker.Builder) {
         val localTime = LocalTime.now()
         builder.setHour(localTime.hour)
@@ -29,5 +24,9 @@ class ReminderNotificationTimePickerDialogFragment : BaseTimePickerDialogFragmen
 
     override fun handleOnCancel() {
         setResult(RESULT_KEY, DialogResult.Cancel)
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + ReminderNotificationTimePickerDialogFragment::class.java.name
     }
 }

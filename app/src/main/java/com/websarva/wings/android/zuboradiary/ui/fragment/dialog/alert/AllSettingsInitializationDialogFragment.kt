@@ -7,11 +7,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
 class AllSettingsInitializationDialogFragment : BaseAlertDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + AllSettingsInitializationDialogFragment::class.java.name
-    }
-
     override fun createTitle(): String {
         return getString(R.string.dialog_all_settings_initialization_title)
     }
@@ -30,5 +25,9 @@ class AllSettingsInitializationDialogFragment : BaseAlertDialogFragment() {
 
     override fun handleOnCancel() {
         setResult(RESULT_KEY, DialogResult.Cancel)
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + AllSettingsInitializationDialogFragment::class.java.name
     }
 }

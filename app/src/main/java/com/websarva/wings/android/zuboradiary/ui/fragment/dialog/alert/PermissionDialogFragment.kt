@@ -7,11 +7,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
 class PermissionDialogFragment : BaseAlertDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + PermissionDialogFragment::class.java.name
-    }
-
     override fun createTitle(): String {
         return getString(R.string.dialog_permission_title)
     }
@@ -34,5 +29,9 @@ class PermissionDialogFragment : BaseAlertDialogFragment() {
 
     override fun handleOnCancel() {
         setResult(RESULT_KEY, DialogResult.Cancel)
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + PermissionDialogFragment::class.java.name
     }
 }

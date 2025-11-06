@@ -8,11 +8,6 @@ import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 
 class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryDeleteDialogFragment::class.java.name
-    }
-
     override fun createTitle(): String {
         return getString(R.string.dialog_diary_delete_title)
     }
@@ -34,5 +29,9 @@ class DiaryDeleteDialogFragment : BaseAlertDialogFragment() {
 
     override fun handleOnCancel() {
         setResult(RESULT_KEY, DialogResult.Cancel)
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryDeleteDialogFragment::class.java.name
     }
 }

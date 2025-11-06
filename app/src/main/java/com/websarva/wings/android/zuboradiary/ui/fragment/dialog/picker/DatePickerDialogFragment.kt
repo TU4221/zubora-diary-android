@@ -8,11 +8,6 @@ import java.time.LocalDate
 
 class DatePickerDialogFragment : BaseDatePickerDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + DatePickerDialogFragment::class.java.name
-    }
-
     override fun createInitialDate(): LocalDate {
         return DatePickerDialogFragmentArgs.fromBundle(requireArguments()).date
     }
@@ -27,5 +22,9 @@ class DatePickerDialogFragment : BaseDatePickerDialogFragment() {
 
     override fun handleOnCancel() {
         setResult(RESULT_KEY, DialogResult.Cancel)
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + DatePickerDialogFragment::class.java.name
     }
 }

@@ -10,11 +10,6 @@ import java.time.DayOfWeek
 
 class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + CalendarStartDayPickerDialogFragment::class.java.name
-    }
-
     override fun handleOnPositiveButtonClick(
         firstPickerValue: Int,
         secondPickerValue: Int,
@@ -81,5 +76,9 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
                 dayOfWeek.asCalendarStartDayOfWeekString(requireContext())
         }
         binding.numberPickerFirst.displayedValues = dayOfWeekList
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + CalendarStartDayPickerDialogFragment::class.java.name
     }
 }

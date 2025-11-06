@@ -9,11 +9,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
 class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + ThemeColorPickerDialogFragment::class.java.name
-    }
-
     override fun handleOnPositiveButtonClick(
         firstPickerValue: Int,
         secondPickerValue: Int,
@@ -62,5 +57,9 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
             themeColorList[ordinal] = item.asString(requireContext())
         }
         binding.numberPickerFirst.displayedValues = themeColorList
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + ThemeColorPickerDialogFragment::class.java.name
     }
 }

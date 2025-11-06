@@ -7,11 +7,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
 class ExitWithoutDiarySaveDialogFragment : BaseAlertDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + ExitWithoutDiarySaveDialogFragment::class.java.name
-    }
-
     override fun createTitle(): String {
         return getString(R.string.dialog_exit_without_diary_save_title)
     }
@@ -30,5 +25,9 @@ class ExitWithoutDiarySaveDialogFragment : BaseAlertDialogFragment() {
 
     override fun handleOnCancel() {
         setResult(RESULT_KEY, DialogResult.Cancel)
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + ExitWithoutDiarySaveDialogFragment::class.java.name
     }
 }

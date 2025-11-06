@@ -7,11 +7,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
 class AllDataDeleteDialogFragment : BaseAlertDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + AllDataDeleteDialogFragment::class.java.name
-    }
-
     override fun createTitle(): String {
         return getString(R.string.dialog_all_data_delete_title)
     }
@@ -30,5 +25,9 @@ class AllDataDeleteDialogFragment : BaseAlertDialogFragment() {
 
     override fun handleOnCancel() {
         setResult(RESULT_KEY, DialogResult.Cancel)
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + AllDataDeleteDialogFragment::class.java.name
     }
 }

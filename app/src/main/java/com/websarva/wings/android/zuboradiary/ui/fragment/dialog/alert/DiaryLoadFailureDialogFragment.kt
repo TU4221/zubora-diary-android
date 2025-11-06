@@ -9,11 +9,6 @@ import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 
 class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryLoadFailureDialogFragment::class.java.name
-    }
-
     override fun createTitle(): String {
         return getString(R.string.dialog_diary_load_failure_title)
     }
@@ -40,5 +35,9 @@ class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
     override fun customizeDialog(builder: MaterialAlertDialogBuilder) {
         super.customizeDialog(builder)
         builder.setNegativeButton("", null)
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryLoadFailureDialogFragment::class.java.name
     }
 }

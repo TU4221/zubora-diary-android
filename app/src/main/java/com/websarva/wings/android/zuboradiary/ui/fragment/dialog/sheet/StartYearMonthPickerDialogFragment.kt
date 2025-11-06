@@ -9,11 +9,6 @@ import java.time.YearMonth
 
 class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
 
-    companion object {
-        @JvmField
-        val RESULT_KEY = RESULT_KEY_PREFIX + StartYearMonthPickerDialogFragment::class.java.name
-    }
-
     override fun handleOnPositiveButtonClick(
         firstPickerValue: Int,
         secondPickerValue: Int,
@@ -56,5 +51,9 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
             numberPickerSecond.wrapSelectorWheel = false
             numberPickerThird.visibility = View.GONE
         }
+    }
+
+    companion object {
+        val RESULT_KEY = RESULT_KEY_PREFIX + StartYearMonthPickerDialogFragment::class.java.name
     }
 }
