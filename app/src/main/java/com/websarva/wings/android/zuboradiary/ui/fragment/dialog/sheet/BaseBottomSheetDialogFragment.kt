@@ -20,27 +20,21 @@ import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 
 abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialogFragment() {
 
-    // View関係
+    //region Properties
     private var _binding: T? = null
     internal val binding get() = checkNotNull(_binding)
-
-    private val fragmentHelper = FragmentHelper()
 
     internal val themeColor
         get() = (requireActivity() as MainActivity).themeColor
 
+    private val fragmentHelper = FragmentHelper()
+    //endregion
+
+    //region Fragment Lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setStyle(STYLE_NORMAL, themeColor.bottomSheetDialogThemeResId)
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
-        return dialog.apply {
-            // MEMO:表示するLayoutによっては折り畳み状態で表示される為、固定で展開状態で表示する。
-            behavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
     }
 
     override fun onCreateView(
@@ -58,26 +52,34 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
         return binding.root
     }
 
-    private fun setUpDialogCancelFunction() {
-        // MEMO:下記機能を無効にするにはDialogFragment#setCancelableを設定する必要あり。
-        //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)
-        //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)
-        isCancelable = true
-    }
-
-    /**
-     * BaseBottomSheetDialogFragment#onCreateView()で呼び出される。
-     */
-    internal abstract fun createViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         enableEdgeToEdge(themeColor)
     }
 
-    internal fun navigatePreviousFragment() {
-        findNavController().navigateUp()
+    override fun onDestroyView() {
+        Log.d(logTag, "onDestroyView()")
+        clearViewBindings()
+
+        super.onDestroyView()
+    }
+    //endregion
+
+    //region Dialog Setup
+    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        val dialog = super.onCreateDialog(savedInstanceState) as BottomSheetDialog
+        return dialog.apply {
+            // MEMO:表示するLayoutによっては折り畳み状態で表示される為、固定で展開状態で表示する。
+            behavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+    }
+
+    private fun setUpDialogCancelFunction() {
+        // MEMO:下記機能を無効にするにはDialogFragment#setCancelableを設定する必要あり。
+        //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)
+        //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)
+        isCancelable = true
     }
 
     // ダイアログ枠外タッチ、popBackStack時に処理
@@ -95,15 +97,22 @@ abstract class BaseBottomSheetDialogFragment<T: ViewBinding> : BottomSheetDialog
      * BaseBottomSheetDialogFragment.onCancel()で呼び出される。
      */
     internal abstract fun handleOnCancel()
+    //endregion
 
-    override fun onDestroyView() {
-        Log.d(logTag, "onDestroyView()")
-        clearViewBindings()
-
-        super.onDestroyView()
-    }
+    //region View Binding Setup
+    /**
+     * BaseBottomSheetDialogFragment#onCreateView()で呼び出される。
+     */
+    internal abstract fun createViewBinding(inflater: LayoutInflater, container: ViewGroup?): T
 
     private fun clearViewBindings() {
         _binding = null
     }
+    //endregion
+
+    //region Navigation Helpers
+    internal fun navigatePreviousFragment() {
+        findNavController().navigateUp()
+    }
+    //endregion
 }

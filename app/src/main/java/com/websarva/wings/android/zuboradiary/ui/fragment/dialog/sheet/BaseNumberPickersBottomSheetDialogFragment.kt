@@ -16,23 +16,6 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
 abstract class BaseNumberPickersBottomSheetDialogFragment
     : BaseBottomSheetDialogFragment<DialogFragmentNumberPickersBinding>() {
 
-    override fun createViewBinding(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): DialogFragmentNumberPickersBinding {
-
-        // HACK:下記理由から、ThemeColor#getNumberPickerBottomSheetDialogThemeResId()から
-        //      ThemeResIdを取得してInflaterを再作成。
-        //      ・NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
-        //      ・ThemeColorBlackの時は背景が黒となり、NumberPickerの値が見えない。
-        val themeResId = themeColor.numberPickerBottomSheetDialogThemeResId
-        val contextWithTheme: Context = ContextThemeWrapper(requireActivity(), themeResId)
-        val cloneInflater = inflater.cloneInContext(contextWithTheme)
-
-        return DialogFragmentNumberPickersBinding
-            .inflate(cloneInflater, container, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -54,6 +37,23 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
             setUpNumberPickerTextColor(binding)
             setUpNumberPickers()
         }
+    }
+
+    override fun createViewBinding(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): DialogFragmentNumberPickersBinding {
+
+        // HACK:下記理由から、ThemeColor#getNumberPickerBottomSheetDialogThemeResId()から
+        //      ThemeResIdを取得してInflaterを再作成。
+        //      ・NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
+        //      ・ThemeColorBlackの時は背景が黒となり、NumberPickerの値が見えない。
+        val themeResId = themeColor.numberPickerBottomSheetDialogThemeResId
+        val contextWithTheme: Context = ContextThemeWrapper(requireActivity(), themeResId)
+        val cloneInflater = inflater.cloneInContext(contextWithTheme)
+
+        return DialogFragmentNumberPickersBinding
+            .inflate(cloneInflater, container, false)
     }
 
     // HACK:NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。

@@ -21,17 +21,17 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColor
 
 class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<FragmentOpenSourceLicensesBinding>() {
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setUpToolBar()
+        setUpAboutLibraries()
+    }
+
     override fun createViewBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup?
     ): FragmentOpenSourceLicensesBinding {
         return FragmentOpenSourceLicensesBinding.inflate(themeColorInflater, container, false)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setUpToolBar()
-        setUpAboutLibraries()
     }
 
     private fun setUpToolBar() {

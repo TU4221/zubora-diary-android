@@ -19,29 +19,28 @@ import kotlinx.coroutines.CoroutineScope
 abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
     : BaseSimpleFullScreenDialogFragment<T>(), MainUiEventHandler<E>, CommonUiEventHandler {
 
+    //region Properties
     internal abstract val mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>
 
     internal abstract val destinationId: Int
+    //endregion
 
-    internal fun launchAndRepeatOnViewLifeCycleStarted(
-        block: suspend CoroutineScope.() -> Unit
-    ) {
-        fragmentHelper.launchAndRepeatOnViewLifeCycleStarted(this, block)
-    }
-
+    //region Fragment Lifecycle
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        initializeFragmentResultReceiver()
-        setUpUiEvent()
-        setUpPendingNavigationCollector()
+        setUpFragmentResultReceivers()
+        setUpUiEventObservers()
+        observePendingNavigation()
         registerOnBackPressedCallback()
     }
+    //endregion
 
+    //region Fragment Result Receiver Setup
     /**
      *  setUpFragmentResultReceiver()、setUpDialogResultReceiver()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
      * */
-    internal abstract fun initializeFragmentResultReceiver()
+    internal abstract fun setUpFragmentResultReceivers()
 
     internal fun <T> setUpDialogResultReceiver(key: String, block: (DialogResult<T>) -> Unit) {
         setUpFragmentResultReceiverInternal(key, block)
@@ -59,13 +58,15 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
                 block
             )
     }
+    //endregion
 
-    private fun setUpUiEvent() {
-        setUpMainUiEvent()
-        setUpCommonUiEvent()
+    //region UI Observation Setup
+    private fun setUpUiEventObservers() {
+        observeMainUiEvent()
+        observeCommonUiEvent()
     }
 
-    private fun setUpMainUiEvent() {
+    private fun observeMainUiEvent() {
         fragmentHelper
             .setUpMainUiEvent(
                 this,
@@ -74,7 +75,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
             )
     }
 
-    private fun setUpCommonUiEvent() {
+    private fun observeCommonUiEvent() {
         fragmentHelper
             .setUpCommonUiEvent(
                 this,
@@ -83,7 +84,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
             )
     }
 
-    private fun setUpPendingNavigationCollector() {
+    private fun observePendingNavigation() {
         fragmentHelper
             .setUpPendingNavigation(
                 findNavController(),
@@ -91,7 +92,15 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
                 mainViewModel
             )
     }
+    //endregion
 
+    //region Back Press Setup
+    private fun registerOnBackPressedCallback() {
+        fragmentHelper.registerOnBackPressedCallback(this, mainViewModel)
+    }
+    //endregion
+
+    //region Navigation Helpers
     internal fun navigateFragmentOnce(command: NavigationCommand) {
         fragmentHelper
             .navigateFragmentOnce(
@@ -125,8 +134,13 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
     }
 
     internal abstract fun navigateAppMessageDialog(appMessage: AppMessage)
+    //endregion
 
-    private fun registerOnBackPressedCallback() {
-        fragmentHelper.registerOnBackPressedCallback(this, mainViewModel)
+    //region Internal Helpers
+    internal fun launchAndRepeatOnViewLifeCycleStarted(
+        block: suspend CoroutineScope.() -> Unit
+    ) {
+        fragmentHelper.launchAndRepeatOnViewLifeCycleStarted(this, block)
     }
+    //endregion
 }

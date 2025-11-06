@@ -62,7 +62,7 @@ class DiaryItemTitleEditDialog :
     //endregion
 
     //region Fragment Result Receiver Setup
-    override fun initializeFragmentResultReceiver() {
+    override fun setUpFragmentResultReceivers() {
         setUpDiaryItemTitleDeleteDialogResultReceiver()
     }
 

@@ -15,7 +15,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.enableEdgeToEdge
 
 abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragment() {
 
-    // View関係
+    //region Properties
     private var _binding: T? = null
     internal val binding get() = checkNotNull(_binding)
 
@@ -23,7 +23,9 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
 
     internal val themeColor
         get() = (requireActivity() as MainActivity).themeColor
+    //endregion
 
+    //region Fragment Lifecycle
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setStyle(STYLE_NORMAL, R.style.MaterialFullScreenDialogTheme)
@@ -36,11 +38,6 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
         _binding = createViewBinding(themeColorInflater, container)
         return binding.root
     }
-
-    internal abstract fun createViewBinding(
-        themeColorInflater: LayoutInflater,
-        container: ViewGroup?
-    ): T
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -62,12 +59,22 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
 
         clearViewBindings()
     }
+    //endregion
+
+    //region View Binding Setup
+    internal abstract fun createViewBinding(
+        themeColorInflater: LayoutInflater,
+        container: ViewGroup?
+    ): T
 
     internal open fun clearViewBindings() {
         _binding = null
     }
+    //endregion
 
+    //region Navigation Helpers
     internal fun navigatePreviousFragment() {
         findNavController().navigateUp()
     }
+    //endregion
 }
