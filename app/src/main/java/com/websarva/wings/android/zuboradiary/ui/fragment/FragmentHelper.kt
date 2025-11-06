@@ -33,23 +33,17 @@ import kotlinx.coroutines.launch
 
 class FragmentHelper {
 
-    fun launchAndRepeatOnViewLifeCycleStarted(
-        fragment: Fragment,
-        block: suspend CoroutineScope.() -> Unit
-    ) {
-        fragment.viewLifecycleOwner.lifecycleScope.launch {
-            fragment.viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED, block)
-        }
-    }
-
+    //region View Inflater Helpers
     fun createThemeColorInflater(
         inflater: LayoutInflater,
         themeColor: ThemeColorUi
     ): LayoutInflater {
         return ThemeColorInflaterCreator().create(inflater, themeColor)
     }
+    //endregion
 
-    fun <R : NavigationResult> setUpFragmentResultReceiverInternal(
+    //region UI Observation Helpers
+    fun <R : NavigationResult> observeFragmentResult(
         navController: NavController,
         fragmentDestinationId: Int,
         key: String,
@@ -72,7 +66,7 @@ class FragmentHelper {
         }
     }
 
-    fun <E: UiEvent> setUpMainUiEvent(
+    fun <E: UiEvent> observeMainUiEvent(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
         handler: MainUiEventHandler<E>
@@ -89,7 +83,7 @@ class FragmentHelper {
         }
     }
 
-    fun <E: UiEvent> setUpCommonUiEvent(
+    fun <E: UiEvent> observeCommonUiEvent(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
         handler: CommonUiEventHandler
@@ -106,7 +100,7 @@ class FragmentHelper {
         }
     }
 
-    fun setUpActivityUiEvent(
+    fun observeActivityUiEvent(
         fragment: Fragment,
         mainActivityViewModel: MainActivityViewModel,
         handler: ActivityCallbackUiEventHandler
@@ -123,7 +117,7 @@ class FragmentHelper {
         }
     }
 
-    fun setUpPendingNavigation(
+    fun observePendingNavigation(
         navController: NavController,
         navDestinationId: Int,
         mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
@@ -158,7 +152,9 @@ class FragmentHelper {
             }
         }
     }
+    //endregion
 
+    //region Navigation Helpers
     fun navigateFragmentOnce(
         navController: NavController,
         fragmentDestinationId: Int,
@@ -276,7 +272,9 @@ class FragmentHelper {
              NavigationCommand.Up(resultKey, result)
          }
     }
+    //endregion
 
+    //region Back Press Helpers
     fun registerOnBackPressedCallback(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
@@ -294,4 +292,16 @@ class FragmentHelper {
                 }
             )
     }
+    //endregion
+
+    //region Coroutine Helpers
+    fun launchAndRepeatOnViewLifeCycleStarted(
+        fragment: Fragment,
+        block: suspend CoroutineScope.() -> Unit
+    ) {
+        fragment.viewLifecycleOwner.lifecycleScope.launch {
+            fragment.viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED, block)
+        }
+    }
+    //endregion
 }

@@ -174,7 +174,7 @@ class DiaryListFragment :
     }
 
     private fun observeUiEventFromActivity() {
-        fragmentHelper.setUpActivityUiEvent(
+        fragmentHelper.observeActivityUiEvent(
             this,
             mainActivityViewModel,
             this

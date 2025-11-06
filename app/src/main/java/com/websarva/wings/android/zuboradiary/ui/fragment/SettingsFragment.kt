@@ -298,7 +298,7 @@ class SettingsFragment :
     }
 
     private fun observeUiEventFromActivity() {
-        fragmentHelper.setUpActivityUiEvent(
+        fragmentHelper.observeActivityUiEvent(
             this,
             mainActivityViewModel,
             this

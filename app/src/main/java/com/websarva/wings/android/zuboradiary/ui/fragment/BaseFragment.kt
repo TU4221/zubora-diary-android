@@ -237,7 +237,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         block: (R) -> Unit
     ) {
         fragmentHelper
-            .setUpFragmentResultReceiverInternal(
+            .observeFragmentResult(
                 findNavController(),
                 destinationId,
                 key,
@@ -274,7 +274,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
 
     private fun observeMainUiEvent() {
         fragmentHelper
-            .setUpMainUiEvent(
+            .observeMainUiEvent(
                 this,
                 mainViewModel,
                 this
@@ -283,7 +283,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
 
     private fun observeCommonUiEvent() {
         fragmentHelper
-            .setUpCommonUiEvent(
+            .observeCommonUiEvent(
                 this,
                 mainViewModel,
                 this
@@ -292,7 +292,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
 
     private fun observePendingNavigation() {
         fragmentHelper
-            .setUpPendingNavigation(
+            .observePendingNavigation(
                 findNavController(),
                 destinationId,
                 mainViewModel
