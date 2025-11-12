@@ -22,16 +22,16 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListNewLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListRefreshException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
-import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
+import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -176,7 +176,7 @@ class DiaryListViewModel @Inject internal constructor(
         }
     }
 
-    internal fun onDiaryListItemClick(item: DiaryDayListItemUi.Standard) {
+    internal fun onDiaryListItemClick(item: DiaryListItemContainerUi.Standard) {
         val id = item.id
         val date = item.date
         launchWithUnexpectedErrorHandler {
@@ -184,7 +184,7 @@ class DiaryListViewModel @Inject internal constructor(
         }
     }
 
-    internal fun onDiaryListItemDeleteButtonClick(item: DiaryDayListItemUi.Standard) {
+    internal fun onDiaryListItemDeleteButtonClick(item: DiaryListItemContainerUi.Standard) {
         if (!isReadyForOperation) return
 
         val id = item.id
@@ -281,7 +281,7 @@ class DiaryListViewModel @Inject internal constructor(
     }
 
     private suspend fun loadNewDiaryList(
-        currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
+        currentList: DiaryListUi<DiaryListItemContainerUi.Standard>,
         sortConditionDate: LocalDate?
     ) {
         executeLoadDiaryList(
@@ -304,7 +304,7 @@ class DiaryListViewModel @Inject internal constructor(
     }
 
     private suspend fun loadAdditionDiaryList(
-        currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
+        currentList: DiaryListUi<DiaryListItemContainerUi.Standard>,
         sortConditionDate: LocalDate?
     ) {
         executeLoadDiaryList(
@@ -332,7 +332,7 @@ class DiaryListViewModel @Inject internal constructor(
     }
 
     private suspend fun refreshDiaryList(
-        currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
+        currentList: DiaryListUi<DiaryListItemContainerUi.Standard>,
         sortConditionDate: LocalDate?
     ) {
         executeLoadDiaryList(
@@ -356,7 +356,7 @@ class DiaryListViewModel @Inject internal constructor(
 
     private suspend fun <E : UseCaseException> executeLoadDiaryList(
         updateToLoadingUiState: suspend () -> Unit,
-        currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
+        currentList: DiaryListUi<DiaryListItemContainerUi.Standard>,
         executeLoad: suspend (DiaryYearMonthList<DiaryDayListItem.Standard>)
         -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.Standard>, E>,
         emitAppMessageOnFailure: suspend (E) -> Unit
@@ -388,7 +388,7 @@ class DiaryListViewModel @Inject internal constructor(
 
     private suspend fun mapDiaryListUiModel(
         list: DiaryYearMonthList<DiaryDayListItem.Standard>
-    ): DiaryYearMonthListUi<DiaryDayListItemUi.Standard>{
+    ): DiaryListUi<DiaryListItemContainerUi.Standard>{
         return list.toUiModel { fileName: DiaryImageFileName? ->
             fileName?.let {
                 try {
@@ -410,7 +410,7 @@ class DiaryListViewModel @Inject internal constructor(
 
     private suspend fun deleteDiary(
         id: DiaryId,
-        currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
+        currentList: DiaryListUi<DiaryListItemContainerUi.Standard>,
         sortConditionDate: LocalDate?
     ) {
         val logMsg = "日記削除"
@@ -520,7 +520,7 @@ class DiaryListViewModel @Inject internal constructor(
     }
 
     private fun updateToDiaryListLoadCompletedState(
-        list: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>
+        list: DiaryListUi<DiaryListItemContainerUi.Standard>
     ) {
         updateUiState {
             it.copy(
@@ -551,7 +551,7 @@ class DiaryListViewModel @Inject internal constructor(
     //region Pending Diary Delete Parameters
     private fun updatePendingDiaryDeleteParameters(
         id: DiaryId,
-        currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
+        currentList: DiaryListUi<DiaryListItemContainerUi.Standard>,
         sortConditionDate: LocalDate?
     ) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, currentList, sortConditionDate)
@@ -563,7 +563,7 @@ class DiaryListViewModel @Inject internal constructor(
 
     private data class DiaryDeleteParameters(
         val id: DiaryId,
-        val currentList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>,
+        val currentList: DiaryListUi<DiaryListItemContainerUi.Standard>,
         val sortConditionDate: LocalDate?
     )
     //endregion

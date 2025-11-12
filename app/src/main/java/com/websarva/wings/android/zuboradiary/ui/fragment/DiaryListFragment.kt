@@ -10,15 +10,17 @@ import androidx.fragment.app.viewModels
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
+import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.StandardDiaryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
-import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.diary.DiaryYearMonthListAdapter
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
+import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.DiaryListSetupHelper
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
+import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.SwipeBackgroundButtonInteractionHelper
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -43,7 +45,11 @@ class DiaryListFragment :
     
     override val destinationId = R.id.navigation_diary_list_fragment
 
-    private lateinit var diaryListAdapter: DiaryYearMonthListAdapter
+    private lateinit var diaryListAdapter: StandardDiaryListAdapter
+
+    private var diaryListSetupHelper: DiaryListSetupHelper? = null
+
+    private var swipeBackgroundButtonInteractionHelper: SwipeBackgroundButtonInteractionHelper? = null
     //endregion
 
     //region Fragment Lifecycle
@@ -60,6 +66,13 @@ class DiaryListFragment :
         super.onDestroyView()
 
         mainViewModel.onUiGone()
+
+        diaryListSetupHelper?.cleanup()
+        diaryListSetupHelper = null
+
+        swipeBackgroundButtonInteractionHelper?.cleanup()
+        swipeBackgroundButtonInteractionHelper = null
+
     }
     //endregion
     
@@ -196,37 +209,42 @@ class DiaryListFragment :
     }
 
     private fun setUpDiaryList() {
-        diaryListAdapter =
-            object : DiaryYearMonthListAdapter(binding.recyclerDiaryList, themeColor) {
-                override fun loadListOnScrollEnd() {
-                    mainViewModel.onDiaryListEndScrolled()
-                }
-            }.apply {
-                build()
-                registerOnChildItemClickListener { item: DiaryDayListItemUi.Standard ->
-                    mainViewModel.onDiaryListItemClick(item)
-                }
-                registerOnChildItemBackgroundButtonClickListener { item: DiaryDayListItemUi.Standard ->
-                    mainViewModel.onDiaryListItemDeleteButtonClick(item)
-                }
-            }
+        val diaryRecyclerView = binding.recyclerDiaryList
+        diaryListAdapter = StandardDiaryListAdapter(
+            themeColor,
+            { mainViewModel.onDiaryListItemClick(it) },
+            { mainViewModel.onDiaryListItemDeleteButtonClick(it) }
+        )
+
+        diaryListSetupHelper =
+            DiaryListSetupHelper(
+                diaryRecyclerView,
+                diaryListAdapter
+            ) {
+                mainViewModel.onDiaryListEndScrolled()
+            }.also { it.setup() }
+
+        swipeBackgroundButtonInteractionHelper =
+            SwipeBackgroundButtonInteractionHelper(
+                diaryRecyclerView,
+                diaryListAdapter
+            ).also { it.setup() }
     }
     //endregion
 
     //region View Manipulation
-    private fun updateDiaryList(diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard>) {
+    private fun updateDiaryList(diaryList: DiaryListUi<DiaryListItemContainerUi.Standard>) {
         diaryListAdapter.submitList(diaryList.itemList) {
             mainViewModel.onDiaryListUpdateCompleted()
         }
     }
 
     private fun updateDiaryListSwipeEnabled(isSwipeEnabled: Boolean) {
-        diaryListAdapter.setSwipeEnabled(isSwipeEnabled)
+        swipeBackgroundButtonInteractionHelper?.updateItemSwipeEnabled(isSwipeEnabled)
     }
 
     private fun scrollDiaryListToFirstPosition() {
-        val listAdapter = binding.recyclerDiaryList.adapter as DiaryYearMonthListAdapter
-        listAdapter.scrollToTop()
+        binding.recyclerDiaryList.smoothScrollToPosition(0)
     }
     //endregion
 

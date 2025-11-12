@@ -1,8 +1,8 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -10,7 +10,7 @@ data class WordSearchUiState(
     // UiData
     val searchWord: String = "",
     val numWordSearchResults: Int = 0,
-    val wordSearchResultList: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult> = DiaryYearMonthListUi(),
+    val wordSearchResultList: DiaryListUi<DiaryListItemContainerUi.WordSearchResult> = DiaryListUi(),
 
     // UiState
     val isWordSearchIdle: Boolean = true,

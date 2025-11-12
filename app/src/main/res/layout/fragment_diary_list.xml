@@ -57,7 +57,7 @@
 
                 <!-- MEMO:スクロールバーを表示させたいが、子RecyclerViewに反応してスクロールバーの長さが安定しない。
                           その為、"android:scrollbars="none"" とする。 -->
-                <androidx.recyclerview.widget.RecyclerView
+                <com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeBackgroundButtonRecyclerView
                     style="@style/DiaryListRecyclerViewStyle"
                     android:id="@+id/recycler_diary_list"
                     android:layout_width="match_parent"

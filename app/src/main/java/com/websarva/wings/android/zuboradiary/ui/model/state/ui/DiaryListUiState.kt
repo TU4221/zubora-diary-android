@@ -1,15 +1,15 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
 @Parcelize
 data class DiaryListUiState(
     // UiData
-    val diaryList: DiaryYearMonthListUi<DiaryDayListItemUi.Standard> = DiaryYearMonthListUi(),
+    val diaryList: DiaryListUi<DiaryListItemContainerUi.Standard> = DiaryListUi(),
     val sortConditionDate: LocalDate? = null,
 
     // UiState

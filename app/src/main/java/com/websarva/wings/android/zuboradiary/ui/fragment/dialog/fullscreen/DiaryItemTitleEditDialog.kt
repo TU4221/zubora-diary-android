@@ -5,13 +5,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
-import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diaryitemtitle.DiaryItemTitleSelectionHistoryListAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.DiaryItemTitleSelectionHistoryListAdapter
+import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.SwipeSimpleInteractionHelper
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemTitleDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -36,7 +38,9 @@ class DiaryItemTitleEditDialog :
 
     override val destinationId = R.id.navigation_diary_item_title_edit_dialog
 
-    private lateinit var itemTitleSelectionHistoryListAdapter: DiaryItemTitleSelectionHistoryListAdapter
+    private lateinit var selectionHistoryListAdapter: DiaryItemTitleSelectionHistoryListAdapter
+
+    private var swipeSimpleInteractionHelper: SwipeSimpleInteractionHelper? = null
     //endregion
 
     //region Fragment Lifecycle
@@ -79,17 +83,15 @@ class DiaryItemTitleEditDialog :
     override fun onMainUiEventReceived(event: DiaryItemTitleEditUiEvent) {
         when (event) {
             DiaryItemTitleEditUiEvent.CloseSwipedItem -> {
-                val adapter =
-                    checkNotNull(
-                        binding.recyclerItemTitleSelectionHistory.adapter
-                    ) as DiaryItemTitleSelectionHistoryListAdapter
-                adapter.closeSwipedItem()
+                swipeSimpleInteractionHelper?.closeSwipedItem()
             }
+
             is DiaryItemTitleEditUiEvent.CompleteEdit -> {
                 completeItemTitleEdit(
                     event.diaryItemTitleSelection
                 )
             }
+
             is DiaryItemTitleEditUiEvent.NavigateSelectionHistoryItemDeleteDialog -> {
                 navigateDiaryItemTitleDeleteDialog(event.itemTitle)
             }
@@ -101,6 +103,7 @@ class DiaryItemTitleEditDialog :
             is CommonUiEvent.NavigatePreviousFragment<*> -> {
                 navigatePreviousFragment()
             }
+
             is CommonUiEvent.NavigateAppMessage -> {
                 navigateAppMessageDialog(event.message)
             }
@@ -114,7 +117,7 @@ class DiaryItemTitleEditDialog :
             }.mapNotNull {
                 (it.titleSelectionHistoriesLoadState as? LoadState.Success)?.data
             }.collect {
-                itemTitleSelectionHistoryListAdapter.submitList(it.itemList)
+                selectionHistoryListAdapter.submitList(it.itemList)
             }
         }
     }
@@ -122,19 +125,27 @@ class DiaryItemTitleEditDialog :
 
     //region View Setup
     private fun setUpItemTitleSelectionHistory() {
-        itemTitleSelectionHistoryListAdapter =
+        val recyclerView = binding.recyclerItemTitleSelectionHistory
+        selectionHistoryListAdapter =
             DiaryItemTitleSelectionHistoryListAdapter(
-                binding.recyclerItemTitleSelectionHistory,
                 themeColor
-            ).apply {
-                build()
-                registerOnItemClickListener { item: DiaryItemTitleSelectionHistoryListItemUi ->
-                    mainViewModel.onDiaryItemTitleSelectionHistoryListItemClick(item)
-                }
-                registerOnItemSwipeListener { item: DiaryItemTitleSelectionHistoryListItemUi ->
-                    mainViewModel.onDiaryItemTitleSelectionHistoryListItemSwipe(item)
-                }
-            }
+            ) { mainViewModel.onDiaryItemTitleSelectionHistoryListItemClick(it) }
+
+        recyclerView.apply {
+            adapter = selectionHistoryListAdapter
+            layoutManager = LinearLayoutManager(context)
+            addItemDecoration(
+                DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+            )
+        }
+
+        swipeSimpleInteractionHelper = SwipeSimpleInteractionHelper(
+            recyclerView,
+            selectionHistoryListAdapter
+        ) {
+            val item = selectionHistoryListAdapter.getItemAt(it)
+            mainViewModel.onDiaryItemTitleSelectionHistoryListItemSwipe(item)
+        }.also { it.setup() }
     }
     //endregion
 

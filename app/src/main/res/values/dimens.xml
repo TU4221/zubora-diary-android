@@ -51,12 +51,6 @@
     <dimen name="layout_diary_edit_item_delete_button_layout_height">@dimen/fragment_diary_edit_delete_button_layout_height</dimen>
 
 
-    <!-- fragment_diary_item_title_edit -->
-    <dimen name="fragment_diary_item_title_edit_text_size">18sp</dimen>
-    <dimen name="fragment_diary_item_title_edit_margin_start">8dp</dimen>
-    <dimen name="fragment_diary_item_title_edit_margin_top">16dp</dimen>
-
-
     <!-- fragment_settings -->
     <dimen name="fragment_settings_text_size">18sp</dimen>
 
@@ -67,23 +61,29 @@
     <dimen name="fragment_settings_item_drawable_padding">16dp</dimen>
 
 
+    <!-- dialog_diary_item_title_edit -->
+    <dimen name="dialog_diary_item_title_edit_text_size">18sp</dimen>
+    <dimen name="dialog_diary_item_title_edit_margin_start">8dp</dimen>
+    <dimen name="dialog_diary_item_title_edit_margin_top">16dp</dimen>
+
+
     <!-- dialog_fragment_number_picker -->
     <dimen name="dialog_fragment_number_picker_layout_margin_horizontal">16dp</dimen>
     <dimen name="dialog_fragment_number_picker_layout_margin_horizontal_between_items">8dp</dimen>
     <dimen name="dialog_fragment_number_picker_layout_margin_vertical">8dp</dimen>
 
-    <!-- row_diary_year_month_list -->
-    <dimen name="row_diary_year_month_list_padding_bottom">@dimen/row_diary_day_list_layout_margin_vertical_between_items</dimen>
 
-    <!-- row_diary_day_list -->
-    <dimen name="row_diary_day_list_height">72dp</dimen>
-    <dimen name="row_diary_day_list_image_height">64dp</dimen>
-    <dimen name="row_diary_day_list_layout_margin_horizontal_between_items">16dp</dimen>
-    <dimen name="row_diary_day_list_layout_margin_vertical_between_items">8dp</dimen>
+    <!-- SpacingItemDecoration -->
+    <dimen name="spacing_item_decoration_list_layout_padding_vertical_between_items">8dp</dimen>
 
-    <!-- row_word_search_result_list -->
-    <dimen name="row_word_search_result_list_layout_margin_horizontal_between_items">@dimen/row_diary_day_list_layout_margin_horizontal_between_items</dimen>
-    <dimen name="row_word_search_result_list_layout_margin_vertical_between_items">@dimen/row_diary_day_list_layout_margin_vertical_between_items</dimen>
-    <dimen name="row_word_search_result_list_views_layout_margin">8dp</dimen>
+
+    <!-- row_diary_list -->
+    <dimen name="row_diary_list_height">72dp</dimen>
+    <dimen name="row_diary_list_image_height">64dp</dimen>
+    <dimen name="row_diary_list_layout_margin_horizontal_between_items">16dp</dimen>
+
+
+    <!-- row_diary_list_word_search_result -->
+    <dimen name="row_diary_list_word_search_result_views_layout_margin">8dp</dimen>
 
 </resources>

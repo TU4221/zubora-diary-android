@@ -78,7 +78,7 @@
                         android:hint="@string/fragment_diary_item_title_edit_new_item_title_hint"
                         android:maxLength="@integer/fragment_diary_item_title_edit_item_title_max_length"
                         android:text="@{viewModel.uiState.title}"
-                        android:textSize="@dimen/fragment_diary_item_title_edit_text_size"
+                        android:textSize="@dimen/dialog_diary_item_title_edit_text_size"
                         android:onTextChanged="@{(s, start, before, count) -> viewModel.onItemTitleTextChanged(s)}" />
 
                 </com.google.android.material.textfield.TextInputLayout>
@@ -88,10 +88,10 @@
                     android:id="@+id/button_new_item_title_selection"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
+                    android:layout_marginTop="@dimen/dialog_diary_item_title_edit_margin_top"
                     android:layout_gravity="center_horizontal"
                     android:text="@string/fragment_diary_item_title_edit_new_item_title_selection_button"
-                    android:textSize="@dimen/fragment_diary_item_title_edit_text_size"
+                    android:textSize="@dimen/dialog_diary_item_title_edit_text_size"
                     android:enabled="@{viewModel.uiState.titleValidationState instanceof InputTextValidationState.Valid}"
                     android:onClick="@{() -> viewModel.onNewDiaryItemTitleSelectionButtonClick()}" />
 
@@ -107,11 +107,11 @@
                     android:id="@+id/text_item_title_history"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="@dimen/fragment_diary_item_title_edit_margin_start"
-                    android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
+                    android:layout_marginStart="@dimen/dialog_diary_item_title_edit_margin_start"
+                    android:layout_marginTop="@dimen/dialog_diary_item_title_edit_margin_top"
                     android:textAppearance="@style/AppTextViewTextAppearance"
                     android:text="@string/fragment_diary_item_title_edit_title_selection_history"
-                    android:textSize="@dimen/fragment_diary_item_title_edit_text_size"
+                    android:textSize="@dimen/dialog_diary_item_title_edit_text_size"
                     app:applySystemInsetsToPaddingLeft="@{true}"
                     app:applySystemInsetsToPaddingRight="@{true}" />
 
@@ -129,12 +129,12 @@
                         android:gravity="center"
                         android:visibility="@{viewModel.uiState.titleSelectionHistoriesLoadState instanceof LoadState.Error ? View.VISIBLE : View.GONE}" />
 
-                    <com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeRecyclerView
+                    <androidx.recyclerview.widget.RecyclerView
                         style="@style/AppRecyclerViewStyle"
                         android:id="@+id/recycler_item_title_selection_history"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="@dimen/fragment_diary_item_title_edit_margin_top"
+                        android:layout_marginTop="@dimen/dialog_diary_item_title_edit_margin_top"
                         android:visibility="@{viewModel.uiState.titleSelectionHistoriesLoadState instanceof LoadState.Error ? View.GONE : View.VISIBLE}"
                         android:clipToPadding="false"
                         app:applySystemInsetsToPaddingBottom="@{true}" />

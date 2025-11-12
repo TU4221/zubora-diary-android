@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.widget.ImageView.ScaleType"/>
+    </data>
+    
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- MEMO:親タグのFrameLayoutにpadding属性を設定するのではなく、子タグにmargin属性を設定する理由は、
+                  スワイプ時にViewの端が途切れずに画面外に出てくような動きを表現するため。 -->
+        <include
+            layout="@layout/row_left_swipe_button_background"
+            android:id="@+id/include_background"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginHorizontal="@dimen/row_diary_list_layout_margin_horizontal_between_items" />
+
+        <LinearLayout
+            style="@style/DiaryDayListBackgroundLayoutStyle"
+            android:id="@+id/liner_layout_foreground"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="@dimen/row_diary_list_layout_margin_horizontal_between_items"
+            android:minHeight="@dimen/row_diary_list_height"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <include
+                layout="@layout/layout_diary_list_item_day"
+                android:id="@+id/include_day"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <TextView
+                style="@style/DiaryDayListTextViewStyle"
+                android:id="@+id/text_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:hint="@string/row_diary_list_standard_title_hint"
+                android:textAppearance="@style/DiaryListDayTextAppearance"
+                android:textSize="20sp"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
+                android:id="@+id/image_progress_attached_image"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/row_diary_list_image_height"
+                android:layout_weight="1"
+                android:layout_gravity="center_vertical"
+                android:foregroundGravity="center_vertical"
+                app:defaultIcon="@drawable/ic_image_24px"
+                app:errorIcon="@drawable/ic_hide_image_24px"
+                app:iconTint="?attr/colorOnSecondaryContainer"
+                app:imageScaleType="centerCrop"
+                app:imageContentDescription="@string/row_diary_list_standard_image_description" />
+
+        </LinearLayout>
+
+
+    </FrameLayout>
+</layout>
+

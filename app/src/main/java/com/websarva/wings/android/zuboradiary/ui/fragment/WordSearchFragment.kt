@@ -9,11 +9,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
+import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.WordSearchResultDiaryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
-import com.websarva.wings.android.zuboradiary.ui.adapter.recycler.diary.wordsearchresult.WordSearchResultYearMonthListAdapter
+import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.DiaryListSetupHelper
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryYearMonthListUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
@@ -35,7 +36,9 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
 
     override val destinationId = R.id.navigation_word_search_fragment
 
-    private lateinit var wordSearchResultListAdapter: WordSearchResultYearMonthListAdapter
+    private lateinit var wordSearchResultDiaryListAdapter: WordSearchResultDiaryListAdapter
+
+    private var diaryListSetupHelper: DiaryListSetupHelper? = null
     //endregion
 
     //region Fragment Lifecycle
@@ -51,6 +54,9 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     override fun onDestroyView() {
         super.onDestroyView()
         mainViewModel.onUiGone()
+
+        diaryListSetupHelper?.cleanup()
+        diaryListSetupHelper = null
     }
     //endregion
 
@@ -116,29 +122,25 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
 
     //region View Setup
     private fun setUpWordSearchResultListAdapter() {
-        wordSearchResultListAdapter =
-            object : WordSearchResultYearMonthListAdapter(
-                binding.recyclerWordSearchResultList,
-                themeColor
-            ) {
-                override fun loadListOnScrollEnd() {
-                    mainViewModel.onWordSearchResultListEndScrolled()
-                }
-            }
+        val diaryRecyclerView = binding.recyclerWordSearchResultList
+        wordSearchResultDiaryListAdapter = WordSearchResultDiaryListAdapter(
+            themeColor
+        ) { mainViewModel.onWordSearchResultListItemClick(it) }
 
-        wordSearchResultListAdapter.apply {
-            build()
-            registerOnChildItemClickListener { item: DiaryDayListItemUi.WordSearchResult ->
-                mainViewModel.onWordSearchResultListItemClick(item)
-            }
-        }
+        diaryListSetupHelper =
+            DiaryListSetupHelper(
+                diaryRecyclerView,
+                wordSearchResultDiaryListAdapter
+            ) {
+                mainViewModel.onWordSearchResultListEndScrolled()
+            }.also { it.setup() }
     }
 
     private fun setUpFloatingActionButton() {
         binding.floatingActionButtonTopScroll.apply {
             hide() // MEMO:初回起動用
             setOnClickListener {
-                wordSearchResultListAdapter.scrollToTop()
+                binding.recyclerWordSearchResultList.smoothScrollToPosition(0)
             }
         }
         binding.recyclerWordSearchResultList.addOnScrollListener(object :
@@ -158,9 +160,9 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
 
     //region View Manipulation
     private fun updateWordSearchResultList(
-        list: DiaryYearMonthListUi<DiaryDayListItemUi.WordSearchResult>
+        list: DiaryListUi<DiaryListItemContainerUi.WordSearchResult>
     ) {
-        wordSearchResultListAdapter.submitList(list.itemList) {
+        wordSearchResultDiaryListAdapter.submitList(list.itemList) {
             mainViewModel.onWordSearchResultListUpdateCompleted()
         }
     }

@@ -39,21 +39,21 @@
     <string name="row_diary_year_month_list_section_bar_year">年</string>
     <string name="row_diary_year_month_list_section_bar_month">月</string>
 
-    <!-- row_diary_day_list -->
-    <string name="row_diary_day_list_title_hint">無題</string>
-    <string name="row_diary_day_list_image_description">添付写真</string>
+    <!-- row_diary_list_standard -->
+    <string name="row_diary_list_standard_title_hint">無題</string>
+    <string name="row_diary_list_standard_image_description">添付写真</string>
 
-    <!-- row_word_search_result_list -->
-    <string name="row_word_search_result_list_title_hint">無題</string>
-    <string name="row_word_search_result_list_item_hint">項目*</string>
-    <string name="row_word_search_result_list_item_title_hint">無題</string>
-    <string name="row_word_search_result_list_item_comment_hint">コメントなし</string>
+    <!-- row_diary_list_word_search_result -->
+    <string name="row_diary_list_word_search_result_title_hint">無題</string>
+    <string name="row_diary_list_word_search_result_item_hint">項目*</string>
+    <string name="row_diary_list_word_search_result_item_title_hint">無題</string>
+    <string name="row_diary_list_word_search_result_item_comment_hint">コメントなし</string>
 
     <!-- row_background_delete_button -->
     <string name="row_background_delete_button_delete">削除</string>
 
-    <!-- row_no_diary_message -->
-    <string name="row_no_diary_message_message">上記以前の日記はありません。</string>
+    <!-- row_diary_list_no_diary_message -->
+    <string name="row_diary_list_no_diary_message_message">上記以前の日記はありません。</string>
 
     <!--*****************************************************************************************-->
 

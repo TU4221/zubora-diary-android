@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/row_diary_list_height">
+
+    <TextView
+        style="@style/AppTextViewStyle"
+        android:id="@+id/text_no_diary_message"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:textAppearance="@style/AppTextViewTextAppearance"
+        android:text="@string/row_diary_list_no_diary_message_message"
+        android:gravity="center" />
+
+</FrameLayout>

@@ -9,13 +9,13 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemNumber
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
-import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryDayListItemUi
+import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 
 @JvmName("toUiModelStandard")
 internal suspend fun DiaryDayListItem.Standard.toUiModel(
     processBuildPathFromFileName: suspend (DiaryImageFileName?) -> FilePathUi?
-): DiaryDayListItemUi.Standard {
-    return DiaryDayListItemUi.Standard(
+): DiaryListItemContainerUi.Standard {
+    return DiaryListItemContainerUi.Standard(
         id.value,
         date,
         title.value,
@@ -25,8 +25,8 @@ internal suspend fun DiaryDayListItem.Standard.toUiModel(
 }
 
 @JvmName("toUiModelWordSearchResult")
-internal fun DiaryDayListItem.WordSearchResult.toUiModel(): DiaryDayListItemUi.WordSearchResult {
-    return DiaryDayListItemUi.WordSearchResult(
+internal fun DiaryDayListItem.WordSearchResult.toUiModel(): DiaryListItemContainerUi.WordSearchResult {
+    return DiaryListItemContainerUi.WordSearchResult(
         id.value,
         date,
         title.value,
@@ -37,8 +37,8 @@ internal fun DiaryDayListItem.WordSearchResult.toUiModel(): DiaryDayListItemUi.W
     )
 }
 
-@JvmName("toUiModelStandard")
-internal fun DiaryDayListItemUi.Standard.toDomainModel(): DiaryDayListItem.Standard {
+@JvmName("toDomainModelStandard")
+internal fun DiaryListItemContainerUi.Standard.toDomainModel(): DiaryDayListItem.Standard {
     return DiaryDayListItem.Standard(
         DiaryId(id),
         date,
@@ -47,8 +47,8 @@ internal fun DiaryDayListItemUi.Standard.toDomainModel(): DiaryDayListItem.Stand
     )
 }
 
-@JvmName("toUiModelWordSearchResult")
-internal fun DiaryDayListItemUi.WordSearchResult.toDomainModel(): DiaryDayListItem.WordSearchResult {
+@JvmName("toDomainModelWordSearchResult")
+internal fun DiaryListItemContainerUi.WordSearchResult.toDomainModel(): DiaryDayListItem.WordSearchResult {
     return DiaryDayListItem.WordSearchResult(
         DiaryId(id),
         date,
