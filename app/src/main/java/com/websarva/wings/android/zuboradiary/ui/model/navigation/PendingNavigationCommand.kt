@@ -1,12 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.model.navigation
 
+import com.websarva.wings.android.zuboradiary.ui.model.common.Identifiable
 import java.util.UUID
 
 data class PendingNavigationCommand (
     val command: NavigationCommand,
-    val id: UUID = UUID.randomUUID(),
+    override val id: UUID = UUID.randomUUID(),
     val currentRetryCount: Int = 0,
-) {
+) : Identifiable {
 
     init {
         require(currentRetryCount >= 0)

@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.diary
 
 import android.os.Parcelable
+import com.websarva.wings.android.zuboradiary.ui.model.common.Identifiable
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -26,7 +27,7 @@ import java.time.LocalDateTime
  */
 @Parcelize
 data class DiaryUi(
-    val id: String,
+    override val id: String,
     val date: LocalDate,
     val log: LocalDateTime,
     val weather1: WeatherUi,
@@ -36,4 +37,4 @@ data class DiaryUi(
     val itemTitles: Map<Int, String?>,
     val itemComments: Map<Int, String?>,
     val imageFileName: String?
-) : Parcelable
+) : Parcelable, Identifiable

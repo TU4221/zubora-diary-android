@@ -2,14 +2,15 @@ package com.websarva.wings.android.zuboradiary.ui.model.diary.list
 
 import android.os.Parcelable
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
+import com.websarva.wings.android.zuboradiary.ui.model.common.Identifiable
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
 @Parcelize
 sealed class DiaryListItemContainerUi(
-    open val id: String,
+    override val id: String,
     open val date: LocalDate
-) : Parcelable {
+) : Parcelable, Identifiable {
 
     data class Standard(
         override val id: String,
