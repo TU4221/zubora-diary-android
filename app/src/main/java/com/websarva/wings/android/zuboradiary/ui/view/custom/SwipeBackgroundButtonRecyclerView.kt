@@ -31,12 +31,10 @@ internal class SwipeBackgroundButtonRecyclerView : RecyclerView {
 
     private var onPerformClickListener: OnPerformClickListener? = null
 
-    fun interface OnPerformClickListener {
-        fun onPerformClick(view: View, event: MotionEvent): Boolean
-    }
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
 
-    fun setOnPerformClickListener(listener: OnPerformClickListener?) {
-        onPerformClickListener = listener
+        onPerformClickListener = null
     }
 
     override fun onTouchEvent(e: MotionEvent): Boolean {
@@ -63,5 +61,13 @@ internal class SwipeBackgroundButtonRecyclerView : RecyclerView {
         super.performClick()
         val motionEvent = motionEvent ?: throw IllegalStateException()
         return onPerformClickListener?.onPerformClick(this, motionEvent) ?: true
+    }
+
+    fun setOnPerformClickListener(listener: OnPerformClickListener?) {
+        onPerformClickListener = listener
+    }
+
+    fun interface OnPerformClickListener {
+        fun onPerformClick(view: View, event: MotionEvent): Boolean
     }
 }
