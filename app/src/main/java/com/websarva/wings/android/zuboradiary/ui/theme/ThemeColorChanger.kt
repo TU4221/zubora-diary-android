@@ -240,32 +240,32 @@ internal open class ThemeColorChanger {
     }
 
     // 共通処理
-    protected open fun applyViewColor(view: View, color: Int) {
+    protected fun applyViewColor(view: View, color: Int) {
         view.setBackgroundColor(color)
     }
 
-    protected open fun applyTextViewsColor(textViewList: List<TextView>, color: Int, onColor: Int) {
+    protected fun applyTextViewsColor(textViewList: List<TextView>, color: Int, onColor: Int) {
         textViewList.forEach(Consumer { x: TextView -> applyTextViewColor(x, color, onColor) })
     }
 
-    protected open fun applyTextViewColor(textView: TextView, color: Int, onColor: Int) {
+    protected fun applyTextViewColor(textView: TextView, color: Int, onColor: Int) {
         textView.setBackgroundColor(color)
         textView.setTextColor(onColor)
     }
 
-    protected open fun applyTextViewsColorOnlyText(textViewList: List<TextView>, onColor: Int) {
+    protected fun applyTextViewsColorOnlyText(textViewList: List<TextView>, onColor: Int) {
         textViewList.forEach(Consumer { x: TextView -> applyTextViewColorOnlyText(x, onColor) })
     }
 
-    protected open fun applyTextViewColorOnlyText(textView: TextView, color: Int) {
+    protected fun applyTextViewColorOnlyText(textView: TextView, color: Int) {
         textView.setTextColor(color)
     }
 
-    protected open fun applyTextViewsColorOnlyIcon(textViewList: List<TextView>, color: Int) {
+    protected fun applyTextViewsColorOnlyIcon(textViewList: List<TextView>, color: Int) {
         textViewList.forEach(Consumer { x: TextView -> applyTextViewColorOnlyIcon(x, color) })
     }
 
-    protected open fun applyTextViewColorOnlyIcon(view: TextView, color: Int) {
+    protected fun applyTextViewColorOnlyIcon(view: TextView, color: Int) {
         val drawables = view.compoundDrawablesRelative
         val wrappedDrawable = arrayOfNulls<Drawable>(drawables.size)
 
@@ -281,11 +281,11 @@ internal open class ThemeColorChanger {
         )
     }
 
-    protected open fun applyDrawableColor(drawable: Drawable, color: Int) {
+    protected fun applyDrawableColor(drawable: Drawable, color: Int) {
         drawable.setTint(color)
     }
 
-    protected open fun createCheckedColorStateList(checkedColor: Int, unCheckedColor: Int): ColorStateList {
+    protected fun createCheckedColorStateList(checkedColor: Int, unCheckedColor: Int): ColorStateList {
         val states = arrayOf(
             intArrayOf(android.R.attr.state_checked),  // ON状態
             intArrayOf(-android.R.attr.state_checked) // OFF状態
