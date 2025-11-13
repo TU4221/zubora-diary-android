@@ -62,7 +62,7 @@
     <!--*****************************************************************************************-->
 
     <!-- fragment_calendar -->
-    <string name="fragment_calendar_month_header_format">yyyy年MM月</string>
+    <string name="fragment_calendar_month_header_format">yyyy年M月</string>
     <string name="fragment_calendar_month_header_tools_value">0000年00月00日</string>
     <string name="fragment_calendar_no_diary_message">日記がありません。</string>
     <string name="fragment_calendar_diary_load_failure_message">日記の読込に失敗しました。</string>
@@ -366,8 +366,8 @@
     <string name="day_of_week_short_name_saturday">土</string>
 
     <!-- TimeFormatPattern -->
-    <string name="local_date_format_pattern_japanese_date">yyyy年MM月dd日(E)</string>
-    <string name="local_date_time_format_pattern_japanese_date_time_with_seconds">yyyy年MM月dd日(E) HH:mm:ss</string>
+    <string name="local_date_format_pattern_japanese_date">yyyy年M月d日(E)</string>
+    <string name="local_date_time_format_pattern_japanese_date_time_with_seconds">yyyy年M月d日(E) HH:mm:ss</string>
     <string name="local_time_format_pattern_hour_minute">HH:mm</string>
 
     <!-- ReminderNotificationWorker -->
