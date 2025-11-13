@@ -4,23 +4,21 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.contentColorFor
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.unit.dp
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
-import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults.chipPadding
 import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
 import com.mikepenz.aboutlibraries.ui.compose.chipColors
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
 import com.websarva.wings.android.zuboradiary.databinding.DialogOpenSourceLicensesBinding
-import com.websarva.wings.android.zuboradiary.ui.utils.asErrorColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSecondaryContainerColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asPrimaryColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColorInt
+import com.websarva.wings.android.zuboradiary.ui.utils.asSurfaceColorInt
 
 class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<DialogOpenSourceLicensesBinding>() {
 
@@ -44,7 +42,6 @@ class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<Dialo
             }
     }
 
-    // TODO:VerUpによる仮修正
     private fun setUpAboutLibraries() {
         binding.composeViewAboutLibraries
             .apply {
@@ -61,60 +58,30 @@ class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<Dialo
                         libraries = libraries.value, // Libs オブジェクトを渡す
                         modifier = Modifier.fillMaxSize(),
 
-
-                        // リスト全体の左右の余白
-                        contentPadding = PaddingValues(horizontal = 16.dp),
-
                         // 色の設定
                         colors = LibraryDefaults.libraryColors(
-                            backgroundColor = Color(themeColor.asSecondaryContainerColorInt(resources)),
-                            contentColor = Color(themeColor.asPrimaryColorInt(resources)),
+                            // ダイアログ背景色
+                            backgroundColor = Color(themeColor.asSurfaceColorInt(resources)),
+
+                            // リストアイテム、ダイアログ文字
+                            contentColor = Color(themeColor.asOnSurfaceColorInt(resources)),
+
+                            // バージョンチップ
                             versionChipColors = LibraryDefaults.chipColors(
-                                containerColor = Color(
-                                    themeColor.asSecondaryContainerColorInt(resources)
-                                )
+                                containerColor = Color(themeColor.asSecondaryContainerColorInt(resources)),
+                                contentColor = Color(themeColor.asOnSecondaryContainerColorInt(resources))
                             ),
-                            licenseChipColors = LibraryDefaults.chipColors(),
-                            fundingChipColors = LibraryDefaults.chipColors(
-                                    containerColor = Color(themeColor.asErrorColorInt(resources)),
-                                    contentColor = contentColorFor(
-                                        Color(themeColor.asErrorColorInt(resources))
-                                    ),
-                                ),
+
+                            // ライセンスチップ
+                            licenseChipColors = LibraryDefaults.chipColors(
+                                containerColor = Color(themeColor.asSecondaryContainerColorInt(resources)),
+                                contentColor = Color(themeColor.asOnSecondaryContainerColorInt(resources))
+                            ),
+
+                            // ダイアログの確認ボタン
                             dialogConfirmButtonColor = Color(themeColor.asPrimaryColorInt(resources))
-                        ),
-
-                        // 各ライブラリ項目の「内部」の余白を設定
-                        padding = LibraryDefaults.libraryPadding(
-                            contentPadding = PaddingValues(16.dp),
-                            namePadding = PaddingValues(0.dp),
-                            versionPadding = chipPadding(
-                                containerPadding = PaddingValues(start = 8.dp)
-                            ),
-                            licensePadding = chipPadding(),
-                            fundingPadding = chipPadding(),
-                            verticalPadding = 2.dp,
-                            licenseDialogContentPadding = 8.dp
-                        ),
-
-                        // 各ライブラリ項目「間」のスペースを設定
-                        dimensions = LibraryDefaults.libraryDimensions(
-                            itemSpacing = 8.dp, // 各項目間の縦のスペース
-                            chipMinHeight = 16.dp
                         )
                     )
-
-                    /*LibrariesContainer(
-                        modifier = Modifier.fillMaxSize(), //
-                        contentPadding = PaddingValues(16.dp),//
-                        colors = LibraryDefaults.libraryColors(
-                            backgroundColor = Color(themeColor.getSecondaryContainerColor(resources)),
-                            badgeBackgroundColor = Color(themeColor.getPrimaryColor(resources)),
-                            dialogConfirmButtonColor = Color(themeColor.getPrimaryColor(resources))
-                        ),
-                        itemContentPadding = LibraryDefaults.ContentPadding,
-                        itemSpacing = 8.dp
-                    )*/
                 }
             }
     }
