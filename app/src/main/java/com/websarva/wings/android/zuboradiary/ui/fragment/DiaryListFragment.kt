@@ -45,7 +45,7 @@ class DiaryListFragment :
     
     override val destinationId = R.id.navigation_diary_list_fragment
 
-    private lateinit var diaryListAdapter: StandardDiaryListAdapter
+    private var diaryListAdapter: StandardDiaryListAdapter? = null
 
     private var diaryListSetupHelper: DiaryListSetupHelper? = null
 
@@ -66,13 +66,6 @@ class DiaryListFragment :
         super.onDestroyView()
 
         mainViewModel.onUiGone()
-
-        diaryListSetupHelper?.cleanup()
-        diaryListSetupHelper = null
-
-        swipeBackgroundButtonInteractionHelper?.cleanup()
-        swipeBackgroundButtonInteractionHelper = null
-
     }
     //endregion
     
@@ -85,6 +78,21 @@ class DiaryListFragment :
                 lifecycleOwner = viewLifecycleOwner
                 viewModel = mainViewModel
             }
+    }
+
+    override fun clearViewBindings() {
+        binding.materialToolbarTopAppBar.setOnMenuItemClickListener(null)
+
+        binding.recyclerDiaryList.adapter = null
+        diaryListAdapter = null
+
+        diaryListSetupHelper?.cleanup()
+        diaryListSetupHelper = null
+
+        swipeBackgroundButtonInteractionHelper?.cleanup()
+        swipeBackgroundButtonInteractionHelper = null
+
+        super.clearViewBindings()
     }
     //endregion
 
@@ -214,27 +222,27 @@ class DiaryListFragment :
             themeColor,
             { mainViewModel.onDiaryListItemClick(it) },
             { mainViewModel.onDiaryListItemDeleteButtonClick(it) }
-        )
+        ).also { adapter ->
+            diaryListSetupHelper =
+                DiaryListSetupHelper(
+                    diaryRecyclerView,
+                    adapter
+                ) {
+                    mainViewModel.onDiaryListEndScrolled()
+                }.also { it.setup() }
 
-        diaryListSetupHelper =
-            DiaryListSetupHelper(
-                diaryRecyclerView,
-                diaryListAdapter
-            ) {
-                mainViewModel.onDiaryListEndScrolled()
-            }.also { it.setup() }
-
-        swipeBackgroundButtonInteractionHelper =
-            SwipeBackgroundButtonInteractionHelper(
-                diaryRecyclerView,
-                diaryListAdapter
-            ).also { it.setup() }
+            swipeBackgroundButtonInteractionHelper =
+                SwipeBackgroundButtonInteractionHelper(
+                    diaryRecyclerView,
+                    adapter
+                ).also { it.setup() }
+        }
     }
     //endregion
 
     //region View Manipulation
     private fun updateDiaryList(diaryList: DiaryListUi<DiaryListItemContainerUi.Standard>) {
-        diaryListAdapter.submitList(diaryList.itemList) {
+        diaryListAdapter?.submitList(diaryList.itemList) {
             mainViewModel.onDiaryListUpdateCompleted()
         }
     }

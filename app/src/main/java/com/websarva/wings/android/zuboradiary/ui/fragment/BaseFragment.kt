@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.findNavController
@@ -111,6 +112,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         themeColorInflater: LayoutInflater, container: ViewGroup
     ): T
 
+    @CallSuper
     protected open fun clearViewBindings() {
         _binding = null
     }

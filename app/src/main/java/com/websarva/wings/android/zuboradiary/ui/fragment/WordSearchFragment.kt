@@ -36,9 +36,13 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
 
     override val destinationId = R.id.navigation_word_search_fragment
 
-    private lateinit var wordSearchResultDiaryListAdapter: WordSearchResultDiaryListAdapter
+    private var wordSearchResultDiaryListAdapter: WordSearchResultDiaryListAdapter? = null
 
     private var diaryListSetupHelper: DiaryListSetupHelper? = null
+
+    private var fabScrollListener: RecyclerView.OnScrollListener? = null
+
+    private lateinit var keyboardManager: KeyboardManager
     //endregion
 
     //region Fragment Lifecycle
@@ -47,16 +51,15 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
 
         setUpWordSearchResultListAdapter()
         setUpFloatingActionButton()
+        setUpKeyboard()
 
         mainViewModel.onUiReady()
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        
         mainViewModel.onUiGone()
-
-        diaryListSetupHelper?.cleanup()
-        diaryListSetupHelper = null
     }
     //endregion
 
@@ -69,6 +72,22 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
                 lifecycleOwner = viewLifecycleOwner
                 viewModel = mainViewModel
             }
+    }
+
+    override fun clearViewBindings() {
+        binding.recyclerWordSearchResultList.adapter = null
+        wordSearchResultDiaryListAdapter = null
+
+        diaryListSetupHelper?.cleanup()
+        diaryListSetupHelper = null
+
+        binding.floatingActionButtonTopScroll.setOnClickListener(null)
+        fabScrollListener?.let {
+            binding.recyclerWordSearchResultList.removeOnScrollListener(it)
+        }
+        fabScrollListener = null
+
+        super.clearViewBindings()
     }
     //endregion
 
@@ -125,36 +144,39 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         val diaryRecyclerView = binding.recyclerWordSearchResultList
         wordSearchResultDiaryListAdapter = WordSearchResultDiaryListAdapter(
             themeColor
-        ) { mainViewModel.onWordSearchResultListItemClick(it) }
-
-        diaryListSetupHelper =
-            DiaryListSetupHelper(
-                diaryRecyclerView,
-                wordSearchResultDiaryListAdapter
-            ) {
-                mainViewModel.onWordSearchResultListEndScrolled()
-            }.also { it.setup() }
+        ) { mainViewModel.onWordSearchResultListItemClick(it) }.also { adapter ->
+            diaryListSetupHelper =
+                DiaryListSetupHelper(
+                    diaryRecyclerView,
+                    adapter
+                ) {
+                    mainViewModel.onWordSearchResultListEndScrolled()
+                }.also { it.setup() }
+        }
     }
 
     private fun setUpFloatingActionButton() {
-        binding.floatingActionButtonTopScroll.apply {
+        val fab = binding.floatingActionButtonTopScroll.apply {
             hide() // MEMO:初回起動用
             setOnClickListener {
                 binding.recyclerWordSearchResultList.smoothScrollToPosition(0)
             }
         }
-        binding.recyclerWordSearchResultList.addOnScrollListener(object :
-            RecyclerView.OnScrollListener() {
+        fabScrollListener = object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
 
                 if (recyclerView.canScrollVertically(-1)) {
-                    binding.floatingActionButtonTopScroll.show()
+                    fab.show()
                 } else {
-                    binding.floatingActionButtonTopScroll.hide()
+                    fab.hide()
                 }
             }
-        })
+        }.also { binding.recyclerWordSearchResultList.addOnScrollListener(it) }
+    }
+
+    private fun setUpKeyboard() {
+        keyboardManager = KeyboardManager(requireContext())
     }
     //endregion
 
@@ -162,14 +184,14 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     private fun updateWordSearchResultList(
         list: DiaryListUi<DiaryListItemContainerUi.WordSearchResult>
     ) {
-        wordSearchResultDiaryListAdapter.submitList(list.itemList) {
+        wordSearchResultDiaryListAdapter?.submitList(list.itemList) {
             mainViewModel.onWordSearchResultListUpdateCompleted()
         }
     }
 
     private fun showKeyboard() {
         binding.textInputEditTextSearchWord.requestFocus()
-        KeyboardManager().showKeyboard(binding.textInputEditTextSearchWord)
+        keyboardManager.showKeyboard(binding.textInputEditTextSearchWord)
     }
     //endregion
 

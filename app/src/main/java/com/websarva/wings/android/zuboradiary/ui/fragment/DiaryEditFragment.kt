@@ -10,10 +10,8 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
-import android.widget.LinearLayout
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.motion.widget.MotionLayout
-import androidx.core.widget.NestedScrollView
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.websarva.wings.android.zuboradiary.R
@@ -53,24 +51,25 @@ import kotlin.collections.map
 class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEvent>() {
 
     //region Properties
-    private val motionLayoutTransitionTime = 500 /*ms*/
-
-    private val motionLayoutJumpTime = 1 /*ms*/
-
-    private lateinit var motionLayoutDiaryEditItems: Array<MotionLayout>
-
-    private var itemMotionLayoutListeners: Array<ItemMotionLayoutListener>? = null
-
-    private var shouldTransitionItemMotionLayout = false
-
-    override val destinationId = R.id.navigation_diary_edit_fragment
-
-    // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     override val mainViewModel: DiaryEditViewModel by viewModels()
+
+    override val destinationId = R.id.navigation_diary_edit_fragment
+
+    private val motionLayoutTransitionTime = 500 /*ms*/
+
+    private val motionLayoutJumpTime = 1 /*ms*/
+
+    private var itemMotionLayouts: Array<MotionLayout>? = null
+
+    private var itemMotionLayoutListeners: Array<ItemMotionLayoutListener>? = null
+
+    private var shouldTransitionItemMotionLayout = false
+
+    private lateinit var keyboardManager: KeyboardManager
 
     private val screenHeight: Int
         get() {
@@ -98,7 +97,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpFocusViewScroll()
+        setUpKeyboard()
+        setUpKeyboard()
         setUpToolbar()
         setUpItemMotionLayouts()
     }
@@ -116,6 +116,16 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     override fun clearViewBindings() {
+        binding.materialToolbarTopAppBar.setOnMenuItemClickListener(null)
+
+        binding.autoCompleteTextWeather1.setAdapter(null)
+        binding.autoCompleteTextWeather2.setAdapter(null)
+        binding.autoCompleteTextCondition.setAdapter(null)
+
+        itemMotionLayouts?.forEach {
+            it.setTransitionListener(null)
+        }
+        itemMotionLayouts = null
         itemMotionLayoutListeners = null
 
         super.clearViewBindings()
@@ -379,21 +389,23 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             }
     }
 
-    private fun setUpFocusViewScroll() {
-        KeyboardManager().registerKeyBoredStateListener(this) { isVisible ->
-            if (!isVisible) return@registerKeyBoredStateListener
-            require(isSoftInputAdjustNothing())
+    private fun setUpKeyboard() {
+        keyboardManager = KeyboardManager(requireContext()).apply {
+            registerKeyboardStateListener(this@DiaryEditFragment) { isVisible ->
+                if (!isVisible) return@registerKeyboardStateListener
+                if (!isSoftInputAdjustNothing()) return@registerKeyboardStateListener
 
-            val focusView =
-                this@DiaryEditFragment.view?.findFocus() ?: return@registerKeyBoredStateListener
+                val focusView =
+                    this@DiaryEditFragment.view?.findFocus() ?: return@registerKeyboardStateListener
 
-            val offset = screenHeight / 3
-            val location = IntArray(2)
-            focusView.getLocationOnScreen(location)
-            val positionY = location[1]
-            val scrollAmount = positionY - offset
+                val offset = screenHeight / 3
+                val location = IntArray(2)
+                focusView.getLocationOnScreen(location)
+                val positionY = location[1]
+                val scrollAmount = positionY - offset
 
-            binding.nestedScrollFullScreen.smoothScrollBy(0, scrollAmount)
+                binding.nestedScrollFullScreen.smoothScrollBy(0, scrollAmount)
+            }
         }
     }
 
@@ -453,8 +465,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     //region Motion Layout Setup
     private fun setUpItemMotionLayouts() {
-        // 項目欄MotionLayout設定
-        motionLayoutDiaryEditItems =
+        itemMotionLayouts =
             binding.run {
                 arrayOf(
                     includeItem1.motionLayoutDiaryEditItem,
@@ -463,32 +474,36 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                     includeItem4.motionLayoutDiaryEditItem,
                     includeItem5.motionLayoutDiaryEditItem,
                 )
+            }.also { motionLayoutDiaryEditItems ->
+                val arraySize = motionLayoutDiaryEditItems.size
+                itemMotionLayoutListeners =
+                    Array(arraySize) { init ->
+                        ItemMotionLayoutListener(
+                            arraySize,
+                            init + 1,
+                            binding.includeItem1.linerLayoutDiaryEditItem.height,
+                            { mainViewModel.onDiaryItemInvisibleStateTransitionCompleted(it) },
+                            { mainViewModel.onDiaryItemVisibleStateTransitionCompleted() },
+                            { selectItemMotionLayout(it) },
+                            { dx, dy, scrollDurationMs ->
+                                binding.nestedScrollFullScreen.smoothScrollBy(dx, dy, scrollDurationMs)
+                            }
+                        ).also {
+                            motionLayoutDiaryEditItems[init].setTransitionListener(it)
+                        }
+                    }
             }
-        val arraySize = motionLayoutDiaryEditItems.size
-        itemMotionLayoutListeners =
-            Array(arraySize) { init ->
-                ItemMotionLayoutListener(
-                    arraySize,
-                    init + 1,
-                    binding.includeItem1.linerLayoutDiaryEditItem,
-                    binding.nestedScrollFullScreen,
-                    { mainViewModel.onDiaryItemInvisibleStateTransitionCompleted(it) },
-                    { mainViewModel.onDiaryItemVisibleStateTransitionCompleted() },
-                    { selectItemMotionLayout(it) }
-                ).also {
-                    motionLayoutDiaryEditItems[init].setTransitionListener(it)
-                }
-            }
+
     }
 
     private class ItemMotionLayoutListener(
         private val maxItemNumber: Int,
         private val itemNumber: Int,
-        private val itemLayout: LinearLayout,
-        private val scrollView: NestedScrollView,
+        private val itemHeight: Int,
         private val onDiaryItemTransitionToInvisibleCompleted: (Int) -> Unit,
         private val onDiaryItemTransitionToVisibleCompleted: (Int) -> Unit,
-        private val processSelectionItemMotionLayout: (Int) -> MotionLayout,
+        private val processSelectionItemMotionLayout: (Int) -> MotionLayout?,
+        private val processSmoothScroll: (dx: Int, dy: Int, scrollDurationMs: Int) -> Unit,
     ): MotionLayout.TransitionListener {
 
         private val scrollTimeMotionLayoutTransition = 1000 /*ms*/
@@ -547,7 +562,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         private fun isNextItemInvisibleState(): Boolean {
             if (itemNumber == maxItemNumber) return true
             val nextItemNumber = itemNumber.inc()
-            val motionLayout = processSelectionItemMotionLayout(nextItemNumber)
+            val motionLayout = processSelectionItemMotionLayout(nextItemNumber) ?: return true
             return motionLayout.currentState == R.id.motion_scene_edit_diary_item_invisible_state
         }
 
@@ -562,15 +577,13 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
 
         private fun scrollOnDiaryItemTransition(isUpDirection: Boolean) {
-            val itemHeight = itemLayout.height
             val scrollY =
                 if (isUpDirection) {
                     itemHeight
                 } else {
                     -itemHeight
                 }
-            Log.d("20250801", "scrollOnDiaryItemTransition(${isUpDirection})_scrollView:${scrollView}_itemHeight:${itemHeight}")
-            scrollView.smoothScrollBy(0, scrollY, scrollTimeMotionLayoutTransition)
+            processSmoothScroll(0, scrollY, scrollTimeMotionLayoutTransition)
         }
 
         override fun onTransitionTrigger(
@@ -600,21 +613,22 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             }
         }
 
-
-        for (i in motionLayoutDiaryEditItems.indices) {
-            val itemNumber = i + 1
-            if (itemNumber <= numVisibleItems) {
-                transitionDiaryItemToVisible(itemNumber, true)
-            } else {
-                transitionDiaryItemToInvisible(itemNumber, true)
+        itemMotionLayouts?.let {
+            for (i in it.indices) {
+                val itemNumber = i + 1
+                if (itemNumber <= numVisibleItems) {
+                    transitionDiaryItemToVisible(itemNumber, true)
+                } else {
+                    transitionDiaryItemToInvisible(itemNumber, true)
+                }
             }
         }
     }
 
     private fun transitionDiaryItemToInvisible(itemNumber: Int, isJump: Boolean) {
         Log.d("logTag", "transitionDiaryItemToInvisible()_itemNumber = $itemNumber, isJump = $isJump")
-        val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber)
-        val itemMotionLayout = selectItemMotionLayout(itemNumber)
+        val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber) ?: return
+        val itemMotionLayout = selectItemMotionLayout(itemNumber) ?: return
         if (isJump) {
             itemMotionLayoutListener.markTransitionAsJump()
             // HACK: 画面回転後など、特定の条件下で jumpToState() を使用すると、
@@ -637,8 +651,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     private fun transitionDiaryItemToVisible(itemNumber: Int, isJump: Boolean) {
         Log.d("logTag", "transitionDiaryItemToVisible()_itemNumber = $itemNumber, isJump = $isJump")
-        val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber)
-        val itemMotionLayout = selectItemMotionLayout(itemNumber)
+        val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber) ?: return
+        val itemMotionLayout = selectItemMotionLayout(itemNumber) ?: return
         if (isJump) {
             itemMotionLayoutListener.markTransitionAsJump()
             // HACK: 画面回転後など、特定の条件下で jumpToState() を使用すると、
@@ -659,20 +673,34 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    private fun selectItemMotionLayout(itemNumber: Int): MotionLayout {
+    private fun selectItemMotionLayout(itemNumber: Int): MotionLayout? {
         val arrayNumber = itemNumber - 1
-        return motionLayoutDiaryEditItems[arrayNumber]
+        return itemMotionLayouts?.let {
+            if (arrayNumber in it.indices) {
+                it[arrayNumber]
+            } else {
+                null
+            }
+        }
     }
 
-    private fun selectItemMotionLayoutListener(itemNumber: Int): ItemMotionLayoutListener {
+    private fun selectItemMotionLayoutListener(itemNumber: Int): ItemMotionLayoutListener? {
         val arrayNumber = itemNumber - 1
-        return checkNotNull(itemMotionLayoutListeners)[arrayNumber]
+        return itemMotionLayoutListeners?.let {
+            if (arrayNumber in it.indices) {
+                it[arrayNumber]
+            } else {
+                null
+            }
+        }
     }
 
     private fun countVisibleItems(): Int {
-        return motionLayoutDiaryEditItems.count { motionLayout ->
-            motionLayout.currentState == R.id.motion_scene_edit_diary_item_visible_state
-        }
+        return itemMotionLayouts?.let {
+            it.count { motionLayout ->
+                motionLayout.currentState == R.id.motion_scene_edit_diary_item_visible_state
+            }
+        } ?: 0
     }
     //endregion
 

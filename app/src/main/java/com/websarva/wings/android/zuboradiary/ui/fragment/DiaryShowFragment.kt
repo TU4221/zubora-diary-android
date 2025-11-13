@@ -50,6 +50,12 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
                 viewModel = mainViewModel
             }
     }
+
+    override fun clearViewBindings() {
+        binding.materialToolbarTopAppBar.setOnMenuItemClickListener(null)
+
+        super.clearViewBindings()
+    }
     //endregion
 
     //region Fragment Result Observation Setup
