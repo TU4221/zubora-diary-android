@@ -22,45 +22,48 @@
 
     </data>
 
-    <FrameLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/fragment_settings_section_layout_min_height"
+        android:onClickListener="@{onClickListener}"
         app:applySystemInsetsToPaddingLeft="@{true}"
-        app:applySystemInsetsToPaddingRight="@{true}" >
+        app:applySystemInsetsToPaddingRight="@{true}">
 
         <!-- HACK:警告で"android:drawableStart"から"app:drawableStartCompat"に変更するように促されるが、
                   "app:drawableStartCompat"はリソースしか受け付けない為、"android:drawableStart"を使用
-                  この警告は"android:drawableStart"がAPIレベルが17以上でないと対応してないことから起きており
-                  (ChatGPTより)、本アプリはAPIレベル21が対応最小レベルとなるのでこのまま使用する。 -->
+                  この警告は"android:drawableStart"がAPIレベルが27以上でないと対応してないことから起きており、
+                  本アプリはAPIレベル21が対応最小レベルとなるのでこのまま使用する。 -->
         <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
         <TextView
-            style="@style/SettingsItemTextViewStyle"
             android:id="@+id/text_title"
-            android:layout_width="match_parent"
+            style="@style/SettingsItemTextViewStyle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:textAppearance="@style/SettingsItemTextViewTextAppearance"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_toStartOf="@+id/text_value"
             android:text="@{settingTitle}"
-            android:onClickListener="@{onClickListener}"
+            android:textAppearance="@style/SettingsItemTextViewTextAppearance"
             app:drawableStartCompat="@{settingIcon}"
-            tools:text="@string/layout_settings_item_title_tools_value"
             tools:drawableStart="@drawable/ic_settings_24px"
-            tools:ignore="DuplicateIncludedIds" />
+            tools:ignore="DuplicateIncludedIds"
+            tools:text="@string/layout_settings_item_title_tools_value" />
 
         <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
         <TextView
-            style="@style/SettingsItemValueTextViewStyle"
             android:id="@+id/text_value"
-            android:layout_width="match_parent"
+            style="@style/SettingsItemValueTextViewStyle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="end|center_vertical"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
             android:textAppearance="@style/SettingsItemValueTextViewTextAppearance"
             android:visibility="@{settingValueVisibility}"
             app:settingValueText="@{settingValue}"
             tools:ignore="DuplicateIncludedIds" />
 
-    </FrameLayout>
+    </RelativeLayout>
 
 </layout>
 
