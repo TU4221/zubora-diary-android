@@ -91,7 +91,7 @@
     <string name="fragment_settings_item_title_all_data_delete">全データ削除</string>
 
     <string name="fragment_settings_section_title_other">その他</string>
-    <string name="fragment_settings_item_title_open_source_licenses">オープンソースライセンス</string>
+    <string name="fragment_settings_item_title_open_source_software_licenses">OSSライセンス</string>
 
     <!-- layout_settings_item -->
     <string name="layout_settings_item_title_tools_value">設定項目</string>
@@ -118,7 +118,7 @@
     <string name="dialog_all_data_delete_message">削除したデータは復元できませんがよろしいでしょうか。</string>
 
     <!-- fragment_licenses -->
-    <string name="fragment_open_source_licenses_toolbar_title">オープンソースライセンス</string>
+    <string name="fragment_open_source_software_licenses_toolbar_title">OSSライセンス</string>
 
     <!--*****************************************************************************************-->
 

@@ -13,14 +13,15 @@ import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
 import com.mikepenz.aboutlibraries.ui.compose.chipColors
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
-import com.websarva.wings.android.zuboradiary.databinding.DialogOpenSourceLicensesBinding
+import com.websarva.wings.android.zuboradiary.databinding.DialogOpenSourceSoftwareLicensesBinding
 import com.websarva.wings.android.zuboradiary.ui.utils.asOnSecondaryContainerColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asPrimaryColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asSurfaceColorInt
 
-class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<DialogOpenSourceLicensesBinding>() {
+class OpenSourceSoftwareLicensesDialogFragment
+    : BaseSimpleFullScreenDialogFragment<DialogOpenSourceSoftwareLicensesBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,8 +32,8 @@ class OpenSourceLicensesDialogFragment: BaseSimpleFullScreenDialogFragment<Dialo
     override fun createViewBinding(
         themeColorInflater: LayoutInflater,
         container: ViewGroup?
-    ): DialogOpenSourceLicensesBinding {
-        return DialogOpenSourceLicensesBinding.inflate(themeColorInflater, container, false)
+    ): DialogOpenSourceSoftwareLicensesBinding {
+        return DialogOpenSourceSoftwareLicensesBinding.inflate(themeColorInflater, container, false)
     }
 
     private fun setUpToolBar() {

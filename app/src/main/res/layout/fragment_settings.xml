@@ -281,7 +281,7 @@
                             layout="@layout/layout_settings_item"
                             android:id="@+id/include_open_source_licenses_setting"
                             app:settingIcon="@{@drawable/ic_copyright_24dp}"
-                            app:settingTitle="@{@string/fragment_settings_item_title_open_source_licenses}"
+                            app:settingTitle="@{@string/fragment_settings_item_title_open_source_software_licenses}"
                             app:settingValueVisibility="@{View.GONE}"
                             app:onClickListener="@{() -> viewModel.onOpenSourceLicenseButtonClick()}" />
 
