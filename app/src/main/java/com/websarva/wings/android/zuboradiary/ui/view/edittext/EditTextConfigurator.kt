@@ -56,6 +56,8 @@ internal class EditTextConfigurator {
 
     private class NextOnEnterListener : TextView.OnEditorActionListener {
 
+        private lateinit var keyboardManager : KeyboardManager
+
         override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
             v as EditText
 
@@ -64,7 +66,9 @@ internal class EditTextConfigurator {
                 v.inputType == (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE)
                 ) return false
 
-            val keyboardManager = KeyboardManager()
+            if (!::keyboardManager.isInitialized) {
+                keyboardManager = KeyboardManager(v.context)
+            }
             when (actionId) {
                 EditorInfo.IME_ACTION_DONE -> {
                     keyboardManager.hideKeyboard(v)
@@ -92,7 +96,7 @@ internal class EditTextConfigurator {
                 offsetView = nextView
             } while (nextView !is EditText && nextView != null)
 
-            if (nextView == null || nextView !is EditText) return null
+            if (nextView == null) return null
             nextView.requestFocus()
             return nextView
         }
