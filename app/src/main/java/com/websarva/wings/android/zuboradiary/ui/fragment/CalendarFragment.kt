@@ -286,6 +286,7 @@ class CalendarFragment :
             } else {
                 textDay.visibility = View.INVISIBLE
                 viewDayDot.visibility = View.INVISIBLE
+                (textDay.parent as? View)?.background = null
             }
         }
 
