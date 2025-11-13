@@ -12,6 +12,8 @@ internal class ClearFocusBackgroundView @JvmOverloads constructor (
     defStyleRes: Int = 0
 ) : View(context, attrs, defStyleAttr, defStyleRes) {
 
+    private val keyboardManager = KeyboardManager(context)
+
     init {
         setUpFocusClearOnClick()
     }
@@ -25,7 +27,7 @@ internal class ClearFocusBackgroundView @JvmOverloads constructor (
         isClickable = true
         isFocusable = true
         setOnClickListener { v: View ->
-            KeyboardManager().hideKeyboard(v)
+            keyboardManager.hideKeyboard(v)
 
             isFocusableInTouchMode = true
             v.requestFocus()
