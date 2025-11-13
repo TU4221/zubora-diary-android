@@ -6,7 +6,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
-import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
+import com.websarva.wings.android.zuboradiary.ui.theme.withTheme
 
 internal abstract class ListBaseAdapter <T, VH : RecyclerView.ViewHolder> protected constructor(
     protected val themeColor: ThemeColorUi,
@@ -15,8 +15,7 @@ internal abstract class ListBaseAdapter <T, VH : RecyclerView.ViewHolder> protec
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
         val inflater = LayoutInflater.from(parent.context)
-        val themeColorInflater = ThemeColorInflaterCreator().create(inflater, themeColor)
-
+        val themeColorInflater = inflater.withTheme(themeColor)
         return createViewHolder(parent, themeColorInflater, viewType)
     }
 

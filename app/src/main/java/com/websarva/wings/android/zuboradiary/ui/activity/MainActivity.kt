@@ -16,7 +16,6 @@ import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.ActivityMainBinding
-import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
 import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityUiEvent
@@ -30,6 +29,7 @@ import androidx.core.view.get
 import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.theme.withTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -116,7 +116,7 @@ class MainActivity : LoggingActivity() {
     }
 
     private fun setUpMainActivityBinding() {
-        val themeColorInflater = ThemeColorInflaterCreator().create(layoutInflater, themeColor)
+        val themeColorInflater = layoutInflater.withTheme(themeColor)
         _binding =
             ActivityMainBinding.inflate(themeColorInflater).apply {
                 viewModel = mainActivityViewModel

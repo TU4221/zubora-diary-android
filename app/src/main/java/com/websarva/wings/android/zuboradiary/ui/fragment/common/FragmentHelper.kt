@@ -20,7 +20,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
-import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorInflaterCreator
+import com.websarva.wings.android.zuboradiary.ui.theme.withTheme
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +35,7 @@ class FragmentHelper {
         inflater: LayoutInflater,
         themeColor: ThemeColorUi
     ): LayoutInflater {
-        return ThemeColorInflaterCreator().create(inflater, themeColor)
+        return inflater.withTheme(themeColor)
     }
     //endregion
 
