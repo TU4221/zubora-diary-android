@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.theme
 
 import android.content.res.Resources
 import android.view.View
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.res.ResourcesCompat
 import com.websarva.wings.android.zuboradiary.R
@@ -64,7 +65,7 @@ internal class CalendarThemeColorChanger : ThemeColorChanger() {
             )
 
         applyDrawableColor(drawable, color)
-        textDay.background = drawable
+        (textDay.parent as? View)?.background = drawable
 
         applyTextViewColorOnlyText(textDay, onColor)
         applyViewColor(viewDot, onColor)
