@@ -40,11 +40,11 @@ abstract class BaseViewModel<S: UiState, E: UiEvent, M: AppMessage> internal con
     //endregion
 
     //region UI State Update
-    protected open fun updateUiState(state: S) {
+    protected fun updateUiState(state: S) {
         _uiState.value = state
     }
 
-    protected open fun updateUiState(function: (S) -> S) {
+    protected fun updateUiState(function: (S) -> S) {
         _uiState.update{ function(it) }
     }
     //endregion

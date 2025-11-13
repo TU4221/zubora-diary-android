@@ -256,6 +256,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         observePendingNavigation()
     }
 
+    @CallSuper
     protected open fun setUpUiStateObservers() {
         observeProcessingState()
     }
@@ -270,6 +271,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         }
     }
 
+    @CallSuper
     protected open fun setUpUiEventObservers() {
         observeMainUiEvent()
         observeCommonUiEvent()

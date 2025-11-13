@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.CallSuper
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
@@ -29,6 +30,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         return builder.create()
     }
 
+    @CallSuper
     protected open fun customizeDialog(builder: MaterialAlertDialogBuilder) {
         val title = createTitle()
         builder.setTitle(title)
