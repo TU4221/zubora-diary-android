@@ -69,15 +69,6 @@ internal object BindingAdapters {
             }
     }
 
-    /**
-     * ImageProgressView にカスタム属性を介してクリックリスナーを設定するためのBindingAdapter。
-     */
-    @JvmStatic
-    @BindingAdapter("onImageClick")
-    fun setImageProgressViewClickListener(view: ImageProgressView, listener: View.OnClickListener?) {
-        view.setImageOnClickListener(listener)
-    }
-
     @JvmStatic
     @BindingAdapter("imagePath")
     fun setImageProgressViewLoadImagePath(imageView: ImageProgressView, filePath: String?) {

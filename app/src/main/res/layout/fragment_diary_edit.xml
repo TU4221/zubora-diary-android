@@ -366,27 +366,24 @@
 
                         </LinearLayout>
 
-                        <FrameLayout
+                        <com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
+                            android:id="@+id/image_progress_attached_image"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:background="@drawable/diary_edit_image_bg_rounded_rectangle_image">
-
-                            <com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
-                                android:id="@+id/image_progress_attached_image"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:layout_margin="@dimen/fragment_diary_edit_image_margin"
-                                app:defaultIcon="@drawable/ic_photo_library_24px"
-                                app:errorIcon="@drawable/ic_hide_image_24px"
-                                app:iconTint="?attr/colorOnSurfaceVariant"
-                                app:imageScaleType="fitCenter"
-                                app:imageContentDescription="@string/fragment_diary_edit_attached_image_attachment"
-                                app:imageAdjustViewBounds="true"
-                                app:onImageClick="@{() -> viewModel.onAttachedImageClick()}"
-                                app:imagePath="@{viewModel.uiState.diaryImageFilePath.path}" />
-
-                        </FrameLayout>
+                            android:layout_gravity="center"
+                            android:padding="@dimen/fragment_diary_edit_image_padding"
+                            android:background="@drawable/diary_edit_image_bg_rounded_rectangle_image"
+                            android:foreground="@drawable/ripple_effect_rounded_corners_12dp"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:onClick="@{() -> viewModel.onAttachedImageClick()}"
+                            app:defaultIcon="@drawable/ic_photo_library_24px"
+                            app:errorIcon="@drawable/ic_hide_image_24px"
+                            app:iconTint="?attr/colorOnSurfaceVariant"
+                            app:imageScaleType="fitCenter"
+                            app:imageContentDescription="@string/fragment_diary_edit_attached_image_attachment"
+                            app:imageAdjustViewBounds="true"
+                            app:imagePath="@{viewModel.uiState.diaryImageFilePath.path}" />
 
                     </LinearLayout>
 

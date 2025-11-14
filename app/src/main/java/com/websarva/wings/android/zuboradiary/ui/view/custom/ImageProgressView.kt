@@ -137,13 +137,4 @@ internal class ImageProgressView @JvmOverloads constructor (
             }
         }
     }
-
-    /**
-     * 内部のImageViewにクリックリスナーを設定する。
-     *
-     * @param listener 設定するクリックリスナー、またはnull。
-     */
-    fun setImageOnClickListener(listener: OnClickListener?) {
-        binding.image.setOnClickListener(listener)
-    }
 }
