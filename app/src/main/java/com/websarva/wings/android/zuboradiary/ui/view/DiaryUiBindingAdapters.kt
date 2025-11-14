@@ -17,20 +17,6 @@ internal object DiaryUiBindingAdapters {
 
     @JvmStatic
     @BindingAdapter("diaryDateText")
-    fun setDiaryDateText(toolbar: Toolbar, diaryLoadState: LoadState<DiaryUi>) {
-        if (diaryLoadState is LoadState.Success) {
-            val diaryUi = diaryLoadState.data
-            val dateText = diaryUi.date.formatDateString(toolbar.context)
-            toolbar.title?.let {
-                if (it.toString() == dateText) return
-            }
-
-            toolbar.title = dateText
-        }
-    }
-
-    @JvmStatic
-    @BindingAdapter("diaryDateText")
     fun setDiaryDateText(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
         if (diaryLoadState is LoadState.Success) {
             val diaryUi = diaryLoadState.data
