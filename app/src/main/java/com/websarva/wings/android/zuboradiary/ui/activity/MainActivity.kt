@@ -6,7 +6,9 @@ import android.util.Log
 import android.view.MenuItem
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.doOnPreDraw
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -187,10 +189,8 @@ class MainActivity : LoggingActivity() {
             binding.motionLayoutBottomNavigation.jumpToState(motionResId)
         } else {
             // HACK:BottomNavigationViewを非表示から表示に変更した時Viewが一瞬ぶれる為、下記コードで対策。
-            binding.motionLayoutBottomNavigation.apply {
-                post {
-                    transitionToState(motionResId)
-                }
+            binding.motionLayoutBottomNavigation.doOnPreDraw {
+                (it as MotionLayout).transitionToState(motionResId)
             }
         }
     }
