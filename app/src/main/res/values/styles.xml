@@ -188,12 +188,16 @@
     </style>
 
     <!-- MEMO:Viewのデフォルトスタイルなし -->
-    <style name="DiaryDayListBackgroundViewStyle">
+    <style name="DiaryListBackgroundViewStyle">
         <item name="android:background">?attr/colorSecondaryContainer</item>
     </style>
 
     <!-- MEMO:Layout系のデフォルトスタイルなし -->
-    <style name="DiaryDayListBackgroundLayoutStyle" parent="DiaryDayListBackgroundViewStyle">
+    <style name="DiaryListItemLayoutStyle" parent="DiaryListBackgroundViewStyle">
+        <!-- 波紋エフェクト設定 -->
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
     </style>
 
     <style name="DiaryDayListTextViewStyle" parent="Widget.AppCompat.TextView">

@@ -20,7 +20,7 @@
             android:layout_marginHorizontal="@dimen/row_diary_list_layout_margin_horizontal_between_items" />
 
         <LinearLayout
-            style="@style/DiaryDayListBackgroundLayoutStyle"
+            style="@style/DiaryListItemLayoutStyle"
             android:id="@+id/liner_layout_foreground"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
