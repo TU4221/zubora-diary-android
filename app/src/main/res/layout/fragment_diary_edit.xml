@@ -76,7 +76,7 @@
                             android:layout_gravity="center_vertical|end"
                             android:textAppearance="@style/AppTextViewTextAppearance"
                             android:textSize="@dimen/fragment_diary_edit_small_text_size"
-                            android:visibility="@{viewModel.uiState.isNewDiary ? View.INVISIBLE : View.VISIBLE}"
+                            android:visibility="@{viewModel.uiState.isNewDiary ? View.GONE : View.VISIBLE}"
                             app:originalDiaryDateText="@{viewModel.uiState.originalDiaryLoadState}"
                             tools:text="編集日記：2025年6月19日(木)"/>
 
