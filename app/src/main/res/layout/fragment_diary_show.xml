@@ -34,12 +34,11 @@
                     android:id="@+id/material_toolbar_top_app_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:title="@string/fragment_diary_show_toolbar_title"
                     app:onNavigationIconClick="@{() -> viewModel.onNavigationIconClick()}"
                     app:menu="@menu/diary_show_toolbar_menu"
                     app:applySystemInsetsToPaddingLeft="@{true}"
-                    app:applySystemInsetsToPaddingRight="@{true}"
-                    app:diaryDateText="@{viewModel.uiState.diaryLoadState}"
-                    tools:title="@string/fragment_diary_show_toolbar_title"/>
+                    app:applySystemInsetsToPaddingRight="@{true}" />
 
             </com.google.android.material.appbar.AppBarLayout>
 
@@ -52,14 +51,26 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <FrameLayout
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:paddingHorizontal="@dimen/fragment_padding_horizontal"
                     android:paddingVertical="@dimen/fragment_padding_vertical"
+                    android:orientation="vertical"
                     app:applySystemInsetsToPaddingLeft="@{true}"
                     app:applySystemInsetsToPaddingRight="@{true}"
                     app:applySystemInsetsToPaddingBottom="@{true}" >
+
+                    <TextView
+                        style="@style/AppTextViewStyle"
+                        android:id="@+id/text_date"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="@dimen/fragment_diary_show_margin_bottom"
+                        android:textAppearance="@style/AppTextViewTextAppearance"
+                        android:textSize="@dimen/fragment_diary_show_text_size"
+                        app:diaryDateText="@{viewModel.uiState.diaryLoadState}"
+                        tools:text="@string/fragment_diary_show_date"/>
 
                     <include
                         layout="@layout/layout_diary_show"
@@ -69,7 +80,7 @@
                         app:numVisibleDiaryItems="@{viewModel.uiState.numVisibleDiaryItems}"
                         app:diaryImageFilePath="@{viewModel.uiState.diaryImageFilePath}" />
 
-                </FrameLayout>
+                </LinearLayout>
 
             </androidx.core.widget.NestedScrollView>
 

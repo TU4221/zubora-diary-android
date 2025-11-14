@@ -30,6 +30,18 @@ internal object DiaryUiBindingAdapters {
     }
 
     @JvmStatic
+    @BindingAdapter("diaryDateText")
+    fun setDiaryDateText(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
+        if (diaryLoadState is LoadState.Success) {
+            val diaryUi = diaryLoadState.data
+            val dateText = diaryUi.date.formatDateString(textView.context)
+            if (textView.text.toString() != dateText) {
+                textView.text = dateText
+            }
+        }
+    }
+
+    @JvmStatic
     @BindingAdapter("originalDiaryDateText")
     fun setOriginalDiaryDateText(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
         if (diaryLoadState is LoadState.Success) {

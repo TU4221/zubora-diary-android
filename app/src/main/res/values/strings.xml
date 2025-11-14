@@ -127,9 +127,10 @@
     <!--*****************************************************************************************-->
 
     <!-- fragment_diary_show -->
-    <string name="fragment_diary_show_toolbar_title">0000年00月00日(月)</string>
+    <string name="fragment_diary_show_toolbar_title">日記</string>
     <string name="fragment_diary_show_toolbar_option_edit_diary">日記編集</string>
     <string name="fragment_diary_show_toolbar_option_delete_diary">日記削除</string>
+    <string name="fragment_diary_show_date">0000年00月00日(月)</string>
 
     <!-- layout_show_diary -->
     <string name="layout_diary_show_weather">天気：</string>

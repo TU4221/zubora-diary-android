@@ -19,6 +19,12 @@
     <dimen name="fragment_calendar_margin_top">16dp</dimen>
 
 
+    <!-- fragment_calendar -->
+    <dimen name="fragment_diary_show_text_size">@dimen/layout_diary_show_text_size</dimen>
+    <!-- MEMO:includeタグにはMarginの設定ができないため、includeタグの上のタグのBottomMarginの設定を行う。-->
+    <dimen name="fragment_diary_show_margin_bottom">@dimen/layout_diary_show_margin_top</dimen>
+
+
     <!-- layout_diary_show -->
     <dimen name="layout_diary_show_text_size">18sp</dimen>
     <dimen name="layout_diary_show_small_text_size">14sp</dimen>
