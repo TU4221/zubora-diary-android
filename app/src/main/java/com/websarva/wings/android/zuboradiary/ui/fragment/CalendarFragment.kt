@@ -241,16 +241,95 @@ class CalendarFragment :
 
     // カレンダーBind設定
     private fun configureCalendarBinders(daysOfWeek: List<DayOfWeek>, themeColor: ThemeColorUi) {
+        val format = getString(R.string.fragment_calendar_month_header_format)
+        binding.calendar.monthHeaderBinder =
+            CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor, format)
+
         binding.calendar.dayBinder =
             CalendarMonthDayBinder(
                 themeColor,
                 { date: LocalDate -> mainViewModel.onCalendarDayClick(date) },
-                { date: LocalDate -> mainViewModel.onCalendarDayDotVisibilityCheck(date) }
+                { date: LocalDate ->
+                    mainViewModel.onCalendarDayDotVisibilityCheck(date)
+                }
             )
+    }
 
-        val format = getString(R.string.fragment_calendar_month_header_format)
-        binding.calendar.monthHeaderBinder =
-            CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor, format)
+    private class CalendarMonthHeaderFooterBinder(
+        private val daysOfWeek: List<DayOfWeek>,
+        private val themeColor: ThemeColorUi,
+        private val headerDateFormat: String
+    ) : MonthHeaderFooterBinder<MonthViewContainer> {
+
+        @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
+        override fun bind(container: MonthViewContainer, calendarMonth: CalendarMonth) {
+            container.bind(
+                calendarMonth.yearMonth,
+                daysOfWeek,
+                headerDateFormat,
+                themeColor
+            )
+        }
+
+        override fun create(view: View): MonthViewContainer {
+            return MonthViewContainer(view)
+        }
+    }
+
+    // カレンダー月単位コンテナ
+    private class MonthViewContainer(view: View) : ViewContainer(view) {
+
+        private val binding: LayoutCalendarHeaderBinding = LayoutCalendarHeaderBinding.bind(view)
+
+        private val themeColorChanger = CalendarThemeColorChanger()
+
+        fun bind(
+            yearMonth: YearMonth,
+            daysOfWeek: List<DayOfWeek>,
+            headerDateFormat: String,
+            themeColor: ThemeColorUi
+        ) {
+            // カレンダーの年月表示設定
+            val formatter = DateTimeFormatter.ofPattern(headerDateFormat)
+            binding.textYearMonth.text = yearMonth.format(formatter)
+
+            // カレンダーの曜日設定 (一度だけ設定する)
+            val legendLayout = binding.legendLayout.root
+            if (legendLayout.tag == yearMonth) return
+            legendLayout.tag = yearMonth
+
+            // カレンダー曜日表示と色の設定
+            val max = legendLayout.childCount
+            for (i in 0 until max) {
+                val childView = legendLayout.getChildAt(i)
+                val childTextView = childView as TextView
+                val dayOfWeek = daysOfWeek[i]
+
+                childTextView.text = dayOfWeek.name.substring(0, 3)
+
+                // 曜日の色設定
+                setUpDayOfWeekColor(dayOfWeek, childTextView, themeColor)
+            }
+        }
+
+        private fun setUpDayOfWeekColor(
+            dayOfWeek: DayOfWeek,
+            dayOfWeekText: TextView,
+            themeColor: ThemeColorUi
+        ) {
+            when (dayOfWeek) {
+                DayOfWeek.SATURDAY -> {
+                    themeColorChanger.applyCalendarDayOfWeekSaturdayColor(dayOfWeekText)
+                }
+                DayOfWeek.SUNDAY -> {
+                    themeColorChanger.applyCalendarDayOfWeekSundayColor(dayOfWeekText)
+                }
+                else -> {
+                    themeColorChanger
+                        .applyCalendarDayOfWeekWeekdaysColor(dayOfWeekText, themeColor)
+                }
+            }
+        }
     }
 
     private class CalendarMonthDayBinder(
@@ -262,6 +341,10 @@ class CalendarFragment :
         private var selectedDate: LocalDate = LocalDate.now()
 
         private val dayDotVisibilityCache = mutableMapOf<LocalDate, Boolean>()
+
+        override fun create(view: View): DayViewContainer {
+            return DayViewContainer(view)
+        }
 
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun bind(container: DayViewContainer, calendarDay: CalendarDay) {
@@ -295,37 +378,12 @@ class CalendarFragment :
             )
         }
 
-        override fun create(view: View): DayViewContainer {
-            return DayViewContainer(view)
-        }
-
         fun updateSelectedDate(date: LocalDate) {
             selectedDate = date
         }
 
         fun updateDayDotVisibilityCache(date: LocalDate, isVisible: Boolean) {
             dayDotVisibilityCache[date] = isVisible
-        }
-    }
-
-    private class CalendarMonthHeaderFooterBinder(
-        private val daysOfWeek: List<DayOfWeek>,
-        private val themeColor: ThemeColorUi,
-        private val headerDateFormat: String
-    ) : MonthHeaderFooterBinder<MonthViewContainer> {
-
-        @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-        override fun bind(container: MonthViewContainer, calendarMonth: CalendarMonth) {
-            container.bind(
-                calendarMonth.yearMonth,
-                daysOfWeek,
-                headerDateFormat,
-                themeColor
-            )
-        }
-
-        override fun create(view: View): MonthViewContainer {
-            return MonthViewContainer(view)
         }
     }
 
@@ -387,62 +445,6 @@ class CalendarFragment :
             SATURDAY,
             SUNDAY,
             WEEKDAY
-        }
-    }
-
-    // カレンダー月単位コンテナ
-    private class MonthViewContainer(view: View) : ViewContainer(view) {
-
-        private val binding: LayoutCalendarHeaderBinding = LayoutCalendarHeaderBinding.bind(view)
-
-        private val themeColorChanger = CalendarThemeColorChanger()
-
-        fun bind(
-            yearMonth: YearMonth,
-            daysOfWeek: List<DayOfWeek>,
-            headerDateFormat: String,
-            themeColor: ThemeColorUi
-        ) {
-            // カレンダーの年月表示設定
-            val formatter = DateTimeFormatter.ofPattern(headerDateFormat)
-            binding.textYearMonth.text = yearMonth.format(formatter)
-
-            // カレンダーの曜日設定 (一度だけ設定する)
-            val legendLayout = binding.legendLayout.root
-            if (legendLayout.tag == yearMonth) return
-            legendLayout.tag = yearMonth
-
-            // カレンダー曜日表示と色の設定
-            val max = legendLayout.childCount
-            for (i in 0 until max) {
-                val childView = legendLayout.getChildAt(i)
-                val childTextView = childView as TextView
-                val dayOfWeek = daysOfWeek[i]
-
-                childTextView.text = dayOfWeek.name.substring(0, 3)
-
-                // 曜日の色設定
-                setUpDayOfWeekColor(dayOfWeek, childTextView, themeColor)
-            }
-        }
-
-        private fun setUpDayOfWeekColor(
-            dayOfWeek: DayOfWeek,
-            dayOfWeekText: TextView,
-            themeColor: ThemeColorUi
-        ) {
-            when (dayOfWeek) {
-                DayOfWeek.SATURDAY -> {
-                    themeColorChanger.applyCalendarDayOfWeekSaturdayColor(dayOfWeekText)
-                }
-                DayOfWeek.SUNDAY -> {
-                    themeColorChanger.applyCalendarDayOfWeekSundayColor(dayOfWeekText)
-                }
-                else -> {
-                    themeColorChanger
-                        .applyCalendarDayOfWeekWeekdaysColor(dayOfWeekText, themeColor)
-                }
-            }
         }
     }
     //endregion
