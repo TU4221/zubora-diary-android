@@ -114,7 +114,7 @@ class SettingsFragment :
     //endregion
 
     //region Fragment Result Observation Setup
-    override fun setUpFragmentResultObservers() {
+    override fun setupFragmentResultObservers() {
         observeThemeColorPickerDialogResult()
         observeCalendarStartDayPickerDialogResult()
         observeReminderNotificationTimePickerDialogResult()
@@ -273,14 +273,14 @@ class SettingsFragment :
         }
     }
 
-    override fun setUpUiStateObservers() {
-        super.setUpUiStateObservers()
+    override fun setupUiStateObservers() {
+        super.setupUiStateObservers()
 
         observeViewColor()
     }
 
-    override fun setUpUiEventObservers() {
-        super.setUpUiEventObservers()
+    override fun setupUiEventObservers() {
+        super.setupUiEventObservers()
 
         observeUiEventFromActivity()
     }

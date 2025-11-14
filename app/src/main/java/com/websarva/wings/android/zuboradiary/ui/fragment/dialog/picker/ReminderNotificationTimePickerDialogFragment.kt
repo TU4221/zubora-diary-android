@@ -8,7 +8,7 @@ import java.time.LocalTime
 
 class ReminderNotificationTimePickerDialogFragment : BaseTimePickerDialogFragment() {
 
-    override fun setUpInitializationTime(builder: MaterialTimePicker.Builder) {
+    override fun setupInitializationTime(builder: MaterialTimePicker.Builder) {
         val localTime = LocalTime.now()
         builder.setHour(localTime.hour)
         builder.setMinute(localTime.minute)

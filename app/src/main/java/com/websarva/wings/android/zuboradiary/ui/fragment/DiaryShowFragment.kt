@@ -36,7 +36,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpToolbar()
+        setupToolbar()
     }
     //endregion
 
@@ -59,7 +59,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     //endregion
 
     //region Fragment Result Observation Setup
-    override fun setUpFragmentResultObservers() {
+    override fun setupFragmentResultObservers() {
         observeDiaryLoadFailureDialogResult()
         observeDiaryDeleteDialogResult()
     }
@@ -117,7 +117,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     //endregion
 
     //region View Setup
-    private fun setUpToolbar() {
+    private fun setupToolbar() {
         binding.materialToolbarTopAppBar.setOnMenuItemClickListener { item: MenuItem ->
             // 日記編集フラグメント起動
             if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {

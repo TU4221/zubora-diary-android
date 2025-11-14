@@ -70,7 +70,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
 
-        setUpVisibleFragmentTransitionEffect()
+        setupVisibleFragmentTransitionEffect()
 
         val themeColorInflater = fragmentHelper.createThemeColorInflater(inflater, themeColor)
         _binding = createViewBinding(themeColorInflater, requireNotNull(container))
@@ -81,8 +81,8 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         super.onViewCreated(view, savedInstanceState)
         mainActivityViewModel.onFragmentViewReady(this is RequiresBottomNavigation)
 
-        setUpFragmentResultObservers()
-        setUpUiObservers()
+        setupFragmentResultObservers()
+        setupUiObservers()
         if (!isNavigationStartFragment) registerOnBackPressedCallback()
     }
 
@@ -93,7 +93,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
 
     override fun onPause() {
         mainActivityViewModel.onFragmentViewPause()
-        setUpInvisibleFragmentTransitionEffect()
+        setupInvisibleFragmentTransitionEffect()
         super.onPause()
     }
 
@@ -119,7 +119,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     //endregion
 
     //region Fragment Transition Effect Setup
-    private fun setUpVisibleFragmentTransitionEffect() {
+    private fun setupVisibleFragmentTransitionEffect() {
         // FROM:遷移元 TO:遷移先
         // FROM - TO の TO として現れるアニメーション
 
@@ -176,7 +176,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         mainActivityViewModel.onVisibleFragmentTransitionSetupCompleted()
     }
 
-    private fun setUpInvisibleFragmentTransitionEffect() {
+    private fun setupInvisibleFragmentTransitionEffect() {
         if (mainActivityViewModel.wasSelectedTab.value) {
             exitTransition =
                 MaterialFadeThrough().apply {
@@ -225,7 +225,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     /**
      *  observeFragmentResult()、observeDialogResult()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
      * */
-    protected abstract fun setUpFragmentResultObservers()
+    protected abstract fun setupFragmentResultObservers()
 
     protected fun <T> observeFragmentResult(key: String, block: (FragmentResult<T>) -> Unit) {
         executeFragmentResultObservation(key, block)
@@ -250,14 +250,14 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     //endregion
 
     //region UI Observation Setup
-    private fun setUpUiObservers() {
-        setUpUiStateObservers()
-        setUpUiEventObservers()
+    private fun setupUiObservers() {
+        setupUiStateObservers()
+        setupUiEventObservers()
         observePendingNavigation()
     }
 
     @CallSuper
-    protected open fun setUpUiStateObservers() {
+    protected open fun setupUiStateObservers() {
         observeProcessingState()
     }
 
@@ -272,7 +272,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     }
 
     @CallSuper
-    protected open fun setUpUiEventObservers() {
+    protected open fun setupUiEventObservers() {
         observeMainUiEvent()
         observeCommonUiEvent()
     }

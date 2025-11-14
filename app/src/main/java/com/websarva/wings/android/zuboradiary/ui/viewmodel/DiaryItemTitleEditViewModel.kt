@@ -52,11 +52,11 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
 
     //region Initialization
     init {
-        setUpTitle()
+        setupTitle()
         collectUiStates()
     }
 
-    private fun setUpTitle() {
+    private fun setupTitle() {
         if (handle.contains(SAVED_STATE_UI_KEY)) return
 
         val diaryItemTitleSelection =

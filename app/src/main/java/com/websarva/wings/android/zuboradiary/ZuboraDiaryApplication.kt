@@ -53,7 +53,7 @@ class ZuboraDiaryApplication :
         // ナイトモード無効化(ライトモード常に有効)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
-        setUpReminderNotificationChannel()
+        setupReminderNotificationChannel()
         ProcessLifecycleOwner.get().lifecycleScope.launch {
             try {
                 imageFileDataSource.deleteAllFilesInCache()
@@ -79,7 +79,7 @@ class ZuboraDiaryApplication :
      * Android O (API 26) 以降では、通知を表示する前に通知チャネルを作成する必要がある。
      * このメソッドは、リマインダー通知用のチャネルを作成し、設定する。
      */
-    private fun setUpReminderNotificationChannel() {
+    private fun setupReminderNotificationChannel() {
         // MEMO:NotificationChannelはSdk26以降の機能
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val notificationManager =

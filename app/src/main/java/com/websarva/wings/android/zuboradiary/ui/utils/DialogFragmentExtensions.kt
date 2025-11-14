@@ -9,18 +9,18 @@ import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
 
 internal fun DialogFragment.enableEdgeToEdge(themeColor: ThemeColorUi) {
     val window = dialog?.window ?: return
-    setUpEdgeToEdge(window)
-    setUpStatusBarAndNavigationBarIconColor(window, themeColor)
+    setupEdgeToEdge(window)
+    setupStatusBarAndNavigationBarIconColor(window, themeColor)
 }
 
-private fun setUpEdgeToEdge(window: Window) {
+private fun setupEdgeToEdge(window: Window) {
     WindowCompat.setDecorFitsSystemWindows(window, false)
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         window.isNavigationBarContrastEnforced = false
     }
 }
 
-private fun setUpStatusBarAndNavigationBarIconColor(window: Window, themeColor: ThemeColorUi) {
+private fun setupStatusBarAndNavigationBarIconColor(window: Window, themeColor: ThemeColorUi) {
     val changer = ThemeColorChanger()
     changer.applyNavigationBarIconColor(window, themeColor)
 }

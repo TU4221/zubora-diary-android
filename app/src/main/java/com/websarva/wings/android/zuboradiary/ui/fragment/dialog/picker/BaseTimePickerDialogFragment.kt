@@ -43,18 +43,18 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
             .setTimeFormat(TimeFormat.CLOCK_24H)
             .setInputMode(INPUT_MODE_CLOCK)
 
-        setUpInitializationTime(builder)
+        setupInitializationTime(builder)
 
         val timePicker = builder.build()
 
-        setUpOnClickListener(timePicker, dummyDialog)
+        setupOnClickListener(timePicker, dummyDialog)
 
         return timePicker
     }
 
-    protected abstract fun setUpInitializationTime(builder: MaterialTimePicker.Builder)
+    protected abstract fun setupInitializationTime(builder: MaterialTimePicker.Builder)
 
-    private fun setUpOnClickListener(timePicker: MaterialTimePicker, dummyDialog: Dialog) {
+    private fun setupOnClickListener(timePicker: MaterialTimePicker, dummyDialog: Dialog) {
         timePicker.addOnPositiveButtonClickListener { _ ->
             Log.d(logTag, "onClick()_PositiveButton")
 

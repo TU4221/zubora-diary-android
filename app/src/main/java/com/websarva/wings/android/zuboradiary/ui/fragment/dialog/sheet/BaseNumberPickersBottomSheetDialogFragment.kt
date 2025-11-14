@@ -37,8 +37,8 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
             }
         }
 
-        setUpNumberPickerTextColor(binding)
-        setUpNumberPickers()
+        setupNumberPickerTextColor(binding)
+        setupNumberPickers()
     }
 
     override fun createViewBinding(
@@ -59,7 +59,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     }
 
     // HACK:NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
-    private fun setUpNumberPickerTextColor(binding: DialogFragmentNumberPickersBinding) {
+    private fun setupNumberPickerTextColor(binding: DialogFragmentNumberPickersBinding) {
         if (Build.VERSION.SDK_INT >= 29) {
             val onSurfaceVariantColor = themeColor.asOnSurfaceVariantColorInt(resources)
             with(binding) {
@@ -87,5 +87,5 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     /**
      * BaseNumberPickersBottomSheetDialogFragment#createDialogView()で呼び出される。
      */
-    protected abstract fun setUpNumberPickers()
+    protected abstract fun setupNumberPickers()
 }

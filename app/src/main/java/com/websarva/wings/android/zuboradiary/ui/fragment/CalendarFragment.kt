@@ -59,7 +59,7 @@ class CalendarFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpCalendar()
+        setupCalendar()
     }
     //endregion
 
@@ -87,7 +87,7 @@ class CalendarFragment :
     //endregion
 
     //region Fragment Result Observation Setup
-    override fun setUpFragmentResultObservers() {
+    override fun setupFragmentResultObservers() {
         observeDiaryShowFragmentResult()
         observeDiaryEditFragmentResult()
     }
@@ -146,15 +146,15 @@ class CalendarFragment :
         }
     }
 
-    override fun setUpUiStateObservers() {
-        super.setUpUiStateObservers()
+    override fun setupUiStateObservers() {
+        super.setupUiStateObservers()
 
         observeSelectedDate()
         observeCalendarStartDayOfWeek()
     }
 
-    override fun setUpUiEventObservers() {
-        super.setUpUiEventObservers()
+    override fun setupUiEventObservers() {
+        super.setupUiEventObservers()
 
         observeUiEventFromActivity()
     }
@@ -209,7 +209,7 @@ class CalendarFragment :
     //endregion
 
     //region Calendar View - Setup
-    private fun setUpCalendar() {
+    private fun setupCalendar() {
         val calendar = binding.calendar
 
         val daysOfWeek = createDayOfWeekList() // 曜日リスト取得
@@ -308,11 +308,11 @@ class CalendarFragment :
                 childTextView.text = dayOfWeek.name.substring(0, 3)
 
                 // 曜日の色設定
-                setUpDayOfWeekColor(dayOfWeek, childTextView, themeColor)
+                setupDayOfWeekColor(dayOfWeek, childTextView, themeColor)
             }
         }
 
-        private fun setUpDayOfWeekColor(
+        private fun setupDayOfWeekColor(
             dayOfWeek: DayOfWeek,
             dayOfWeekText: TextView,
             themeColor: ThemeColorUi

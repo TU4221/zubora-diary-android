@@ -25,7 +25,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         val builder = MaterialAlertDialogBuilder(requireContext(), themeResId)
         customizeDialog(builder)
 
-        setUpDialogCancelFunction()
+        setupDialogCancelFunction()
 
         return builder.create()
     }
@@ -49,7 +49,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
         }
     }
 
-    private fun setUpDialogCancelFunction() {
+    private fun setupDialogCancelFunction() {
         // MEMO:下記機能を無効にするにはAlertDialog#setCanceledOnTouchOutside、DialogFragment#setCancelableを設定する必要あり。
         //      ・UIに表示されているダイアログ外の部分をタッチしてダイアログを閉じる(キャンセル)(AlertDialog#setCanceledOnTouchOutside)
         //      ・端末の戻るボタンでダイアログを閉じる(キャンセルする)(DialogFragment#setCancelable)

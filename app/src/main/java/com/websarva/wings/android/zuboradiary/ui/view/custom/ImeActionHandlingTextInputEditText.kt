@@ -21,6 +21,6 @@ internal open class ImeActionHandlingTextInputEditText : TextInputEditText {
     ) : super(context, attrs, defStyleAttr)
 
     init {
-        EditTextConfigurator().setUpKeyboardCloseOnEnter(this)
+        EditTextConfigurator().setupKeyboardCloseOnEnter(this)
     }
 }

@@ -56,8 +56,8 @@ class DiaryListFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpToolbar()
-        setUpDiaryList()
+        setupToolbar()
+        setupDiaryList()
 
         mainViewModel.onUiReady()
     }
@@ -97,7 +97,7 @@ class DiaryListFragment :
     //endregion
 
     //region Fragment Result Observation Setup
-    override fun setUpFragmentResultObservers() {
+    override fun setupFragmentResultObservers() {
         observeDatePickerDialogResult()
         observeDiaryDeleteDialogResult()
     }
@@ -161,15 +161,15 @@ class DiaryListFragment :
         }
     }
 
-    override fun setUpUiStateObservers() {
-        super.setUpUiStateObservers()
+    override fun setupUiStateObservers() {
+        super.setupUiStateObservers()
 
         observeDiaryListItem()
         observeDiaryListSwipeEnabled()
     }
 
-    override fun setUpUiEventObservers() {
-        super.setUpUiEventObservers()
+    override fun setupUiEventObservers() {
+        super.setupUiEventObservers()
 
         observeUiEventFromActivity()
     }
@@ -204,7 +204,7 @@ class DiaryListFragment :
     //endregion
 
     //region View Setup
-    private fun setUpToolbar() {
+    private fun setupToolbar() {
         binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
                 // ワード検索フラグメント起動
@@ -216,7 +216,7 @@ class DiaryListFragment :
             }
     }
 
-    private fun setUpDiaryList() {
+    private fun setupDiaryList() {
         val diaryRecyclerView = binding.recyclerDiaryList
         diaryListAdapter = StandardDiaryListAdapter(
             themeColor,

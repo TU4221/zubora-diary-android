@@ -34,7 +34,7 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
         setResult(RESULT_KEY, DialogResult.Cancel)
     }
 
-    override fun setUpNumberPickers() {
+    override fun setupNumberPickers() {
         val today = LocalDate.now()
         val maxYear =
             StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).maxYear

@@ -49,14 +49,14 @@ abstract class BaseDatePickerDialogFragment : DialogFragment() {
 
         val datePicker = builder.build()
 
-        setUpOnClickListener(datePicker, dummyDialog)
+        setupOnClickListener(datePicker, dummyDialog)
 
         return datePicker
     }
 
     protected abstract fun createInitialDate(): LocalDate
 
-    private fun setUpOnClickListener(datePicker: MaterialDatePicker<Long>, dummyDialog: Dialog) {
+    private fun setupOnClickListener(datePicker: MaterialDatePicker<Long>, dummyDialog: Dialog) {
         datePicker.addOnPositiveButtonClickListener { selection: Long ->
             Log.d(logTag, "onClick()_PositiveButton")
 

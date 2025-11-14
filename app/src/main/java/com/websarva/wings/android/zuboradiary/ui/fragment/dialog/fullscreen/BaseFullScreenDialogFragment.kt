@@ -28,8 +28,8 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpFragmentResultObservers()
-        setUpUiEventObservers()
+        setupFragmentResultObservers()
+        setupUiEventObservers()
         observePendingNavigation()
         registerOnBackPressedCallback()
     }
@@ -37,9 +37,9 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
 
     //region Fragment Result Observation Setup
     /**
-     *  setUpFragmentResultReceiver()、setUpDialogResultReceiver()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
+     *  setupFragmentResultReceiver()、setupDialogResultReceiver()を使用してフラグメント、ダイアログからの結果の処理内容を設定する
      * */
-    protected abstract fun setUpFragmentResultObservers()
+    protected abstract fun setupFragmentResultObservers()
 
     protected fun <T> observeDialogResult(key: String, block: (DialogResult<T>) -> Unit) {
         fragmentHelper
@@ -53,7 +53,7 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
     //endregion
 
     //region UI Observation Setup
-    private fun setUpUiEventObservers() {
+    private fun setupUiEventObservers() {
         observeMainUiEvent()
         observeCommonUiEvent()
     }

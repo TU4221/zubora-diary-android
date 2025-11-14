@@ -48,7 +48,7 @@ class DiaryItemTitleEditDialog :
         super.onViewCreated(view, savedInstanceState)
 
         observeItemTitleSelectionHistoryListItem()
-        setUpItemTitleSelectionHistory()
+        setupItemTitleSelectionHistory()
     }
     //endregion
 
@@ -65,12 +65,12 @@ class DiaryItemTitleEditDialog :
     //endregion
 
     //region Fragment Result Observation Setup
-    override fun setUpFragmentResultObservers() {
-        setUpDiaryItemTitleDeleteDialogResultReceiver()
+    override fun setupFragmentResultObservers() {
+        setupDiaryItemTitleDeleteDialogResultReceiver()
     }
 
     // 履歴項目削除確認ダイアログからの結果受取
-    private fun setUpDiaryItemTitleDeleteDialogResultReceiver() {
+    private fun setupDiaryItemTitleDeleteDialogResultReceiver() {
         observeDialogResult(
             DiaryItemTitleDeleteDialogFragment.RESULT_KEY
         ) { result ->
@@ -124,7 +124,7 @@ class DiaryItemTitleEditDialog :
     //endregion
 
     //region View Setup
-    private fun setUpItemTitleSelectionHistory() {
+    private fun setupItemTitleSelectionHistory() {
         selectionHistoryListAdapter =
             DiaryItemTitleSelectionHistoryListAdapter(
                 themeColor

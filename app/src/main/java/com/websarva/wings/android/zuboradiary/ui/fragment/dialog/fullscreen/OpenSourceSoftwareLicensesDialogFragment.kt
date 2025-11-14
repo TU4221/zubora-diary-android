@@ -25,8 +25,8 @@ class OpenSourceSoftwareLicensesDialogFragment
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpToolBar()
-        setUpAboutLibraries()
+        setupToolBar()
+        setupAboutLibraries()
     }
 
     override fun createViewBinding(
@@ -36,14 +36,14 @@ class OpenSourceSoftwareLicensesDialogFragment
         return DialogOpenSourceSoftwareLicensesBinding.inflate(themeColorInflater, container, false)
     }
 
-    private fun setUpToolBar() {
+    private fun setupToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
                 navigatePreviousFragment()
             }
     }
 
-    private fun setUpAboutLibraries() {
+    private fun setupAboutLibraries() {
         with (binding.composeViewAboutLibraries) {
             // Compositionの破棄タイミングをFragmentのViewのライフサイクルと連動
             setViewCompositionStrategy(

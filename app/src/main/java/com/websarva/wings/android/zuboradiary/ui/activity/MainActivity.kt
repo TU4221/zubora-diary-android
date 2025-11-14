@@ -68,11 +68,11 @@ class MainActivity : LoggingActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen().setKeepOnScreenCondition { !isMainActivityLayoutInflated }
-        setUpEdgeToEdge()
+        setupEdgeToEdge()
         restoreThemeColor(savedInstanceState)
         super.onCreate(savedInstanceState)
 
-        setUpUi()
+        setupUi()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -85,7 +85,7 @@ class MainActivity : LoggingActivity() {
     // MEMO:EdgeToEdge対応。下記ページ参照。
     //      https://developer.android.com/develop/ui/views/layout/edge-to-edge?hl=ja
     //      https://developer.android.com/codelabs/edge-to-edge?hl=ja#2
-    private fun setUpEdgeToEdge() {
+    private fun setupEdgeToEdge() {
         enableEdgeToEdge()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             window.isNavigationBarContrastEnforced = false
@@ -105,19 +105,19 @@ class MainActivity : LoggingActivity() {
         savedThemeColor?.let { themeColor = it }
     }
 
-    private fun setUpUi() {
+    private fun setupUi() {
         lifecycleScope.launch {
             themeColor =
                 mainActivityViewModel.uiState.map { it.themeColor }.filterNotNull().first()
-            setUpMainActivityBinding()
+            setupMainActivityBinding()
             isMainActivityLayoutInflated = true
             observeUiEvent()
             observeUiState()
-            setUpNavigation()
+            setupNavigation()
         }
     }
 
-    private fun setUpMainActivityBinding() {
+    private fun setupMainActivityBinding() {
         val themeColorInflater = layoutInflater.withTheme(themeColor)
         _binding =
             ActivityMainBinding.inflate(themeColorInflater).apply {
@@ -212,7 +212,7 @@ class MainActivity : LoggingActivity() {
         changer.applyBottomNavigationColor(binding.bottomNavigation, themeColor)
     }
 
-    private fun setUpNavigation() {
+    private fun setupNavigation() {
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
         val bottomNavigationView =

@@ -97,10 +97,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpKeyboard()
-        setUpKeyboard()
-        setUpToolbar()
-        setUpItemMotionLayouts()
+        setupKeyboard()
+        setupKeyboard()
+        setupToolbar()
+        setupItemMotionLayouts()
     }
     //endregion
 
@@ -133,7 +133,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region Fragment Result Observation Setup
-    override fun setUpFragmentResultObservers() {
+    override fun setupFragmentResultObservers() {
         observeDiaryItemTitleEditFragmentResult()
         observeDiaryLoadDialogResult()
         observeDiaryLoadFailureDialogResult()
@@ -306,8 +306,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    override fun setUpUiStateObservers() {
-        super.setUpUiStateObservers()
+    override fun setupUiStateObservers() {
+        super.setupUiStateObservers()
 
         observeToolbarMenuState()
         observeWeather1DropdownOptions()
@@ -365,7 +365,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region View Setup
-    private fun setUpToolbar() {
+    private fun setupToolbar() {
         binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
                 // 日記保存、削除
@@ -389,7 +389,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             }
     }
 
-    private fun setUpKeyboard() {
+    private fun setupKeyboard() {
         keyboardManager = KeyboardManager(requireContext()).apply {
             registerKeyboardStateListener(this@DiaryEditFragment) { isVisible ->
                 if (!isVisible) return@registerKeyboardStateListener
@@ -464,7 +464,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region Motion Layout Setup
-    private fun setUpItemMotionLayouts() {
+    private fun setupItemMotionLayouts() {
         itemMotionLayouts =
             binding.run {
                 arrayOf(
@@ -603,7 +603,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     //region Motion Layout Manipulation
     private fun renderItemLayouts(numVisibleItems: Int) {
-        Log.d(logTag, "setUpItemsLayout()_numItems = $numVisibleItems")
+        Log.d(logTag, "setupItemsLayout()_numItems = $numVisibleItems")
 
         // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
         if (shouldTransitionItemMotionLayout) {

@@ -23,6 +23,6 @@ internal class ScrollableMultiLineTextInputEditText : ImeActionHandlingTextInput
     init {
         inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_FLAG_MULTI_LINE
         overScrollMode = OVER_SCROLL_IF_CONTENT_SCROLLS
-        EditTextConfigurator().setUpScrollable(this)
+        EditTextConfigurator().setupScrollable(this)
     }
 }

@@ -13,20 +13,20 @@ import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 
 internal class EditTextConfigurator {
 
-    fun setUpScrollable(editText: EditText) {
+    fun setupScrollable(editText: EditText) {
         editText.onFocusChangeListener = EditTextScrollableOnFocusChangeListener()
     }
 
     private class EditTextScrollableOnFocusChangeListener : OnFocusChangeListener {
         override fun onFocusChange(v: View, hasFocus: Boolean) {
             if (hasFocus) {
-                setUpEditTextScrollable(v)
+                setupEditTextScrollable(v)
             } else {
                 resetEditTextScrollable(v)
             }
         }
 
-        fun setUpEditTextScrollable(focusedView: View) {
+        fun setupEditTextScrollable(focusedView: View) {
             val editText = focusedView as EditText
             if (editText.minLines > 1) focusedView.setOnTouchListener(ScrollableTextOnTouchListener())
         }
@@ -50,7 +50,7 @@ internal class EditTextConfigurator {
         }
     }
 
-    fun setUpKeyboardCloseOnEnter(editText: EditText) {
+    fun setupKeyboardCloseOnEnter(editText: EditText) {
         editText.setOnEditorActionListener(NextOnEnterListener())
     }
 

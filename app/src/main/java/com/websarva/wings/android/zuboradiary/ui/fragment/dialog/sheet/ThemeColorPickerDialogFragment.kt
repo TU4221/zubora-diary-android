@@ -33,23 +33,23 @@ class ThemeColorPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragmen
         setResult(RESULT_KEY, DialogResult.Cancel)
     }
 
-    override fun setUpNumberPickers() {
+    override fun setupNumberPickers() {
         val maxNumThemeColors = ThemeColorUi.entries.size
         binding.numberPickerFirst.maxValue = maxNumThemeColors - 1
         binding.numberPickerFirst.minValue = 0
-        setUpInitialValue()
-        setUpDisplayedValues()
+        setupInitialValue()
+        setupDisplayedValues()
         binding.numberPickerFirst.wrapSelectorWheel = false
         binding.numberPickerSecond.visibility = View.GONE
         binding.numberPickerThird.visibility = View.GONE
     }
 
-    private fun setUpInitialValue() {
+    private fun setupInitialValue() {
         binding.numberPickerFirst.value =
             themeColor.ordinal // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
     }
 
-    private fun setUpDisplayedValues() {
+    private fun setupDisplayedValues() {
         val maxNumThemeColors = ThemeColorUi.entries.size
         val themeColorList = arrayOfNulls<String>(maxNumThemeColors)
         for (item in ThemeColorUi.entries) {

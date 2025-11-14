@@ -49,9 +49,9 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setUpWordSearchResultListAdapter()
-        setUpFloatingActionButton()
-        setUpKeyboard()
+        setupWordSearchResultListAdapter()
+        setupFloatingActionButton()
+        setupKeyboard()
 
         mainViewModel.onUiReady()
     }
@@ -92,7 +92,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     //endregion
 
     //region Fragment Result Observation Setup
-    override fun setUpFragmentResultObservers() {
+    override fun setupFragmentResultObservers() {
         // 処理なし
     }
     //endregion
@@ -120,8 +120,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         }
     }
 
-    override fun setUpUiStateObservers() {
-        super.setUpUiStateObservers()
+    override fun setupUiStateObservers() {
+        super.setupUiStateObservers()
 
         observeWordSearchResultListItem()
     }
@@ -140,7 +140,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     //endregion
 
     //region View Setup
-    private fun setUpWordSearchResultListAdapter() {
+    private fun setupWordSearchResultListAdapter() {
         val diaryRecyclerView = binding.recyclerWordSearchResultList
         wordSearchResultDiaryListAdapter = WordSearchResultDiaryListAdapter(
             themeColor
@@ -155,7 +155,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         }
     }
 
-    private fun setUpFloatingActionButton() {
+    private fun setupFloatingActionButton() {
         val fab = binding.floatingActionButtonTopScroll.apply {
             hide() // MEMO:初回起動用
             setOnClickListener {
@@ -175,7 +175,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         }.also { binding.recyclerWordSearchResultList.addOnScrollListener(it) }
     }
 
-    private fun setUpKeyboard() {
+    private fun setupKeyboard() {
         keyboardManager = KeyboardManager(requireContext())
     }
     //endregion

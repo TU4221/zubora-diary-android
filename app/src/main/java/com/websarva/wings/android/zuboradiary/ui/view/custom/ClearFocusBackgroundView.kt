@@ -15,10 +15,10 @@ internal class ClearFocusBackgroundView @JvmOverloads constructor (
     private val keyboardManager = KeyboardManager(context)
 
     init {
-        setUpFocusClearOnClick()
+        setupFocusClearOnClick()
     }
 
-    private fun setUpFocusClearOnClick() {
+    private fun setupFocusClearOnClick() {
         // MEMO:BackGroundViewのクリック処理で自身にフォーカスを当てるには、isFocusableInTouchModeを有効にした状態で
         //      requestFocus()を呼び出す必要がある。isFocusableInTouchModeを有効にしたままBackGroundViewをタッチすると、
         //      クリック処理は行われず、フォーカスのみがあてられる。そのためキーボードが非表示にならず、
