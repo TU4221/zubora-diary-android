@@ -18,6 +18,7 @@ import com.websarva.wings.android.zuboradiary.ui.recyclerview.decoration.Spacing
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.decoration.StickyHeaderAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemUi
+import com.websarva.wings.android.zuboradiary.ui.utils.formatYearMonthString
 
 internal abstract class DiaryListBaseAdapter<T, VH> (
     themeColor: ThemeColorUi
@@ -244,7 +245,7 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
             val diaryDate =
                 (diaryYearMonth.year.toString() + context.getString(R.string.row_diary_year_month_list_section_bar_year)
                         + diaryYearMonth.monthValue + context.getString(R.string.row_diary_year_month_list_section_bar_month))
-            binding.textSection.text = diaryDate.also { date = it }
+            binding.textSection.text = item.yearMonth.formatYearMonthString(context).also { date = it }
             // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
             binding.textSection.y = 0f
         }

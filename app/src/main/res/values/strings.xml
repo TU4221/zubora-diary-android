@@ -370,6 +370,7 @@
     <string name="local_date_format_pattern_japanese_date">yyyy年M月d日(E)</string>
     <string name="local_date_time_format_pattern_japanese_date_time_with_seconds">yyyy年M月d日(E) HH:mm:ss</string>
     <string name="local_time_format_pattern_hour_minute">HH:mm</string>
+    <string name="year_month_format_pattern_japanese_year_month">yyyy年M月</string>
 
     <!-- ReminderNotificationWorker -->
     <string name="reminder_notification_worker_channel_name">リマインダー通知</string>
