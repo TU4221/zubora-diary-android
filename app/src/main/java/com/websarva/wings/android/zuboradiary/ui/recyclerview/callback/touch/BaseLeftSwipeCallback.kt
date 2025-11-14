@@ -8,8 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 internal abstract class BaseLeftSwipeCallback(
-    private val processToFindViewHolder: (position: Int) -> RecyclerView.ViewHolder?,
-    private val processReattachAfterCloseAnimation: (RecyclerView.ViewHolder) -> Unit,
+    private val findViewHolder: (position: Int) -> RecyclerView.ViewHolder?,
+    private val reattachViewHolderAfterCloseAnimation: (RecyclerView.ViewHolder) -> Unit,
     private val onSwiped: (position: Int) -> Unit = {}
 ) : ItemTouchHelper.SimpleCallback(
     ItemTouchHelper.ACTION_STATE_IDLE,
@@ -173,7 +173,7 @@ internal abstract class BaseLeftSwipeCallback(
     protected fun closeSwipedViewHolder(position: Int) {
         Log.d(logTag, "closeSwipedViewHolder()_position:$position")
 
-        val viewHolder = processToFindViewHolder(position) ?: return
+        val viewHolder = findViewHolder(position) ?: return
 
         animateCloseSwipedViewHolder(position, viewHolder)
     }
@@ -196,7 +196,7 @@ internal abstract class BaseLeftSwipeCallback(
             .withEndAction {
                 // MEMO:Viewをアニメーションで視覚的にスワイプ前の状態に戻しても、
                 //      内部(ItemTouchHelper)的にはスワイプ状態が続く為、下記でリセットする。
-                processReattachAfterCloseAnimation(viewHolder)
+                reattachViewHolderAfterCloseAnimation(viewHolder)
 
                 leftSwipeViewHolder.isRollingBack = false
             }

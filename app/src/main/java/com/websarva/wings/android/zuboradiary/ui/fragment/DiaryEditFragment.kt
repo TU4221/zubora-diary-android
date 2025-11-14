@@ -503,9 +503,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         private val itemNumber: Int,
         private val onDiaryItemTransitionToInvisibleCompleted: (Int) -> Unit,
         private val onDiaryItemTransitionToVisibleCompleted: (Int) -> Unit,
-        private val processSelectionItemMotionLayout: (Int) -> MotionLayout?,
-        private val processSmoothScroll: (dx: Int, dy: Int, scrollDurationMs: Int) -> Unit,
-        private val processItemHeightGetting: () -> Int,
+        private val selectItemMotionLayout: (Int) -> MotionLayout?,
+        private val smoothScroll: (dx: Int, dy: Int, scrollDurationMs: Int) -> Unit,
+        private val getItemHeight: () -> Int,
     ): MotionLayout.TransitionListener {
 
         private val scrollTimeMotionLayoutTransition = 1000 /*ms*/
@@ -564,7 +564,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         private fun isNextItemInvisibleState(): Boolean {
             if (itemNumber == maxItemNumber) return true
             val nextItemNumber = itemNumber.inc()
-            val motionLayout = processSelectionItemMotionLayout(nextItemNumber) ?: return true
+            val motionLayout = selectItemMotionLayout(nextItemNumber) ?: return true
             return motionLayout.currentState == R.id.motion_scene_edit_diary_item_invisible_state
         }
 
@@ -579,14 +579,14 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
 
         private fun scrollOnDiaryItemTransition(isUpDirection: Boolean) {
-            val itemHeight = processItemHeightGetting()
+            val itemHeight = getItemHeight()
             val scrollY =
                 if (isUpDirection) {
                     itemHeight
                 } else {
                     -itemHeight
                 }
-            processSmoothScroll(0, scrollY, scrollTimeMotionLayoutTransition)
+            smoothScroll(0, scrollY, scrollTimeMotionLayoutTransition)
         }
 
         override fun onTransitionTrigger(

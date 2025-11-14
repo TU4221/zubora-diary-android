@@ -335,7 +335,7 @@ class CalendarFragment :
     private class CalendarMonthDayBinder(
         private val themeColor: ThemeColorUi,
         private val onDateClick: (date: LocalDate) -> Unit,
-        private val processCheckDiaryExists: (date: LocalDate) -> Unit
+        private val checkDiaryExists: (date: LocalDate) -> Unit
     ) : MonthDayBinder<DayViewContainer> {
 
         private var selectedDate: LocalDate = LocalDate.now()
@@ -365,7 +365,7 @@ class CalendarFragment :
 
             val dotIsVisible = dayDotVisibilityCache[calendarDay.date] ?: run {
                 if (calendarDay.position == DayPosition.MonthDate) {
-                    processCheckDiaryExists(calendarDay.date)
+                    checkDiaryExists(calendarDay.date)
                 }
                 false // 初回は非表示にしておき、データ取得後に更新
             }
