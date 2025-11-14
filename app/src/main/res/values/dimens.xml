@@ -44,8 +44,8 @@
     <dimen name="fragment_diary_edit_small_text_size">14sp</dimen>
     <dimen name="fragment_diary_edit_margin_start">8dp</dimen>
     <dimen name="fragment_diary_edit_margin_top">16dp</dimen>
-    <dimen name="fragment_diary_edit_delete_button_layout_width">48dp</dimen>
-    <dimen name="fragment_diary_edit_delete_button_layout_height">@dimen/fragment_diary_edit_delete_button_layout_width</dimen>
+    <dimen name="fragment_diary_edit_image_button_layout_width">48dp</dimen>
+    <dimen name="fragment_diary_edit_image_button_layout_height">@dimen/fragment_diary_edit_image_button_layout_width</dimen>
     <dimen name="fragment_diary_edit_image_padding">16dp</dimen>
 
 
@@ -53,8 +53,8 @@
     <dimen name="layout_diary_edit_item_text_size">@dimen/fragment_diary_edit_text_size</dimen>
     <dimen name="layout_diary_edit_item_margin_start">@dimen/fragment_diary_edit_margin_start</dimen>
     <dimen name="layout_diary_edit_item_margin_top">@dimen/fragment_diary_edit_margin_top</dimen>
-    <dimen name="layout_diary_edit_item_delete_button_layout_width">@dimen/fragment_diary_edit_delete_button_layout_width</dimen>
-    <dimen name="layout_diary_edit_item_delete_button_layout_height">@dimen/fragment_diary_edit_delete_button_layout_height</dimen>
+    <dimen name="layout_diary_edit_item_delete_button_layout_width">@dimen/fragment_diary_edit_image_button_layout_width</dimen>
+    <dimen name="layout_diary_edit_item_delete_button_layout_height">@dimen/fragment_diary_edit_image_button_layout_height</dimen>
 
 
     <!-- fragment_settings -->

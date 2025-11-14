@@ -147,7 +147,8 @@
 
     <!-- ImageButton -->
     <style name="AppImageButtonStyle" parent="Widget.AppCompat.ImageButton">
-        <item name="android:background">@drawable/bg_image_button</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:foreground">@drawable/ripple_effect_oval</item>
         <item name="tint">?attr/colorOnSurfaceVariant</item>
     </style>
 
