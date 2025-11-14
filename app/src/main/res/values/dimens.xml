@@ -46,6 +46,7 @@
     <dimen name="fragment_diary_edit_margin_top">16dp</dimen>
     <dimen name="fragment_diary_edit_image_button_layout_width">48dp</dimen>
     <dimen name="fragment_diary_edit_image_button_layout_height">@dimen/fragment_diary_edit_image_button_layout_width</dimen>
+    <dimen name="fragment_diary_edit_image_button_vertical_center_adjust_padding">4dp</dimen>
     <dimen name="fragment_diary_edit_image_padding">16dp</dimen>
 
 
@@ -55,6 +56,7 @@
     <dimen name="layout_diary_edit_item_margin_top">@dimen/fragment_diary_edit_margin_top</dimen>
     <dimen name="layout_diary_edit_item_delete_button_layout_width">@dimen/fragment_diary_edit_image_button_layout_width</dimen>
     <dimen name="layout_diary_edit_item_delete_button_layout_height">@dimen/fragment_diary_edit_image_button_layout_height</dimen>
+    <dimen name="layout_diary_edit_item_image_button_vertical_center_adjust_padding">@dimen/fragment_diary_edit_image_button_vertical_center_adjust_padding</dimen>
 
 
     <!-- fragment_settings -->
