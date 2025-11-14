@@ -141,7 +141,7 @@ class CalendarFragment :
     override fun onActivityCallbackUiEventReceived(event: ActivityCallbackUiEvent) {
         when (event) {
             ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
-                processOnBottomNavigationItemReselected()
+                onBottomNavigationItemReselected()
             }
         }
     }
@@ -195,7 +195,7 @@ class CalendarFragment :
     //endregion
 
     //region View Manipulation
-    private fun processOnBottomNavigationItemReselected() {
+    private fun onBottomNavigationItemReselected() {
         if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
             scrollToTop()
             return
