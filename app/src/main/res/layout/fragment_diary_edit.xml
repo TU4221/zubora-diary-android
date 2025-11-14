@@ -372,7 +372,7 @@
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
                             android:padding="@dimen/fragment_diary_edit_image_padding"
-                            android:background="@drawable/diary_edit_image_bg_rounded_rectangle_image"
+                            android:background="@drawable/bg_outline_rounded_corners_12dp"
                             android:foreground="@drawable/ripple_effect_rounded_corners_12dp"
                             android:clickable="true"
                             android:focusable="true"
