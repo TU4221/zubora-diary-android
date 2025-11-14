@@ -265,90 +265,34 @@ class CalendarFragment :
 
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun bind(container: DayViewContainer, calendarDay: CalendarDay) {
-            val textDay = container.binding.textDay.apply {
-                setOnClickListener {
-                    if (calendarDay.position == DayPosition.MonthDate) {
-                        onDateClick(calendarDay.date)
-                    }
-                }
-
-                // 数値設定
-                val day = calendarDay.date.dayOfMonth.toString()
-                text = day
-            }
-            val viewDayDot = container.binding.viewDayDot
-
-            // 日にちマス状態(可視、数値色、背景色、ドット有無)設定
-            if (calendarDay.position == DayPosition.MonthDate) {
-                textDay.visibility = View.VISIBLE
-                setUpCalendarDayColor(calendarDay, textDay, viewDayDot)
-                setUpCalendarDayDotVisibility(calendarDay, viewDayDot)
-            } else {
-                textDay.visibility = View.INVISIBLE
-                viewDayDot.visibility = View.INVISIBLE
-                (textDay.parent as? View)?.background = null
-            }
-        }
-
-        private fun setUpCalendarDayColor(
-            calendarDay: CalendarDay, textCalendarDay: TextView, viewCalendarDayDot: View
-        ) {
-            val themeColorChanger =
-                CalendarThemeColorChanger()
-
-            val isSelectedDay = calendarDay.date.isEqual(selectedDate)
-            val isToday = calendarDay.date.isEqual(LocalDate.now())
-
-            if (isSelectedDay) {
-                themeColorChanger.applyCalendarSelectedDayColor(
-                    textCalendarDay,
-                    viewCalendarDayDot,
-                    themeColor
-                )
-            } else if (isToday) {
-                themeColorChanger
-                    .applyCalendarTodayColor(
-                        textCalendarDay,
-                        viewCalendarDayDot,
-                        themeColor
-                    )
-            } else {
-                val dayOfWeek = calendarDay.date.dayOfWeek
-                val isSaturday = dayOfWeek == DayOfWeek.SATURDAY
-                val isSunday = dayOfWeek == DayOfWeek.SUNDAY
-
-                if (isSaturday) {
-                    themeColorChanger.applyCalendarSaturdayColor(
-                        textCalendarDay,
-                        viewCalendarDayDot,
-                        themeColor
-                    )
-                } else if (isSunday) {
-                    themeColorChanger.applyCalendarSundayColor(
-                        textCalendarDay,
-                        viewCalendarDayDot,
-                        themeColor
-                    )
-                } else {
-                    themeColorChanger.applyCalendarWeekdaysColor(
-                        textCalendarDay,
-                        viewCalendarDayDot,
-                        themeColor
-                    )
+            container.view.setOnClickListener {
+                if (calendarDay.position == DayPosition.MonthDate) {
+                    onDateClick(calendarDay.date)
                 }
             }
-        }
 
-        private fun setUpCalendarDayDotVisibility(calendarDay: CalendarDay, viewCalendarDayDot: View) {
-            val localDate = calendarDay.date
-            val boolean = dayDotVisibilityCache[localDate]
-            viewCalendarDayDot.visibility =
-                if (boolean == null) {
-                    processCheckDiaryExists(localDate)
-                    View.INVISIBLE
-                } else {
-                    if (boolean) View.VISIBLE else View.INVISIBLE
+            val dayState =
+                when {
+                    calendarDay.date.isEqual(selectedDate) -> DayViewContainer.DayState.SELECTED
+                    calendarDay.date.isEqual(LocalDate.now()) -> DayViewContainer.DayState.TODAY
+                    calendarDay.date.dayOfWeek == DayOfWeek.SATURDAY -> DayViewContainer.DayState.SATURDAY
+                    calendarDay.date.dayOfWeek == DayOfWeek.SUNDAY -> DayViewContainer.DayState.SUNDAY
+                    else -> DayViewContainer.DayState.WEEKDAY
                 }
+
+            val dotIsVisible = dayDotVisibilityCache[calendarDay.date] ?: run {
+                if (calendarDay.position == DayPosition.MonthDate) {
+                    processCheckDiaryExists(calendarDay.date)
+                }
+                false // 初回は非表示にしておき、データ取得後に更新
+            }
+
+            container.bind(
+                calendarDay,
+                dayState,
+                dotIsVisible,
+                themeColor
+            )
         }
 
         override fun create(view: View): DayViewContainer {
@@ -372,42 +316,12 @@ class CalendarFragment :
 
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun bind(container: MonthViewContainer, calendarMonth: CalendarMonth) {
-            // カレンダーの年月表示設定
-            val formatter = DateTimeFormatter.ofPattern(headerDateFormat)
-            val stringYearMonth = calendarMonth.yearMonth.format(formatter)
-            container.binding.textYearMonth.text = stringYearMonth
-
-            // カレンダーの曜日設定(未設定アイテムのみ設定)
-            val linearLayout = container.binding.legendLayout.root
-            if (linearLayout.tag != null) return
-            linearLayout.tag = calendarMonth.yearMonth
-
-            // カレンダー曜日表示設定
-            val max = linearLayout.childCount
-            for (i in 0 until max) {
-                val childView = linearLayout.getChildAt(i)
-                val childTextView = childView as TextView
-                val dayOfWeek = daysOfWeek[i]
-
-                childTextView.text = dayOfWeek.name.substring(0, 3)
-
-                setUpDayOfWeekColor(dayOfWeek, childTextView)
-            }
-        }
-
-        private fun setUpDayOfWeekColor(dayOfWeek: DayOfWeek, dayOfWeekText: TextView) {
-            val themeColorChanger = CalendarThemeColorChanger()
-
-            val isSaturday = dayOfWeek == DayOfWeek.SATURDAY
-            val isSunday = dayOfWeek == DayOfWeek.SUNDAY
-
-            if (isSaturday) {
-                themeColorChanger.applyCalendarDayOfWeekSaturdayColor(dayOfWeekText)
-            } else if (isSunday) {
-                themeColorChanger.applyCalendarDayOfWeekSundayColor(dayOfWeekText)
-            } else {
-                themeColorChanger.applyCalendarDayOfWeekWeekdaysColor(dayOfWeekText, themeColor)
-            }
+            container.bind(
+                calendarMonth.yearMonth,
+                daysOfWeek,
+                headerDateFormat,
+                themeColor
+            )
         }
 
         override fun create(view: View): MonthViewContainer {
@@ -417,12 +331,119 @@ class CalendarFragment :
 
     // カレンダー日単位コンテナ
     private class DayViewContainer(view: View) : ViewContainer(view) {
-        val binding: LayoutCalendarDayBinding = LayoutCalendarDayBinding.bind(view)
+
+        private val binding: LayoutCalendarDayBinding = LayoutCalendarDayBinding.bind(view)
+
+        private val themeColorChanger = CalendarThemeColorChanger()
+
+        fun bind(
+            calendarDay: CalendarDay,
+            dayState: DayState,
+            dotIsVisible: Boolean,
+            themeColor: ThemeColorUi
+        ) {
+            val textDay = binding.textDay
+            val viewDayDot = binding.viewDayDot
+
+            textDay.text = calendarDay.date.dayOfMonth.toString()
+
+            // 日にちマス状態(可視、数値色、背景色、ドット有無)設定
+            if (calendarDay.position == DayPosition.MonthDate) {
+                textDay.visibility = View.VISIBLE
+                viewDayDot.visibility = if (dotIsVisible) View.VISIBLE else View.INVISIBLE
+
+                when (dayState) {
+                    DayState.SELECTED -> {
+                        themeColorChanger
+                            .applyCalendarSelectedDayColor(textDay, viewDayDot, themeColor)
+                    }
+                    DayState.TODAY -> {
+                        themeColorChanger
+                            .applyCalendarTodayColor(textDay, viewDayDot, themeColor)
+                    }
+                    DayState.SATURDAY -> {
+                        themeColorChanger
+                            .applyCalendarSaturdayColor(textDay, viewDayDot, themeColor)
+                    }
+                    DayState.SUNDAY -> {
+                        themeColorChanger
+                            .applyCalendarSundayColor(textDay, viewDayDot, themeColor)
+                    }
+                    DayState.WEEKDAY -> {
+                        themeColorChanger
+                            .applyCalendarWeekdaysColor(textDay, viewDayDot, themeColor)
+                    }
+                }
+            } else {
+                textDay.visibility = View.INVISIBLE
+                viewDayDot.visibility = View.INVISIBLE
+                (textDay.parent as? View)?.background = null
+            }
+        }
+
+        enum class DayState {
+            SELECTED,
+            TODAY,
+            SATURDAY,
+            SUNDAY,
+            WEEKDAY
+        }
     }
 
     // カレンダー月単位コンテナ
     private class MonthViewContainer(view: View) : ViewContainer(view) {
-        val binding: LayoutCalendarHeaderBinding = LayoutCalendarHeaderBinding.bind(view)
+
+        private val binding: LayoutCalendarHeaderBinding = LayoutCalendarHeaderBinding.bind(view)
+
+        private val themeColorChanger = CalendarThemeColorChanger()
+
+        fun bind(
+            yearMonth: YearMonth,
+            daysOfWeek: List<DayOfWeek>,
+            headerDateFormat: String,
+            themeColor: ThemeColorUi
+        ) {
+            // カレンダーの年月表示設定
+            val formatter = DateTimeFormatter.ofPattern(headerDateFormat)
+            binding.textYearMonth.text = yearMonth.format(formatter)
+
+            // カレンダーの曜日設定 (一度だけ設定する)
+            val legendLayout = binding.legendLayout.root
+            if (legendLayout.tag == yearMonth) return
+            legendLayout.tag = yearMonth
+
+            // カレンダー曜日表示と色の設定
+            val max = legendLayout.childCount
+            for (i in 0 until max) {
+                val childView = legendLayout.getChildAt(i)
+                val childTextView = childView as TextView
+                val dayOfWeek = daysOfWeek[i]
+
+                childTextView.text = dayOfWeek.name.substring(0, 3)
+
+                // 曜日の色設定
+                setUpDayOfWeekColor(dayOfWeek, childTextView, themeColor)
+            }
+        }
+
+        private fun setUpDayOfWeekColor(
+            dayOfWeek: DayOfWeek,
+            dayOfWeekText: TextView,
+            themeColor: ThemeColorUi
+        ) {
+            when (dayOfWeek) {
+                DayOfWeek.SATURDAY -> {
+                    themeColorChanger.applyCalendarDayOfWeekSaturdayColor(dayOfWeekText)
+                }
+                DayOfWeek.SUNDAY -> {
+                    themeColorChanger.applyCalendarDayOfWeekSundayColor(dayOfWeekText)
+                }
+                else -> {
+                    themeColorChanger
+                        .applyCalendarDayOfWeekWeekdaysColor(dayOfWeekText, themeColor)
+                }
+            }
+        }
     }
     //endregion
 
