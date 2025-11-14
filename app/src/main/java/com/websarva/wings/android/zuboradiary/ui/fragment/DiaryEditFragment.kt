@@ -481,12 +481,14 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                         ItemMotionLayoutListener(
                             arraySize,
                             init + 1,
-                            binding.includeItem1.linerLayoutDiaryEditItem.height,
                             { mainViewModel.onDiaryItemInvisibleStateTransitionCompleted(it) },
                             { mainViewModel.onDiaryItemVisibleStateTransitionCompleted() },
                             { selectItemMotionLayout(it) },
                             { dx, dy, scrollDurationMs ->
                                 binding.nestedScrollFullScreen.smoothScrollBy(dx, dy, scrollDurationMs)
+                            },
+                            {
+                                binding.includeItem1.linerLayoutDiaryEditItem.height
                             }
                         ).also {
                             motionLayoutDiaryEditItems[init].setTransitionListener(it)
@@ -499,11 +501,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     private class ItemMotionLayoutListener(
         private val maxItemNumber: Int,
         private val itemNumber: Int,
-        private val itemHeight: Int,
         private val onDiaryItemTransitionToInvisibleCompleted: (Int) -> Unit,
         private val onDiaryItemTransitionToVisibleCompleted: (Int) -> Unit,
         private val processSelectionItemMotionLayout: (Int) -> MotionLayout?,
         private val processSmoothScroll: (dx: Int, dy: Int, scrollDurationMs: Int) -> Unit,
+        private val processItemHeightGetting: () -> Int,
     ): MotionLayout.TransitionListener {
 
         private val scrollTimeMotionLayoutTransition = 1000 /*ms*/
@@ -577,6 +579,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
 
         private fun scrollOnDiaryItemTransition(isUpDirection: Boolean) {
+            val itemHeight = processItemHeightGetting()
             val scrollY =
                 if (isUpDirection) {
                     itemHeight
