@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAppearance="@style/DiaryListYearMonthSectionTextAppearance"
+            android:paddingStart="@dimen/row_diary_list_layout_padding"
             app:applySystemInsetsToPaddingLeft="@{true}"
             tools:hint="0000年00月" />
 
