@@ -12,7 +12,6 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="?attr/colorSecondaryContainer"
         android:alpha="0.5"
         android:focusable="true"
         android:clickable="true"
