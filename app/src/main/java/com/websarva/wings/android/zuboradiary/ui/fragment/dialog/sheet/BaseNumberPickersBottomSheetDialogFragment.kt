@@ -19,7 +19,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding.apply {
+        with(binding) {
             buttonDecision.setOnClickListener {
                 Log.d(logTag, "onClick()_PositiveButton")
                 handleOnPositiveButtonClick(
@@ -29,14 +29,16 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
                 )
                 navigatePreviousFragment()
             }
+
             buttonCancel.setOnClickListener {
                 Log.d(logTag, "onClick()_NegativeButton")
                 handleOnNegativeButtonClick()
                 navigatePreviousFragment()
             }
-            setUpNumberPickerTextColor(binding)
-            setUpNumberPickers()
         }
+
+        setUpNumberPickerTextColor(binding)
+        setUpNumberPickers()
     }
 
     override fun createViewBinding(
@@ -60,7 +62,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     private fun setUpNumberPickerTextColor(binding: DialogFragmentNumberPickersBinding) {
         if (Build.VERSION.SDK_INT >= 29) {
             val onSurfaceVariantColor = themeColor.asOnSurfaceVariantColorInt(resources)
-            binding.apply {
+            with(binding) {
                 numberPickerFirst.textColor = onSurfaceVariantColor
                 numberPickerSecond.textColor = onSurfaceVariantColor
                 numberPickerThird.textColor = onSurfaceVariantColor

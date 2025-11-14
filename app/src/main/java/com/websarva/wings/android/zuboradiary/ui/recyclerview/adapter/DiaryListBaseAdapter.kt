@@ -214,7 +214,7 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
      * ViewHolderのビューのサイズを測定し、レイアウトするためのヘルパーメソッド。
      */
     private fun measureAndLayoutViewHolder(holder: RecyclerView.ViewHolder, parent: RecyclerView) {
-        holder.itemView.apply {
+        with(holder.itemView) {
             val widthSpec =
                 View.MeasureSpec.makeMeasureSpec(parent.width, View.MeasureSpec.EXACTLY)
             val heightSpec =

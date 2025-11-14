@@ -40,7 +40,7 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
             StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).maxYear
         val minYear =
             StartYearMonthPickerDialogFragmentArgs.fromBundle(requireArguments()).minYear
-        binding.apply {
+        with(binding) {
             numberPickerFirst.maxValue = maxYear.value
             numberPickerFirst.minValue = minYear.value
             numberPickerFirst.value = today.year

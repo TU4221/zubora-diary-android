@@ -90,7 +90,7 @@ internal class ImageProgressView @JvmOverloads constructor (
             typedArray.recycle()
         }
 
-        binding.image.apply {
+        with(binding.image) {
             setImageDrawable(defaultIconDrawable)
             setColorFilter(iconColorInt)
         }

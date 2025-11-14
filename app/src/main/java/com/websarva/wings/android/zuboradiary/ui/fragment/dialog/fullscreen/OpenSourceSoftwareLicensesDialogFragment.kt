@@ -44,46 +44,45 @@ class OpenSourceSoftwareLicensesDialogFragment
     }
 
     private fun setUpAboutLibraries() {
-        binding.composeViewAboutLibraries
-            .apply {
-                // Compositionの破棄タイミングをFragmentのViewのライフサイクルと連動
-                setViewCompositionStrategy(
-                    ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
-                )
+        with (binding.composeViewAboutLibraries) {
+            // Compositionの破棄タイミングをFragmentのViewのライフサイクルと連動
+            setViewCompositionStrategy(
+                ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed
+            )
 
-                setContent {
-                    // ライブラリ情報を読み込み、インスタンス化
-                    val libraries = rememberLibraries()
-                    // 新しい LibrariesContainer のシグネチャに合わせて修正
-                    LibrariesContainer(
-                        libraries = libraries.value, // Libs オブジェクトを渡す
-                        modifier = Modifier.fillMaxSize(),
+            setContent {
+                // ライブラリ情報を読み込み、インスタンス化
+                val libraries = rememberLibraries()
+                // 新しい LibrariesContainer のシグネチャに合わせて修正
+                LibrariesContainer(
+                    libraries = libraries.value, // Libs オブジェクトを渡す
+                    modifier = Modifier.fillMaxSize(),
 
-                        // 色の設定
-                        colors = LibraryDefaults.libraryColors(
-                            // ダイアログ背景色
-                            backgroundColor = Color(themeColor.asSurfaceColorInt(resources)),
+                    // 色の設定
+                    colors = LibraryDefaults.libraryColors(
+                        // ダイアログ背景色
+                        backgroundColor = Color(themeColor.asSurfaceColorInt(resources)),
 
-                            // リストアイテム、ダイアログ文字
-                            contentColor = Color(themeColor.asOnSurfaceColorInt(resources)),
+                        // リストアイテム、ダイアログ文字
+                        contentColor = Color(themeColor.asOnSurfaceColorInt(resources)),
 
-                            // バージョンチップ
-                            versionChipColors = LibraryDefaults.chipColors(
-                                containerColor = Color(themeColor.asSecondaryContainerColorInt(resources)),
-                                contentColor = Color(themeColor.asOnSecondaryContainerColorInt(resources))
-                            ),
+                        // バージョンチップ
+                        versionChipColors = LibraryDefaults.chipColors(
+                            containerColor = Color(themeColor.asSecondaryContainerColorInt(resources)),
+                            contentColor = Color(themeColor.asOnSecondaryContainerColorInt(resources))
+                        ),
 
-                            // ライセンスチップ
-                            licenseChipColors = LibraryDefaults.chipColors(
-                                containerColor = Color(themeColor.asSecondaryContainerColorInt(resources)),
-                                contentColor = Color(themeColor.asOnSecondaryContainerColorInt(resources))
-                            ),
+                        // ライセンスチップ
+                        licenseChipColors = LibraryDefaults.chipColors(
+                            containerColor = Color(themeColor.asSecondaryContainerColorInt(resources)),
+                            contentColor = Color(themeColor.asOnSecondaryContainerColorInt(resources))
+                        ),
 
-                            // ダイアログの確認ボタン
-                            dialogConfirmButtonColor = Color(themeColor.asPrimaryColorInt(resources))
-                        )
+                        // ダイアログの確認ボタン
+                        dialogConfirmButtonColor = Color(themeColor.asPrimaryColorInt(resources))
                     )
-                }
+                )
             }
+        }
     }
 }

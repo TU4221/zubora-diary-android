@@ -53,8 +53,8 @@ internal class WordSearchResultDiaryListAdapter (
     ) : DiaryListViewHolder(binding.root) {
 
         fun bind(item: DiaryListItemContainerUi.WordSearchResult) {
-            val context = binding.root.context
-            binding.apply {
+            with(binding) {
+                val context = root.context
                 val date = item.date
                 val dayOfWeekString = date.dayOfWeek.asDiaryListDayOfWeekString(context)
                 includeDay.textDayOfWeek.text = dayOfWeekString

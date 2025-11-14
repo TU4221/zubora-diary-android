@@ -215,20 +215,20 @@ class MainActivity : LoggingActivity() {
     private fun setUpNavigation() {
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
-        val bottomNavigationView = binding.bottomNavigation
-        setupWithNavController(bottomNavigationView, navController)
+        val bottomNavigationView =
+            binding.bottomNavigation.apply {
+                setOnItemSelectedListener { menuItem: MenuItem ->
+                    Log.i(logTag, "ボトムナビゲーション_セレクト")
+                    mainActivityViewModel.onBottomNavigationItemSelect()
+                    onNavDestinationSelected(menuItem, navController)
+                }
+                setOnItemReselectedListener {
+                    Log.i(logTag, "ボトムナビゲーション_リセレクト")
+                    mainActivityViewModel.onBottomNavigationItemReselect()
+                }
+            }
 
-        bottomNavigationView.apply {
-            setOnItemSelectedListener { menuItem: MenuItem ->
-                Log.i(logTag, "ボトムナビゲーション_セレクト")
-                mainActivityViewModel.onBottomNavigationItemSelect()
-                onNavDestinationSelected(menuItem, navController)
-            }
-            setOnItemReselectedListener {
-                Log.i(logTag, "ボトムナビゲーション_リセレクト")
-                mainActivityViewModel.onBottomNavigationItemReselect()
-            }
-        }
+        setupWithNavController(bottomNavigationView, navController)
     }
 
     // MEMO:BottomNavigationView経由のFragment間でNavigateUpすると、意図しない遷移エフェクトになる。
@@ -236,7 +236,7 @@ class MainActivity : LoggingActivity() {
     //      これを避け、ユーザーがタブを再選択した際と同じ挙動(正しいエフェクト)で開始Fragmentに戻すために、
     //      このメソッドを使用する。
     private fun navigateBottomNavigationStartTabFragment() {
-        binding.bottomNavigation.apply {
+        with(binding.bottomNavigation) {
             selectedItemId =
                 menu[0].itemId // 初期メニューアイテム(アプリ起動で最初に選択されているアイテム)
         }
@@ -254,7 +254,7 @@ class MainActivity : LoggingActivity() {
     }
 
     private fun clearViewBindings() {
-        binding.bottomNavigation.apply {
+        with(binding.bottomNavigation) {
             setOnItemSelectedListener(null)
             setOnItemReselectedListener(null)
         }

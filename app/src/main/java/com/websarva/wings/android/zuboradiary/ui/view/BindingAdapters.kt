@@ -144,7 +144,7 @@ internal object BindingAdapters {
         val initialViewMarginTop = initialViewMargin.topMargin
         val initialViewMarginRight = initialViewMargin.rightMargin
         val initialViewMarginBottom = initialViewMargin.bottomMargin
-        view.apply {
+        with(view) {
             ViewCompat.setOnApplyWindowInsetsListener(
                 this
             ) { view, windowInsets ->
@@ -202,7 +202,7 @@ internal object BindingAdapters {
         val initialViewPaddingTop = view.paddingTop
         val initialViewPaddingRight = view.paddingRight
         val initialViewPaddingBottom = view.paddingBottom
-        view.apply {
+        with(view) {
             ViewCompat.setOnApplyWindowInsetsListener(
                 this
             ) { view, windowInsets ->

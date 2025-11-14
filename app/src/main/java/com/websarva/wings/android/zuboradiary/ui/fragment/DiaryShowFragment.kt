@@ -118,18 +118,16 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
 
     //region View Setup
     private fun setUpToolbar() {
-        binding.materialToolbarTopAppBar.apply {
-            setOnMenuItemClickListener { item: MenuItem ->
-                // 日記編集フラグメント起動
-                if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
-                    mainViewModel.onDiaryEditMenuClick()
-                    return@setOnMenuItemClickListener true
-                } else if (item.itemId == R.id.diaryShowToolbarOptionDeleteDiary) {
-                    mainViewModel.onDiaryDeleteMenuClick()
-                    return@setOnMenuItemClickListener true
-                }
-                false
+        binding.materialToolbarTopAppBar.setOnMenuItemClickListener { item: MenuItem ->
+            // 日記編集フラグメント起動
+            if (item.itemId == R.id.diaryShowToolbarOptionEditDiary) {
+                mainViewModel.onDiaryEditMenuClick()
+                return@setOnMenuItemClickListener true
+            } else if (item.itemId == R.id.diaryShowToolbarOptionDeleteDiary) {
+                mainViewModel.onDiaryDeleteMenuClick()
+                return@setOnMenuItemClickListener true
             }
+            false
         }
     }
     //endregion

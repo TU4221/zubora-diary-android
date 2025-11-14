@@ -125,13 +125,12 @@ class DiaryItemTitleEditDialog :
 
     //region View Setup
     private fun setUpItemTitleSelectionHistory() {
-        val recyclerView = binding.recyclerItemTitleSelectionHistory
         selectionHistoryListAdapter =
             DiaryItemTitleSelectionHistoryListAdapter(
                 themeColor
             ) { mainViewModel.onDiaryItemTitleSelectionHistoryListItemClick(it) }
 
-        recyclerView.apply {
+        val recyclerView = binding.recyclerItemTitleSelectionHistory.apply {
             adapter = selectionHistoryListAdapter
             layoutManager = LinearLayoutManager(context)
             addItemDecoration(

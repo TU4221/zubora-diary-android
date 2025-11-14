@@ -95,7 +95,7 @@ internal class NotificationSchedulingDataSource(
     suspend fun cancelReminderNotificationWorker() {
         withContext(dispatcher) {
             try {
-                workManager.apply {
+                with(workManager) {
                     cancelAllWorkByTag(reminderNotificationWorkTag)
                     cancelUniqueWork(reminderNotificationUniqueWorkName)
                 }
