@@ -50,17 +50,17 @@ class ImageFileDataSource(
 
     private val imageCacheDir: File by lazy {
         File(cacheDir, imageDirName)
-            .also { it.mkdir() } // 指定ディレクトリ作成
+            .apply { mkdir() } // 指定ディレクトリ作成
     }
 
     private val imagePermanentDir: File by lazy {
         File(permanentDir, imageDirName)
-            .also { it.mkdir() }
+            .apply { mkdir() }
     }
 
     private val imageBackupDir: File by lazy {
         File(imageCacheDir, "backup")
-            .also { it.mkdir() }
+            .apply { mkdir() }
     }
 
     /**

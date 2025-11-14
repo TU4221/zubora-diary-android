@@ -144,7 +144,7 @@ class DiaryItemTitleEditDialog :
         ) {
             val item = selectionHistoryListAdapter.getItemAt(it)
             mainViewModel.onDiaryItemTitleSelectionHistoryListItemSwipe(item)
-        }.also { it.setup() }
+        }.apply { setup() }
     }
     //endregion
 

@@ -229,13 +229,13 @@ class DiaryListFragment :
                     adapter
                 ) {
                     mainViewModel.onDiaryListEndScrolled()
-                }.also { it.setup() }
+                }.apply { setup() }
 
             swipeBackgroundButtonInteractionHelper =
                 SwipeBackgroundButtonInteractionHelper(
                     diaryRecyclerView,
                     adapter
-                ).also { it.setup() }
+                ).apply { setup() }
         }
     }
     //endregion

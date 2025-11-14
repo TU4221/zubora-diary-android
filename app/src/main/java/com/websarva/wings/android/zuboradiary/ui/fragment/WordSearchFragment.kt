@@ -151,7 +151,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
                     adapter
                 ) {
                     mainViewModel.onWordSearchResultListEndScrolled()
-                }.also { it.setup() }
+                }.apply { setup() }
         }
     }
 
