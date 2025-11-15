@@ -240,9 +240,6 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
             // セクションバー設定
             // 左端に余白を持たせる為、最初にスペースを入力。
             val context = binding.root.context
-            val diaryDate =
-                (diaryYearMonth.year.toString() + context.getString(R.string.row_diary_year_month_list_section_bar_year)
-                        + diaryYearMonth.monthValue + context.getString(R.string.row_diary_year_month_list_section_bar_month))
             binding.textSection.text = item.yearMonth.formatYearMonthString(context)
             // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
             binding.textSection.y = 0f

@@ -35,10 +35,6 @@
     <string name="fragment_word_search_result_item">項目</string>
     <string name="fragment_word_search_fab_top_scroll">先頭へスクロール</string>
 
-    <!-- row_diary_year_month_list -->
-    <string name="row_diary_year_month_list_section_bar_year">年</string>
-    <string name="row_diary_year_month_list_section_bar_month">月</string>
-
     <!-- row_diary_list_standard -->
     <string name="row_diary_list_standard_title_hint">無題</string>
     <string name="row_diary_list_standard_image_description">添付写真</string>
