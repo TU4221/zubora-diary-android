@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
@@ -234,10 +233,6 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
     ) : DiaryListViewHolder(binding.root) {
 
         fun bind(item: DiaryListItemUi.Header<*>) {
-            // 対象行の情報を取得
-            val diaryYearMonth = item.yearMonth
-
-            // セクションバー設定
             // 左端に余白を持たせる為、最初にスペースを入力。
             val context = binding.root.context
             binding.textHeader.text = item.yearMonth.formatYearMonthString(context)
