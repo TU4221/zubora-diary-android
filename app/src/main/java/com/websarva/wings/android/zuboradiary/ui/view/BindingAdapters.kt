@@ -60,10 +60,10 @@ internal object BindingAdapters {
                 InputTextValidationState.Valid -> null
                 InputTextValidationState.Invalid -> ""
                 InputTextValidationState.InvalidEmpty -> {
-                    context.getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_empty)
+                    context.getString(R.string.dialog_diary_item_title_edit_new_item_title_input_field_error_message_empty)
                 }
                 InputTextValidationState.InvalidInitialCharUnmatched -> {
-                    context.getString(R.string.fragment_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched)
+                    context.getString(R.string.dialog_diary_item_title_edit_new_item_title_input_field_error_message_initial_char_unmatched)
                 }
                 null -> null
             }

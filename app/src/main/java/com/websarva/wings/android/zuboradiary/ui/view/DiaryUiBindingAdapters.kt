@@ -143,7 +143,7 @@ internal object DiaryUiBindingAdapters {
     fun setDiaryItemNumberText(toolbar: Toolbar, number: Int) {
         val dateText =
             toolbar.context.getString(
-                R.string.fragment_diary_item_title_edit_toolbar_title,
+                R.string.dialog_diary_item_title_edit_toolbar_title,
                 number.toString()
             )
         toolbar.title?.let {
