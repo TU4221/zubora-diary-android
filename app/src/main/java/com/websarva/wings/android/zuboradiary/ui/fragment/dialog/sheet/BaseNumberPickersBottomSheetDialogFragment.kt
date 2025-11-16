@@ -8,13 +8,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.view.ContextThemeWrapper
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
+import com.websarva.wings.android.zuboradiary.databinding.DialogNumberPickersBinding
 import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceVariantColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.numberPickerBottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
 abstract class BaseNumberPickersBottomSheetDialogFragment
-    : BaseBottomSheetDialogFragment<DialogFragmentNumberPickersBinding>() {
+    : BaseBottomSheetDialogFragment<DialogNumberPickersBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -44,7 +44,7 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     override fun createViewBinding(
         inflater: LayoutInflater,
         container: ViewGroup?
-    ): DialogFragmentNumberPickersBinding {
+    ): DialogNumberPickersBinding {
 
         // HACK:下記理由から、ThemeColor#getNumberPickerBottomSheetDialogThemeResId()から
         //      ThemeResIdを取得してInflaterを再作成。
@@ -54,12 +54,12 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
         val contextWithTheme: Context = ContextThemeWrapper(requireActivity(), themeResId)
         val cloneInflater = inflater.cloneInContext(contextWithTheme)
 
-        return DialogFragmentNumberPickersBinding
+        return DialogNumberPickersBinding
             .inflate(cloneInflater, container, false)
     }
 
     // HACK:NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
-    private fun setupNumberPickerTextColor(binding: DialogFragmentNumberPickersBinding) {
+    private fun setupNumberPickerTextColor(binding: DialogNumberPickersBinding) {
         if (Build.VERSION.SDK_INT >= 29) {
             val onSurfaceVariantColor = themeColor.asOnSurfaceVariantColorInt(resources)
             with(binding) {

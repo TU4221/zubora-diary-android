@@ -99,10 +99,9 @@
     <string name="reminder_notification_worker_content_text">今日の出来事を日記に書きましょう。</string>
     <!-- endregion -->
 
-    <!-- TODO 名称からfragment削除 -->
     <!-- region Layout - dialog_fragment_number_picker -->
-    <string name="dialog_fragment_number_picker_cancel">キャンセル</string>
-    <string name="dialog_fragment_number_picker_decision">決定</string>
+    <string name="dialog_number_picker_cancel">キャンセル</string>
+    <string name="dialog_number_picker_decision">決定</string>
     <!-- endregion -->
 
     <!-- region Layout - row_background_delete_button -->

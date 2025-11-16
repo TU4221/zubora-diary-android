@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet
 
 import android.view.View
-import com.websarva.wings.android.zuboradiary.databinding.DialogFragmentNumberPickersBinding
+import com.websarva.wings.android.zuboradiary.databinding.DialogNumberPickersBinding
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -50,7 +50,7 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         binding.numberPickerThird.visibility = View.GONE
     }
 
-    private fun setupInitialValue(binding: DialogFragmentNumberPickersBinding) {
+    private fun setupInitialValue(binding: DialogNumberPickersBinding) {
         val currentCalendarStartDayOfWeek =
             CalendarStartDayPickerDialogFragmentArgs.fromBundle(requireArguments()).initialValue
         // MEMO:DayOfWeekはMonday～Sundayの値が1～7となる。Sundayを先頭に表示させたいため、下記コード記述。
@@ -62,7 +62,7 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         binding.numberPickerFirst.value = initialValue // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
     }
 
-    private fun setupDisplayedValues(binding: DialogFragmentNumberPickersBinding) {
+    private fun setupDisplayedValues(binding: DialogNumberPickersBinding) {
         val maxNumDaysOfWeek = DayOfWeek.entries.size
         val dayOfWeekList = arrayOfNulls<String>(maxNumDaysOfWeek)
         for (dayOfWeek in DayOfWeek.entries) {
