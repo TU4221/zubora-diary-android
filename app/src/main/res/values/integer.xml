@@ -1,17 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- fragment_diary_edit -->
+    <!-- ===================================================================================== -->
+    <!-- region Screen - Diary Edit -->
+    <!-- ===================================================================================== -->
+
+    <!-- region fragment_diary_edit -->
     <integer name="fragment_diary_edit_title_max_length">15</integer>
+    <!-- endregion -->
 
 
-    <!-- layout_diary_edit -->
+    <!-- region layout_diary_edit -->
     <integer name="layout_diary_edit_item_title_max_length">15</integer>
     <integer name="layout_diary_edit_item_comment_max_length">50</integer>
     <integer name="layout_diary_edit_item_comment_min_lines">5</integer>
+    <!-- endregion -->
+
+    <!-- ===================================================================================== -->
+    <!-- endregion -->
 
 
-    <!-- fragment_diary_item_title_edit -->
+    <!-- ===================================================================================== -->
+    <!-- region Screen - Diary Item Title Edit -->
+    <!-- ===================================================================================== -->
+
+    <!-- region fragment_diary_item_title_edit -->
     <integer name="fragment_diary_item_title_edit_item_title_max_length">@integer/layout_diary_edit_item_title_max_length</integer>
+    <!-- endregion -->
+
+    <!-- ===================================================================================== -->
+    <!-- endregion -->
 
 </resources>

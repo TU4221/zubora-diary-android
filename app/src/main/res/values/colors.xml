@@ -4,9 +4,13 @@
           そのため使用している色リソースもIDEでは未使用となるため、
           警告を"tools:ignore="UnusedResources"を記述して無視する。 -->
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="UnusedResources">
+
+    <!-- region  Ic Launcher Color -->
     <color name="ic_launcher_foreground">#333333</color>
     <color name="ic_launcher_background">#FAFAFA</color>
+    <!-- endregion -->
 
+    <!-- region App Base Color -->
     <color name="transparent">#00000000</color>
     <color name="white">#fff</color>
     <color name="black">#000</color>
@@ -14,9 +18,11 @@
     <color name="blue">#00f</color>
     <color name="gray">#999</color>
     <color name="transparentButtonPressed">#33000000</color>
+    <!-- endregion -->
 
 
-    <!-- theme_color_white ((MaterialThemeBuilder SourceColor:#FFFFFFにて生成)-->
+    <!-- region Theme Color White -->
+    <!-- (MaterialThemeBuilder SourceColor:#FFFFFFにて生成) -->
     <color name="md_theme_color_white_primary">#5D5F5F</color>
     <color name="md_theme_color_white_onPrimary">#FFFFFF</color>
     <color name="md_theme_color_white_primaryContainer">#FFFFFF</color>
@@ -159,9 +165,11 @@
     <color name="md_theme_color_white_surfaceContainer_highContrast">#F1EDEC</color>
     <color name="md_theme_color_white_surfaceContainerHigh_highContrast">#EBE7E7</color>
     <color name="md_theme_color_white_surfaceContainerHighest_highContrast">#E5E2E1</color>
+    <!-- endregion -->
 
 
-    <!-- theme_color_white ((MaterialThemeBuilder SourceColor:#FFFFFFにて生成(NightVer.))-->
+    <!-- region Theme Color Black-->
+    <!-- (MaterialThemeBuilder SourceColor:#FFFFFFにて生成(NightVer.))-->
     <color name="md_theme_color_black_primary">#FFFFFF</color>
     <color name="md_theme_color_black_onPrimary">#2F3131</color>
     <color name="md_theme_color_black_primaryContainer">#D4D4D4</color>
@@ -304,8 +312,10 @@
     <color name="md_theme_color_black_surfaceContainer_highContrast">#201F1F</color>
     <color name="md_theme_color_black_surfaceContainerHigh_highContrast">#2A2A2A</color>
     <color name="md_theme_color_black_surfaceContainerHighest_highContrast">#353434</color>
+    <!-- endregion -->
 
-    <!-- theme_color_red (MaterialThemeBuilder SourceColor:#B33B15にて生成) -->
+    <!-- region Theme Color Red -->
+    <!-- (MaterialThemeBuilder SourceColor:#B33B15にて生成) -->
     <color name="md_theme_color_red_primary">#8F4C38</color>
     <color name="md_theme_color_red_onPrimary">#FFFFFF</color>
     <color name="md_theme_color_red_primaryContainer">#FFDBD1</color>
@@ -448,9 +458,10 @@
     <color name="md_theme_color_red_surfaceContainer_highContrast">#FCEAE5</color>
     <color name="md_theme_color_red_surfaceContainerHigh_highContrast">#F7E4E0</color>
     <color name="md_theme_color_red_surfaceContainerHighest_highContrast">#F1DFDA</color>
+    <!-- endregion -->
 
-
-    <!-- theme_color_blue (MaterialThemeBuilder SourceColor:#769CDFにて生成) -->
+    <!-- region Theme Color Blue -->
+    <!-- (MaterialThemeBuilder SourceColor:#769CDFにて生成) -->
     <color name="md_theme_color_blue_primary">#415F91</color>
     <color name="md_theme_color_blue_onPrimary">#FFFFFF</color>
     <color name="md_theme_color_blue_primaryContainer">#D6E3FF</color>
@@ -593,9 +604,11 @@
     <color name="md_theme_color_blue_surfaceContainer_highContrast">#EDEDF4</color>
     <color name="md_theme_color_blue_surfaceContainerHigh_highContrast">#E7E8EE</color>
     <color name="md_theme_color_blue_surfaceContainerHighest_highContrast">#E2E2E9</color>
+    <!-- endregion -->
 
 
-    <!-- theme_color_green (MaterialThemeBuilder SourceColor:#63A002にて生成) -->
+    <!-- region Theme Color Green -->
+    <!-- (MaterialThemeBuilder SourceColor:#63A002にて生成) -->
     <color name="md_theme_color_green_primary">#4C662B</color>
     <color name="md_theme_color_green_onPrimary">#FFFFFF</color>
     <color name="md_theme_color_green_primaryContainer">#CDEDA3</color>
@@ -738,9 +751,10 @@
     <color name="md_theme_color_green_surfaceContainer_highContrast">#EEEFE3</color>
     <color name="md_theme_color_green_surfaceContainerHigh_highContrast">#E8E9DE</color>
     <color name="md_theme_color_green_surfaceContainerHighest_highContrast">#E2E3D8</color>
+    <!-- endregion -->
 
-
-    <!-- theme_color_yellow (MaterialThemeBuilder SourceColor:#FFDE3Fにて生成) -->
+    <!-- region Theme Color Yellow -->
+    <!-- (MaterialThemeBuilder SourceColor:#FFDE3Fにて生成) -->
     <color name="md_theme_color_yellow_primary">#6D5E0F</color>
     <color name="md_theme_color_yellow_onPrimary">#FFFFFF</color>
     <color name="md_theme_color_yellow_primaryContainer">#F8E287</color>
@@ -883,5 +897,6 @@
     <color name="md_theme_color_yellow_surfaceContainer_highContrast">#F4EDDF</color>
     <color name="md_theme_color_yellow_surfaceContainerHigh_highContrast">#EEE8DA</color>
     <color name="md_theme_color_yellow_surfaceContainerHighest_highContrast">#E8E2D4</color>
+    <!-- endregion -->
 
 </resources>

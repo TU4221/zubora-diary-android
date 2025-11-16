@@ -1,20 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Common -->
-    <!-- *************************************************************************************** -->
 
-    <!-- RootView -->
+
+    <!-- ===================================================================================== -->
+    <!-- region Common - View -->
+    <!-- ===================================================================================== -->
+
+    <!-- region Root View -->
     <!-- MEMO:Viewのデフォルトスタイルなし -->
     <style name="AppRootViewStyle">
         <item name="android:background">?attr/colorSurface</item>
     </style>
+    <!-- endregion -->
 
-    <!-- AppBarLayout -->
+
+    <!-- region App Bar Layout -->
     <style name="AppAppBarLayout" parent="Widget.Material3.AppBarLayout">
         <item name="android:fitsSystemWindows">true</item>
     </style>
+    <!-- endregion -->
 
-    <!-- Toolbar -->
+
+    <!-- region Toolbar -->
     <!-- MEMO:Rippleの色、Tooltipsの背景色の変更方法が不明の為、AppThemeColorBlackのparentをDarkThemeにして対応。-->
     <style name="AppToolbarStyle" parent="ThemeOverlay.Material3.Toolbar.Surface">
         <item name="android:gravity">center</item>
@@ -32,9 +39,10 @@
     <style name="AppToolbarPopupMenuStyle" parent="Widget.Material3.PopupMenu">
         <item name="android:textColor">@color/text_color_on_surface</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- TextView -->
+    <!-- region Text View -->
     <style name="AppTextViewStyle" parent="Widget.AppCompat.TextView">
         <!-- HACK:"android:textColorHint"はTextAppearanceでは反映されない為、Styleに記述 -->
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
@@ -53,9 +61,10 @@
     <style name="AppDropDownTextViewTextAppearance" parent="AppTextViewTextAppearance">
         <item name="android:textColor">?attr/colorOnSurfaceVariant</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- TextInputLayout -->
+    <!-- region Text Input Layout -->
     <style name="AppTextInputLayoutOutlinedBoxStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox">
         <item name="expandedHintEnabled">false</item>
         <item name="endIconTint">?colorOnSurfaceVariant</item>
@@ -71,9 +80,10 @@
     <style name="AppTextInputLayoutDropdownMenuStyle" parent="Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
         <item name="expandedHintEnabled">false</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- TextInputEditText -->
+    <!-- region Text Input Edit Text -->
     <style name="AppTextInputEditTextStyle" parent="Widget.AppCompat.EditText">
         <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
         <item name="android:textColor">@color/text_color_on_surface</item>
@@ -91,8 +101,10 @@
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
         -->
     </style>
+    <!-- endregion -->
 
-    <!-- ImeActionHandlingTextInputEditText -->
+    
+    <!-- region Ime Action Handling Text Input Edit Text -->
     <style name="AppImeActionHandlingTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
         <item name="android:textColor">@color/text_color_on_surface</item>
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
@@ -108,8 +120,10 @@
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
         -->
     </style>
+    <!-- endregion -->
 
-    <!-- ScrollableMultiLineTextInputEditText -->
+
+    <!-- region Scrollable MultiLine Text Input Edit Text -->
     <style name="AppScrollableMultiLineTextInputEditTextStyle" parent="AppImeActionHandlingTextInputEditTextStyle">
         <item name="android:textColor">@color/text_color_on_surface</item>
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
@@ -124,8 +138,10 @@
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
         -->
     </style>
+    <!-- endregion -->
 
-    <!-- AutoCompleteTextView -->
+
+    <!-- region Auto Complete Text View -->
     <style name="AppAutoCompleteTextViewDropDownStyle" parent="ThemeOverlay.Material3.AutoCompleteTextView">
         <item name="android:cursorVisible">false</item>
         <item name="android:inputType">none</item>
@@ -134,220 +150,135 @@
         <item name="android:textSize">@dimen/fragment_diary_edit_text_size</item>
         <!-- HACK:"android:textColor"、"android:textColorHint"はStyle、TextAppearanceでは反映されない為、layoutに記述 -->
     </style>
+    <!-- endregion -->
 
 
-    <!-- CircularProgressIndicator -->
+    <!-- region Circular Progress Indicator -->
     <style name="AppMediumCircularProgressIndicatorStyle" parent="Widget.Material3.CircularProgressIndicator.Medium">
         <item name="android:indeterminate">true</item>
     </style>
+    <!-- endregion -->
 
-    <!-- Button -->
+
+    <!-- region Button -->
     <style name="AppTonalButtonStyle" parent="ThemeOverlay.Material3.Button.TonalButton">
     </style>
+    <!-- endregion -->
 
-    <!-- ImageButton -->
+
+    <!-- region Image Button -->
     <style name="AppImageButtonStyle" parent="Widget.AppCompat.ImageButton">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:foreground">@drawable/ripple_effect_oval</item>
         <item name="tint">?attr/colorOnSurfaceVariant</item>
     </style>
+    <!-- endregion -->
 
 
-    <!-- ImageView -->
+    <!-- region Image View -->
     <!-- MEMO:ImageViewのデフォルトスタイルなし -->
     <style name="AppImageViewStyle">
     </style>
+    <!-- endregion -->
 
 
-    <!-- FloatingActionButton -->
+    <!-- region Floating Action Button -->
     <style name="AppMainFloatingActionButtonStyle" parent="ThemeOverlay.Material3.FloatingActionButton.Primary">
     </style>
 
     <style name="AppSubFloatingActionButtonStyle" parent="ThemeOverlay.Material3.FloatingActionButton.Surface">
     </style>
+    <!-- endregion -->
 
-    <!-- RecyclerView -->
+
+    <!-- region Recycler View -->
     <!-- MEMO:RecyclerViewのデフォルトスタイルなし -->
     <style name="AppRecyclerViewStyle">
         <item name="android:transitionGroup">true</item>
     </style>
+    <!-- endregion -->
 
-    <!-- *************************************************************************************** -->
-
-
-    <!-- DiaryListFragment、WordSearchFragment -->
-    <!-- *************************************************************************************** -->
-    <style name="DiaryListRecyclerViewStyle" parent="AppRecyclerViewStyle">
-        <item name="android:scrollbars">none</item>
+    
+    <!-- region Number Pickers -->
+    <!-- MEMO:NumberPickerのデフォルトスタイルなし -->
+    <style name="NumberPickerStyle" >
+        <item name="android:descendantFocusability">blocksDescendants</item>
     </style>
+    <!-- endregion -->
 
-    <style name="DiaryYearMonthListSectionTextViewStyle" parent="AppTextViewStyle">
-        <item name="android:background">?attr/colorSecondary</item>
+    <!-- ===================================================================================== -->
+    <!-- endregion -->
+
+
+    <!-- ===================================================================================== -->
+    <!-- region Common - Dialog -->
+    <!-- ===================================================================================== -->
+
+    <!-- region Material Full Screen Dialog -->
+    <style name="MaterialFullScreenDialogTheme" parent="ThemeOverlay.Material3.Dialog">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowFullscreen">false</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+
+        <!-- MEMO:下記はEdgeToEdgeに対応できるように設定 -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
     </style>
-    <style name="DiaryListYearMonthSectionTextAppearance" parent="TextAppearance.AppCompat.Body1">
-        <item name="android:textColor">?attr/colorOnSecondary</item>
-    </style>
+    <!-- endregion -->
+    
 
-    <!-- MEMO:Viewのデフォルトスタイルなし -->
-    <style name="DiaryListBackgroundViewStyle">
-        <item name="android:background">?attr/colorSecondaryContainer</item>
-    </style>
-
-    <!-- MEMO:Layout系のデフォルトスタイルなし -->
-    <style name="DiaryListItemLayoutStyle" parent="DiaryListBackgroundViewStyle">
-        <!-- 波紋エフェクト設定 -->
-        <item name="android:foreground">?attr/selectableItemBackground</item>
-        <item name="android:clickable">true</item>
-        <item name="android:focusable">true</item>
-    </style>
-
-    <style name="DiaryDayListTextViewStyle" parent="Widget.AppCompat.TextView">
-        <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
-    </style>
-    <style name="DiaryListDayTextAppearance" parent="TextAppearance.AppCompat.Body1">
-        <item name="android:textColor">@color/text_color_on_secondary_container</item>
-    </style>
-
-    <!-- 検索バー -->
-    <style name="WordSearchTextInputLayoutStyle" parent="AppTextInputLayoutClearTextStyle">
-        <item name="endIconTint">?colorOnSecondaryContainer</item>
-        <item name="hintEnabled">false</item>
-        <item name="boxBackgroundMode">none</item>
-    </style>
-
-    <style name="WordSearchTextInputEditTextStyle" parent="AppImeActionHandlingTextInputEditTextStyle">
-        <item name="android:textColor">@color/text_color_on_secondary_container</item>
-        <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
-        <item name="android:imeOptions">actionSearch</item>
-        <item name="android:inputType">text</item>
-        <item name="android:hint">@string/fragment_word_search_input_field_hint</item>
-    </style>
-    <style name="WordSearchTextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
-        <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
-        <!--
-        <item name="android:textColor">@color/text_color_on_secondary_container</item>
-        <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
-        -->
-        <item name="android:textSize">16sp</item>
-    </style>
-    <!-- ******************************************************************************** -->
-
-
-    <!-- DiaryItemTitleEditFragment -->
-    <!-- ******************************************************************************** -->
-    <style name="DiaryItemSelectionHistoryTextViewStyle" parent="AppTextViewStyle">
-        <item name="android:background">?colorSurface</item>
-    </style>
-    <!-- ******************************************************************************** -->
-
-
-    <!-- SettingsFragment -->
-    <!-- ******************************************************************************** -->
-    <style name="SettingsItemBaseTextViewStyle" parent="AppTextViewStyle">
-        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
-        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
-    </style>
-    <style name="SettingsItemBaseTextViewTextAppearance" parent="AppTextViewTextAppearance">
-        <item name="android:textSize">@dimen/fragment_settings_text_size</item>
-    </style>
-
-
-    <!-- SettingsItemTextView -->
-    <style name="SettingsItemTextViewStyle" parent="SettingsItemBaseTextViewStyle">
-        <item name="android:drawablePadding">@dimen/fragment_settings_item_drawable_padding</item>
-        <item name="android:gravity">center_vertical</item>
-    </style>
-    <style name="SettingsItemTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance"/>
-
-
-    <!-- SettingsSectionTextView -->
-    <style name="SettingsSectionTextViewStyle" parent="SettingsItemBaseTextViewStyle">
-        <item name="android:gravity">bottom</item>
-        <item name="android:background">?attr/colorSecondaryContainer</item>
-    </style>
-    <style name="SettingsSectionTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance">
-        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
-    </style>
-
-
-    <!-- SettingsItemValue -->
-    <style name="SettingsItemValueTextViewStyle" parent="AppTextViewStyle">
-        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
-        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
-        <item name="android:gravity">center_vertical|end</item>
-        <item name="android:hint">@string/fragment_settings_item_value_not_set</item>
-    </style>
-    <style name="SettingsItemValueTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance"/>
-
-
-    <!-- SettingsItemValueSwitch -->
-    <style name="SettingsItemValueSwitchStyle" parent="Widget.Material3.CompoundButton.MaterialSwitch">
-        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
-        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
-    </style>
-
-    <!-- ******************************************************************************** -->
-
-
-    <!-- BottomSheetsCommon -->
-    <!-- ******************************************************************************** -->
-
+    <!-- region Bottom Sheet Dialog -->
     <style name="AppBaseBottomSheetDialogStyle" parent="ThemeOverlay.Material3.BottomSheetDialog">
         <!-- MEMO:下記はEdgeToEdgeに対応できるように設定 -->
         <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppBaseModalBottomSheetStyle" parent="Widget.Material3.BottomSheet.Modal">
     </style>
 
     <style name="AppBottomSheetDialogThemeColorWhite" parent="AppBaseBottomSheetDialogStyle">
         <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorWhite</item>
     </style>
 
-    <style name="AppBottomSheetDialogThemeColorBlack" parent="AppBaseBottomSheetDialogStyle">
-        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorBlack</item>
-    </style>
-
-    <style name="AppBottomSheetDialogThemeColorRed" parent="AppBaseBottomSheetDialogStyle">
-        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorRed</item>
-    </style>
-
-    <style name="AppBottomSheetDialogThemeColorBlue" parent="AppBaseBottomSheetDialogStyle">
-        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorBlue</item>
-    </style>
-
-    <style name="AppBottomSheetDialogThemeColorGreen" parent="AppBaseBottomSheetDialogStyle">
-        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorGreen</item>
-    </style>
-
-    <style name="AppBottomSheetDialogThemeColorYellow" parent="AppBaseBottomSheetDialogStyle">
-        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorYellow</item>
-    </style>
-
-    <style name="AppBaseModalBottomSheetStyle" parent="Widget.Material3.BottomSheet.Modal">
-    </style>
-
     <style name="AppModalBottomSheetThemeColorWhite" parent="AppBaseModalBottomSheetStyle">
         <item name="backgroundTint">@color/md_theme_color_white_surface</item>
+    </style>
+
+    <style name="AppBottomSheetDialogThemeColorBlack" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorBlack</item>
     </style>
 
     <style name="AppModalBottomSheetThemeColorBlack" parent="AppBaseModalBottomSheetStyle">
         <item name="backgroundTint">@color/md_theme_color_black_surface</item>
     </style>
 
+    <style name="AppBottomSheetDialogThemeColorRed" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorRed</item>
+    </style>
+
     <style name="AppModalBottomSheetThemeColorRed" parent="AppBaseModalBottomSheetStyle">
         <item name="backgroundTint">@color/md_theme_color_red_surface</item>
+    </style>
+
+    <style name="AppBottomSheetDialogThemeColorBlue" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorBlue</item>
     </style>
 
     <style name="AppModalBottomSheetThemeColorBlue" parent="AppBaseModalBottomSheetStyle">
         <item name="backgroundTint">@color/md_theme_color_blue_surface</item>
     </style>
 
+    <style name="AppBottomSheetDialogThemeColorGreen" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorGreen</item>
+    </style>
+
     <style name="AppModalBottomSheetThemeColorGreen" parent="AppBaseModalBottomSheetStyle">
         <item name="backgroundTint">@color/md_theme_color_green_surface</item>
+    </style>
+
+    <style name="AppBottomSheetDialogThemeColorYellow" parent="AppBaseBottomSheetDialogStyle">
+        <item name="bottomSheetStyle">@style/AppModalBottomSheetThemeColorYellow</item>
     </style>
 
     <style name="AppModalBottomSheetThemeColorYellow" parent="AppBaseModalBottomSheetStyle">
@@ -367,22 +298,10 @@
     </style>
     <style name="BottomSheetTopBarButtonTextAppearance" parent="TextAppearance.AppCompat.Widget.Button">
     </style>
+    <!-- endregion -->
 
-    <!-- ******************************************************************************** -->
-
-
-    <!-- NumberPickersDialogFragment -->
-    <!-- ******************************************************************************** -->
-    <!-- MEMO:NumberPickerのデフォルトスタイルなし -->
-    <style name="NumberPickerStyle" >
-        <item name="android:descendantFocusability">blocksDescendants</item>
-    </style>
-
-    <!-- ******************************************************************************** -->
-
-
-    <!-- MaterialCalendarDialog -->
-    <!-- ******************************************************************************** -->
+    
+    <!-- region Material Calendar Dialog -->
     <style name="MaterialCalendarThemeColorWhite" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="android:theme">@style/ThemeColorWhite</item>
         <!-- HACK:theme属性で指定しているstyleに"colorSurfaceContainerHigh"は含まれているが、反映されないので下記コードを記述して対応。
@@ -414,11 +333,10 @@
         <item name="android:theme">@style/ThemeColorYellow</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_yellow_surfaceContainerHigh</item>
     </style>
+    <!-- endregion -->
 
-    <!-- ******************************************************************************** -->
-
-    <!-- MaterialTimePickerDialog -->
-    <!-- ******************************************************************************** -->
+    
+    <!-- region Material Time Picker Dialog -->
     <style name="MaterialTimePickerThemeColorWhite" parent="ThemeOverlay.Material3.MaterialTimePicker">
         <item name="android:theme">@style/ThemeColorWhite</item>
     </style>
@@ -442,12 +360,10 @@
     <style name="MaterialTimePickerThemeColorYellow" parent="ThemeOverlay.Material3.MaterialTimePicker">
         <item name="android:theme">@style/ThemeColorYellow</item>
     </style>
+    <!-- endregion -->
 
-    <!-- ******************************************************************************** -->
 
-
-    <!-- MaterialAlertDialog -->
-    <!-- ******************************************************************************** -->
+    <!-- region Material Alert Dialog -->
     <style name="MaterialAlertDialogThemeColorWhite" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="android:theme">@style/ThemeColorWhite</item>
         <!-- HACK:theme属性で指定しているstyleに"colorSurfaceContainerHigh"は含まれているが、反映されないので下記コードを記述して対応。
@@ -479,22 +395,135 @@
         <item name="android:theme">@style/ThemeColorYellow</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_yellow_surfaceContainerHigh</item>
     </style>
+    <!-- endregion -->
+    
+    <!-- ===================================================================================== -->
+    <!-- endregion -->
 
-    <!-- ******************************************************************************** -->
+    
+    <!-- ===================================================================================== -->
+    <!-- region Screen - Diary List & Word Search -->
+    <!-- ===================================================================================== -->
 
-
-    <!-- MaterialFullScreenDialog -->
-    <!-- ******************************************************************************** -->
-    <style name="MaterialFullScreenDialogTheme" parent="ThemeOverlay.Material3.Dialog">
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowFullscreen">false</item>
-        <item name="android:windowIsFloating">false</item>
-        <item name="android:windowBackground">@android:color/transparent</item>
-
-        <!-- MEMO:下記はEdgeToEdgeに対応できるように設定 -->
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+    <!-- region Diary List -->
+    <style name="DiaryListRecyclerViewStyle" parent="AppRecyclerViewStyle">
+        <item name="android:scrollbars">none</item>
     </style>
 
-    <!-- ******************************************************************************** -->
+    <!-- TODO:YearMonth名称削除 -->
+    <style name="DiaryYearMonthListSectionTextViewStyle" parent="AppTextViewStyle">
+        <item name="android:background">?attr/colorSecondary</item>
+    </style>
+    <style name="DiaryListYearMonthSectionTextAppearance" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">?attr/colorOnSecondary</item>
+    </style>
+
+    <!-- MEMO:Viewのデフォルトスタイルなし -->
+    <style name="DiaryListBackgroundViewStyle">
+        <item name="android:background">?attr/colorSecondaryContainer</item>
+    </style>
+
+    <!-- MEMO:Layout系のデフォルトスタイルなし -->
+    <style name="DiaryListItemLayoutStyle" parent="DiaryListBackgroundViewStyle">
+        <!-- 波紋エフェクト設定 -->
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <!-- TODO:Day名称削除 -->
+    <style name="DiaryDayListTextViewStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
+    </style>
+    <style name="DiaryListDayTextAppearance" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textColor">@color/text_color_on_secondary_container</item>
+    </style>
+    <!-- endregion -->
+
+    <!-- region Search Bar -->
+    <style name="WordSearchTextInputLayoutStyle" parent="AppTextInputLayoutClearTextStyle">
+        <item name="endIconTint">?colorOnSecondaryContainer</item>
+        <item name="hintEnabled">false</item>
+        <item name="boxBackgroundMode">none</item>
+    </style>
+
+    <style name="WordSearchTextInputEditTextStyle" parent="AppImeActionHandlingTextInputEditTextStyle">
+        <item name="android:textColor">@color/text_color_on_secondary_container</item>
+        <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
+        <item name="android:imeOptions">actionSearch</item>
+        <item name="android:inputType">text</item>
+        <item name="android:hint">@string/fragment_word_search_input_field_hint</item>
+    </style>
+    <style name="WordSearchTextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
+        <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
+        <!--
+        <item name="android:textColor">@color/text_color_on_secondary_container</item>
+        <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
+        -->
+        <item name="android:textSize">16sp</item>
+    </style>
+    <!-- endregion -->
+
+    <!-- ===================================================================================== -->
+    <!-- endregion -->
+
+
+    <!-- ===================================================================================== -->
+    <!-- region Screen - Settings -->
+    <!-- ===================================================================================== -->
+    <style name="SettingsItemBaseTextViewStyle" parent="AppTextViewStyle">
+        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+    </style>
+    <style name="SettingsItemBaseTextViewTextAppearance" parent="AppTextViewTextAppearance">
+        <item name="android:textSize">@dimen/fragment_settings_text_size</item>
+    </style>
+
+    <style name="SettingsItemTextViewStyle" parent="SettingsItemBaseTextViewStyle">
+        <item name="android:drawablePadding">@dimen/fragment_settings_item_drawable_padding</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+    <style name="SettingsItemTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance"/>
+
+    <style name="SettingsSectionTextViewStyle" parent="SettingsItemBaseTextViewStyle">
+        <item name="android:gravity">bottom</item>
+        <item name="android:background">?attr/colorSecondaryContainer</item>
+    </style>
+    <style name="SettingsSectionTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance">
+        <item name="android:textColor">?attr/colorOnSecondaryContainer</item>
+    </style>
+
+    <style name="SettingsItemValueTextViewStyle" parent="AppTextViewStyle">
+        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:gravity">center_vertical|end</item>
+        <item name="android:hint">@string/fragment_settings_item_value_not_set</item>
+    </style>
+    <style name="SettingsItemValueTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance"/>
+
+    <style name="SettingsItemValueSwitchStyle" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+    </style>
+
+    <!-- ===================================================================================== -->
+    <!-- endregion -->
+
+
+    <!-- ===================================================================================== -->
+    <!-- region Screen - Diary Item Title Edit -->
+    <!-- ===================================================================================== -->
+
+    <style name="DiaryItemSelectionHistoryTextViewStyle" parent="AppTextViewStyle">
+        <item name="android:background">?colorSurface</item>
+    </style>
+
+    <!-- ===================================================================================== -->
+    <!-- endregion -->
 </resources>
