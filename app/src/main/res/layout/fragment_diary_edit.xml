@@ -36,7 +36,7 @@
                     app:menu="@menu/diary_edit_toolbar_menu"
                     app:applySystemInsetsToPaddingLeft="@{true}"
                     app:applySystemInsetsToPaddingRight="@{true}"
-                    tools:title="@string/fragment_diary_edit_toolbar_title_value_tools" />
+                    tools:title="@string/fragment_diary_edit_toolbar_title_create_new" />
 
             </com.google.android.material.appbar.AppBarLayout>
 

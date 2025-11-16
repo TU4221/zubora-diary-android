@@ -280,7 +280,6 @@
     <!-- region Layout - fragment_diary_edit -->
     <string name="fragment_diary_edit_toolbar_title_create_new">新規作成</string>
     <string name="fragment_diary_edit_toolbar_title_edit">編集中</string>
-    <string name="fragment_diary_edit_toolbar_title_value_tools">新規作成／編集中</string> <!-- TODO:削除 使用先正規に置換 -->
     <string name="fragment_diary_edit_toolbar_option_save_diary">日記保存</string>
     <string name="fragment_diary_edit_toolbar_option_delete_diary">日記削除</string>
     <string name="fragment_diary_edit_toolbar_option_test">テスト</string> <!-- TODO:テスト用の為、最終的に削除 -->
