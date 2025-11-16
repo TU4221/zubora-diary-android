@@ -39,11 +39,7 @@
     <dimen name="row_diary_list_layout_margin_vertical_between_items">8dp</dimen>
     <dimen name="row_diary_list_layout_margin_horizontal_between_items">16dp</dimen>
     <dimen name="row_diary_list_layout_padding">8dp</dimen>
-    <!-- endregion -->
 
-
-    <!-- TODO:row_diary_list_views_layout_marginに統一 -->
-    <!-- region row_diary_list_word_search_result -->
     <dimen name="row_diary_list_word_search_result_views_layout_margin">8dp</dimen>
     <!-- endregion -->
 
