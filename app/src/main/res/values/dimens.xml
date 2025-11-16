@@ -33,15 +33,10 @@
     <!-- region Screen - Diary List & Word Search -->
     <!-- ===================================================================================== -->
 
-    <!-- region Spacing Item Decoration -->
-    <!-- TODO:row_diary_list_views_layout_marginに名称変更 -->
-    <dimen name="spacing_item_decoration_list_layout_padding_vertical_between_items">8dp</dimen>
-    <!-- endregion -->
-
-
     <!-- region row_diary_list -->
     <dimen name="row_diary_list_height">72dp</dimen>
     <dimen name="row_diary_list_image_height">64dp</dimen>
+    <dimen name="row_diary_list_layout_margin_vertical_between_items">8dp</dimen>
     <dimen name="row_diary_list_layout_margin_horizontal_between_items">16dp</dimen>
     <dimen name="row_diary_list_layout_padding">8dp</dimen>
     <!-- endregion -->

@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.DiaryListB
 internal class SpacingItemDecoration(
     context: Context
 ) : RecyclerView.ItemDecoration() {
-    private val itemSpacing = context.resources.getDimensionPixelSize(R.dimen.spacing_item_decoration_list_layout_padding_vertical_between_items)
+    private val itemSpacing = context.resources.getDimensionPixelSize(R.dimen.row_diary_list_layout_margin_vertical_between_items)
 
     override fun getItemOffsets(
         outRect: Rect,
@@ -25,7 +25,7 @@ internal class SpacingItemDecoration(
         val adapter = parent.adapter as? DiaryListBaseAdapter<*, *> ?: return
 
         if (position == 0) {
-            // リスト最初のヘッダー(またはアイテム)のtopのpaddingは0
+            // リスト最初のヘッダー(またはアイテム)のtopのmarginは0
             outRect.top = 0
         } else {
             if (adapter.isSpacingItem(position)) {
