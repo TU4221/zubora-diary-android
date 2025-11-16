@@ -6,21 +6,21 @@
     android:orientation="vertical">
 
     <TextView
-        style="@style/DiaryDayListTextViewStyle"
+        style="@style/DiaryListTextViewStyle"
         android:id="@+id/text_day_of_week"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/DiaryListDayTextAppearance"
+        android:textAppearance="@style/DiaryListTextAppearance"
         android:textSize="14sp"
         android:gravity="center_horizontal"
         tools:text="金" />
 
     <TextView
-        style="@style/DiaryDayListTextViewStyle"
+        style="@style/DiaryListTextViewStyle"
         android:id="@+id/text_day_of_month"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/DiaryListDayTextAppearance"
+        android:textAppearance="@style/DiaryListTextAppearance"
         android:textSize="24sp"
         android:gravity="center_horizontal"
         android:paddingTop="8dp"

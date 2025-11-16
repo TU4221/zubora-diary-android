@@ -410,11 +410,10 @@
         <item name="android:scrollbars">none</item>
     </style>
 
-    <!-- TODO:YearMonth名称削除 -->
-    <style name="DiaryYearMonthListSectionTextViewStyle" parent="AppTextViewStyle">
+    <style name="DiaryListHeaderTextViewStyle" parent="AppTextViewStyle">
         <item name="android:background">?attr/colorSecondary</item>
     </style>
-    <style name="DiaryListYearMonthSectionTextAppearance" parent="TextAppearance.AppCompat.Body1">
+    <style name="DiaryListHeaderTextAppearance" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textColor">?attr/colorOnSecondary</item>
     </style>
 
@@ -431,11 +430,10 @@
         <item name="android:focusable">true</item>
     </style>
 
-    <!-- TODO:Day名称削除 -->
-    <style name="DiaryDayListTextViewStyle" parent="Widget.AppCompat.TextView">
+    <style name="DiaryListTextViewStyle" parent="Widget.AppCompat.TextView">
         <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
     </style>
-    <style name="DiaryListDayTextAppearance" parent="TextAppearance.AppCompat.Body1">
+    <style name="DiaryListTextAppearance" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textColor">@color/text_color_on_secondary_container</item>
     </style>
     <!-- endregion -->

@@ -22,12 +22,12 @@
         android:layout_weight="3">
 
         <TextView
-            style="@style/DiaryDayListTextViewStyle"
+            style="@style/DiaryListTextViewStyle"
             android:id="@+id/text_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/row_diary_list_word_search_result_views_layout_margin"
-            android:textAppearance="@style/DiaryListDayTextAppearance"
+            android:textAppearance="@style/DiaryListTextAppearance"
             android:textSize="20sp"
             android:hint="@string/row_diary_list_word_search_result_title_hint"
             android:maxLines="1"
@@ -37,25 +37,25 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            style="@style/DiaryDayListTextViewStyle"
+            style="@style/DiaryListTextViewStyle"
             android:id="@+id/text_item_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/row_diary_list_word_search_result_views_layout_margin"
-            android:textAppearance="@style/DiaryListDayTextAppearance"
+            android:textAppearance="@style/DiaryListTextAppearance"
             android:textSize="16sp"
             android:hint="@string/row_diary_list_word_search_result_item_hint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/text_title" />
 
         <TextView
-            style="@style/DiaryDayListTextViewStyle"
+            style="@style/DiaryListTextViewStyle"
             android:id="@+id/text_item_title"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/row_diary_list_word_search_result_views_layout_margin"
             android:layout_marginTop="@dimen/row_diary_list_word_search_result_views_layout_margin"
-            android:textAppearance="@style/DiaryListDayTextAppearance"
+            android:textAppearance="@style/DiaryListTextAppearance"
             android:textSize="16sp"
             android:hint="@string/row_diary_list_word_search_result_item_title_hint"
             android:maxLines="1"
@@ -65,7 +65,7 @@
             app:layout_constraintTop_toBottomOf="@+id/text_title" />
 
         <TextView
-            style="@style/DiaryDayListTextViewStyle"
+            style="@style/DiaryListTextViewStyle"
             android:id="@+id/text_item_comment"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -73,7 +73,7 @@
             android:layout_marginVertical="@dimen/row_diary_list_word_search_result_views_layout_margin"
             android:maxLines="4"
             android:ellipsize="end"
-            android:textAppearance="@style/DiaryListDayTextAppearance"
+            android:textAppearance="@style/DiaryListTextAppearance"
             android:textSize="14sp"
             android:hint="@string/row_diary_list_word_search_result_item_comment_hint"
             app:layout_constraintEnd_toEndOf="parent"

@@ -37,7 +37,7 @@
                 android:layout_weight="1" />
 
             <TextView
-                style="@style/DiaryDayListTextViewStyle"
+                style="@style/DiaryListTextViewStyle"
                 android:id="@+id/text_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -45,7 +45,7 @@
                 android:layout_gravity="center_vertical"
                 android:gravity="center_vertical"
                 android:hint="@string/row_diary_list_standard_title_hint"
-                android:textAppearance="@style/DiaryListDayTextAppearance"
+                android:textAppearance="@style/DiaryListTextAppearance"
                 android:textSize="20sp"
                 android:maxLines="1"
                 android:ellipsize="end" />
