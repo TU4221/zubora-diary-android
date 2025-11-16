@@ -29,23 +29,22 @@
     <string name="year_month_format_pattern_japanese_year_month">yyyy年M月</string>
     <!-- endregion -->
 
-    <!-- TODO: 接頭辞にenum -->
     <!-- region Enum - Day Of Week -->
-    <string name="day_of_week_name_sunday">日曜</string>
-    <string name="day_of_week_name_monday">月曜</string>
-    <string name="day_of_week_name_tuesday">火曜</string>
-    <string name="day_of_week_name_wednesday">水曜</string>
-    <string name="day_of_week_name_thursday">木曜</string>
-    <string name="day_of_week_name_friday">金曜</string>
-    <string name="day_of_week_name_saturday">土曜</string>
+    <string name="enum_day_of_week_name_sunday">日曜</string>
+    <string name="enum_day_of_week_name_monday">月曜</string>
+    <string name="enum_day_of_week_name_tuesday">火曜</string>
+    <string name="enum_day_of_week_name_wednesday">水曜</string>
+    <string name="enum_day_of_week_name_thursday">木曜</string>
+    <string name="enum_day_of_week_name_friday">金曜</string>
+    <string name="enum_day_of_week_name_saturday">土曜</string>
 
-    <string name="day_of_week_short_name_sunday">日</string>
-    <string name="day_of_week_short_name_monday">月</string>
-    <string name="day_of_week_short_name_tuesday">火</string>
-    <string name="day_of_week_short_name_wednesday">水</string>
-    <string name="day_of_week_short_name_thursday">木</string>
-    <string name="day_of_week_short_name_friday">金</string>
-    <string name="day_of_week_short_name_saturday">土</string>
+    <string name="enum_day_of_week_short_name_sunday">日</string>
+    <string name="enum_day_of_week_short_name_monday">月</string>
+    <string name="enum_day_of_week_short_name_tuesday">火</string>
+    <string name="enum_day_of_week_short_name_wednesday">水</string>
+    <string name="enum_day_of_week_short_name_thursday">木</string>
+    <string name="enum_day_of_week_short_name_friday">金</string>
+    <string name="enum_day_of_week_short_name_saturday">土</string>
     <!-- endregion -->
 
     <!-- region Enum - Weather -->
