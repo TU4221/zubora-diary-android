@@ -240,9 +240,9 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
             // セクションバー設定
             // 左端に余白を持たせる為、最初にスペースを入力。
             val context = binding.root.context
-            binding.textSection.text = item.yearMonth.formatYearMonthString(context)
+            binding.textHeader.text = item.yearMonth.formatYearMonthString(context)
             // 日記リストスクロール時に移動させているので、バインディング時に位置リセット
-            binding.textSection.y = 0f
+            binding.textHeader.y = 0f
         }
     }
 
