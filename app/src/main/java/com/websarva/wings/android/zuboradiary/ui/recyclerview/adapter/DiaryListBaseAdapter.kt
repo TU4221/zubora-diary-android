@@ -143,46 +143,6 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
         val holder = findOrCreateHeaderViewHolder(recyclerView, headerPosition)
         holder.bind(headerDataItem)
         return holder.itemView
-
-        // TODO:リスト最後尾の時だけヘッダーが上手く表示さない。
-        // ヘッダーポジションに対応するViewHolderを、再利用プールから取得する
-        /*val headerHolder =
-            recyclerView
-                .findViewHolderForAdapterPosition(headerPosition) as? DiaryListHeaderViewHolder
-
-        Log.d(
-            logTag,
-            "headerHolder = ${
-                if (headerHolder is DiaryListHeaderViewHolder) {
-                    headerHolder.date
-                } else {
-                    "miss"
-                }
-            }"
-        )*/
-
-        // iewHolderが画面外でnullの場合は、新しく生成してバインドする
-        /*return headerHolder?.itemView ?: run {
-            val createdHolder =
-                onCreateViewHolder(
-                    recyclerView,
-                    ViewType.HEADER.viewTypeNumber
-                ) as DiaryListHeaderViewHolder
-            onBindViewHolder(createdHolder, headerPosition)
-
-            // Viewを描画するためにmeasure/layoutを呼び出す
-            createdHolder.itemView.apply {
-                measure(
-                    View.MeasureSpec.makeMeasureSpec(
-                        recyclerView.width, View.MeasureSpec.EXACTLY
-                    ),
-                    View.MeasureSpec.makeMeasureSpec(
-                        0, View.MeasureSpec.UNSPECIFIED
-                    )
-                )
-                layout(0, 0, measuredWidth, measuredHeight)
-            }
-        }*/
     }
 
     /**

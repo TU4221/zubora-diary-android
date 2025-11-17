@@ -3,6 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.recyclerview.decoration
 import android.graphics.Canvas
 import android.view.View
 import androidx.core.graphics.withTranslation
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 internal class StickyHeaderDecoration(
@@ -13,8 +14,11 @@ internal class StickyHeaderDecoration(
         super.onDrawOver(c, parent, state)
 
         // リストの一番上に表示されているアイテムのポジションを取得
-        val topChild = parent.getChildAt(0) ?: return
-        val topChildPosition = parent.getChildAdapterPosition(topChild)
+        // MEMO:画面遷移時、MotionLayoutによりRecyclerViewの高さが変わる時がある為、
+        //      RecyclerViewから取得しようとすると安定して値を取得することができない(最後尾のアイテムポジションを取得する)。
+        //      その為、LinearLayoutManagerから取得するようにする。
+        val layoutManager = parent.layoutManager as? LinearLayoutManager ?: return
+        val topChildPosition = layoutManager.findFirstVisibleItemPosition()
         if (topChildPosition == RecyclerView.NO_POSITION) return
 
         // アイテムが属するヘッダーのViewを取得
