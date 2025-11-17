@@ -190,8 +190,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     }
 
     private fun showKeyboard() {
-        binding.textInputEditTextSearchWord.requestFocus()
-        keyboardManager.showKeyboard(binding.textInputEditTextSearchWord)
+        val textSearchWord = binding.textInputEditTextSearchWord.apply { requestFocus() }
+        keyboardManager.showKeyboard(textSearchWord)
     }
     //endregion
 
