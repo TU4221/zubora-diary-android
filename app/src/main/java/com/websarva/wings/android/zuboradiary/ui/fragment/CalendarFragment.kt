@@ -241,18 +241,20 @@ class CalendarFragment :
 
     // カレンダーBind設定
     private fun configureCalendarBinders(daysOfWeek: List<DayOfWeek>, themeColor: ThemeColorUi) {
-        val format = getString(R.string.fragment_calendar_month_header_format)
-        binding.calendar.monthHeaderBinder =
-            CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor, format)
+        with (binding.calendar) {
+            val format = getString(R.string.fragment_calendar_month_header_format)
+            monthHeaderBinder =
+                CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor, format)
 
-        binding.calendar.dayBinder =
-            CalendarMonthDayBinder(
-                themeColor,
-                { date: LocalDate -> mainViewModel.onCalendarDayClick(date) },
-                { date: LocalDate ->
-                    mainViewModel.onCalendarDayDotVisibilityCheck(date)
-                }
-            )
+            dayBinder =
+                CalendarMonthDayBinder(
+                    themeColor,
+                    { date: LocalDate -> mainViewModel.onCalendarDayClick(date) },
+                    { date: LocalDate ->
+                        mainViewModel.onCalendarDayDotVisibilityCheck(date)
+                    }
+                )
+        }
     }
 
     private class CalendarMonthHeaderFooterBinder(
