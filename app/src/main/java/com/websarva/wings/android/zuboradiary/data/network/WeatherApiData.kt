@@ -37,9 +37,9 @@ internal data class WeatherApiData @Suppress("unused") constructor(
      */
     // MEMO:constructorは直接使用されていないがRetrofit2(Moshi)にてインスタンス化している為、@Suppressで警告回避。
     data class WeatherApiResponseDairy @Suppress("unused") constructor(
-        @field:Json(name = "time")
+        @param:Json(name = "time")
         val timeList: List<String>,
-        @field:Json(name = "weather_code")
+        @param:Json(name = "weather_code")
         val weatherCodeList: List<Int>
     )
 }
