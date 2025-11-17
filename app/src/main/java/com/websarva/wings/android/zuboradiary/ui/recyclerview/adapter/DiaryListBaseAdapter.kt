@@ -254,7 +254,7 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
             oldItem: DiaryListItemUi<T>,
             newItem: DiaryListItemUi<T>
         ): Boolean {
-            val result = run {
+            val result = when {
                 // HACK:RecyclerViewの初回アイテム表示時にスクロール初期位置がズレる事がある。
                 //      原因はプログレスバーの存在。最初にアイテムを表示する時、読込中の意味を込めてプログレスバーのみを表示させている。
                 //      スクロール読込機能の仕様により、読込データをRecyclerViewに表示する際、アイテムリスト末尾にプログレスバーを追加している。
@@ -262,15 +262,15 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
                 //      ListAdapterクラスの仕様により表示されていたプログレスバーが更新後も表示されるようにスクロール位置がズレた。
                 //      プログレスバー同士が同一アイテムと認識されないようにするために、下記条件を追加して対策。
                 //      areContentsTheSame()では対応できない。
-                if (oldItem is DiaryListItemUi.ProgressIndicator) return@run false
+                oldItem is DiaryListItemUi.ProgressIndicator -> false
 
-                if (oldItem::class != newItem::class) return@run false
+                oldItem::class != newItem::class -> false
 
-                if (oldItem is DiaryListItemUi.Diary && newItem is DiaryListItemUi.Diary) {
-                    return@run oldItem.containerUi.id == newItem.containerUi.id
+                oldItem is DiaryListItemUi.Diary && newItem is DiaryListItemUi.Diary -> {
+                    oldItem.containerUi.id == newItem.containerUi.id
                 }
 
-                return@run true
+                else -> true
             }
             Log.d(
                 logTag,

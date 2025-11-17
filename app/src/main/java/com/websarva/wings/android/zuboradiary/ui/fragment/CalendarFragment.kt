@@ -363,12 +363,16 @@ class CalendarFragment :
                     else -> DayViewContainer.DayState.WEEKDAY
                 }
 
-            val dotIsVisible = dayDotVisibilityCache[calendarDay.date] ?: run {
-                if (calendarDay.position == DayPosition.MonthDate) {
-                    checkDiaryExists(calendarDay.date)
+            val cachedVisibility = dayDotVisibilityCache[calendarDay.date]
+            val dotIsVisible =
+                if (cachedVisibility == null) {
+                    if (calendarDay.position == DayPosition.MonthDate) {
+                        checkDiaryExists(calendarDay.date)
+                    }
+                    false // 初回は非表示にしておき、データ取得後に更新
+                } else {
+                    cachedVisibility
                 }
-                false // 初回は非表示にしておき、データ取得後に更新
-            }
 
             container.bind(
                 calendarDay,

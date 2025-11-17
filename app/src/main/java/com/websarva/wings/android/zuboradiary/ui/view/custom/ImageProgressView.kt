@@ -55,17 +55,15 @@ internal class ImageProgressView @JvmOverloads constructor (
             )
             errorIconDrawable = ContextCompat.getDrawable(context, errorIconRes)
 
+            val typedValue = TypedValue()
+            context.theme.resolveAttribute(
+                com.google.android.material.R.attr.colorOnSurfaceVariant,
+                typedValue,
+                true
+            )
             iconColorInt = typedArray.getColor(
                 R.styleable.ImageProgressView_iconTint,
-                run {
-                    val typedValue = TypedValue()
-                    context.theme.resolveAttribute(
-                        com.google.android.material.R.attr.colorOnSurfaceVariant,
-                        typedValue,
-                        true
-                    )
-                    typedValue.data
-                }
+                typedValue.data
             )
 
             val scaleTypeIndex = typedArray.getInt(
