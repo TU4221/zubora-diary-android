@@ -15,10 +15,10 @@ import com.websarva.wings.android.zuboradiary.data.location.exception.Permission
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import java.util.concurrent.TimeoutException
+import kotlinx.coroutines.withTimeout
 
 /**
  * Fused Location Provider APIを利用して位置情報を取得するデータソースクラス。
@@ -63,7 +63,7 @@ internal class FusedLocationDataSource(
             Log.i(logTag, "${logMsg}_開始")
             val cancellationTokenSource = CancellationTokenSource()
             try {
-                return@withContext withTimeoutOrNull(timeoutMillis) {
+                return@withContext withTimeout(timeoutMillis) {
                     val locationRequest =
                         CurrentLocationRequest.Builder()
                             // MEMO:"PRIORITY_BALANCED_POWER_ACCURACY"だとnullが返ってくることがある為、
@@ -78,14 +78,12 @@ internal class FusedLocationDataSource(
                         ).await()
 
                     if (location == null) {
-                        return@withTimeoutOrNull null
-                    } else {
-                        Log.i(logTag, "${logMsg}_完了_location:$location")
+                        Log.w(logTag, "${logMsg}_失敗_位置情報:null")
+                        throw LocationUnavailableException()
                     }
-                    return@withTimeoutOrNull location
-                } ?: run {
-                    Log.w(logTag, "${logMsg}_失敗_location:null")
-                    throw TimeoutException()
+
+                    Log.i(logTag, "${logMsg}_完了_位置情報:$location")
+                    return@withTimeout location
                 }
             } catch (e: SecurityException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
@@ -93,7 +91,7 @@ internal class FusedLocationDataSource(
             } catch (e: IllegalStateException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
                 throw LocationAccessException(e)
-            } catch (e: TimeoutException) {
+            } catch (e: TimeoutCancellationException) {
                 Log.e(logTag, "${logMsg}_失敗", e)
                 throw LocationUnavailableException(e)
             } finally {
