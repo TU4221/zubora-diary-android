@@ -232,7 +232,7 @@ class SettingsFragment :
             is SettingsUiEvent.NavigateAllDataDeleteDialog -> {
                 navigateAllDataDeleteDialog()
             }
-            is SettingsUiEvent.NavigateOpenSourceLicensesFragment -> {
+            is SettingsUiEvent.NavigateOSSLicensesDialog -> {
                 navigateOpenSourceSoftwareLicensesDialog()
             }
             is SettingsUiEvent.CheckPostNotificationsPermission -> {

@@ -428,7 +428,7 @@ class SettingsViewModel @Inject internal constructor(
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                SettingsUiEvent.NavigateOpenSourceLicensesFragment
+                SettingsUiEvent.NavigateOSSLicensesDialog
             )
         }
     }

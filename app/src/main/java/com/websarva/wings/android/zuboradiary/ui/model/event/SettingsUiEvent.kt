@@ -36,8 +36,7 @@ sealed class SettingsUiEvent : UiEvent {
     data object NavigateAllDataDeleteDialog : SettingsUiEvent()
 
     /** OSSライセンスダイアログへ遷移することを示すイベント。 */
-    // TODO:Fragment -> Dialog
-    data object NavigateOpenSourceLicensesFragment : SettingsUiEvent()
+    data object NavigateOSSLicensesDialog : SettingsUiEvent()
 
     /** 通知権限を確認することを示すイベント。 */
     data object CheckPostNotificationsPermission : SettingsUiEvent()
