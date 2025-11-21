@@ -1270,7 +1270,7 @@ class DiaryEditViewModel @Inject internal constructor(
     // MEMO:日記項目追加処理完了時のUi更新(編集中)は日記項目追加完了イベントメソッドにて処理
     private suspend fun addDiaryItem() {
         updateToInputDisabledState()
-        emitUiEvent(DiaryEditUiEvent.ItemAddition)
+        emitUiEvent(DiaryEditUiEvent.PrepareDiaryItemVisibleTransition)
         val numVisibleItems = currentUiState.numVisibleDiaryItems
         val additionItemNumber = numVisibleItems + 1
         updateUiState {
@@ -1297,7 +1297,7 @@ class DiaryEditViewModel @Inject internal constructor(
             deleteItem(itemNumber)
         } else {
             emitUiEvent(
-                DiaryEditUiEvent.TransitionDiaryItemToInvisibleState(itemNumber.value)
+                DiaryEditUiEvent.TransitionDiaryItemToInvisible(itemNumber.value)
             )
         }
     }

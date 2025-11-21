@@ -96,14 +96,13 @@ sealed class DiaryEditUiEvent : UiEvent {
      * 日記項目を非表示（削除）にするアニメーションを開始することを示すイベント。
      * @property itemNumber 非表示にする項目の番号。
      */
-    data class TransitionDiaryItemToInvisibleState(val itemNumber: Int) : DiaryEditUiEvent()
+    data class TransitionDiaryItemToInvisible(val itemNumber: Int) : DiaryEditUiEvent()
 
     /** 天気情報を取得する前に、位置情報権限を確認することを示すイベント。 */
     data object CheckAccessLocationPermissionBeforeWeatherInfoFetch : DiaryEditUiEvent()
 
-    //TODO:最適名称へ変更
-    /** 日記項目が追加されたことを示すイベント。 */
-    data object ItemAddition : DiaryEditUiEvent()
+    /** 日記項目を表示（追加）するアニメーション処理の準備を示すイベント。 */
+    data object PrepareDiaryItemVisibleTransition : DiaryEditUiEvent()
 
     /** ギャラリーから画像を選択する処理を開始することを示すイベント。 */
     data object SelectImage : DiaryEditUiEvent()

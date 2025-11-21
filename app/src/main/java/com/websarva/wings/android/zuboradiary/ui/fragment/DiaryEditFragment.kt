@@ -298,13 +298,13 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             is DiaryEditUiEvent.UpdateDiaryItemLayout -> {
                 renderItemLayouts(event.numVisibleItems)
             }
-            is DiaryEditUiEvent.TransitionDiaryItemToInvisibleState -> {
+            is DiaryEditUiEvent.TransitionDiaryItemToInvisible -> {
                 transitionDiaryItemToInvisible(event.itemNumber, false)
             }
             is DiaryEditUiEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch -> {
                 checkAccessLocationPermissionBeforeWeatherInfoFetch()
             }
-            is DiaryEditUiEvent.ItemAddition -> {
+            is DiaryEditUiEvent.PrepareDiaryItemVisibleTransition -> {
                 shouldTransitionItemMotionLayout = true
             }
             is DiaryEditUiEvent.SelectImage -> {
