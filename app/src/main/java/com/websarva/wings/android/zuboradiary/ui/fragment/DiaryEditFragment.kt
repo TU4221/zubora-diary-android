@@ -47,6 +47,15 @@ import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import kotlin.collections.map
 
+/**
+ * 日記の作成、編集を行うフラグメント。
+ *
+ * 以下の責務を持つ:
+ * - 新規日記の作成、または既存日記の編集
+ * - 日記の日付、天気、体調、タイトル、項目タイトル、項目コメント、画像の編集
+ * - 日記項目の追加、削除、および表示順の制御
+ * - 編集内容の保存、または保存せずに終了する際の確認処理
+ */
 @AndroidEntryPoint
 class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEvent>() {
 
@@ -59,18 +68,25 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     override val destinationId = R.id.navigation_diary_edit_fragment
 
+    /** 日記項目レイアウトのトランジションアニメーション時間(ms)。 */
     private val motionLayoutTransitionTime = 500 /*ms*/
 
+    /** 日記項目レイアウトのトランジションを即時完了させるための時間(ms)。 */
     private val motionLayoutJumpTime = 1 /*ms*/
 
+    /** 各日記項目のMotionLayoutインスタンスを保持する配列。 */
     private var itemMotionLayouts: Array<MotionLayout>? = null
 
+    /** 各日記項目のMotionLayoutリスナーを保持する配列。 */
     private var itemMotionLayoutListeners: Array<ItemMotionLayoutListener>? = null
 
+    /** 日記項目追加時のアニメーション実行を制御するフラグ。 */
     private var shouldTransitionItemMotionLayout = false
 
+    /** ソフトウェアキーボードを制御するマネージャークラス。 */
     private lateinit var keyboardManager: KeyboardManager
 
+    /** 画面の高さを取得する。 */
     private val screenHeight: Int
         get() {
             val windowManager =
@@ -85,6 +101,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             return screenHeight
         }
 
+    /** 端末のギャラリーから画像を選択した結果を処理するランチャー。 */
     // MEMO:端末ギャラリーから画像Uri取得。画像未選択時、nullを受け取る。
     private val openDocumentResultLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
@@ -94,10 +111,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region Fragment Lifecycle
+    /** 追加処理として、キーボード、ツールバー、および項目レイアウトの初期設定を行う。 */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupKeyboard()
         setupKeyboard()
         setupToolbar()
         setupItemMotionLayouts()
@@ -115,6 +132,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             }
     }
 
+    /** 追加処理として、各種リスナーとアダプターの解放を行う。 */
     override fun clearViewBindings() {
         binding.materialToolbarTopAppBar.setOnMenuItemClickListener(null)
 
@@ -122,9 +140,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         binding.autoCompleteTextWeather2.setAdapter(null)
         binding.autoCompleteTextCondition.setAdapter(null)
 
-        itemMotionLayouts?.forEach {
-            it.setTransitionListener(null)
-        }
+        itemMotionLayouts?.forEach { it.setTransitionListener(null) }
         itemMotionLayouts = null
         itemMotionLayoutListeners = null
 
@@ -146,7 +162,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         observeExitWithoutDiarySaveDialogResult()
     }
 
-    // DiaryItemTitleEditFragmentから編集結果受取
+    /** 日記項目タイトル編集ダイアログからの結果を監視する。 */
     private fun observeDiaryItemTitleEditFragmentResult() {
         observeFragmentResult(
             DiaryItemTitleEditDialog.RESULT_KEY
@@ -155,7 +171,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    // 既存日記読込ダイアログフラグメントから結果受取
+    /** 既存日記読込ダイアログからの結果を監視する。 */
     private fun observeDiaryLoadDialogResult() {
         observeDialogResult(
             DiaryLoadDialogFragment.RESULT_KEY
@@ -164,7 +180,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    // 日記読込失敗確認ダイアログフラグメントから結果受取
+    /** 日記読込失敗確認ダイアログからの結果を監視する。 */
     private fun observeDiaryLoadFailureDialogResult() {
         observeDialogResult(
             DiaryLoadFailureDialogFragment.RESULT_KEY
@@ -173,7 +189,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    // 既存日記上書きダイアログフラグメントから結果受取
+    /** 既存日記上書きダイアログからの結果を監視する。 */
     private fun observeDiaryUpdateDialogResult() {
         observeDialogResult(
             DiaryUpdateDialogFragment.RESULT_KEY
@@ -182,7 +198,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    // 既存日記上書きダイアログフラグメントから結果受取
+    /** 日記削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryDeleteDialogResult() {
         observeDialogResult(
             DiaryDeleteDialogFragment.RESULT_KEY
@@ -191,7 +207,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    // 日付入力ダイアログフラグメントからデータ受取
+    /** 日付選択ダイアログからの結果を監視する。 */
     private fun observeDatePickerDialogResult() {
         observeDialogResult(
             DatePickerDialogFragment.RESULT_KEY
@@ -200,7 +216,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    // 天気情報読込ダイアログフラグメントから結果受取
+    /** 天気情報読込ダイアログからの結果を監視する。 */
     private fun observeUpWeatherInfoFetchDialogResult() {
         observeDialogResult(
             WeatherInfoFetchDialogFragment.RESULT_KEY
@@ -209,7 +225,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    // 項目削除確認ダイアログフラグメントから結果受取
+    /** 項目削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryItemDeleteDialogResult() {
         observeDialogResult(
             DiaryItemDeleteDialogFragment.RESULT_KEY
@@ -218,6 +234,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    /** 添付画像削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryImageDeleteDialogResult() {
         observeDialogResult(
             DiaryImageDeleteDialogFragment.RESULT_KEY
@@ -226,6 +243,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    /** 未保存終了確認ダイアログからの結果を監視する。 */
     private fun observeExitWithoutDiarySaveDialogResult() {
         observeDialogResult(
             ExitWithoutDiarySaveDialogFragment.RESULT_KEY
@@ -242,7 +260,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 navigateDiaryShowFragment(event.id, event.date)
             }
             is DiaryEditUiEvent.NavigateDiaryItemTitleEditFragment -> {
-                navigateDiaryItemTitleEditFragment(event.diaryItemTitleSelection)
+                navigateDiaryItemTitleEditDialog(event.diaryItemTitleSelection)
             }
             is DiaryEditUiEvent.NavigateDiaryLoadDialog -> {
                 navigateDiaryLoadDialog(event.date)
@@ -315,6 +333,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         observeConditionDropdownOptions()
     }
 
+    /** ツールバーメニューの表示状態を監視する。 */
     private fun observeToolbarMenuState() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
@@ -327,6 +346,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    /** 天気1のドロップダウンメニューの選択肢を監視する。 */
     private fun observeWeather1DropdownOptions() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
@@ -339,6 +359,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    /** 天気2のドロップダウンメニューの選択肢を監視する。 */
     private fun observeWeather2DropdownOptions() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
@@ -351,6 +372,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    /** 体調のドロップダウンメニューの選択肢を監視する。 */
     private fun observeConditionDropdownOptions() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
@@ -365,6 +387,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region View Setup
+    /** ツールバーのメニューアイテムクリックリスナーを設定する。 */
     private fun setupToolbar() {
         binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
@@ -372,53 +395,61 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 when (item.itemId) {
                     R.id.diaryEditToolbarOptionSaveDiary -> {
                         mainViewModel.onDiarySaveMenuClick()
-                        return@setOnMenuItemClickListener true
+                        true
                     }
 
                     R.id.diaryEditToolbarOptionDeleteDiary -> {
                         mainViewModel.onDiaryDeleteMenuClick()
-                        return@setOnMenuItemClickListener true
+                        true
                     }
 
                     R.id.diaryEditToolbarOptionTest -> {
                         mainViewModel.test()
-                        return@setOnMenuItemClickListener true
+                        true
                     }
+
+                    else -> false
                 }
-                false
             }
     }
 
+    /** キーボード操作を管理するクラスを初期化する。 */
     private fun setupKeyboard() {
         keyboardManager = KeyboardManager(requireContext()).apply {
             registerKeyboardStateListener(this@DiaryEditFragment) { isVisible ->
                 if (!isVisible) return@registerKeyboardStateListener
-                if (!isSoftInputAdjustNothing()) return@registerKeyboardStateListener
 
-                val focusView =
-                    this@DiaryEditFragment.view?.findFocus() ?: return@registerKeyboardStateListener
-
-                val offset = screenHeight / 3
-                val location = IntArray(2)
-                focusView.getLocationOnScreen(location)
-                val positionY = location[1]
-                val scrollAmount = positionY - offset
-
-                binding.nestedScrollFullScreen.smoothScrollBy(0, scrollAmount)
+                ensureFocusedViewIsVisible()
             }
         }
     }
 
-    // MEMO:キーボード表示時、ActivityのLayoutが変更されない設定であるかを確認。
-    private fun isSoftInputAdjustNothing(): Boolean {
-        val softInputAdjust =
-            requireActivity().window.attributes.softInputMode and
-                    WindowManager.LayoutParams.SOFT_INPUT_MASK_ADJUST
-        return softInputAdjust == WindowManager.LayoutParams.SOFT_INPUT_ADJUST_NOTHING
+    /**
+     * キーボードが表示された際に、フォーカスされたViewが隠れないように画面をスクロールさせる。
+     *
+     * このアプリは`AndroidManifest.xml`で`windowSoftInputMode="adjustNothing"`に設定されているため、
+     * キーボード表示時にレイアウトが自動調整されない。
+     * 本メソッドは、その副作用で入力欄がキーボードに隠れる問題を解決するために、
+     * フォーカス位置まで手動でスクロールを実行する。
+     */
+    private fun ensureFocusedViewIsVisible() {
+        val focusView = this@DiaryEditFragment.view?.findFocus() ?: return
+
+        val offset = screenHeight / 3
+        val location = IntArray(2)
+        focusView.getLocationOnScreen(location)
+        val positionY = location[1]
+        val scrollAmount = positionY - offset
+
+        binding.nestedScrollFullScreen.smoothScrollBy(0, scrollAmount)
     }
     //endregion
 
     //region View Manipulation
+    /**
+     * ツールバーのメニューの各項目の有効/無効を切り替える。
+     * @param isDeleteEnabled 削除項目が有効場合はtrue
+     */
     private fun updateToolbarMenuState(isDeleteEnabled: Boolean) {
         val menu = binding.materialToolbarTopAppBar.menu
         val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
@@ -429,6 +460,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         testMenuItem.isEnabled = !isDeleteEnabled
     }
 
+    /**
+     * 天気1のドロップダウンアダプターを更新する。
+     * @param options 表示する天気の選択肢
+     */
     private fun updateWeather1DropdownAdapter(options: List<WeatherUi>) {
         val context = requireContext()
         val adapter =
@@ -440,6 +475,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         binding.autoCompleteTextWeather1.setAdapter(adapter)
     }
 
+    /**
+     * 天気2のドロップダウンアダプターを更新する。
+     * @param options 表示する天気の選択肢
+     */
     private fun updateWeather2DropdownAdapter(options: List<WeatherUi>) {
         val context = requireContext()
         val adapter =
@@ -451,6 +490,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         binding.autoCompleteTextWeather2.setAdapter(adapter)
     }
 
+    /**
+     * 体調のドロップダウンアダプターを更新する。
+     * @param options 表示する体調の選択肢
+     */
     private fun updateConditionDropdownAdapter(options: List<ConditionUi>) {
         val context = requireContext()
         val adapter =
@@ -464,6 +507,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region Motion Layout Setup
+    /**
+     * 日記項目に対応する[MotionLayout]の配列とそのリスナーを初期化し、関連付けを行う。
+     */
     private fun setupItemMotionLayouts() {
         itemMotionLayouts =
             binding.run {
@@ -498,6 +544,20 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     }
 
+    /**
+     * 各日記項目の[MotionLayout]における遷移イベントを監視するリスナー。
+     * MotionLayoutのアニメーション完了を検知し、状態に応じて
+     * スクロール処理の実行やViewModelへのイベント通知を行う責務を持つ。
+     * また、アニメーションがスムーズな遷移か、ジャンプによる状態変化かを判別するための状態も管理する。
+     *
+     * @property maxItemNumber 全日記項目の最大数。
+     * @property itemNumber このリスナーが担当する日記項目の番号。
+     * @property onDiaryItemTransitionToInvisibleCompleted 項目が「非表示」状態への遷移を完了したときに呼び出されるコールバック。
+     * @property onDiaryItemTransitionToVisibleCompleted 項目が「表示」状態への遷移を完了したときに呼び出されるコールバック。
+     * @property selectItemMotionLayout 指定された項目番号のMotionLayoutを取得するためのコールバック。
+     * @property smoothScroll 画面全体をスムーズスクロールさせるためのコールバック。
+     * @property getItemHeight 1項目あたりの高さを取得するためのコールバック。
+     */
     private class ItemMotionLayoutListener(
         private val maxItemNumber: Int,
         private val itemNumber: Int,
@@ -510,12 +570,21 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
         private val scrollTimeMotionLayoutTransition = 1000 /*ms*/
 
+        /** アニメーションがスムーズな遷移（ユーザー操作によるもの）か、ジャンプ（初期化など）かを区別するためのフラグ。 */
         private var isTriggeredBySmooth = false
 
+        /**
+         * 現在の遷移をスムーズなアニメーションとしてマークする。
+         * ユーザー操作による項目追加/削除アニメーションの開始前に呼び出す。
+         */
         fun markTransitionAsSmooth() {
             isTriggeredBySmooth = true
         }
 
+        /**
+         * 現在の遷移をジャンプ（アニメーションなし）としてマークする。
+         * 画面初期化時など、アニメーションを伴わない状態変化の際に呼び出す。
+         */
         fun markTransitionAsJump() {
             isTriggeredBySmooth = false
         }
@@ -548,7 +617,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                     onDiaryItemTransitionToInvisibleCompleted(itemNumber)
                 }
 
-            // 対象項目欄追加後の処理
+                // 対象項目欄追加後の処理
             } else if (currentId == R.id.motion_scene_edit_diary_item_visible_state) {
                 completedStateLogMsg = "VisibleState"
                 if (isTriggeredBySmooth) {
@@ -561,6 +630,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             isTriggeredBySmooth = false
         }
 
+        /**
+         * この項目の次の項目が「非表示」状態であるかを確認する。
+         *
+         * 本リスナの対象が最後の項目の場合は常にtrueを返す。
+         * これは、項目削除時に不要なスクロールが発生するのを防ぐために使用される。
+         */
         private fun isNextItemInvisibleState(): Boolean {
             if (itemNumber == maxItemNumber) return true
             val nextItemNumber = itemNumber.inc()
@@ -568,16 +643,25 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             return motionLayout.currentState == R.id.motion_scene_edit_diary_item_invisible_state
         }
 
-        // 対象項目追加後のスクロール処理
+        /**
+         * 日記項目が「表示」状態に遷移した後のスクロール処理を実行する。
+         */
         private fun scrollOnDiaryItemTransitionToVisible() {
             scrollOnDiaryItemTransition(true)
         }
 
-        // 対象項目削除後のスクロール処理
+        /**
+         * 日記項目が「非表示」状態に遷移した後のスクロール処理を実行する。
+         */
         private fun scrollOnDiaryItemTransitionToInvisible() {
             scrollOnDiaryItemTransition(false)
         }
 
+        /**
+         * 日記項目の高さに基づいて、画面全体をスクロールさせる。
+         *
+         * @param isUpDirection trueの場合は上方向（項目追加時）、falseの場合は下方向（項目削除時）にスクロールする。
+         */
         private fun scrollOnDiaryItemTransition(isUpDirection: Boolean) {
             val itemHeight = getItemHeight()
             val scrollY =
@@ -602,6 +686,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region Motion Layout Manipulation
+    /**
+     * 表示すべき日記項目数に応じて、各項目のレイアウト（表示/非表示）を更新・描画する。
+     *
+     * このメソッドは、画面初期化時や日記項目数が変更された際に呼び出される。
+     * 現在表示されている項目数と引数で渡された項目数を比較し、
+     * 差分に応じて各項目を[transitionDiaryItemToVisible]または[transitionDiaryItemToInvisible]へ遷移させる。
+     *
+     * @param numVisibleItems 表示すべき日記項目の総数。
+     */
     private fun renderItemLayouts(numVisibleItems: Int) {
         Log.d(logTag, "setupItemsLayout()_numItems = $numVisibleItems")
 
@@ -628,6 +721,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    /**
+     * 指定された番号の日記項目を「非表示」状態へ遷移させる。
+     *
+     * @param itemNumber 遷移させる日記項目の番号。
+     * @param isJump trueの場合はアニメーションなし（ジャンプ）、falseの場合はアニメーションあり（スムーズ）で遷移する。
+     */
     private fun transitionDiaryItemToInvisible(itemNumber: Int, isJump: Boolean) {
         Log.d("logTag", "transitionDiaryItemToInvisible()_itemNumber = $itemNumber, isJump = $isJump")
         val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber) ?: return
@@ -652,6 +751,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    /**
+     * 指定された番号の日記項目を「表示」状態へ遷移させる。
+     *
+     * @param itemNumber 遷移させる日記項目の番号。
+     * @param isJump trueの場合はアニメーションなし（ジャンプ）、falseの場合はアニメーションあり（スムーズ）で遷移する。
+     */
     private fun transitionDiaryItemToVisible(itemNumber: Int, isJump: Boolean) {
         Log.d("logTag", "transitionDiaryItemToVisible()_itemNumber = $itemNumber, isJump = $isJump")
         val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber) ?: return
@@ -676,6 +781,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    /**
+     * 指定された項目番号に対応する[MotionLayout]を返す。
+     *
+     * @param itemNumber 取得したい日記項目の番号。
+     * @return 対応するMotionLayout。見つからなければnull。
+     */
     private fun selectItemMotionLayout(itemNumber: Int): MotionLayout? {
         val arrayNumber = itemNumber - 1
         return itemMotionLayouts?.let {
@@ -687,6 +798,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    /**
+     * 指定された項目番号に対応する[ItemMotionLayoutListener]を返す。
+     *
+     * @param itemNumber 取得したい日記項目の番号。
+     * @return 対応するItemMotionLayoutListener。見つからなければnull。
+     */
     private fun selectItemMotionLayoutListener(itemNumber: Int): ItemMotionLayoutListener? {
         val arrayNumber = itemNumber - 1
         return itemMotionLayoutListeners?.let {
@@ -698,6 +815,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
+    /**
+     * 現在「表示」状態にある日記項目の数を数える。
+     *
+     * @return 表示状態のMotionLayoutの数。
+     */
     private fun countVisibleItems(): Int {
         return itemMotionLayouts?.let {
             it.count { motionLayout ->
@@ -708,6 +830,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region Navigation Helpers
+    /**
+     * 日記表示画面([DiaryShowFragment])へ遷移する。
+     * @param id 表示する日記のID
+     * @param date 表示する日記の日付
+     */
     private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
         // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
         val containsDiaryShowFragment =
@@ -728,7 +855,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
-    private fun navigateDiaryItemTitleEditFragment(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
+    /**
+     * 日記項目タイトル編集ダイアログ([DiaryItemTitleEditDialog])へ遷移する。
+     * @param diaryItemTitleSelection 編集対象の日記項目タイトル情報
+     */
+    private fun navigateDiaryItemTitleEditDialog(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemTitleEditDialog(
                 diaryItemTitleSelection
@@ -736,36 +867,60 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 既存日記読込ダイアログ([DiaryLoadDialogFragment])へ遷移する。
+     * @param date 読み込む日記の日付
+     */
     private fun navigateDiaryLoadDialog(date: LocalDate) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 日記読込失敗ダイアログ([DiaryLoadFailureDialogFragment])へ遷移する。
+     * @param date 読み込みに失敗した日記の日付
+     */
     private fun navigateDiaryLoadFailureDialog(date: LocalDate) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadFailureDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 既存日記上書きダイアログ([DiaryUpdateDialogFragment])へ遷移する。
+     * @param date 上書きする日記の日付
+     */
     private fun navigateDiaryUpdateDialog(date: LocalDate) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryUpdateDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 日記削除確認ダイアログ([DiaryDeleteDialogFragment])へ遷移する。
+     * @param date 削除する日記の日付
+     */
     private fun navigateDiaryDeleteDialog(date: LocalDate) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryDeleteDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 日付選択ダイアログ([DatePickerDialogFragment])へ遷移する。
+     * @param date 初期選択されている日付
+     */
     private fun navigateDatePickerDialog(date: LocalDate) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDatePickerDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 天気情報読込ダイアログ([WeatherInfoFetchDialogFragment])へ遷移する。
+     * @param date 天気情報を取得する日付
+     */
     private fun navigateWeatherInfoFetchDialog(date: LocalDate) {
         val directions =
             DiaryEditFragmentDirections
@@ -773,12 +928,17 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 項目削除確認ダイアログ([DiaryItemDeleteDialogFragment])へ遷移する。
+     * @param itemNumber 削除する項目の番号
+     */
     private fun navigateDiaryItemDeleteDialog(itemNumber: Int) {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** 添付画像削除確認ダイアログ([DiaryImageDeleteDialogFragment])へ遷移する。 */
     private fun navigateDiaryImageDeleteDialog() {
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryImageDeleteDialog()
@@ -791,6 +951,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
+    /** 日記を保存せずに終了することを確認するダイアログ([ExitWithoutDiarySaveDialogFragment])へ遷移する。 */
     private fun navigateExitWithoutDiarySaveConfirmationDialog() {
         val directions =
             DiaryEditFragmentDirections
@@ -798,6 +959,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 前の画面へ戻る（日記削除時専用）。
+     * @param result 遷移元へ返す結果
+     */
     private fun navigatePreviousFragmentOnDiaryDelete(result: FragmentResult.Some<LocalDate>) {
         val destinationId =
             try {
@@ -818,14 +983,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region Permission Handling
+    /** 位置情報へのアクセス権限を確認し、結果をViewModelに通知する。 */
     private fun checkAccessLocationPermissionBeforeWeatherInfoFetch() {
-        mainViewModel.onAccessLocationPermissionChecked(
-            requireContext().isAccessLocationGranted()
-        )
+        val isGranted = requireContext().isAccessLocationGranted()
+        mainViewModel.onAccessLocationPermissionChecked(isGranted)
     }
     //endregion
 
     internal companion object {
+        /** このフラグメントから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
     }
 }

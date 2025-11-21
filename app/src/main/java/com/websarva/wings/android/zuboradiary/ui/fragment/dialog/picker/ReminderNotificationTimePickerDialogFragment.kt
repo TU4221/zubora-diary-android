@@ -6,6 +6,9 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import java.time.LocalTime
 
+/**
+ * リマインダー通知の時刻を設定するための時刻選択ダイアログ。
+ */
 class ReminderNotificationTimePickerDialogFragment : BaseTimePickerDialogFragment() {
 
     override fun setupInitializationTime(builder: MaterialTimePicker.Builder) {
@@ -27,6 +30,7 @@ class ReminderNotificationTimePickerDialogFragment : BaseTimePickerDialogFragmen
     }
 
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + ReminderNotificationTimePickerDialogFragment::class.java.name
     }
 }

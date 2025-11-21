@@ -3,15 +3,18 @@ package com.websarva.wings.android.zuboradiary.ui.utils
 import android.content.Context
 import android.content.res.Resources
 import android.os.Build
+import android.widget.NumberPicker
 import androidx.core.content.res.ResourcesCompat
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.timepicker.MaterialTimePicker
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 
 //region StringConverter
-/**
- * ThemeColorUi enumに対応する文字列リソースIDを取得する拡張プロパティ。
- */
-internal val ThemeColorUi.stringResId: Int
+/** [ThemeColorUi]に対応する文字列リソースIDを返す。 */
+private val ThemeColorUi.stringResId: Int
     get() = when (this) {
         ThemeColorUi.WHITE -> R.string.enum_theme_color_white
         ThemeColorUi.BLACK -> R.string.enum_theme_color_black
@@ -22,7 +25,8 @@ internal val ThemeColorUi.stringResId: Int
     }
 
 /**
- * ThemeColorUiをContextを使ってローカライズされた文字列に変換する拡張関数。
+ * [ThemeColorUi]を、ユーザーに表示するためのローカライズされた文字列に変換する。
+ * @param context 文字列リソースを取得するためのコンテキスト。
  */
 internal fun ThemeColorUi.asString(context: Context): String {
     return context.getString(this.stringResId)
@@ -30,18 +34,14 @@ internal fun ThemeColorUi.asString(context: Context): String {
 //endregion
 
 //region ResourceProperties
-/**
- * ステータスバーのアイコン等を明るい色で表示するべきか (背景が暗い色か) を示す。
- */
+/** システムバーを明るい色で表示するべきかを判定する。 */
 internal val ThemeColorUi.isAppearanceLightStatusBars: Boolean
     get() = when (this) {
         ThemeColorUi.BLACK -> false
         ThemeColorUi.WHITE, ThemeColorUi.RED, ThemeColorUi.BLUE, ThemeColorUi.GREEN, ThemeColorUi.YELLOW -> true
     }
 
-/**
- * DatePickerDialogに適用するテーマのリソースIDを取得する。
- */
+/** [MaterialDatePicker]に適用するテーマのリソースIDを返す。 */
 internal val ThemeColorUi.datePickerDialogThemeResId: Int
     get() {
         return when (this) {
@@ -54,9 +54,7 @@ internal val ThemeColorUi.datePickerDialogThemeResId: Int
         }
     }
 
-/**
- * TimePickerDialogに適用するテーマのリソースIDを取得する。
- */
+/** [MaterialTimePicker]に適用するテーマのリソースIDを返す。 */
 internal val ThemeColorUi.timePickerDialogThemeResId: Int
     get() {
         return when (this) {
@@ -69,9 +67,7 @@ internal val ThemeColorUi.timePickerDialogThemeResId: Int
         }
     }
 
-/**
- * アプリケーション全体に適用するテーマのリソースIDを取得する。
- */
+/** アプリケーション全体に適用するテーマのリソースIDを返す。 */
 internal val ThemeColorUi.themeResId: Int
     get() {
         return when (this) {
@@ -85,7 +81,8 @@ internal val ThemeColorUi.themeResId: Int
     }
 
 /**
- * NumberPickerを含むBottomSheetDialogのViewをInflateする時のThemeResIdを取得する。
+ * [NumberPicker]を含むBottomSheetDialogのViewをInflateする時のテーマリソースIDを返す。
+ * APIレベル29未満かつ黒テーマの場合、[NumberPicker]の文字色（黒）が背景に埋もれるのを防ぐため、白テーマを強制的に適用する。
  */
 internal val ThemeColorUi.numberPickerBottomSheetDialogThemeResId: Int
     get() {
@@ -106,9 +103,7 @@ internal val ThemeColorUi.numberPickerBottomSheetDialogThemeResId: Int
         }
     }
 
-/**
- * AlertDialogに適用するテーマのリソースIDを取得する。
- */
+/** [MaterialAlertDialogBuilder]に適用するテーマのリソースIDを返す。 */
 internal val ThemeColorUi.alertDialogThemeResId: Int
     get() {
         return when (this) {
@@ -121,9 +116,7 @@ internal val ThemeColorUi.alertDialogThemeResId: Int
         }
     }
 
-/**
- * BottomSheetDialogに適用するテーマのリソースIDを取得する。
- */
+/** [BottomSheetDialogFragment]に適用するテーマのリソースIDを返す。 */
 internal val ThemeColorUi.bottomSheetDialogThemeResId: Int
     get() {
         return when (this) {
@@ -138,6 +131,7 @@ internal val ThemeColorUi.bottomSheetDialogThemeResId: Int
 //endregion
 
 //region ColorValueConverter
+/** PrimaryColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asPrimaryColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_primary
@@ -150,6 +144,7 @@ internal fun ThemeColorUi.asPrimaryColorInt(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** OnPrimaryColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asOnPrimaryColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onPrimary
@@ -162,6 +157,7 @@ internal fun ThemeColorUi.asOnPrimaryColorInt(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** OnPrimaryContainerColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asOnPrimaryContainerColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onPrimaryContainer
@@ -174,6 +170,7 @@ internal fun ThemeColorUi.asOnPrimaryContainerColorInt(resources: Resources): In
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** SecondaryColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asSecondaryColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_secondary
@@ -186,6 +183,7 @@ internal fun ThemeColorUi.asSecondaryColorInt(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** OnSecondaryColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asOnSecondaryColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onSecondary
@@ -198,6 +196,7 @@ internal fun ThemeColorUi.asOnSecondaryColorInt(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** SecondaryContainerColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asSecondaryContainerColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_secondaryContainer
@@ -210,6 +209,7 @@ internal fun ThemeColorUi.asSecondaryContainerColorInt(resources: Resources): In
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** OnSecondaryContainerColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asOnSecondaryContainerColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onSecondaryContainer
@@ -222,6 +222,7 @@ internal fun ThemeColorUi.asOnSecondaryContainerColorInt(resources: Resources): 
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** TertiaryContainerColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asTertiaryContainerColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_tertiaryContainer
@@ -234,6 +235,7 @@ internal fun ThemeColorUi.asTertiaryContainerColorInt(resources: Resources): Int
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** OnTertiaryContainerColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asOnTertiaryContainerColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onTertiaryContainer
@@ -246,6 +248,7 @@ internal fun ThemeColorUi.asOnTertiaryContainerColorInt(resources: Resources): I
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** SurfaceColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asSurfaceColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_surface
@@ -258,6 +261,7 @@ internal fun ThemeColorUi.asSurfaceColorInt(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** SurfaceContainerColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asSurfaceContainerColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_surfaceContainer
@@ -270,6 +274,7 @@ internal fun ThemeColorUi.asSurfaceContainerColorInt(resources: Resources): Int 
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** SurfaceContainerHighestColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asSurfaceContainerHighestColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_surfaceContainerHighest
@@ -282,6 +287,7 @@ internal fun ThemeColorUi.asSurfaceContainerHighestColorInt(resources: Resources
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** OnSurfaceColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asOnSurfaceColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onSurface
@@ -294,6 +300,7 @@ internal fun ThemeColorUi.asOnSurfaceColorInt(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** OnSurfaceVariantColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asOnSurfaceVariantColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_onSurfaceVariant
@@ -306,6 +313,7 @@ internal fun ThemeColorUi.asOnSurfaceVariantColorInt(resources: Resources): Int 
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** OutlineColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asOutlineColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_outline
@@ -318,6 +326,7 @@ internal fun ThemeColorUi.asOutlineColorInt(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** OutlineVariantColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asOutlineVariantColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_outlineVariant
@@ -330,6 +339,7 @@ internal fun ThemeColorUi.asOutlineVariantColorInt(resources: Resources): Int {
     return ResourcesCompat.getColor(resources, colorResId, null)
 }
 
+/** ErrorColorを色のInt値として返す。 */
 internal fun ThemeColorUi.asErrorColorInt(resources: Resources): Int {
     val colorResId = when (this) {
         ThemeColorUi.WHITE -> R.color.md_theme_color_white_error

@@ -23,11 +23,19 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 
+/**
+ * 日記のワード検索機能を提供するフラグメント。
+ *
+ * 以下の責務を持つ:
+ * - 入力されたキーワードで日記を検索し、結果を一覧表示する
+ * - スクロールに応じた追加の検索結果読み込み
+ * - 検索結果リストアイテムをタップした際の日記詳細画面への遷移
+ * - 画面表示時のキーボード自動表示
+ */
 @AndroidEntryPoint
 class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiEvent>() {
 
     //region Properties
-    // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
@@ -36,22 +44,27 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
 
     override val destinationId = R.id.navigation_word_search_fragment
 
+    /** ワード検索結果の日記リストを表示するためのRecyclerViewアダプター。 */
     private var wordSearchResultDiaryListAdapter: WordSearchResultDiaryListAdapter? = null
 
+    /** 日記リスト(RecyclerView)のセットアップを補助するヘルパークラス。 */
     private var diaryListSetupHelper: DiaryListSetupHelper? = null
 
+    /** FABを制御するためのスクロールリスナー。 */
     private var fabScrollListener: RecyclerView.OnScrollListener? = null
 
+    /** ソフトウェアキーボードを制御するマネージャークラス。 */
     private lateinit var keyboardManager: KeyboardManager
     //endregion
 
     //region Fragment Lifecycle
+    /** 追加処理として、日記リスト、先頭スクロールFAB、キーボードマネージャーの初期設定を行う。*/
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        setupWordSearchResultListAdapter()
-        setupFloatingActionButton()
-        setupKeyboard()
+        setupWordSearchResultList()
+        setupTopScrollFAB()
+        setupKeyboardManager()
 
         mainViewModel.onUiReady()
     }
@@ -74,6 +87,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
             }
     }
 
+    /** 追加処理として、リスナ、アダプタ等の解放を行う。*/
     override fun clearViewBindings() {
         binding.recyclerWordSearchResultList.adapter = null
         wordSearchResultDiaryListAdapter = null
@@ -93,7 +107,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
 
     //region Fragment Result Observation Setup
     override fun setupFragmentResultObservers() {
-        // 処理なし
+        // このフラグメントでは結果を受け取らないため、処理はなし
     }
     //endregion
 
@@ -126,6 +140,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         observeWordSearchResultListItem()
     }
 
+    /** ワード検索結果リストのデータの変更を監視し、UIを更新する。 */
     private fun observeWordSearchResultListItem() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
@@ -140,7 +155,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     //endregion
 
     //region View Setup
-    private fun setupWordSearchResultListAdapter() {
+    /** ワード検索結果リストを表示するRecyclerViewの初期設定を行う。 */
+    private fun setupWordSearchResultList() {
         val diaryRecyclerView = binding.recyclerWordSearchResultList
         wordSearchResultDiaryListAdapter = WordSearchResultDiaryListAdapter(
             themeColor
@@ -155,7 +171,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         }
     }
 
-    private fun setupFloatingActionButton() {
+    /** リスト先頭へスクロールするためのFloatingActionButtonを設定する。 */
+    private fun setupTopScrollFAB() {
         val fab = binding.floatingActionButtonTopScroll.apply {
             hide() // MEMO:初回起動用
             setOnClickListener {
@@ -175,12 +192,14 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         }.also { binding.recyclerWordSearchResultList.addOnScrollListener(it) }
     }
 
-    private fun setupKeyboard() {
+    /** キーボード操作を管理するクラスを初期化する。 */
+    private fun setupKeyboardManager() {
         keyboardManager = KeyboardManager(requireContext())
     }
     //endregion
 
     //region View Manipulation
+    /** アダプターに新しい検索結果リストを送信し、UIを更新する。 */
     private fun updateWordSearchResultList(
         list: DiaryListUi<DiaryListItemContainerUi.WordSearchResult>
     ) {
@@ -189,6 +208,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         }
     }
 
+    /** 検索ワード入力欄にフォーカスを当て、キーボードを表示する。 */
     private fun showKeyboard() {
         val textSearchWord = binding.textInputEditTextSearchWord.apply { requestFocus() }
         keyboardManager.showKeyboard(textSearchWord)
@@ -196,6 +216,11 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     //endregion
 
     //region Navigation Helpers
+    /**
+     * 日記表示画面([DiaryShowFragment])へ遷移する。
+     * @param id 表示する日記のID
+     * @param date 表示する日記の日付
+     */
     private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
         val directions =
             WordSearchFragmentDirections

@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.theme
 
 import android.content.res.ColorStateList
-import android.content.res.Resources
 import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.Window
@@ -33,51 +32,97 @@ import androidx.core.view.size
 import androidx.core.view.get
 
 /**
- * Enum ThemeColorをもとにViewの色を変更するクラス。
- * Activity、各Fragment共通処理を本クラスにまとめる。
- * 各Fragment固有のViewに対しては本クラスを継承して継承クラスにメソッドを追加する。
- * 本クラスに記述されている各Viewの色はアプリ背景色(SurfaceColor)を考慮して選定。
+ * UIコンポーネントのテーマカラーを動的に変更するためのヘルパークラス。
+ *
+ * このクラスは、[ThemeColorUi]に基づき、ステータスバー、ツールバー、ボトムナビゲーションビューなど、
+ * アプリケーション内の様々なViewの配色を適用する責務を持つ。
  */
 internal open class ThemeColorChanger {
 
-    protected fun View.requireResources(): Resources {
-        return requireNotNull(context.resources)
-    }
-
-    fun applyBackgroundColor(view: View, themeColor: ThemeColorUi) {
-        val resources = view.requireResources()
-        val surfaceColor = themeColor.asSurfaceColorInt(resources)
-        applyViewColor(view, surfaceColor)
-    }
-
-    fun applyTextColorOnBackground(textViewList: List<TextView>, themeColor: ThemeColorUi) {
-        require(textViewList.isNotEmpty())
-
-        val resources = textViewList.first().requireResources()
-        val onSurfaceColor = themeColor.asOnSurfaceColorInt(resources)
-        applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
-    }
-
-    fun applyRedTextColorOnBackground(textViewList: List<TextView>, themeColor: ThemeColorUi) {
-        require(textViewList.isNotEmpty())
-
-        val resources = textViewList.first().requireResources()
-        val onSurfaceColor = themeColor.asErrorColorInt(resources)
-        applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
-    }
-
+    // region System Bars
+    /**
+     * ステータスバーのアイコンの色（明/暗）をテーマカラーに応じて切り替える。
+     * @param window 対象のWindow。
+     * @param themeColor 適用するテーマカラー。
+     */
     fun applyStatusBarIconColor(window: Window, themeColor: ThemeColorUi) {
-        // ステータスバーのアイコンの色を変更(白 or 灰)
         val isLight = themeColor.isAppearanceLightStatusBars
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = isLight
     }
 
+    /**
+     * ナビゲーションバーのアイコンの色（明/暗）をテーマカラーに応じて切り替える。
+     * @param window 対象のWindow。
+     * @param themeColor 適用するテーマカラー。
+     */
     fun applyNavigationBarIconColor(window: Window, themeColor: ThemeColorUi) {
-        // ナビゲエーションバーのアイコンの色を変更
         val isLight = themeColor.isAppearanceLightStatusBars
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightNavigationBars = isLight
     }
+    // endregion
 
+    // region App Main View
+    // TODO:メソッド名にAppを付け加える
+    /**
+     * [View]の背景色にアプリケーションの基本的な背景色を適用する。
+     * @param view 対象のView。
+     * @param themeColor 適用するテーマカラー。
+     */
+    fun applyBackgroundColor(view: View, themeColor: ThemeColorUi) {
+        val resources = view.resources
+        val surfaceColor = themeColor.asSurfaceColorInt(resources)
+        applyViewColor(view, surfaceColor)
+    }
+
+    /**
+     * 複数の[TextView]に、アプリケーションの基本的な背景に対するテキストカラーを適用する。
+     * @param textViewList 対象のTextViewのリスト。
+     * @param themeColor 適用するテーマカラー。
+     */
+    fun applyTextColorOnBackground(textViewList: List<TextView>, themeColor: ThemeColorUi) {
+        require(textViewList.isNotEmpty())
+
+        val resources = textViewList.first().resources
+        val onSurfaceColor = themeColor.asOnSurfaceColorInt(resources)
+        applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
+    }
+
+    // TODO:メソッド名REd -> Error 変更
+    /**
+     * 複数の[TextView]に、アプリケーションの基本的なエラーを示す色のテキストカラーを適用する。
+     * @param textViewList 対象のTextViewのリスト。
+     * @param themeColor 適用するテーマカラー。
+     */
+    fun applyRedTextColorOnBackground(textViewList: List<TextView>, themeColor: ThemeColorUi) {
+        require(textViewList.isNotEmpty())
+
+        val resources = textViewList.first().resources
+        val onSurfaceColor = themeColor.asErrorColorInt(resources)
+        applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
+    }
+
+    /**
+     * 複数の[MaterialDivider]にアプリケーションの基本的な色を適用する。
+     * @param dividerList 対象のMaterialDividerのリスト。
+     * @param themeColor 適用するテーマカラー。
+     */
+    fun applyDividerColor(dividerList: List<MaterialDivider>, themeColor: ThemeColorUi) {
+        require(dividerList.isNotEmpty())
+        val resources = dividerList.first().resources
+
+        val color = themeColor.asOutlineVariantColorInt(resources)
+        dividerList.forEach(Consumer { x: MaterialDivider ->
+            x.dividerColor = color
+        })
+    }
+    // endregion
+
+    // region Bottom Navigation View
+    /**
+     * [BottomNavigationView]の全ての配色（背景、波紋、テキスト、アイコン、アクティブインジケータ）を適用する。
+     * @param bottomNavigationView 対象のBottomNavigationView。
+     * @param themeColor 適用するテーマカラー。
+     */
     fun applyBottomNavigationColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
@@ -89,21 +134,31 @@ internal open class ThemeColorChanger {
         applyBottomNavigationActiveIndicatorColor(bottomNavigationView, themeColor)
     }
 
+    /**
+     * [applyBottomNavigationColor]から呼び出され、背景色を適用する。
+     * @param bottomNavigationView 対象のBottomNavigationView。
+     * @param themeColor 適用するテーマカラー。
+     */
     private fun applyBottomNavigationBackgroundColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
-        val resources = bottomNavigationView.requireResources()
+        val resources = bottomNavigationView.resources
 
         val color = themeColor.asSurfaceContainerColorInt(resources)
         bottomNavigationView.backgroundTintList = ColorStateList.valueOf(color)
     }
 
+    /**
+     * [applyBottomNavigationColor]から呼び出され、アイテムの波紋色を適用する。
+     * @param bottomNavigationView 対象のBottomNavigationView。
+     * @param themeColor 適用するテーマカラー。
+     */
     private fun applyBottomNavigationItemRippleColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
-        val resources = bottomNavigationView.requireResources()
+        val resources = bottomNavigationView.resources
 
         val checkedColor = themeColor.asPrimaryColorInt(resources)
         val unCheckedColor = themeColor.asOnSurfaceVariantColorInt(resources)
@@ -111,11 +166,16 @@ internal open class ThemeColorChanger {
         bottomNavigationView.itemRippleColor = colorStateList
     }
 
+    /**
+     * [applyBottomNavigationColor]から呼び出され、アイテムのテキスト色を適用する。
+     * @param bottomNavigationView 対象のBottomNavigationView。
+     * @param themeColor 適用するテーマカラー。
+     */
     private fun applyBottomNavigationItemTextColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
-        val resources = bottomNavigationView.requireResources()
+        val resources = bottomNavigationView.resources
 
         val checkedColor = themeColor.asOnSurfaceColorInt(resources)
         val unCheckedColor = themeColor.asOnSurfaceVariantColorInt(resources)
@@ -123,11 +183,16 @@ internal open class ThemeColorChanger {
         bottomNavigationView.itemTextColor = colorStateList
     }
 
+    /**
+     * [applyBottomNavigationColor]から呼び出され、アイテムのアイコン色を適用する。
+     * @param bottomNavigationView 対象のBottomNavigationView。
+     * @param themeColor 適用するテーマカラー。
+     */
     private fun applyBottomNavigationItemIconColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
-        val resources = bottomNavigationView.requireResources()
+        val resources = bottomNavigationView.resources
 
         val checkedColor = themeColor.asOnSecondaryContainerColorInt(resources)
         val unCheckedColor = themeColor.asOnSurfaceVariantColorInt(resources)
@@ -135,19 +200,32 @@ internal open class ThemeColorChanger {
         bottomNavigationView.itemIconTintList = colorStateList
     }
 
+    /**
+     * [applyBottomNavigationColor]から呼び出され、アクティブなアイテムのインジケータ色を適用する。
+     * @param bottomNavigationView 対象のBottomNavigationView。
+     * @param themeColor 適用するテーマカラー。
+     */
     private fun applyBottomNavigationActiveIndicatorColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
-        val resources = bottomNavigationView.requireResources()
+        val resources = bottomNavigationView.resources
 
         val secondaryContainerColor = themeColor.asSecondaryContainerColorInt(resources)
         bottomNavigationView.itemActiveIndicatorColor =
             ColorStateList.valueOf(secondaryContainerColor)
     }
+    // endregion
 
+    // region Toolbar
+    /**
+     * [MaterialToolbar]の配色（背景、タイトル、メニューアイコン、ナビゲーションアイコン）を適用する。
+     * @param toolbar 対象のMaterialToolbar。
+     * @param themeColor 適用するテーマカラー。
+     * @param appBarLayout ツールバーを含むAppBarLayout（任意）。指定された場合、背景色が適用される。
+     */
     fun applyToolbarColor(toolbar: MaterialToolbar, themeColor: ThemeColorUi, appBarLayout: AppBarLayout? = null) {
-        val resources = toolbar.requireResources()
+        val resources = toolbar.resources
 
         val surfaceColor = themeColor.asSurfaceColorInt(resources)
         val onSurfaceColor = themeColor.asOnSurfaceColorInt(resources)
@@ -160,11 +238,21 @@ internal open class ThemeColorChanger {
         appBarLayout?.setBackgroundColor(surfaceColor)
     }
 
+    /**
+     * [applyToolbarColor]から呼び出され、ナビゲーションアイコンの色を適用する。
+     * @param toolbar 対象のMaterialToolbar。
+     * @param color 適用する色。
+     */
     private fun applyToolbarNavigationIconColor(toolbar: MaterialToolbar, color: Int) {
         val navigationIcon = toolbar.navigationIcon ?: return
         navigationIcon.setTint(color)
     }
 
+    /**
+     * [applyToolbarColor]から呼び出され、メニュー関連のアイコン（オーバーフロー、折りたたみ）の色を適用する。
+     * @param toolbar 対象のMaterialToolbar。
+     * @param color 適用する色。
+     */
     private fun applyToolbarMenuColor(toolbar: MaterialToolbar, color: Int) {
         val menuIcon = toolbar.overflowIcon
         menuIcon?.setTint(color)
@@ -175,6 +263,11 @@ internal open class ThemeColorChanger {
         applyToolbarMenuIconColor(toolbar, color)
     }
 
+    /**
+     * [applyToolbarMenuColor]から呼び出され、ツールバーのメニューアイテムに含まれる各アイコンの色を適用する。
+     * @param toolbar 対象のMaterialToolbar。
+     * @param color 適用する色。
+     */
     private fun applyToolbarMenuIconColor(toolbar: MaterialToolbar, color: Int) {
         val menu = toolbar.menu ?: return
 
@@ -186,16 +279,28 @@ internal open class ThemeColorChanger {
             icon?.setTint(color)
         }
     }
+    // endregion
 
+    // region Switch
+    /**
+     * [MaterialSwitch]の全ての配色（つまみ、つまみのアイコン、トラック）を適用する。
+     * @param switchList 対象のMaterialSwitchのリスト。
+     * @param themeColor 適用するテーマカラー。
+     */
     fun applySwitchColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
         applySwitchThumbColor(switchList, themeColor)
         applySwitchThumbIconColor(switchList, themeColor)
         applySwitchTrackColor(switchList, themeColor)
     }
 
+    /**
+     * [applySwitchColor]から呼び出され、スイッチのつまみの色を適用する。
+     * @param switchList 対象のMaterialSwitchのリスト。
+     * @param themeColor 適用するテーマカラー。
+     */
     private fun applySwitchThumbColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
         require(switchList.isNotEmpty())
-        val resources = switchList.first().requireResources()
+        val resources = switchList.first().resources
 
         val checkedColor = themeColor.asOnPrimaryColorInt(resources)
         val unCheckedColor = themeColor.asOutlineColorInt(resources)
@@ -205,9 +310,14 @@ internal open class ThemeColorChanger {
         })
     }
 
+    /**
+     * [applySwitchColor]から呼び出され、スイッチのつまみアイコンの色を適用する。
+     * @param switchList 対象のMaterialSwitchのリスト。
+     * @param themeColor 適用するテーマカラー。
+     */
     private fun applySwitchThumbIconColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
         require(switchList.isNotEmpty())
-        val resources = switchList.first().requireResources()
+        val resources = switchList.first().resources
 
         val checkedColor = themeColor.asOnPrimaryContainerColorInt(resources)
         val unCheckedColor = themeColor.asSurfaceContainerHighestColorInt(resources)
@@ -217,9 +327,14 @@ internal open class ThemeColorChanger {
         })
     }
 
+    /**
+     * [applySwitchColor]から呼び出され、スイッチのトラックの色を適用する。
+     * @param switchList 対象のMaterialSwitchのリスト。
+     * @param themeColor 適用するテーマカラー。
+     */
     private fun applySwitchTrackColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
         require(switchList.isNotEmpty())
-        val resources = switchList.first().requireResources()
+        val resources = switchList.first().resources
 
         val checkedColor = themeColor.asPrimaryColorInt(resources)
         val unCheckedColor = themeColor.asSurfaceContainerHighestColorInt(resources)
@@ -228,43 +343,79 @@ internal open class ThemeColorChanger {
             x.trackTintList = trackColorStateList
         })
     }
+    // endregion
 
-    fun applyDividerColor(dividerList: List<MaterialDivider>, themeColor: ThemeColorUi) {
-        require(dividerList.isNotEmpty())
-        val resources = dividerList.first().requireResources()
-
-        val color = themeColor.asOutlineVariantColorInt(resources)
-        dividerList.forEach(Consumer { x: MaterialDivider ->
-            x.dividerColor = color
-        })
-    }
-
-    // 共通処理
+    // region Helper
+    /**
+     * [View]の背景色を設定する共通ヘルパーメソッド。
+     * @param view 対象のView。
+     * @param color 適用する色。
+     */
     protected fun applyViewColor(view: View, color: Int) {
         view.setBackgroundColor(color)
     }
 
+    /**
+     * 複数の[TextView]の背景色とテキスト色を設定する共通ヘルパーメソッド。
+     * @param textViewList 対象のTextViewのリスト。
+     * @param color 適用する背景色。
+     * @param onColor 適用するテキスト色。
+     */
     protected fun applyTextViewsColor(textViewList: List<TextView>, color: Int, onColor: Int) {
-        textViewList.forEach(Consumer { x: TextView -> applyTextViewColor(x, color, onColor) })
+        textViewList.forEach {
+            applyTextViewColor(it, color, onColor)
+        }
     }
 
+    /**
+     * [TextView]の背景色とテキスト色を設定する共通ヘルパーメソッド。
+     * @param textView 対象のTextView。
+     * @param color 適用する背景色。
+     * @param onColor 適用するテキスト色。
+     */
     protected fun applyTextViewColor(textView: TextView, color: Int, onColor: Int) {
         textView.setBackgroundColor(color)
         textView.setTextColor(onColor)
     }
 
+    /**
+     * 複数の[TextView]のテキスト色のみを設定する共通ヘルパーメソッド。
+     * @param textViewList 対象のTextViewのリスト。
+     * @param onColor 適用するテキスト色。
+     */
     protected fun applyTextViewsColorOnlyText(textViewList: List<TextView>, onColor: Int) {
-        textViewList.forEach(Consumer { x: TextView -> applyTextViewColorOnlyText(x, onColor) })
+        textViewList.forEach {
+            applyTextViewColorOnlyText(it, onColor)
+        }
     }
 
+    //TODO:applyTextViewColor()にまとめる(引数をnullable)
+    /**
+     * [TextView]のテキスト色のみを設定する共通ヘルパーメソッド。
+     * @param textView 対象のTextView。
+     * @param color 適用するテキスト色。
+     */
     protected fun applyTextViewColorOnlyText(textView: TextView, color: Int) {
         textView.setTextColor(color)
     }
 
+    /**
+     * 複数の[TextView]のCompound Drawable（アイコン）の色合いを設定する共通ヘルパーメソッド。
+     * @param textViewList 対象のTextViewのリスト。
+     * @param color 適用する色。
+     */
     protected fun applyTextViewsColorOnlyIcon(textViewList: List<TextView>, color: Int) {
-        textViewList.forEach(Consumer { x: TextView -> applyTextViewColorOnlyIcon(x, color) })
+        textViewList.forEach {
+            applyTextViewColorOnlyIcon(it, color)
+        }
     }
 
+    // TODO:メソッド名変更
+    /**
+     * [TextView]のアイコン（Compound Drawable）の色を設定する共通ヘルパーメソッド。
+     * @param view 対象のTextView。
+     * @param color 適用する色。
+     */
     protected fun applyTextViewColorOnlyIcon(view: TextView, color: Int) {
         val drawables = view.compoundDrawablesRelative
         val wrappedDrawable = arrayOfNulls<Drawable>(drawables.size)
@@ -281,10 +432,22 @@ internal open class ThemeColorChanger {
         )
     }
 
+    /**
+     * [Drawable]の色合いを設定する共通ヘルパーメソッド。
+     * @param drawable 対象のDrawable。
+     * @param color 適用する色。
+     */
     protected fun applyDrawableColor(drawable: Drawable, color: Int) {
         drawable.setTint(color)
     }
 
+    /**
+     * ON/OFFの状態（[android.R.attr.state_checked]）に応じて
+     * 色を切り替える[ColorStateList]を生成する共通ヘルパーメソッド。
+     * @param checkedColor ON状態の色。
+     * @param unCheckedColor OFF状態の色。
+     * @return 生成されたColorStateList。
+     */
     protected fun createCheckedColorStateList(checkedColor: Int, unCheckedColor: Int): ColorStateList {
         val states = arrayOf(
             intArrayOf(android.R.attr.state_checked),  // ON状態
@@ -297,4 +460,5 @@ internal open class ThemeColorChanger {
 
         return ColorStateList(states, colors)
     }
+    // endregion
 }

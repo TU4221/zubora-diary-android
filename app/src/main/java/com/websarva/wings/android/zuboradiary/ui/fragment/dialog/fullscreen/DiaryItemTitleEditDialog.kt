@@ -14,7 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditVie
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.DiaryItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.SwipeSimpleInteractionHelper
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemTitleDeleteDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemTitleSelectionHistoryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -25,6 +25,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
 
+/**
+ * 日記の項目タイトルを編集、または過去の履歴から選択するための全画面ダイアログ。
+ *
+ * 以下の責務を持つ:
+ * - 項目タイトルの直接編集
+ * - 過去に使用したタイトル履歴の表示と選択
+ * - 履歴のスワイプによる削除機能
+ * - 選択、または編集したタイトルを呼び出し元に返す
+ */
 @AndroidEntryPoint
 class DiaryItemTitleEditDialog :
     BaseFullScreenDialogFragment<DialogDiaryItemTitleEditBinding, DiaryItemTitleEditUiEvent>() {
@@ -38,16 +47,18 @@ class DiaryItemTitleEditDialog :
 
     override val destinationId = R.id.navigation_diary_item_title_edit_dialog
 
-    private lateinit var selectionHistoryListAdapter: DiaryItemTitleSelectionHistoryListAdapter
+    /** 項目タイトル選択履歴を表示するためのRecyclerViewアダプター。 */
+    private var selectionHistoryListAdapter: DiaryItemTitleSelectionHistoryListAdapter? = null
 
+    /** 履歴リストのスワイプ操作を補助するヘルパークラス。 */
     private var swipeSimpleInteractionHelper: SwipeSimpleInteractionHelper? = null
     //endregion
 
     //region Fragment Lifecycle
+    /** 追加処理として、項目タイトル選択履歴のデータの監視と初期設定を行う。 */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        observeItemTitleSelectionHistoryListItem()
         setupItemTitleSelectionHistory()
     }
     //endregion
@@ -62,17 +73,27 @@ class DiaryItemTitleEditDialog :
                 viewModel = mainViewModel
             }
     }
+
+    override fun clearViewBindings() {
+        binding.recyclerItemTitleSelectionHistory.adapter = null
+        selectionHistoryListAdapter = null
+
+        swipeSimpleInteractionHelper?.cleanup()
+        swipeSimpleInteractionHelper = null
+
+        super.clearViewBindings()
+    }
     //endregion
 
     //region Fragment Result Observation Setup
     override fun setupFragmentResultObservers() {
-        setupDiaryItemTitleDeleteDialogResultReceiver()
+        observeDiaryItemTitleDeleteDialogResult()
     }
 
-    // 履歴項目削除確認ダイアログからの結果受取
-    private fun setupDiaryItemTitleDeleteDialogResultReceiver() {
+    /** 履歴項目削除確認ダイアログからの結果を監視する。 */
+    private fun observeDiaryItemTitleDeleteDialogResult() {
         observeDialogResult(
-            DiaryItemTitleDeleteDialogFragment.RESULT_KEY
+            DiaryItemTitleSelectionHistoryDeleteDialogFragment.RESULT_KEY
         ) { result ->
             mainViewModel.onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(result)
         }
@@ -110,46 +131,57 @@ class DiaryItemTitleEditDialog :
         }
     }
 
+    override fun setupUiStateObservers() {
+        super.setupUiStateObservers()
+
+        observeItemTitleSelectionHistoryListItem()
+    }
+
+    /** 項目タイトル選択履歴リストのデータの変更を監視し、UIを更新する。 */
     private fun observeItemTitleSelectionHistoryListItem() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
                 old.titleSelectionHistoriesLoadState == new.titleSelectionHistoriesLoadState
-            }.mapNotNull {
-                (it.titleSelectionHistoriesLoadState as? LoadState.Success)?.data
-            }.collect {
-                selectionHistoryListAdapter.submitList(it.itemList)
-            }
+            }.mapNotNull { (it.titleSelectionHistoriesLoadState as? LoadState.Success)?.data }
+                .collect { selectionHistoryListAdapter?.submitList(it.itemList) }
         }
     }
     //endregion
 
     //region View Setup
+    /** 項目タイトル選択履歴を表示するRecyclerViewの初期設定を行う。 */
     private fun setupItemTitleSelectionHistory() {
+        val recyclerView = binding.recyclerItemTitleSelectionHistory
         selectionHistoryListAdapter =
             DiaryItemTitleSelectionHistoryListAdapter(
                 themeColor
-            ) { mainViewModel.onDiaryItemTitleSelectionHistoryListItemClick(it) }
+            ) {
+                mainViewModel.onDiaryItemTitleSelectionHistoryListItemClick(it)
+            }.also { listAdapter ->
+                with(recyclerView) {
+                    adapter = listAdapter
+                    layoutManager = LinearLayoutManager(context)
+                    addItemDecoration(
+                        DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
+                    )
+                }
 
-        val recyclerView = binding.recyclerItemTitleSelectionHistory.apply {
-            adapter = selectionHistoryListAdapter
-            layoutManager = LinearLayoutManager(context)
-            addItemDecoration(
-                DividerItemDecoration(context, DividerItemDecoration.VERTICAL)
-            )
-        }
-
-        swipeSimpleInteractionHelper = SwipeSimpleInteractionHelper(
-            recyclerView,
-            selectionHistoryListAdapter
-        ) {
-            val item = selectionHistoryListAdapter.getItemAt(it)
-            mainViewModel.onDiaryItemTitleSelectionHistoryListItemSwipe(item)
-        }.apply { setup() }
+                swipeSimpleInteractionHelper = SwipeSimpleInteractionHelper(
+                    recyclerView,
+                    listAdapter
+                ) { position ->
+                    val item = listAdapter.getItemAt(position)
+                    mainViewModel.onDiaryItemTitleSelectionHistoryListItemSwipe(item)
+                }.apply { setup() }
+            }
     }
     //endregion
 
     //region Navigation Helpers
-    // DiaryItemTitleEditDialogを閉じる
+    /**
+     * 編集/選択したタイトルを結果として設定し、ダイアログを閉じる。
+     * @param diaryItemTitleSelection 呼び出し元に返すタイトル選択情報
+     */
     private fun completeItemTitleEdit(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
         navigatePreviousFragment(
             RESULT_KEY,
@@ -157,10 +189,14 @@ class DiaryItemTitleEditDialog :
         )
     }
 
+    /**
+     * 履歴項目削除確認ダイアログ([DiaryItemTitleSelectionHistoryDeleteDialogFragment])へ遷移する。
+     * @param itemTitle 削除対象の項目タイトル
+     */
     private fun navigateDiaryItemTitleDeleteDialog(itemTitle: String) {
         val directions =
             DiaryItemTitleEditDialogDirections
-                .actionDiaryItemTitleEditDialogToDiaryItemTitleDeleteDialog(itemTitle)
+                .actionDiaryItemTitleEditDialogToDiaryItemTitleSelectionHistoryDeleteDialog(itemTitle)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
@@ -174,6 +210,7 @@ class DiaryItemTitleEditDialog :
     //endregion
 
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryItemTitleEditDialog::class.java.name
     }
 }

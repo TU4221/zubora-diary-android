@@ -4,10 +4,8 @@ import android.content.Context
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 
-/**
- * ConditionUi enumに対応する文字列リソースIDを取得する拡張プロパティ。
- */
-internal val ConditionUi.stringResId: Int
+/** [ConditionUi]に対応する文字列リソースIDを返す。 */
+private val ConditionUi.stringResId: Int
     get() = when (this) {
         ConditionUi.UNKNOWN -> R.string.enum_condition_unknown
         ConditionUi.HAPPY -> R.string.enum_condition_happy
@@ -18,10 +16,8 @@ internal val ConditionUi.stringResId: Int
     }
 
 /**
- * ConditionUiをContextを使ってローカライズされた文字列に変換する拡張関数。
- *
- * @param context 文字列リソース解決のためのContext。
- * @return 対応する文字列。
+ * [ConditionUi]を、ユーザーに表示するための文字列に変換する。
+ * @param context 文字列リソースを取得するためのコンテキスト。
  */
 internal fun ConditionUi.asString(context: Context): String {
     return context.getString(this.stringResId)

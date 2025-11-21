@@ -7,15 +7,27 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.NumberPicker
 import androidx.appcompat.view.ContextThemeWrapper
 import com.websarva.wings.android.zuboradiary.databinding.DialogNumberPickersBinding
 import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceVariantColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.numberPickerBottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
+/**
+ * 複数の[NumberPicker]を持つボトムシートダイアログの基底クラス。
+ *
+ * 以下の責務を持つ:
+ * - [BaseBottomSheetDialogFragment]の機能の継承
+ * - 複数の[NumberPicker]を持つ共通レイアウトの提供
+ * - テーマカラーに応じた[NumberPicker]のテーマ適用とテキストカラー設定
+ * - 決定/キャンセルボタンのクリックイベント処理
+ * - [NumberPicker]の初期化処理の移譲
+ */
 abstract class BaseNumberPickersBottomSheetDialogFragment
     : BaseBottomSheetDialogFragment<DialogNumberPickersBinding>() {
 
+    /** 追加処理として、ボタンのリスナー設定とNumberPickerの初期化を行う。 */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -58,6 +70,20 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
             .inflate(cloneInflater, container, false)
     }
 
+    /** 追加処理として、リスナの解放を行う。*/
+    override fun clearViewBindings() {
+        with(binding) {
+            buttonDecision.setOnClickListener(null)
+            buttonCancel.setOnClickListener (null)
+        }
+
+        super.clearViewBindings()
+    }
+
+    /**
+     * NumberPickerのテキストカラーをテーマに合わせて設定する。
+     * @param binding カラーを設定するNumberPickerを含むViewBinding
+     */
     // HACK:NumberPickerの値はThemeが適用されず、TextColorはApiLevel29以上からしか変更できない。
     private fun setupNumberPickerTextColor(binding: DialogNumberPickersBinding) {
         if (Build.VERSION.SDK_INT >= 29) {
@@ -71,7 +97,10 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     }
 
     /**
-     * BaseBottomSheetDialogFragment.PositiveButtonClickListener#onClick()で呼び出される。
+     * 決定ボタンがクリックされた際の処理を定義する。
+     * @param firstPickerValue 1つ目のNumberPickerで選択された値
+     * @param secondPickerValue 2つ目のNumberPickerで選択された値
+     * @param thirdPickerValue 3つ目のNumberPickerで選択された値
      */
     protected abstract fun handleOnPositiveButtonClick(
         firstPickerValue: Int,
@@ -80,12 +109,12 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     )
 
     /**
-     * BaseBottomSheetDialogFragment.NegativeButtonClickListener#onClick()で呼び出される。
+     * キャンセルボタンがクリックされた際の処理を定義する。
      */
     protected abstract fun handleOnNegativeButtonClick()
 
     /**
-     * BaseNumberPickersBottomSheetDialogFragment#createDialogView()で呼び出される。
+     * 各NumberPickerの初期設定（最小値、最大値、初期値など）を行う。
      */
     protected abstract fun setupNumberPickers()
 }

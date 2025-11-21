@@ -30,12 +30,23 @@ import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import java.time.Year
 
+/**
+ * 日記を一覧表示をするフラグメント。
+ *
+ * 以下の責務を持つ:
+ * - データベースから日記を検索し、一覧表示する
+ * - スクロールに応じた追加の日記読み込み
+ * - 日記リストアイテムのスワイプによる削除機能
+ * - 日記リストアイテムをタップした際の日記表示画面への遷移
+ * - 新しい日記を作成するための画面遷移
+ * - ワード検索画面への遷移
+ */
 @AndroidEntryPoint
 class DiaryListFragment :
     BaseFragment<FragmentDiaryListBinding, DiaryListUiEvent>(),
     RequiresBottomNavigation,
     ActivityCallbackUiEventHandler {
-        
+
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -45,14 +56,18 @@ class DiaryListFragment :
     
     override val destinationId = R.id.navigation_diary_list_fragment
 
+    /** 日記リストを表示するためのRecyclerViewアダプター。 */
     private var diaryListAdapter: StandardDiaryListAdapter? = null
 
+    /** 日記リスト(RecyclerView)のセットアップを補助するヘルパークラス。 */
     private var diaryListSetupHelper: DiaryListSetupHelper? = null
 
+    /** RecyclerViewのスワイプ操作と背景ボタンのインタラクションを処理するヘルパークラス。 */
     private var swipeBackgroundButtonInteractionHelper: SwipeBackgroundButtonInteractionHelper? = null
     //endregion
 
     //region Fragment Lifecycle
+    /** 追加処理として、ツールバー、日記リストの初期設定を行う。*/
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -80,6 +95,7 @@ class DiaryListFragment :
             }
     }
 
+    /** 追加処理として、リスナ、アダプタ等の解放を行う。*/
     override fun clearViewBindings() {
         binding.materialToolbarTopAppBar.setOnMenuItemClickListener(null)
 
@@ -102,7 +118,7 @@ class DiaryListFragment :
         observeDiaryDeleteDialogResult()
     }
 
-    // 日付入力ダイアログフラグメントから結果受取
+    /** 開始年月の選択ダイアログからの結果を監視する。 */
     private fun observeDatePickerDialogResult() {
         observeDialogResult(
             StartYearMonthPickerDialogFragment.RESULT_KEY
@@ -111,7 +127,7 @@ class DiaryListFragment :
         }
     }
 
-    // 日記削除ダイアログフラグメントから結果受取
+    /** 日記削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryDeleteDialogResult() {
         observeDialogResult(
             DiaryListDeleteDialogFragment.RESULT_KEY
@@ -134,7 +150,7 @@ class DiaryListFragment :
                 navigateWordSearchFragment()
             }
             is DiaryListUiEvent.NavigateStartYearMonthPickerDialog -> {
-                navigateStartYearMonthPickerDialog(event.newestYear, event.oldestYear)
+                navigateStartYearMonthPickerDialog(event.maxYear, event.minYear)
             }
             is DiaryListUiEvent.NavigateDiaryDeleteDialog -> {
                 navigateDiaryDeleteDialog(event.date)
@@ -174,6 +190,7 @@ class DiaryListFragment :
         observeUiEventFromActivity()
     }
 
+    /** 日記リストのデータの変更を監視し、UIを更新する。 */
     private fun observeDiaryListItem() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
@@ -186,6 +203,7 @@ class DiaryListFragment :
         }
     }
 
+    /** 日記リストのスワイプ有効状態の変更を監視し、UIに反映する。 */
     private fun observeDiaryListSwipeEnabled() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.isLoadingOnScrolled.map { !it }.collect {
@@ -194,6 +212,7 @@ class DiaryListFragment :
         }
     }
 
+    /** ActivityからのUIイベントを監視する。 */
     private fun observeUiEventFromActivity() {
         fragmentHelper.observeActivityUiEvent(
             this,
@@ -204,6 +223,7 @@ class DiaryListFragment :
     //endregion
 
     //region View Setup
+    /** ツールバーのメニューアイテムクリックリスナーを設定する。 */
     private fun setupToolbar() {
         binding.materialToolbarTopAppBar
             .setOnMenuItemClickListener { item: MenuItem ->
@@ -216,6 +236,7 @@ class DiaryListFragment :
             }
     }
 
+    /** 日記リストを表示するRecyclerViewの初期設定を行う。 */
     private fun setupDiaryList() {
         val diaryRecyclerView = binding.recyclerDiaryList
         diaryListAdapter = StandardDiaryListAdapter(
@@ -223,15 +244,15 @@ class DiaryListFragment :
             { mainViewModel.onDiaryListItemClick(it) },
             { mainViewModel.onDiaryListItemDeleteButtonClick(it) }
         ).also { adapter ->
-            diaryListSetupHelper =
+            diaryListSetupHelper = 
                 DiaryListSetupHelper(
                     diaryRecyclerView,
                     adapter
-                ) {
+                ) { 
                     mainViewModel.onDiaryListEndScrolled()
                 }.apply { setup() }
 
-            swipeBackgroundButtonInteractionHelper =
+            swipeBackgroundButtonInteractionHelper = 
                 SwipeBackgroundButtonInteractionHelper(
                     diaryRecyclerView,
                     adapter
@@ -241,25 +262,33 @@ class DiaryListFragment :
     //endregion
 
     //region View Manipulation
+    /** アダプターに新しい日記リストを送信し、UIを更新する。 */
     private fun updateDiaryList(diaryList: DiaryListUi<DiaryListItemContainerUi.Standard>) {
         diaryListAdapter?.submitList(diaryList.itemList) {
             mainViewModel.onDiaryListUpdateCompleted()
         }
     }
 
+    /** 日記リストのスワイプ操作の有効/無効を切り替える。 */
     private fun updateDiaryListSwipeEnabled(isSwipeEnabled: Boolean) {
         swipeBackgroundButtonInteractionHelper?.updateItemSwipeEnabled(isSwipeEnabled)
     }
 
+    /** 日記リストの先頭までスムーズにスクロールする。 */
     private fun scrollDiaryListToFirstPosition() {
         binding.recyclerDiaryList.smoothScrollToPosition(0)
     }
     //endregion
 
     //region Navigation Helpers
+    /**
+     * 日記編集画面([DiaryEditFragment])へ遷移する。
+     * @param id 編集する日記のID（新規作成の場合はnull）
+     * @param date 対象の日付
+     *  */
     private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {
         Log.d("20250714", "navigateDiaryEditFragment()")
-        val directions =
+        val directions = 
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryEditFragment(
                 id,
                 date
@@ -267,23 +296,30 @@ class DiaryListFragment :
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 日記表示画面([DiaryShowFragment])へ遷移する。
+     * @param id 編集する日記のID（新規作成の場合はnull）
+     * @param date 対象の日付
+     * */
     private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
         Log.d("20250714", "navigateDiaryShowFragment()")
-        val directions =
+        val directions = 
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryShowFragment(id, date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** ワード検索画面([WordSearchFragment])へ遷移する。 */
     private fun navigateWordSearchFragment() {
         Log.d("20250714", "navigateWordSearchFragment()")
-        val directions =
+        val directions = 
             DiaryListFragmentDirections.actionNavigationDiaryListFragmentToWordSearchFragment()
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** 開始年月選択ダイアログ([StartYearMonthPickerDialogFragment])へ遷移する。 */
     private fun navigateStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
         Log.d("20250714", "navigateStartYearMonthPickerDialog()")
-        val directions =
+        val directions = 
             DiaryListFragmentDirections.actionDiaryListFragmentToStartYearMonthPickerDialog(
                 newestYear,
                 oldestYear
@@ -291,15 +327,16 @@ class DiaryListFragment :
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** 日記削除確認ダイアログ([DiaryListDeleteDialogFragment])へ遷移する。 */
     private fun navigateDiaryDeleteDialog(date: LocalDate) {
         Log.d("20250714", "navigateDiaryDeleteDialog")
-        val directions =
+        val directions = 
             DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
+        val directions = 
             DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }

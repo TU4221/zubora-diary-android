@@ -5,6 +5,10 @@ import com.websarva.wings.android.zuboradiary.R
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
+/**
+ * [LocalDate]を、日本語の日付書式（例: 2023年10月26日）の文字列に変換する。
+ * @param context 書式パターンを取得するためのコンテキスト。
+ */
 internal fun LocalDate.formatDateString(context: Context): String {
     val dateFormatPattern = context.getString(R.string.local_date_format_pattern_japanese_date)
     val dateFormatter = DateTimeFormatter.ofPattern(dateFormatPattern)

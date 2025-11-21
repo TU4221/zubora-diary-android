@@ -19,6 +19,15 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
 
+/**
+ * 日記の詳細情報を表示するフラグメント。
+ *
+ * 以下の責務を持つ:
+ * - 遷移元から渡されたIDに基づいて日記をデータベースから読み込む
+ * - 読み込んだ日記の内容を画面に表示する
+ * - ツールバーのメニュー（編集、削除）に応じた処理を実行する
+ * - 日記の読み込みに失敗した場合のエラー処理(一つ前の画面へ戻る)を行う
+ */
 @AndroidEntryPoint
 class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEvent>() {
 
@@ -33,6 +42,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     //endregion
 
     //region Fragment Lifecycle
+    /** 追加処理として、ツールバーの初期設定を行う。 */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -51,6 +61,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
             }
     }
 
+    /** 追加処理として、ツールバーのリスナー解放を行う。 */
     override fun clearViewBindings() {
         binding.materialToolbarTopAppBar.setOnMenuItemClickListener(null)
 
@@ -64,7 +75,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
         observeDiaryDeleteDialogResult()
     }
 
-    // 日記読込失敗確認ダイアログフラグメントからデータ受取
+    /** 日記読み込み失敗ダイアログからの結果を監視する。 */
     private fun observeDiaryLoadFailureDialogResult() {
         observeDialogResult(
             DiaryLoadFailureDialogFragment.RESULT_KEY
@@ -73,7 +84,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
         }
     }
 
-    // 日記削除確認ダイアログフラグメントからデータ受取
+    /** 日記削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryDeleteDialogResult() {
         observeDialogResult(
             DiaryDeleteDialogFragment.RESULT_KEY
@@ -117,6 +128,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     //endregion
 
     //region View Setup
+    /** ツールバーのメニューアイテムクリックリスナーを設定する。 */
     private fun setupToolbar() {
         binding.materialToolbarTopAppBar.setOnMenuItemClickListener { item: MenuItem ->
             // 日記編集フラグメント起動
@@ -133,6 +145,11 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     //endregion
 
     //region Navigation Helpers
+    /**
+     * 日記編集画面([DiaryEditFragment])へ遷移する。
+     * @param id 編集対象の日記ID
+     * @param date 編集対象の日記の日付
+     */
     private fun navigateDiaryEditFragment(id: String, date: LocalDate) {
         val directions =
             DiaryShowFragmentDirections.actionNavigationDiaryShowFragmentToDiaryEditFragment(
@@ -142,12 +159,20 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 日記読み込み失敗ダイアログ([DiaryLoadFailureDialogFragment])へ遷移する。
+     * @param date 読み込みに失敗した日記の日付
+     */
     private fun navigateDiaryLoadFailureDialog(date: LocalDate) {
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryLoadFailureDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * 日記削除確認ダイアログ([DiaryDeleteDialogFragment])へ遷移する。
+     * @param date 削除対象の日記の日付
+     */
     private fun navigateDiaryDeleteDialog(date: LocalDate) {
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteDialog(date)
@@ -162,6 +187,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     //endregion
 
     internal companion object {
+        /** このフラグメントから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
     }
 }

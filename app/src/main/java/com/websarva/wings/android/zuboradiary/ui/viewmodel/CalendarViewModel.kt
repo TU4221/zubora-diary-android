@@ -33,6 +33,17 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import javax.inject.Inject
 
+/**
+ * カレンダー画面のUIロジックと状態([CalendarUiState])管理を担うViewModel。
+ *
+ * 以下の責務を持つ:
+ * - カレンダーの表示設定（週の開始曜日など）の読み込み
+ * - ユーザーによって選択された日付に対応する日記データの有無を確認し、読み込む
+ * - 読み込んだ日記データをUI表示用に加工し、UI状態を更新する
+ * - 日記の有無に応じてカレンダーの日付へのドット表示を制御する
+ * - 日記編集画面や前の画面への遷移イベントを発行する
+ * - [SavedStateHandle]を利用して、プロセスの再生成後もUI状態を復元する
+ */
 @HiltViewModel
 class CalendarViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
@@ -47,16 +58,19 @@ class CalendarViewModel @Inject internal constructor(
 ) {
 
     //region Properties
+    /** このViewModelが操作を受け入れ可能な状態かを示す。 */
     override val isReadyForOperation
         get() = !currentUiState.isInputDisabled
                 && (currentUiState.diaryLoadState is LoadState.Success
                         || currentUiState.diaryLoadState is LoadState.Empty)
 
+    /** UI状態から正常に読み込まれた日記データのみを抽出して提供するFlow。 */
     private val diaryFlow =
         uiState.distinctUntilChanged { old, new ->
             old.diaryLoadState == new.diaryLoadState
         }.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
+    /** カレンダーのスクロールをスムーズに行うべきかを示すフラグ。 */
     private var shouldSmoothScroll = false
     //endregion
 
@@ -65,6 +79,7 @@ class CalendarViewModel @Inject internal constructor(
         collectUiStates()
     }
 
+    /** UI状態の監視を開始する。 */
     private fun collectUiStates() {
         collectUiStateForSaveStateToHandle()
         collectCalendarStartDayOfWeekSetting()
@@ -74,6 +89,7 @@ class CalendarViewModel @Inject internal constructor(
         collectImageFilePath()
     }
 
+    /** UI状態を[SavedStateHandle]に保存する。 */
     private fun collectUiStateForSaveStateToHandle() {
         uiState.onEach { 
             Log.d(logTag, it.toString())
@@ -81,6 +97,7 @@ class CalendarViewModel @Inject internal constructor(
         }.launchIn(viewModelScope)
     }
 
+    /** 週の開始曜日設定の変更を監視し、UIに反映させる。 */
     private fun collectCalendarStartDayOfWeekSetting() {
         loadCalendarStartDayOfWeekSettingUseCase()
             .onEach {
@@ -109,6 +126,7 @@ class CalendarViewModel @Inject internal constructor(
             }.launchIn(viewModelScope)
     }
 
+    /** 選択された日付の変更を監視し、対応する日記の準備を行う。 */
     private fun collectSelectedDate() {
         viewModelScope.launch {
             uiState.distinctUntilChanged{ old, new ->
@@ -121,6 +139,7 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /** 天気2の表示/非表示状態の変更を監視し、UIに反映させる。 */
     private fun collectWeather2Visible() {
         diaryFlow.distinctUntilChanged{ old, new ->
             old.weather1 == new.weather1 && old.weather2 == new.weather2
@@ -131,6 +150,7 @@ class CalendarViewModel @Inject internal constructor(
         }.launchIn(viewModelScope)
     }
 
+    /** 表示されている日記項目数の変更を監視し、UIに反映させる。 */
     private fun collectNumVisibleDiaryItems() {
         diaryFlow.distinctUntilChanged{ old, new ->
             old.itemTitles == new.itemTitles
@@ -141,6 +161,7 @@ class CalendarViewModel @Inject internal constructor(
         }.launchIn(viewModelScope)
     }
 
+    /** 添付画像のファイルパスの変更を監視し、UIに反映させる。 */
     private fun collectImageFilePath() {
         diaryFlow.distinctUntilChanged{ old, new ->
             old.imageFileName == new.imageFileName
@@ -163,16 +184,30 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * カレンダーの日付セルがクリックされた時に呼び出される事を想定。
+     * 選択された日付を更新する。
+     * @param date クリックされた日付
+     */
     internal fun onCalendarDayClick(date: LocalDate) {
         updateSelectedDate(date)
     }
 
+    /**
+     * カレンダーの日付に日記有無のドットを表示する必要があるか確認する時に呼び出される事を想定。
+     * 日記の有無を確認し、ドットの表示状態を更新する。
+     * @param date 確認対象の日付
+     */
     internal fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
         launchWithUnexpectedErrorHandler {
             refreshCalendarDayDot(date)
         }
     }
 
+    /**
+     * 日記編集ボタンがクリックされた時に呼び出される事を想定。
+     * 日記編集画面へ遷移するイベントを発行する。
+     * */
     fun onDiaryEditButtonClick() {
         if (!isReadyForOperation) return
 
@@ -202,6 +237,10 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * カレンダー画面が表示されている状態で、再度ボトムナビゲーションの同タブが選択された時に呼び出される事を想定。
+     * カレンダーを今日の日付までスクロールさせる。
+     * */
     internal fun onBottomNavigationItemReselect() {
         if (!isReadyForOperation) return
 
@@ -221,6 +260,11 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 日記表示画面から戻ってきた時に呼び出される事を想定。
+     * 選択された日付を更新する。
+     * @param result 日記表示画面からの戻り値
+     */
     internal fun onDiaryShowFragmentResultReceived(result: FragmentResult<LocalDate>) {
         when (result) {
             is FragmentResult.Some -> updateSelectedDate(result.data)
@@ -230,6 +274,11 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 日記編集画面から戻ってきた時に呼び出される事を想定。
+     * 選択された日付を更新する。
+     * @param result 日記編集画面からの戻り値
+     */
     internal fun onDiaryEditFragmentResultReceived(result: FragmentResult<LocalDate>) {
         when (result) {
             is FragmentResult.Some -> updateSelectedDate(result.data)
@@ -241,6 +290,10 @@ class CalendarViewModel @Inject internal constructor(
     //endregion
 
     //region Business Logic
+    /**
+     * 指定された日付の表示準備を行う。カレンダーのスクロールと日記の読み込みを開始する。
+     * @param date 準備対象の日付
+     */
     private suspend fun prepareDiary(date: LocalDate) {
         val action =
             if (shouldSmoothScroll) {
@@ -259,6 +312,10 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 指定された日付に保存されている日記を読み込む。
+     * @param date 読み込み対象の日付
+     */
     private suspend fun loadSavedDiary(date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
@@ -277,12 +334,21 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 指定された日付のドット表示を、日記の有無に応じて更新するイベントを発行する。
+     * @param date 更新対象の日付
+     */
     private suspend fun refreshCalendarDayDot(date: LocalDate) {
         emitUiEvent(
             CalendarUiEvent.RefreshCalendarDayDotVisibility(date, existsSavedDiary(date))
         )
     }
 
+    /**
+     * 指定された日付に日記が存在するかどうかを確認する。
+     * @param date 確認対象の日付
+     * @return 日記が存在する場合はtrue
+     */
     private suspend fun existsSavedDiary(date: LocalDate): Boolean {
         when (val result = doesDiaryExistUseCase(date)) {
             is UseCaseResult.Success -> return result.value
@@ -302,10 +368,18 @@ class CalendarViewModel @Inject internal constructor(
     //endregion
 
     //region UI State Update
+    /**
+     * 週の開始曜日を更新する。
+     * @param dayOfWeek 新しい週の開始曜日
+     */
     private fun updateCalendarStartDayOfWeek(dayOfWeek: DayOfWeek) {
         updateUiState { it.copy(calendarStartDayOfWeek = dayOfWeek) }
     }
 
+    /**
+     * 選択された日付を更新する。
+     * @param date 新しく選択された日付
+     */
     private fun updateSelectedDate(date: LocalDate) {
         // MEMO:selectedDateと同日付を選択した時、previousSelectedDateと同値となり、
         //      次に他の日付を選択した時にpreviousSelectedDateのcollectedが起動しなくなる。
@@ -320,18 +394,31 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 天気2の表示状態を更新する。
+     * @param isVisible 表示する場合はtrue
+     */
     private fun updateIsWeather2Visible(isVisible: Boolean) {
         updateUiState { it.copy(isWeather2Visible = isVisible) }
     }
 
+    /**
+     * 表示されている日記項目数を更新する。
+     * @param count 表示する日記項目の数
+     */
     private fun updateNumVisibleDiaryItems(count: Int) {
         updateUiState { it.copy(numVisibleDiaryItems = count) }
     }
 
+    /**
+     * 添付画像のファイルパスを更新する。
+     * @param path 新しいファイルパス
+     */
     private fun updateDiaryImageFilePath(path: FilePathUi?) {
         updateUiState { it.copy(diaryImageFilePath = path) }
     }
 
+    /** UIを日記読み込み中の状態に更新する。 */
     private fun updateToDiaryLoadingState() {
         updateUiState {
             it.copy(
@@ -342,6 +429,10 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * UIを日記読み込み成功の状態に更新する。
+     * @param diary 読み込んだ日記データ
+     */
     private fun updateToDiaryLoadSuccessState(diary: DiaryUi) {
         updateUiState {
             it.copy(
@@ -352,6 +443,7 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /** UIを日記読み込み失敗の状態に更新する。 */
     private fun updateToDiaryLoadErrorState() {
         updateUiState {
             it.copy(
@@ -362,6 +454,7 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    /** UIを日記なしの状態に更新する。 */
     private fun updateToNoDiaryState() {
         updateUiState {
             it.copy(
@@ -374,12 +467,17 @@ class CalendarViewModel @Inject internal constructor(
     //endregion
 
     //region Internal State Update
+    /**
+     * スムーズスクロールが必要かどうかのフラグを更新する。
+     * @param shouldScroll スムーズスクロールが必要な場合はtrue
+     */
     private fun updateShouldSmoothScroll(shouldScroll: Boolean) {
         shouldSmoothScroll = shouldScroll
     }
     //endregion
 
     private companion object {
+        /** SavedStateHandleにUI状態を保存するためのキー。 */
         const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }

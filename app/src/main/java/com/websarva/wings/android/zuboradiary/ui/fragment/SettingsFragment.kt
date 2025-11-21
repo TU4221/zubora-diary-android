@@ -23,6 +23,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDiarie
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllSettingsInitializationDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.CalendarStartDayPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.PermissionDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.OpenSourceSoftwareLicensesDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment
@@ -41,6 +42,16 @@ import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
 import kotlin.getValue
 
+/**
+ * アプリケーションの設定を管理するフラグメント。
+ *
+ * 以下の責務を持つ:
+ * - デザイン設定（テーマカラー、週の開始曜日）の変更
+ * - 機能設定（リマインダー通知、パスコード、天気情報取得）のON/OFF
+ * - データ管理（全日記削除、設定初期化、全データ削除）
+ * - OSSライセンスダイアログへの遷移
+ * - 各種権限（通知、位置情報）の要求と状態反映
+ */
 @AndroidEntryPoint
 class SettingsFragment :
     BaseFragment<FragmentSettingsBinding, SettingsUiEvent>(),
@@ -48,7 +59,6 @@ class SettingsFragment :
     ActivityCallbackUiEventHandler {
         
     //region Properties
-    // ViewModel
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
@@ -56,7 +66,7 @@ class SettingsFragment :
 
     override val destinationId = R.id.navigation_settings_fragment
 
-    // ActivityResultLauncher関係
+    /** 通知権限のリクエスト結果を処理するランチャー。 */
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private val requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(
@@ -72,7 +82,7 @@ class SettingsFragment :
                 )
         }
 
-    // 位置情報利用権限取得結果処理
+    /** 位置情報権限のリクエスト結果を処理するランチャー。 */
     private val requestAccessLocationPermissionLauncher: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
@@ -93,8 +103,15 @@ class SettingsFragment :
     //endregion
 
     //region Fragment Lifecycle
+    /** 追加処理として、各権限の状態を対応する設定スイッチに反映させる。 */
     override fun onStart() {
         super.onStart()
+
+        initializeSettingsFromPermission()
+    }
+
+    /** 各権限の状態を対応する設定スイッチに反映させる。 */
+    private fun initializeSettingsFromPermission() {
         initializeReminderNotificationSettingFromPermission()
         initializeWeatherInfoFetchSettingFromPermission()
     }
@@ -124,7 +141,7 @@ class SettingsFragment :
         observeAllDataDeleteDialogResult()
     }
 
-    // テーマカラー設定ダイアログフラグメントから結果受取
+    /** テーマカラー選択ダイアログからの結果を監視する。 */
     private fun observeThemeColorPickerDialogResult() {
         observeDialogResult(
             ThemeColorPickerDialogFragment.RESULT_KEY
@@ -133,7 +150,7 @@ class SettingsFragment :
         }
     }
 
-    // カレンダー開始曜日設定ダイアログフラグメントから結果受取
+    /** カレンダー開始曜日選択ダイアログからの結果を監視する。 */
     private fun observeCalendarStartDayPickerDialogResult() {
         observeDialogResult(
             CalendarStartDayPickerDialogFragment.RESULT_KEY
@@ -142,7 +159,7 @@ class SettingsFragment :
         }
     }
 
-    // リマインダー通知時間設定ダイアログフラグメントから結果受取
+    /** リマインダー通知時間選択ダイアログからの結果を監視する。 */
     private fun observeReminderNotificationTimePickerDialogResult() {
         observeDialogResult(
             ReminderNotificationTimePickerDialogFragment.RESULT_KEY
@@ -151,7 +168,7 @@ class SettingsFragment :
         }
     }
 
-    // 権限催促ダイアログフラグメントから結果受取
+    /** 権限要求の理由説明ダイアログからの結果を監視する。 */
     private fun observePermissionDialogResult() {
         observeDialogResult(
             PermissionDialogFragment.RESULT_KEY
@@ -160,6 +177,7 @@ class SettingsFragment :
         }
     }
 
+    /** 全日記削除確認ダイアログからの結果を監視する。 */
     private fun observeAllDiariesDeleteDialogResult() {
         observeDialogResult(
             AllDiariesDeleteDialogFragment.RESULT_KEY
@@ -168,6 +186,7 @@ class SettingsFragment :
         }
     }
 
+    /** 全設定初期化確認ダイアログからの結果を監視する。 */
     private fun observeAllSettingsInitializationDialogResult() {
         observeDialogResult(
             AllSettingsInitializationDialogFragment.RESULT_KEY
@@ -176,6 +195,7 @@ class SettingsFragment :
         }
     }
 
+    /** 全データ削除確認ダイアログからの結果を監視する。 */
     private fun observeAllDataDeleteDialogResult() {
         observeDialogResult(
             AllDataDeleteDialogFragment.RESULT_KEY
@@ -213,7 +233,7 @@ class SettingsFragment :
                 navigateAllDataDeleteDialog()
             }
             is SettingsUiEvent.NavigateOpenSourceLicensesFragment -> {
-                navigateOpenSourceLicensesFragment()
+                navigateOpenSourceSoftwareLicensesDialog()
             }
             is SettingsUiEvent.CheckPostNotificationsPermission -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -268,7 +288,7 @@ class SettingsFragment :
     override fun onActivityCallbackUiEventReceived(event: ActivityCallbackUiEvent) {
         when (event) {
             ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
-                scrollToTop()
+                smoothScrollToTop()
             }
         }
     }
@@ -285,6 +305,7 @@ class SettingsFragment :
         observeUiEventFromActivity()
     }
 
+    /** テーマカラーの変更を監視し、UIに反映させる。 */
     private fun observeViewColor() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
@@ -297,6 +318,7 @@ class SettingsFragment :
         }
     }
 
+    /** ActivityからのUIイベントを監視する。 */
     private fun observeUiEventFromActivity() {
         fragmentHelper.observeActivityUiEvent(
             this,
@@ -307,6 +329,10 @@ class SettingsFragment :
     //endregion
 
     //region View Manipulation
+    /**
+     * テーマカラーに応じてUIの各要素の色を切り替える。
+     * @param themeColor 適用するテーマカラー
+     */
     private fun switchViewColor(themeColor: ThemeColorUi) {
         val changer = SettingsThemeColorChanger()
 
@@ -409,18 +435,26 @@ class SettingsFragment :
         )
     }
 
-    private fun scrollToTop() {
+    /** 画面の最上部までスムーズにスクロールする。 */
+    private fun smoothScrollToTop() {
         binding.scrollViewSettings.smoothScrollTo(0, 0)
     }
     //endregion
 
     //region Navigation Helpers
+    /**
+     * テーマカラー選択ダイアログ ([ThemeColorPickerDialogFragment])へ遷移する。
+     */
     private fun navigateThemeColorPickerDialog() {
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToThemeColorPickerDialog()
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /**
+     * カレンダー開始曜日選択ダイアログ([CalendarStartDayPickerDialogFragment])へ遷移する。
+     * @param dayOfWeek 現在設定されている週の開始曜日
+     */
     private fun navigateCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(
@@ -429,12 +463,14 @@ class SettingsFragment :
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** リマインダー通知時間選択ダイアログ([ReminderNotificationTimePickerDialogFragment])へ遷移する。 */
     private fun navigateReminderNotificationTimePickerDialog() {
         val directions =
             SettingsFragmentDirections.actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog()
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** 通知権限要求の理由説明ダイアログ([PermissionDialogFragment])へ遷移する。 */
     private fun navigateNotificationPermissionDialog() {
         val permissionName = getString(R.string.fragment_settings_permission_name_notification)
         val directions =
@@ -442,6 +478,7 @@ class SettingsFragment :
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** 位置情報権限要求の理由説明ダイアログ([PermissionDialogFragment])へ遷移する。 */
     private fun navigateLocationPermissionDialog() {
         val permissionName = getString(R.string.fragment_settings_permission_name_location)
         val directions =
@@ -449,18 +486,21 @@ class SettingsFragment :
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** 全日記削除確認ダイアログ([AllDiariesDeleteDialogFragment])へ遷移する。 */
     private fun navigateAllDiariesDeleteDialog() {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAllDiariesDeleteDialog()
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** 全設定初期化確認ダイアログ([AllSettingsInitializationDialogFragment])へ遷移する。 */
     private fun navigateAllSettingsInitializationDialog() {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAllSettingsInitializationDialog()
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** 全データ削除確認ダイアログ([AllDataDeleteDialogFragment])へ遷移する。 */
     private fun navigateAllDataDeleteDialog() {
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAllDataDeleteDialog()
@@ -473,28 +513,31 @@ class SettingsFragment :
         navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
-    private fun navigateOpenSourceLicensesFragment() {
+    /** OSSライセンスダイアログ([OpenSourceSoftwareLicensesDialogFragment])へ遷移する。 */
+    private fun navigateOpenSourceSoftwareLicensesDialog() {
         val directions =
-            SettingsFragmentDirections.actionNavigationSettingsFragmentToOpenSourceLicensesFragment()
+            SettingsFragmentDirections.actionNavigationSettingsFragmentToOpenSourceSoftwareLicensesDialog()
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
+    /** アプリケーション詳細設定画面へ遷移する。 */
     private fun showApplicationDetailsSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
         val uri = Uri.fromParts("package", requireActivity().packageName, null)
         intent.setData(uri)
         startActivity(intent)
-        onStart()
     }
     //endregion
 
     //region Permission Handling - Post Notifications
+    /** 通知権限が付与されているか確認し、ViewModelに通知する。 */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private fun checkPostNotificationsPermission() {
         val isGranted = requireContext().isPostNotificationsGranted()
         mainViewModel.onPostNotificationsPermissionChecked(isGranted)
     }
 
+    /** 通知権限要求の理由を提示する必要があるか確認し、ViewModelに通知する。 */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private fun checkShouldShowRequestPostNotificationsPermissionRationale() {
         val shouldShowRequest =
@@ -504,12 +547,14 @@ class SettingsFragment :
         mainViewModel.onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest)
     }
 
+    /** 通知権限を要求する。 */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private fun showRequestPostNotificationsPermissionRationale() {
         requestPostNotificationsPermissionLauncher
             .launch(Manifest.permission.POST_NOTIFICATIONS)
     }
 
+    /** 端末の通知権限設定とアプリ内のリマインダー設定の同期するよう、ViewModelに通知する。 */
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
     private fun initializeReminderNotificationSettingFromPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -521,11 +566,13 @@ class SettingsFragment :
     //endregion
 
     //region Permission Handling - Access Location
+    /** 位置情報権限が付与されているか確認し、ViewModelに通知する。 */
     private fun checkAccessLocationPermission() {
         val isGranted = requireContext().isAccessLocationGranted()
         mainViewModel.onAccessLocationPermissionChecked(isGranted)
     }
 
+    /** 位置情報権限要求の理由を提示する必要があるか確認し、ViewModelに通知する。 */
     private fun checkShouldShowRequestAccessLocationPermissionRationale() {
         val shouldShowRequest =
             ActivityCompat.shouldShowRequestPermissionRationale(
@@ -536,6 +583,7 @@ class SettingsFragment :
         mainViewModel.onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest)
     }
 
+    /** 位置情報権限を要求する。 */
     private fun showRequestAccessLocationPermissionRationale() {
         val requestPermissions =
             arrayOf(
@@ -545,6 +593,7 @@ class SettingsFragment :
         requestAccessLocationPermissionLauncher.launch(requestPermissions)
     }
 
+    /** 端末の位置情報権限設定とアプリ内の天気情報取得設定の同期するよう、ViewModelに通知する。 */
     // MEMO:端末設定画面で"許可 -> 無許可"に変更したときの対応コード
     private fun initializeWeatherInfoFetchSettingFromPermission() {
         val isAccessLocationGranted = requireContext().isAccessLocationGranted()

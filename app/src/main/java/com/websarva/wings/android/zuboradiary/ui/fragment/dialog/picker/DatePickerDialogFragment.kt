@@ -5,7 +5,9 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import java.time.LocalDate
 
-
+/**
+ * 日付を選択するための日付選択ダイアログ。
+ */
 class DatePickerDialogFragment : BaseDatePickerDialogFragment() {
 
     override fun createInitialDate(): LocalDate {
@@ -25,6 +27,7 @@ class DatePickerDialogFragment : BaseDatePickerDialogFragment() {
     }
 
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DatePickerDialogFragment::class.java.name
     }
 }

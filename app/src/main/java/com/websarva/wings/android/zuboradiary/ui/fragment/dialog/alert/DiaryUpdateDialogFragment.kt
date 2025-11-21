@@ -6,6 +6,9 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 
+/**
+ * 既に日記が存在する日付に新しい日記を保存する際に、上書き保存するか確認するための警告ダイアログ。
+ */
 class DiaryUpdateDialogFragment : BaseAlertDialogFragment() {
 
     override fun createTitle(): String {
@@ -32,6 +35,7 @@ class DiaryUpdateDialogFragment : BaseAlertDialogFragment() {
     }
 
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryUpdateDialogFragment::class.java.name
     }
 }

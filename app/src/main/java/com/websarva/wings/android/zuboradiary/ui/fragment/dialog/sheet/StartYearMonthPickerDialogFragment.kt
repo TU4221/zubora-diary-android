@@ -7,6 +7,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import java.time.LocalDate
 import java.time.YearMonth
 
+/**
+ * 日記リストの開始年月を選択するためのボトムシートダイアログ。
+ */
 class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
 
     override fun handleOnPositiveButtonClick(
@@ -17,6 +20,11 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
         setResultSelectedYearMonth(firstPickerValue, secondPickerValue)
     }
 
+    /**
+     * NumberPickerで選択された年月に基づいて結果を設定する。
+     * @param yearPickerValue 年のNumberPickerから取得した値
+     * @param monthPickerValue 月のNumberPickerから取得した値
+     */
     private fun setResultSelectedYearMonth(
         yearPickerValue: Int,
         monthPickerValue: Int
@@ -54,6 +62,7 @@ class StartYearMonthPickerDialogFragment : BaseNumberPickersBottomSheetDialogFra
     }
 
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + StartYearMonthPickerDialogFragment::class.java.name
     }
 }

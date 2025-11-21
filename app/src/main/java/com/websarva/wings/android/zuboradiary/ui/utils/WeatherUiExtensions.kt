@@ -4,10 +4,8 @@ import android.content.Context
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 
-/**
- * WeatherUi enumに対応する文字列リソースIDを取得する拡張プロパティ。
- */
-internal val WeatherUi.stringResId: Int
+/** [WeatherUi]に対応する文字列リソースIDを返す。 */
+private val WeatherUi.stringResId: Int
     get() = when (this) {
         WeatherUi.UNKNOWN -> R.string.enum_weather_unknown
         WeatherUi.SUNNY -> R.string.enum_weather_sunny
@@ -17,10 +15,8 @@ internal val WeatherUi.stringResId: Int
     }
 
 /**
- * WeatherUiをContextを使ってローカライズされた文字列に変換する拡張関数。
- *
- * @param context 文字列リソース解決のためのContext。
- * @return 対応する文字列。
+ * [WeatherUi]を、ユーザーに表示するための文字列に変換する。
+ * @param context 文字列リソースを取得するためのコンテキスト。
  */
 internal fun WeatherUi.asString(context: Context): String {
     return context.getString(this.stringResId)

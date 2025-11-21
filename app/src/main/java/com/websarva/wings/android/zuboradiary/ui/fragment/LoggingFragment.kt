@@ -8,6 +8,14 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
+/**
+ * [Fragment]のライフサイクルイベントをLogcatに出力する機能を持つ抽象基底クラス。
+ *
+ * デバッグ目的でFragmentのライフサイクルの遷移を追跡したい場合に、
+ * このクラスを継承して使用する。
+ * 各ライフサイクルメソッド（[onCreate], [onStart]など）が呼ばれるたびに、
+ * そのメソッド名をログに出力する。
+ */
 abstract class LoggingFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

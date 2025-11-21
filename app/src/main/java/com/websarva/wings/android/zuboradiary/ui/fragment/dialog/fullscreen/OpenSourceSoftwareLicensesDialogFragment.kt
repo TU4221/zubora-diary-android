@@ -20,11 +20,20 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asPrimaryColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asSecondaryContainerColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.asSurfaceColorInt
 
+/**
+ * このアプリケーションで使用しているオープンソースソフトウェアのライセンス情報を表示するための全画面ダイアログ。
+ *
+ * 以下の責務を持つ:
+ * - `AboutLibraries`ライブラリを利用して、ライセンスの一覧をComposeで表示する
+ * - ツールバーのナビゲーションアイコンでダイアログを閉じる
+ */
 class OpenSourceSoftwareLicensesDialogFragment
     : BaseSimpleFullScreenDialogFragment<DialogOpenSourceSoftwareLicensesBinding>() {
 
+    /** 追加処理として、ツールバーとライセンス表示の初期設定を行う。 */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setupToolBar()
         setupAboutLibraries()
     }
@@ -36,6 +45,7 @@ class OpenSourceSoftwareLicensesDialogFragment
         return DialogOpenSourceSoftwareLicensesBinding.inflate(themeColorInflater, container, false)
     }
 
+    /** ツールバーのナビゲーションアイコンクリック時の処理を設定する。 */
     private fun setupToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
@@ -43,6 +53,7 @@ class OpenSourceSoftwareLicensesDialogFragment
             }
     }
 
+    /** `AboutLibraries`ライブラリを使用して、ライセンス一覧を表示するComposeViewを設定する。 */
     private fun setupAboutLibraries() {
         with (binding.composeViewAboutLibraries) {
             // Compositionの破棄タイミングをFragmentのViewのライフサイクルと連動

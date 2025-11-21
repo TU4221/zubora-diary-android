@@ -7,27 +7,25 @@ import com.google.android.material.textfield.TextInputLayout
 import com.websarva.wings.android.zuboradiary.R
 
 /**
- * 標準の `TextInputLayout.END_ICON_CLEAR_TEXT` モードでは、クリアアイコンは
- * EditText がフォーカスを持っており、かつテキストが入力されている場合にのみ表示する。
- * このカスタム TextInputLayout は、EditText のフォーカス状態に関わらず、
- * テキストが存在する限り常にカスタムのクリアアイコンを表示し続けるようにする。
+ * テキストが空でない場合にのみ、末尾にクリアアイコン（×ボタン）を常に表示するカスタム[TextInputLayout]。
+ *
+ * 標準の`endIconMode = END_ICON_CLEAR_TEXT`は、EditTextがフォーカスを持っているときにのみクリアアイコンを表示するが、
+ * このカスタムViewはフォーカスの有無にかかわらず、テキストが存在すれば常にアイコンを表示する責務を持つ。
  */
-internal class PersistentClearIconTextInputLayout : TextInputLayout {
-
-    // MEMO:デフォルトスタイル属性 (defStyleAttr) を指定せずにインスタンス化する場合のコンストラクタ。
-    //      スーパークラスが自身のデフォルトスタイルを適用する。
-    @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-    ) : super(context, attrs)
-
-    constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int
-    ) : super(context, attrs, defStyleAttr)
+internal class PersistentClearIconTextInputLayout @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = 0
+) : TextInputLayout(context, attrs, defStyleAttr) {
 
     init {
+        setupPersistentClearIcon()
+    }
+
+    /**
+     * クリアアイコンの表示モード、Drawable、および表示/非表示とクリックのロジックを設定する。
+     */
+    private fun setupPersistentClearIcon() {
         endIconMode = END_ICON_CUSTOM
 
         // MEMO:"com.google.android.material.R"内は変更、削除される可能性がある為、参照すを控えるように警告が表示される。
@@ -37,9 +35,13 @@ internal class PersistentClearIconTextInputLayout : TextInputLayout {
         addOnEditTextAttachedListener {
             val editText = checkNotNull(it.editText)
             isEndIconVisible = editText.text.toString().isNotEmpty()
+
+            // アイコンクリックでテキストを空にする
             setEndIconOnClickListener {
                 editText.setText("")
             }
+
+            // テキストの変更を監視してアイコンの表示/非表示を切り替え
             editText.addTextChangedListener(
                 onTextChanged = { text, _, _, _ ->
                     isEndIconVisible = text.toString().isNotEmpty()

@@ -4,9 +4,9 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * データの読み込み状態を表現するための、汎用的なシールドクラス。
+ * データの読み込み状態を表すUI状態モデル。
  *
- * @param T 読み込むデータの型。必ず [android.os.Parcelable] である必要がある。
+ * @param T 読み込むデータの型。[Parcelable]を実装している事。
  */
 @Parcelize
 sealed class LoadState<out T : Parcelable> : Parcelable {

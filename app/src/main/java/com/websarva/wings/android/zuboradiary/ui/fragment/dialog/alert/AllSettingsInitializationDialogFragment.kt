@@ -5,6 +5,9 @@ import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
+/**
+ * 全ての設定を初期化することを確認するための警告ダイアログ。
+ */
 class AllSettingsInitializationDialogFragment : BaseAlertDialogFragment() {
 
     override fun createTitle(): String {
@@ -28,6 +31,7 @@ class AllSettingsInitializationDialogFragment : BaseAlertDialogFragment() {
     }
 
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + AllSettingsInitializationDialogFragment::class.java.name
     }
 }

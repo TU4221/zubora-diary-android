@@ -1,10 +1,26 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
+import com.websarva.wings.android.zuboradiary.ui.fragment.WordSearchFragment
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import kotlinx.parcelize.Parcelize
 
+/**
+ * 単語検索画面([WordSearchFragment])のUI状態を表すデータクラス。
+ *
+ * @property searchWord ユーザーによって入力された検索ワード。
+ * @property numWordSearchResults 検索にヒットした結果の総数。
+ * @property wordSearchResultList 検索結果として表示する日記のリスト。
+ *
+ * @property isWordSearchIdle 検索が実行されておらず、アイドル状態であるかを示す。
+ * @property hasWordSearchCompleted 検索処理が完了したかを示す。
+ * @property hasNoWordSearchResults 検索結果が0件であったかを示す。
+ *
+ * @property isProcessing 処理中（読み込み中など）であるかを示す。
+ * @property isInputDisabled ユーザーの入力が無効化されているかを示す。
+ * @property isRefreshing リストの更新中であるかを示す。
+ */
 @Parcelize
 data class WordSearchUiState(
     // UiData

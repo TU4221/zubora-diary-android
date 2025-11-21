@@ -5,6 +5,9 @@ import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
+/**
+ * 日記を保存せずに編集画面を終了するか確認するための警告ダイアログ。
+ */
 class ExitWithoutDiarySaveDialogFragment : BaseAlertDialogFragment() {
 
     override fun createTitle(): String {
@@ -28,6 +31,7 @@ class ExitWithoutDiarySaveDialogFragment : BaseAlertDialogFragment() {
     }
 
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + ExitWithoutDiarySaveDialogFragment::class.java.name
     }
 }

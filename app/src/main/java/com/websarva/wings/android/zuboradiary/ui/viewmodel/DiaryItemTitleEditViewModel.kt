@@ -33,6 +33,16 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import javax.inject.Inject
 
+/**
+ * 日記項目タイトル編集画面のUIロジックと状態([DiaryItemTitleEditUiState])管理を担うViewModel。
+ *
+ * 以下の責務を持つ:
+ * - 編集対象の項目タイトルと項目番号を管理
+ * - 入力されたタイトル文字列のバリデーションを実行する
+ * - 過去に使用したタイトル履歴の読み込み、表示、および削除処理を行う
+ * - ユーザー操作（履歴の選択、新規タイトルの決定など）に応じて編集を完了し、結果を遷移元に通知する
+ * - [SavedStateHandle]を利用して、プロセスの再生成後もUI状態を復元する
+ */
 @HiltViewModel
 class DiaryItemTitleEditViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
@@ -46,7 +56,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
 ) {
 
     //region Properties
-    // キャッシュパラメータ
+    /** 履歴アイテム削除処理が保留中であることを示すためのパラメータキャッシュ。 */
     private var pendingHistoryItemDeleteParameters: HistoryItemDeleteParameters? = null
     //endregion
 
@@ -56,6 +66,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         collectUiStates()
     }
 
+    /** [SavedStateHandle]に保存されたデータがない場合のみ、引数からタイトルと項目番号をセットアップする。 */
     private fun setupTitle() {
         if (handle.contains(SAVED_STATE_UI_KEY)) return
 
@@ -66,12 +77,14 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         updateTitle(diaryItemTitleSelection.title)
     }
 
+    /** UI状態の監視を開始する。 */
     private fun collectUiStates() {
         collectUiState()
         collectTitleValidation()
         collectTitleSelectionHistoryList()
     }
 
+    /** UI状態を[SavedStateHandle]に保存する。 */
     private fun collectUiState() {
         uiState.onEach {
             Log.d(logTag, it.toString())
@@ -79,12 +92,12 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }.launchIn(viewModelScope)
     }
 
+    /** 入力されたタイトルのバリデーション結果を監視し、UIに反映させる。 */
     private fun collectTitleValidation() {
         uiState.distinctUntilChanged { old, new ->
             old.title == new.title
         }.mapNotNull { 
-            val state = validateInputTextUseCase(it.title).value
-            when (state) {
+            when (val state = validateInputTextUseCase(it.title).value) {
                 InputTextValidation.Valid,
                 InputTextValidation.InitialCharUnmatched -> state.toUiModel()
 
@@ -98,22 +111,20 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }.launchIn(viewModelScope)
     }
 
+    /** 日記項目タイトル選択履歴リストの読み込みと状態更新を監視する。 */
     private fun collectTitleSelectionHistoryList() {
         loadDiaryItemTitleSelectionHistoryListUseCase().onStart {
             updateToTitleSelectionHistoryListLoadingState()
-        }.onEach {
-            when (it) {
-                is UseCaseResult.Success -> { /*処理なし*/ }
-                is UseCaseResult.Failure -> {
-                    when (it.exception) {
-                        is DiaryItemTitleSelectionHistoryLoadException.LoadFailure -> {
-                            emitAppMessageEvent(
-                                DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadFailure
-                            )
-                        }
-                        is DiaryItemTitleSelectionHistoryLoadException.Unknown -> {
-                            emitUnexpectedAppMessage(it.exception)
-                        }
+        }.onEach { result ->
+            if (result is UseCaseResult.Failure) {
+                when (result.exception) {
+                    is DiaryItemTitleSelectionHistoryLoadException.LoadFailure -> {
+                        emitAppMessageEvent(
+                            DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadFailure
+                        )
+                    }
+                    is DiaryItemTitleSelectionHistoryLoadException.Unknown -> {
+                        emitUnexpectedAppMessage(result.exception)
                     }
                 }
             }
@@ -143,12 +154,20 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * ナビゲーションアイコンがクリックされた時に呼び出される事を想定。
+     * 前の画面へ戻るイベントを発行する。
+     */
     fun onNavigationIconClick() {
         launchWithUnexpectedErrorHandler {
             emitNavigatePreviousFragmentEvent()
         }
     }
 
+    /**
+     * 新規タイトル選択ボタンがクリックされた時に呼び出される事を想定。
+     * 編集を完了させる処理を開始する。
+     */
     fun onNewDiaryItemTitleSelectionButtonClick() {
         val itemNumber = currentUiState.itemNumber
         val itemTitle = currentUiState.title
@@ -157,7 +176,14 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }
     }
 
-    internal fun onDiaryItemTitleSelectionHistoryListItemClick(item: DiaryItemTitleSelectionHistoryListItemUi) {
+    /**
+     * 履歴リストのアイテムがクリックされた時に呼び出される事を想定。
+     * 編集を完了させる処理を開始する。
+     * @param item クリックされた履歴リストアイテム
+     */
+    internal fun onDiaryItemTitleSelectionHistoryListItemClick(
+        item: DiaryItemTitleSelectionHistoryListItemUi
+    ) {
         val itemNumber = currentUiState.itemNumber
         val itemId = item.id
         val itemTitle = item.title
@@ -170,7 +196,14 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }
     }
 
-    internal fun onDiaryItemTitleSelectionHistoryListItemSwipe(item: DiaryItemTitleSelectionHistoryListItemUi) {
+    /**
+     * 履歴リストのアイテムがスワイプされた時に呼び出される事を想定。
+     * 削除確認ダイアログを表示するイベントを発行する。
+     * @param item スワイプされた履歴リストアイテム
+     */
+    internal fun onDiaryItemTitleSelectionHistoryListItemSwipe(
+        item: DiaryItemTitleSelectionHistoryListItemUi
+    ) {
         val itemId = item.id
         val itemTitle = item.title
         launchWithUnexpectedErrorHandler {
@@ -187,12 +220,21 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }
     }
 
-    // View状態処理
+    /**
+     * 項目タイトル入力欄のテキストが変更された時に呼び出される事を想定。
+     * UI状態のタイトルを更新する。
+     * @param text 変更後のテキスト
+     */
     fun onItemTitleTextChanged(text: CharSequence) {
         val textString = text.toString()
         updateTitle(textString)
     }
 
+    /**
+     * 履歴アイテム削除確認ダイアログから結果を受け取った時に呼び出される事を想定。
+     * 結果に応じて履歴の削除、またはUIの復元を行う。
+     * @param result ダイアログからの結果
+     */
     internal fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(
         result: DialogResult<Unit>
     ) {
@@ -210,6 +252,10 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         clearPendingHistoryItemDeleteParameters()
     }
 
+    /**
+     * 履歴アイテム削除確認ダイアログからのPositive結果を処理し、選択された日記項目タイトル選択履歴を削除する。
+     * @param parameters 削除に必要なパラメータ
+     */
     private fun handleDiaryItemTitleSelectionHistoryDeleteDialogPositiveResult(
         parameters: HistoryItemDeleteParameters?
     ) {
@@ -220,6 +266,10 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 履歴アイテム削除確認ダイアログからのNegative結果を処理し、
+     * 選択された日記項目タイトル選択履歴のスワイプ状態を復元する。
+     */
     private fun handleDiaryItemTitleSelectionHistoryDeleteDialogNegativeResult() {
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
@@ -230,6 +280,12 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     //endregion
 
     //region Business Logic
+    /**
+     * 入力されたタイトルを検証し、有効であれば編集完了イベントを発行する。
+     * @param itemNumberInt 項目番号
+     * @param itemId 履歴ID（履歴から選択した場合）
+     * @param itemTitle 項目タイトル
+     */
     private suspend fun completeItemTitleEdit(
         itemNumberInt: Int,
         itemId: DiaryItemTitleSelectionHistoryId = DiaryItemTitleSelectionHistoryId.generate(),
@@ -250,6 +306,11 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 指定されたIDの日記項目タイトル選択履歴を削除する。
+     * @param id 削除対象の履歴ID
+     * @param title 削除対象のタイトル（ログおよびエラーメッセージ用）
+     */
     private suspend fun deleteDiaryItemTitleSelectionHistory(
         id: DiaryItemTitleSelectionHistoryId,
         title: DiaryItemTitle
@@ -257,8 +318,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         val logMsg = "日記項目タイトル選択履歴アイテム削除"
         Log.i(logTag, "${logMsg}_開始")
 
-        val result = deleteDiaryItemTitleSelectionHistoryUseCase(id, title)
-        when (result) {
+        when (val result = deleteDiaryItemTitleSelectionHistoryUseCase(id, title)) {
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 // 処理なし
@@ -267,7 +327,9 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
                 Log.e(logTag, "${logMsg}_失敗")
                 when (result.exception) {
                     is DiaryItemTitleSelectionHistoryDeleteException.DeleteFailure -> {
-                        emitAppMessageEvent(DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure)
+                        emitAppMessageEvent(
+                            DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure
+                        )
                     }
                     is DiaryItemTitleSelectionHistoryDeleteException.Unknown -> {
                         emitUnexpectedAppMessage(result.exception)
@@ -279,18 +341,31 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     //endregion
 
     //region UI State Update
+    /**
+     * 項目番号を更新する。
+     * @param itemNumber 新しい項目番号
+     */
     private fun updateItemNumber(itemNumber: Int) {
         updateUiState { it.copy(itemNumber = itemNumber) }
     }
 
+    /**
+     * 項目タイトルを更新する。
+     * @param itemTitle 新しい項目タイトル
+     */
     private fun updateTitle(itemTitle: String) {
         updateUiState { it.copy(title = itemTitle) }
     }
 
+    /**
+     * タイトルのバリデーション結果を更新する。
+     * @param result 新しいバリデーション結果
+     */
     private fun updateTitleValidationState(result: InputTextValidationState) {
         updateUiState { it.copy(titleValidationState = result) }
     }
 
+    /** UIをタイトル履歴リスト読み込み中の状態に更新する。 */
     private fun updateToTitleSelectionHistoryListLoadingState() {
         updateUiState {
             it.copy(
@@ -301,6 +376,10 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * UIをタイトル履歴リスト読み込み完了の状態に更新する。
+     * @param loadState 読み込み結果の状態
+     */
     private fun updateToTitleSelectionHistoryListLoadCompletedState(
         loadState: LoadState<DiaryItemTitleSelectionHistoryListUi>
     ) {
@@ -315,6 +394,11 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     //endregion
 
     //region Pending History Item Delete Parameters
+    /**
+     * 保留中の履歴アイテム削除パラメータを更新する。
+     * @param itemId 削除対象の履歴ID
+     * @param itemTitle 削除対象の項目タイトル
+     */
     private fun updatePendingHistoryItemDeleteParameters(
         itemId: DiaryItemTitleSelectionHistoryId,
         itemTitle: DiaryItemTitle
@@ -322,10 +406,16 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         pendingHistoryItemDeleteParameters = HistoryItemDeleteParameters(itemId, itemTitle)
     }
 
+    /** 保留中の履歴アイテム削除パラメータをクリアする。 */
     private fun clearPendingHistoryItemDeleteParameters() {
         pendingHistoryItemDeleteParameters = null
     }
 
+    /**
+     * 履歴アイテム削除処理に必要なパラメータを保持するデータクラス。
+     * @property itemId 削除対象の履歴ID
+     * @property itemTitle 削除対象の項目タイトル
+     */
     private data class HistoryItemDeleteParameters(
         val itemId: DiaryItemTitleSelectionHistoryId,
         val itemTitle: DiaryItemTitle
@@ -333,8 +423,10 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     //endregion
 
     private companion object {
+        /** ナビゲーションコンポーネントで受け渡される日記項目タイトル情報のキー。 */
         const val ARGUMENT_DIARY_ITEM_TITLE_KEY = "diary_item_title"
 
+        /** SavedStateHandleにUI状態を保存するためのキー。 */
         const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }
 }

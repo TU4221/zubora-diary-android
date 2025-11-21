@@ -19,6 +19,21 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemC
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemUi
 import com.websarva.wings.android.zuboradiary.ui.utils.formatYearMonthString
 
+/**
+ * 日記リスト(`RecyclerView`)に表示されるリストのアダプターの基底クラス。
+ * ヘッダー、日記アイテム、プログレスバーなど、複数のビュータイプを扱う。
+ *
+ * 以下の責務を持つ:
+ * - [ListBaseAdapter]を継承し、テーマカラー対応とDiffUtilの基本機能を提供する。
+ * - [SpacingItemProvider]と[StickyHeaderAdapter]を実装し、アイテム間の間隔とスティッキーヘッダー機能を提供する。
+ * - [ViewType.HEADER], [ViewType.PROGRESS_INDICATOR], [ViewType.NO_DIARY_MESSAGE]
+ *   といった共通ビュータイプのViewHolderの生成とバインドを処理する。
+ * - [ViewType.DIARY]のViewHolderの具体的な生成とバインドは、サブクラスに委譲する。
+ *
+ * @param T [DiaryListItemContainerUi]を継承する、日記リストアイテムの具体的なデータコンテナの型。
+ * @param VH [DiaryListViewHolder]を継承する、日記アイテム用のViewHolderの型。
+ * @param themeColor アイテムのViewに適用するテーマカラー。
+ */
 internal abstract class DiaryListBaseAdapter<T, VH> (
     themeColor: ThemeColorUi
 ) : ListBaseAdapter<DiaryListItemUi<T>, DiaryListViewHolder>(
@@ -27,6 +42,7 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
 ), SpacingItemProvider, StickyHeaderAdapter
         where T: DiaryListItemContainerUi, VH: DiaryListViewHolder {
 
+    /** RecyclerViewで表示するビューの種類を定義するenum。 */
     // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
     //      その為、@Suppress("RedundantSuppression")で警告回避。
     @Suppress("RedundantSuppression")
@@ -38,6 +54,7 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
         NO_DIARY_MESSAGE(3)
     }
 
+    /** [viewType]に応じて、対応するViewHolderを生成する。 */
     override fun createViewHolder(
         parent: ViewGroup,
         themeColorInflater: LayoutInflater,
@@ -71,11 +88,18 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
         }
     }
 
+    /**
+     * [ViewType.DIARY]のViewHolderを生成する。[createViewHolder]から呼び出される。
+     * @param parent 親のViewGroup。
+     * @param themeColorInflater テーマが適用されたLayoutInflater。
+     * @return 生成されたViewHolderインスタンス。
+     */
     protected abstract fun onCreateDiaryViewHolder(
         parent: ViewGroup,
         themeColorInflater: LayoutInflater
     ): DiaryListViewHolder
 
+    /** [item]の種類に応じて、対応するViewHolderにデータをバインドする。 */
     override fun bindViewHolder(
         holder: DiaryListViewHolder,
         item: DiaryListItemUi<T>
@@ -95,11 +119,17 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
         }
     }
 
+    /**
+     * [ViewType.DIARY]のViewHolderにデータをバインドする。[bindViewHolder]から呼び出される。
+     * @param holder データをバインドするViewHolder。
+     * @param item バインドするデータアイテム。
+     */
     protected abstract fun onBindDiaryViewHolder(
         holder: DiaryListViewHolder,
         item: DiaryListItemUi.Diary<T>
     )
 
+    /** 指定されたポジションのアイテムの[ViewType]を返す。 */
     override fun getItemViewType(position: Int): Int {
         val item = getItem(position) as DiaryListItemUi<T>
         return when (item) {
@@ -118,16 +148,19 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
         }
     }
 
+    /** [SpacingItemProvider]の実装。指定されたポジションのアイテムが、間隔を設けるべき対象か判定する。 */
     override fun isSpacingItem(itemPosition: Int): Boolean {
         if (itemPosition !in 0..<itemCount) return false
         return getItem(itemPosition) is DiaryListItemUi.Diary
     }
 
+    /** [StickyHeaderAdapter]の実装。指定されたポジションのアイテムがヘッダーか判定する。 */
     override fun isHeader(itemPosition: Int): Boolean {
         if (itemPosition !in 0..<itemCount) return false
         return getItem(itemPosition) is DiaryListItemUi.Header
     }
 
+    /** [StickyHeaderAdapter]の実装。指定されたポジションのアイテムに対応するスティッキーヘッダーのViewを返す。 */
     override fun getHeaderView(
         itemPosition: Int,
         recyclerView: RecyclerView
@@ -146,7 +179,9 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
     }
 
     /**
-     * 指定されたポジションのアイテムが属するヘッダーのポジションを探すヘルパーメソッド
+     * 指定されたポジションのアイテムが属するヘッダーのポジションを探す。
+     * @param itemPosition 現在のアイテムのポジション。
+     * @return 見つかったヘッダーのポジション。見つからない場合は-1。
      */
     private fun findHeaderPositionFor(itemPosition: Int): Int {
         for (i in itemPosition downTo 0) {
@@ -157,6 +192,12 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
         return -1
     }
 
+    /**
+     * ヘッダー用のViewHolderをキャッシュから探すか、新しく生成する。
+     * @param parent 親となるRecyclerView。
+     * @param position ヘッダーアイテムのポジション。
+     * @return [DiaryListHeaderViewHolder]のインスタンス。
+     */
     private fun findOrCreateHeaderViewHolder(
         parent: RecyclerView,
         position: Int
@@ -171,7 +212,9 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
     }
 
     /**
-     * ViewHolderのビューのサイズを測定し、レイアウトするためのヘルパーメソッド。
+     * 指定されたViewHolderのViewのサイズを測定し、レイアウトする。
+     * @param holder レイアウトするViewHolder。
+     * @param parent 親となるRecyclerView。
      */
     private fun measureAndLayoutViewHolder(holder: RecyclerView.ViewHolder, parent: RecyclerView) {
         with(holder.itemView) {
@@ -184,14 +227,23 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
         }
     }
 
+    /** このアダプターで利用されるViewHolderの基底クラス。 */
     abstract class DiaryListViewHolder(
         itemView: View
     ) : WindowInsetsViewHolder(itemView)
 
+    /**
+     * ヘッダーアイテム([DiaryListItemUi.Header])を表示するためのViewHolder。
+     * @property binding View Bindingのインスタンス。
+     */
     data class DiaryListHeaderViewHolder(
         private val binding: RowDiaryListHeaderBinding
     ) : DiaryListViewHolder(binding.root) {
 
+        /**
+         * ヘッダーアイテムのデータをViewにバインドする。
+         * @param item 表示するヘッダーアイテム。
+         */
         fun bind(item: DiaryListItemUi.Header<*>) {
             // 左端に余白を持たせる為、最初にスペースを入力。
             val context = binding.root.context
@@ -199,17 +251,30 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
         }
     }
 
+    /**
+     * 「日記がありません」というメッセージアイテム([DiaryListItemUi.NoDiaryMessage])を表示するためのViewHolder。
+     * @property binding View Bindingのインスタンス。
+     */
     data class DiaryListNoDiaryMessageViewHolder(
         private val binding: RowDiaryListNoDiaryMessageBinding
     ) : DiaryListViewHolder(binding.root)
 
+    /**
+     * プログレスバーアイテム([DiaryListItemUi.ProgressIndicator])を表示するためのViewHolder。
+     * @property binding View Bindingのインスタンス。
+     */
     data class DiaryListProgressBarViewHolder(
         private val binding: RowDiaryListProgressBarBinding
     ) : DiaryListViewHolder(binding.root)
 
+    /**
+     * [DiaryListItemUi]の差分を計算するための[DiffUtil.ItemCallback]。
+     * @param T [DiaryListItemContainerUi]を継承する、日記リストアイテムの具体的なデータコンテナの型。
+     */
     private class DiaryListDiffUtilItemCallback<T: DiaryListItemContainerUi>
         : DiffUtil.ItemCallback<DiaryListItemUi<T>>() {
 
+        /** 2つのアイテムが同じオブジェクトを表しているか（通常はIDで比較）を判定する。 */
         override fun areItemsTheSame(
             oldItem: DiaryListItemUi<T>,
             newItem: DiaryListItemUi<T>
@@ -239,6 +304,7 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
             return result
         }
 
+        /** 2つのアイテムのデータ内容が同じであるかを判定する。 */
         override fun areContentsTheSame(
             oldItem: DiaryListItemUi<T>,
             newItem: DiaryListItemUi<T>

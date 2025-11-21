@@ -28,9 +28,26 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
+/**
+ * Fragmentで利用される共通処理をまとめたヘルパークラス。
+ *
+ * 以下の責務を持つ:
+ * - テーマカラーを適用したView Inflaterの生成
+ * - Fragment Result APIの監視セットアップ
+ * - ViewModelからの各種UIイベントの監視セットアップ
+ * - Navigation Componentを用いた画面遷移の実行とリトライ処理
+ * - バックプレス処理の移譲
+ * - ライフサイクルを考慮したコルーチンの起動
+ */
 class FragmentHelper {
 
     //region View Inflater Helpers
+    /**
+     * 指定されたテーマカラーを適用した新しいLayoutInflaterを生成する。
+     * @param inflater 元となるLayoutInflater
+     * @param themeColor 適用するテーマカラー
+     * @return テーマが適用された新しいLayoutInflaterインスタンス
+     */
     fun createThemeColorInflater(
         inflater: LayoutInflater,
         themeColor: ThemeColorUi
@@ -40,6 +57,13 @@ class FragmentHelper {
     //endregion
 
     //region UI Observation Helpers
+    /**
+     * Fragment Result APIを安全に監視し、結果を受け取る。
+     * @param navController 画面遷移を管理するNavController
+     * @param fragmentDestinationId 結果を監視するフラグメントのDestination ID
+     * @param key 結果を識別するための一意なキー
+     * @param onResultReceived 結果を受け取った際の処理を行うコールバック
+     */
     fun <R : NavigationResult> observeFragmentResult(
         navController: NavController,
         fragmentDestinationId: Int,
@@ -63,6 +87,12 @@ class FragmentHelper {
         }
     }
 
+    /**
+     * ViewModelからの画面固有UIイベントを監視する。
+     * @param fragment ライフサイクルスコープのオーナーとなるFragment
+     * @param mainViewModel イベントを供給するViewModel
+     * @param handler イベントを処理するハンドラ
+     */
     fun <E: UiEvent> observeMainUiEvent(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
@@ -80,6 +110,12 @@ class FragmentHelper {
         }
     }
 
+    /**
+     * ViewModelからの共通UIイベントを監視する。
+     * @param fragment ライフサイクルスコープのオーナーとなるFragment
+     * @param mainViewModel イベントを供給するViewModel
+     * @param handler イベントを処理するハンドラ
+     */
     fun <E: UiEvent> observeCommonUiEvent(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
@@ -97,6 +133,12 @@ class FragmentHelper {
         }
     }
 
+    /**
+     * ActivityからのコールバックUIイベントを監視する。
+     * @param fragment ライフサイクルスコープのオーナーとなるFragment
+     * @param mainActivityViewModel イベントを供給するViewModel
+     * @param handler イベントを処理するハンドラ
+     */
     fun observeActivityUiEvent(
         fragment: Fragment,
         mainActivityViewModel: MainActivityViewModel,
@@ -114,6 +156,12 @@ class FragmentHelper {
         }
     }
 
+    /**
+     * 保留中の画面遷移コマンドを監視し、実行する。
+     * @param navController 画面遷移を管理するNavController
+     * @param navDestinationId 現在のフラグメントのDestination ID
+     * @param mainViewModel 保留コマンドを保持するViewModel
+     */
     fun observePendingNavigation(
         navController: NavController,
         navDestinationId: Int,
@@ -152,6 +200,13 @@ class FragmentHelper {
     //endregion
 
     //region Navigation Helpers
+    /**
+     * 画面遷移を一度だけ試みる。
+     * @param navController 画面遷移を管理するNavController
+     * @param fragmentDestinationId 現在のフラグメントのDestination ID
+     * @param command 実行するナビゲーションコマンド
+     * @return 画面遷移が試みられた場合はtrue、そうでなければfalse
+     */
     fun navigateFragmentOnce(
         navController: NavController,
         fragmentDestinationId: Int,
@@ -165,6 +220,13 @@ class FragmentHelper {
         )
     }
 
+    /**
+     * 画面遷移を試み、失敗した場合はViewModelに通知してリトライを可能にする。
+     * @param navController 画面遷移を管理するNavController
+     * @param fragmentDestinationId 現在のフラグメントのDestination ID
+     * @param mainViewModel 失敗時にコマンドを保持するViewModel
+     * @param command 実行するナビゲーションコマンド
+     */
     fun navigateFragmentWithRetry(
         navController: NavController,
         fragmentDestinationId: Int,
@@ -181,6 +243,14 @@ class FragmentHelper {
         }
     }
 
+    /**
+     * 画面遷移コマンドを実際に実行する内部関数。
+     * @param navController 画面遷移を管理するNavController
+     * @param fragmentDestinationId 現在のフラグメントのDestination ID
+     * @param command 実行するナビゲーションコマンド
+     * @param onCannotNavigate 画面遷移が不可能な場合に実行されるコールバック
+     * @return 画面遷移が試みられた場合はtrue、そうでなければfalse
+     */
     private fun executeFragmentNavigation(
         navController: NavController,
         fragmentDestinationId: Int,
@@ -223,6 +293,12 @@ class FragmentHelper {
         return true
     }
 
+    /**
+     * 現在の画面から指定されたコマンドで遷移可能か判定する。
+     * @param navController 画面遷移を管理するNavController
+     * @param fragmentDestinationId 現在いるべきフラグメントのDestination ID
+     * @return 遷移可能な場合はtrue
+     */
     private fun canNavigateFragment(
         navController: NavController,
         fragmentDestinationId: Int
@@ -231,6 +307,13 @@ class FragmentHelper {
         return fragmentDestinationId == currentDestination.id
     }
 
+    /**
+     * 前の画面に一度だけ戻る。
+     * @param navController 画面遷移を管理するNavController
+     * @param fragmentDestinationId 現在のフラグメントのDestination ID
+     * @param resultKey 遷移元に渡す結果のキー
+     * @param result 遷移元に渡す結果データ
+     */
     fun navigatePreviousFragmentOnce(
         navController: NavController,
         fragmentDestinationId: Int,
@@ -244,6 +327,14 @@ class FragmentHelper {
         )
     }
 
+    /**
+     * 前の画面に戻る遷移を試み、失敗した場合はリトライする。
+     * @param navController 画面遷移を管理するNavController
+     * @param fragmentDestinationId 現在のフラグメントのDestination ID
+     * @param resultKey 遷移元に渡す結果のキー
+     * @param result 遷移元に渡す結果データ
+     * @param mainViewModel 失敗時にコマンドを保持するViewModel
+     */
     fun navigatePreviousFragmentWithRetry(
         navController: NavController,
         fragmentDestinationId: Int,
@@ -259,9 +350,15 @@ class FragmentHelper {
         )
     }
 
+    /**
+     * 前の画面に戻るためのNavigationCommandを生成する。
+     * @param resultKey 遷移元に渡す結果のキー
+     * @param result 遷移元に渡す結果データ
+     * @return 生成されたNavigationCommand
+     */
     private fun createPreviousFragmentCommand(
         resultKey: String?,
-        result: FragmentResult<*>,
+        result: FragmentResult<*>
         ): NavigationCommand {
          return if (resultKey == null) {
              NavigationCommand.Up<Nothing>()
@@ -272,6 +369,11 @@ class FragmentHelper {
     //endregion
 
     //region Back Press Helpers
+    /**
+     * バックプレスイベントをViewModelに委譲するためのコールバックを登録する。
+     * @param fragment ライフサイクルスコープのオーナーとなるFragment
+     * @param mainViewModel バックプレスイベントを処理するViewModel
+     */
     fun registerOnBackPressedCallback(
         fragment: Fragment,
         mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
@@ -292,6 +394,11 @@ class FragmentHelper {
     //endregion
 
     //region Coroutine Helpers
+    /**
+     * FragmentのViewライフサイクルがSTARTED状態の時にコルーチンを起動し、リピート実行する。
+     * @param fragment ライフサイクルスコープのオーナーとなるFragment
+     * @param block 実行する中断可能な処理ブロック
+     */
     fun launchAndRepeatOnViewLifeCycleStarted(
         fragment: Fragment,
         block: suspend CoroutineScope.() -> Unit

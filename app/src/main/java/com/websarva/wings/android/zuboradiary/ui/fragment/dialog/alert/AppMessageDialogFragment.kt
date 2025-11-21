@@ -2,6 +2,9 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 
+/**
+ * アプリケーション内の様々なメッセージ（エラー、情報など）をユーザーに通知するための汎用的な警告ダイアログ。
+ */
 class AppMessageDialogFragment : BaseAlertDialogFragment() {
 
     override fun createTitle(): String {
@@ -26,6 +29,7 @@ class AppMessageDialogFragment : BaseAlertDialogFragment() {
         // 処理なし
     }
 
+    /** 追加処理として、Negativeボタンを無効化。 */
     override fun customizeDialog(builder: MaterialAlertDialogBuilder) {
         super.customizeDialog(builder)
         builder.setNegativeButton("", null)

@@ -10,6 +10,18 @@ import com.websarva.wings.android.zuboradiary.ui.recyclerview.callback.touch.Lef
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.callback.touch.SwipeableViewHolder
 import com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeBackgroundButtonRecyclerView
 
+/**
+ * [SwipeBackgroundButtonRecyclerView]に、
+ * 左スワイプで背景ボタンを表示するインタラクションをセットアップするためのヘルパークラス。
+ *
+ * [BaseSwipeInteractionHelper]を継承し、以下の機能を提供する:
+ * - [LeftSwipeBackgroundButtonCallback]を使用して、スワイプと背景ボタンの表示を実装する。
+ * - [SwipeBackgroundButtonRecyclerView]にリスナーをセットアップし、
+ *   スワイプされたアイテムや背景ボタンがクリックされた際の処理をハンドリングする。
+ *
+ * @param recyclerView インタラクションを適用する[SwipeBackgroundButtonRecyclerView]。
+ * @param listAdapter 対象となるRecyclerViewのアダプター。
+ */
 internal class SwipeBackgroundButtonInteractionHelper(
     recyclerView: SwipeBackgroundButtonRecyclerView,
     listAdapter: ListBaseAdapter<*, *>
@@ -19,6 +31,7 @@ internal class SwipeBackgroundButtonInteractionHelper(
         LeftSwipeBackgroundButtonCallback
 >(recyclerView, listAdapter) {
 
+    /** [LeftSwipeBackgroundButtonCallback]のインスタンスを生成して返す。 */
     override fun createLeftSwipeSimpleCallback(): LeftSwipeBackgroundButtonCallback {
         return LeftSwipeBackgroundButtonCallback(
             {
@@ -31,6 +44,7 @@ internal class SwipeBackgroundButtonInteractionHelper(
         )
     }
 
+    /** RecyclerViewにクリックリスナーをセットアップする。 */
     override fun onSetup() {
         super.onSetup()
 
@@ -39,12 +53,23 @@ internal class SwipeBackgroundButtonInteractionHelper(
         }
     }
 
+    /** セットアップしたクリックリスナーを解放する。 */
     override fun onCleanup() {
         super.onCleanup()
 
         recyclerView.setOnPerformClickListener(null)
     }
 
+    /**
+     * スワイプされた状態のアイテムに対するクリックイベントを処理する。
+     *
+     * 背景ボタンの領域がクリックされた場合はボタンの`performClick`を呼び出し、
+     * それ以外のフォアグラウンド領域がクリックされた場合はスワイプ状態を閉じる。
+     *
+     * @param v タッチイベントが発生したビュー（RecyclerView）。
+     * @param event 発生した[MotionEvent]。
+     * @return イベントを消費した場合は`true`。
+     */
     private fun handleSwipedViewHolderClick(v: View, event: MotionEvent): Boolean {
         // タッチViewHolder取得
         val recyclerView = v as? RecyclerView ?: return false

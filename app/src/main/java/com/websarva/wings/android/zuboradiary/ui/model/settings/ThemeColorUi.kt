@@ -4,6 +4,11 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.util.Arrays
 
+/**
+ * アプリケーションのテーマカラーを表すUIモデル。
+ *
+ * 各テーマカラーは、データベース保存用の数値[number]を持つ。
+ */
 @Parcelize
 // CAUTION:要素の追加、順序変更を行った時はThemeColorPickerDialogFragment、string.xmlを修正すること。
 // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。

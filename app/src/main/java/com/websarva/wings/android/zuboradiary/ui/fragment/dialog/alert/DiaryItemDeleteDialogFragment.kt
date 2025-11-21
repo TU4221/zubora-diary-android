@@ -5,6 +5,9 @@ import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
+/**
+ * 日記の項目を一つ削除することを確認するための警告ダイアログ。
+ */
 class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
 
     override fun createTitle(): String {
@@ -32,6 +35,7 @@ class DiaryItemDeleteDialogFragment : BaseAlertDialogFragment() {
     }
 
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryItemDeleteDialogFragment::class.java.name
     }
 }

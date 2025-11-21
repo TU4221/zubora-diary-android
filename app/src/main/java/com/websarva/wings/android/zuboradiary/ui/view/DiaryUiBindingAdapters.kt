@@ -13,8 +13,17 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateTimeWithSecondsString
 
+/**
+ * 日記に関連するカスタムBinding Adapterを定義するオブジェクト。
+ */
 internal object DiaryUiBindingAdapters {
 
+    /**
+     * [LoadState]から日記([DiaryUi])の日付を取得し、
+     * 日本語の日付書式にフォーマットして[TextView]に設定する。
+     * @param textView 対象のTextView。
+     * @param diaryLoadState 日記の読み込み状態。
+     */
     @JvmStatic
     @BindingAdapter("diaryDateText")
     fun setDiaryDateText(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
@@ -27,6 +36,11 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    /**
+     * [LoadState]から元の日記([DiaryUi])の日付を取得し、「編集対象日記：」という接頭辞をつけて[TextView]に設定する。
+     * @param textView 対象のTextView。
+     * @param diaryLoadState 日記の読み込み状態。
+     */
     @JvmStatic
     @BindingAdapter("originalDiaryDateText")
     fun setOriginalDiaryDateText(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
@@ -43,6 +57,12 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    /**
+     * [LoadState]から日記([DiaryUi])の最終更新日時を取得し、
+     * 日本語の日付書式にフォーマットして[TextView]に設定する。
+     * @param textView 対象のTextView。
+     * @param diaryLoadState 日記の読み込み状態。
+     */
     @JvmStatic
     @BindingAdapter("diaryLogText")
     fun setDiaryLogText(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
@@ -55,6 +75,11 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    /**
+     * [LoadState]から日記([DiaryUi])の天気1を取得し、文字列に変換して[TextView]に設定する。
+     * @param textView 対象のTextView。
+     * @param diaryLoadState 日記の読み込み状態。
+     */
     @JvmStatic
     @BindingAdapter("diaryWeather1Text")
     fun setDiaryWeather1Text(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
@@ -67,6 +92,11 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    /**
+     * [LoadState]から日記([DiaryUi])の天気2を取得し、文字列に変換して[TextView]に設定する。
+     * @param textView 対象のTextView。
+     * @param diaryLoadState 日記の読み込み状態。
+     */
     @JvmStatic
     @BindingAdapter("diaryWeather2Text")
     fun setDiaryWeather2Text(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
@@ -79,6 +109,11 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    /**
+     * [LoadState]から日記([DiaryUi])の体調を取得し、文字列に変換して[TextView]に設定する。
+     * @param textView 対象のTextView。
+     * @param diaryLoadState 日記の読み込み状態。
+     */
     @JvmStatic
     @BindingAdapter("diaryConditionText")
     fun setDiaryConditionText(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
@@ -91,6 +126,11 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    /**
+     * [LoadState]から日記([DiaryUi])のタイトルを取得し、[TextView]に設定する。
+     * @param textView 対象のTextView。
+     * @param diaryLoadState 日記の読み込み状態。
+     */
     @JvmStatic
     @BindingAdapter("diaryTitleText")
     fun setDiaryTitleText(textView: TextView, diaryLoadState: LoadState<DiaryUi>) {
@@ -102,6 +142,12 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    /**
+     * [WeatherUi]を文字列に変換し、[AutoCompleteTextView]に設定する。
+     * この時、ドロップダウンリストは表示しない。
+     * @param view 対象のAutoCompleteTextView。
+     * @param weather 設定する天気。
+     */
     @BindingAdapter("diaryWeatherSpinnerText")
     @JvmStatic
     fun setDiaryWeatherSpinnerText(view: AutoCompleteTextView, weather: WeatherUi) {
@@ -111,6 +157,12 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    /**
+     * [ConditionUi]を文字列に変換し、[AutoCompleteTextView]に設定する。
+     * この時、ドロップダウンリストは表示しない。
+     * @param view 対象のAutoCompleteTextView。
+     * @param condition 設定する体調。
+     */
     @BindingAdapter("diaryConditionSpinnerText")
     @JvmStatic
     fun setDiaryConditionSpinnerText(view: AutoCompleteTextView, condition: ConditionUi) {
@@ -120,6 +172,12 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    /**
+     * [LoadState]の日記([DiaryUi])と項目番号から日記項目のタイトルを取得し、[TextView]に設定する。
+     * @param textView 対象のTextView。
+     * @param diaryItemNumber 項目番号。
+     * @param diaryLoadState 日記の読み込み状態。
+     */
     @JvmStatic
     @BindingAdapter(
         value = [
@@ -138,6 +196,11 @@ internal object DiaryUiBindingAdapters {
         }
     }
 
+    /**
+     * 項目番号を「項目X」という書式に変換し、[Toolbar]のタイトルとして設定する。
+     * @param toolbar 対象のToolbar。
+     * @param number 項目番号。
+     */
     @JvmStatic
     @BindingAdapter("diaryItemNumberText")
     fun setDiaryItemNumberText(toolbar: Toolbar, number: Int) {
@@ -153,6 +216,12 @@ internal object DiaryUiBindingAdapters {
         toolbar.title = dateText
     }
 
+    /**
+     * [LoadState]の日記([DiaryUi])と項目番号から日記項目のコメントを取得し、[TextView]に設定する。
+     * @param textView 対象のTextView。
+     * @param diaryItemNumber 項目番号。
+     * @param diaryLoadState 日記の読み込み状態。
+     */
     @JvmStatic
     @BindingAdapter(
         value = [

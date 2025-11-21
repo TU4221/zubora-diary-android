@@ -15,6 +15,16 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemU
 import com.websarva.wings.android.zuboradiary.ui.utils.asDiaryListDayOfWeekString
 import java.text.NumberFormat
 
+/**
+ * 標準的な日記リスト(`RecyclerView`)に表示されるリストのアダプター。
+ *
+ * [DiaryListBaseAdapter]を継承し、通常の日記リストアイテムに特化したViewHolderの生成とデータバインドを実装する。
+ * アイテムのスワイプ背面ボタンの削除機能もサポートする。
+ *
+ * @param themeColor アイテムのViewに適用するテーマカラー。
+ * @param onDiaryClick 日記アイテムがクリックされた際のコールバック。
+ * @param onDeleteButtonClick 削除ボタン（スワイプ後に表示）がクリックされた際のコールバック。
+ */
 internal class StandardDiaryListAdapter (
     themeColor: ThemeColorUi,
     private val onDiaryClick: (DiaryListItemContainerUi.Standard) -> Unit,
@@ -45,20 +55,36 @@ internal class StandardDiaryListAdapter (
         }
     }
 
+    /**
+     * 標準的な日記一覧のリストアイテムデータ([DiaryListItemContainerUi.Standard])を表示するためのViewHolder。
+     *
+     * [SwipeableViewHolder]と[BackgroundButtonViewHolder]を実装し、スワイプ操作と背景ボタンの機能を提供する。
+     *
+     * @property binding View Bindingのインスタンス。
+     * @property onDiaryClick 日記アイテムがクリックされた際のコールバック。
+     * @property onDeleteButtonClick 削除ボタンがクリックされた際のコールバック。
+     */
     data class DiaryListDiaryViewHolder(
         private val binding: RowDiaryListStandardBinding,
         private val onDiaryClick: (DiaryListItemContainerUi.Standard) -> Unit,
         private val onDeleteButtonClick: (DiaryListItemContainerUi.Standard) -> Unit
     ) : DiaryListViewHolder(binding.root), SwipeableViewHolder, BackgroundButtonViewHolder {
 
+        /** スワイプの対象となるフォアグラウンドビュー。 */
         override val foregroundView: View
             get() = binding.linerLayoutForeground
 
+        /** スワイプ後のロールバックアニメーション中であるかを示すフラグ。 */
         override var isRollingBack: Boolean = false
 
+        /** スワイプによって表示される背景の削除ボタンビュー。 */
         override val backgroundButtonView: View
             get() = binding.includeBackground.imageButtonDelete
 
+        /**
+         * 日記アイテムのデータをViewにバインドする。
+         * @param item 表示する日記アイテム。
+         */
         fun bind(item: DiaryListItemContainerUi.Standard) {
             val date = item.date
             val context = binding.root.context

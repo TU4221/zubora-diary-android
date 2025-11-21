@@ -5,9 +5,16 @@ import com.websarva.wings.android.zuboradiary.R
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
+/**
+ * 複数の画面で共通して使用される、アプリケーションメッセージを表すsealed class。
+ */
 @Parcelize
 sealed class CommonAppMessage : AppMessage {
 
+    /**
+     * 予期せぬエラーが発生したことを示すメッセージ。
+     * @property exception 発生した例外。デバッグビルドの場合、メッセージに例外名が含まれる。
+     */
     class Unexpected(val exception: Exception) : CommonAppMessage() {
 
         @IgnoredOnParcel

@@ -4,6 +4,12 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import java.util.Arrays
 
+/**
+ * 日記の体調を表すUIモデル。
+ *
+ * 各体調は、データベース保存用の数値[number]を持つ。
+ * @property number 体調を表す数値。
+ */
 @Parcelize
 // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。
 //      その為、@Suppress("RedundantSuppression")で警告回避。

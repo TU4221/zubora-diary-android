@@ -5,6 +5,9 @@ import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
+/**
+ * 特定の機能に必要な権限が許可されていない場合に、その理由を説明し、許可を促すための警告ダイアログ。
+ */
 class PermissionDialogFragment : BaseAlertDialogFragment() {
 
     override fun createTitle(): String {
@@ -32,6 +35,7 @@ class PermissionDialogFragment : BaseAlertDialogFragment() {
     }
 
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + PermissionDialogFragment::class.java.name
     }
 }

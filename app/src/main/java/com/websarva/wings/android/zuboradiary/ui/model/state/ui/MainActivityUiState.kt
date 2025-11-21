@@ -1,9 +1,22 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
+import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import kotlinx.parcelize.Parcelize
 
+/**
+ * [MainActivity]のUI状態を表すデータクラス。
+ *
+ * @property themeColor 現在のテーマカラー。
+ *
+ * @property isBottomNavigationVisible BottomNavigationViewが表示されているかを示す。
+ * @property isBottomNavigationEnabled BottomNavigationViewが有効（操作可能）であるかを示す。
+ *
+ * @property isProcessing 処理中（読み込み中など）であるかを示す。
+ * @property isInputDisabled ユーザーの入力が無効化されているかを示す。
+ * @property isNavigating 画面遷移中であるかを示す。
+ */
 @Parcelize
 data class MainActivityUiState(
     // UiData

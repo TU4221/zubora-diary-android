@@ -1,12 +1,17 @@
 package com.websarva.wings.android.zuboradiary.ui.model.message
 
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
+/**
+ * 日記編集画面([DiaryEditFragment])で表示される、固有のアプリケーションメッセージを表すsealed class。
+ */
 @Parcelize
 sealed class DiaryEditAppMessage : AppMessage {
 
+    /** 日記の読み込みに失敗したことを示すメッセージ。 */
     data object DiaryLoadFailure : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
@@ -14,6 +19,7 @@ sealed class DiaryEditAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_diary_load_failure
     }
 
+    /** 日記の保存に失敗したことを示すメッセージ。 */
     data object DiarySaveFailure : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
@@ -21,6 +27,7 @@ sealed class DiaryEditAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_diary_save_failure
     }
 
+    /** ストレージ容量不足により日記の保存に失敗したことを示すメッセージ。 */
     data object DiarySaveInsufficientStorageFailure : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_storage_error
@@ -28,6 +35,7 @@ sealed class DiaryEditAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_diary_save_insufficient_storage_failure
     }
 
+    /** 日記の削除に失敗したことを示すメッセージ。 */
     data object DiaryDeleteFailure : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
@@ -35,6 +43,7 @@ sealed class DiaryEditAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_diary_delete_failure
     }
 
+    /** 添付画像の削除に失敗したことを示すメッセージ。 */
     data object DiaryImageDeleteFailure : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
@@ -42,6 +51,7 @@ sealed class DiaryEditAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_diary_image_delete_failure
     }
 
+    /** 日記情報の読み込みに失敗したことを示すメッセージ。 */
     data object DiaryInfoLoadFailure : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
@@ -49,6 +59,7 @@ sealed class DiaryEditAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_diary_info_load_failure
     }
 
+    /** 天気情報の取得に失敗したことを示すメッセージ。 */
     data object WeatherInfoFetchFailure : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_connection_error
@@ -56,6 +67,7 @@ sealed class DiaryEditAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_weather_info_fetch_failure
     }
 
+    /** 天気情報を取得可能な期間外であることを示すメッセージ。 */
     data object WeatherInfoDateOutOfRange : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_hint
@@ -63,6 +75,7 @@ sealed class DiaryEditAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_weather_info_date_out_of_range
     }
 
+    /** 位置情報へのアクセス許可が必要であることを示すメッセージ。 */
     data object AccessLocationPermissionRequest : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_permission_request
@@ -70,6 +83,7 @@ sealed class DiaryEditAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_access_location_permission_request
     }
 
+    /** 添付画像の読み込みに失敗したことを示すメッセージ。 */
     data object ImageLoadFailure : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
@@ -77,6 +91,7 @@ sealed class DiaryEditAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_edit_app_message_image_load_failure
     }
 
+    /** ストレージ容量不足により添付画像の読み込みに失敗したことを示すメッセージ。 */
     data object ImageLoadInsufficientStorageFailure : DiaryEditAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_storage_error

@@ -8,6 +8,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.asCalendarStartDayOfWeekString
 import java.time.DayOfWeek
 
+/**
+ * カレンダーの週の開始曜日を選択するためのボトムシートダイアログ。
+ */
 class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogFragment() {
 
     override fun handleOnPositiveButtonClick(
@@ -18,6 +21,10 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         setResultSelectedDayOfWeek(firstPickerValue)
     }
 
+    /**
+     * NumberPickerで選択された値を[DayOfWeek]に変換し、結果として設定する。
+     * @param pickerValue NumberPickerから取得した値
+     */
     private fun setResultSelectedDayOfWeek(
         pickerValue: Int
     ) {
@@ -50,6 +57,10 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         binding.numberPickerThird.visibility = View.GONE
     }
 
+    /**
+     * NumberPickerの初期値を設定する。
+     * @param binding NumberPickerを含むViewBinding
+     */
     private fun setupInitialValue(binding: DialogNumberPickersBinding) {
         val currentCalendarStartDayOfWeek =
             CalendarStartDayPickerDialogFragmentArgs.fromBundle(requireArguments()).initialValue
@@ -62,6 +73,10 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
         binding.numberPickerFirst.value = initialValue // MEMO:最大最小値を設定してから設定すること。(0の位置が表示される)
     }
 
+    /**
+     * NumberPickerに表示する曜日の文字列を設定する。
+     * @param binding NumberPickerを含むViewBinding
+     */
     private fun setupDisplayedValues(binding: DialogNumberPickersBinding) {
         val maxNumDaysOfWeek = DayOfWeek.entries.size
         val dayOfWeekList = arrayOfNulls<String>(maxNumDaysOfWeek)
@@ -79,6 +94,7 @@ class CalendarStartDayPickerDialogFragment : BaseNumberPickersBottomSheetDialogF
     }
 
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + CalendarStartDayPickerDialogFragment::class.java.name
     }
 }

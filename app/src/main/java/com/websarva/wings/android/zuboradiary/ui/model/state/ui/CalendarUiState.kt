@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
+import com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
@@ -8,6 +9,21 @@ import kotlinx.parcelize.Parcelize
 import java.time.DayOfWeek
 import java.time.LocalDate
 
+/**
+ * カレンダー画面([CalendarFragment])のUI状態を表すデータクラス。
+ *
+ * @property calendarStartDayOfWeek カレンダーの週の開始曜日。
+ * @property selectedDate ユーザーによって選択されている日付。
+ * @property previousSelectedDate 以前（一つ前）に選択されていた日付。
+ * @property diaryLoadState 日記データの読み込み状態。
+ * @property diaryImageFilePath 添付画像のファイルパス。
+ * 
+ * @property isWeather2Visible 天気2が表示されるべきかを示す。
+ * @property numVisibleDiaryItems 表示されている日記項目の数。
+ * 
+ * @property isProcessing 処理中（読み込み中など）であるかを示す。
+ * @property isInputDisabled ユーザーの入力が無効化されているかを示す。
+ */
 @Parcelize
 data class CalendarUiState(
     // UiData

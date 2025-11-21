@@ -1,12 +1,14 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert
 
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 
+/**
+ * 日記の読み込みに失敗したことを通知するための警告ダイアログ。
+ */
 class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
 
     override fun createTitle(): String {
@@ -32,12 +34,8 @@ class DiaryLoadFailureDialogFragment : BaseAlertDialogFragment() {
         setResult(RESULT_KEY, DialogResult.Cancel)
     }
 
-    override fun customizeDialog(builder: MaterialAlertDialogBuilder) {
-        super.customizeDialog(builder)
-        builder.setNegativeButton("", null)
-    }
-
     internal companion object {
+        /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryLoadFailureDialogFragment::class.java.name
     }
 }

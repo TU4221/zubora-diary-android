@@ -1,11 +1,24 @@
 package com.websarva.wings.android.zuboradiary.ui.recyclerview.callback.touch
 
 import android.util.Log
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
-import kotlin.math.max
-import kotlin.math.min
 
+/**
+ * RecyclerViewのアイテムに対する左スワイプで、
+ * 背景にボタンを表示する機能を実装するための[ItemTouchHelper.Callback]。
+ *
+ * 以下の責務を持つ:
+ * - スワイプの閾値を、背面ボタンの幅に基づいて動的に計算する。
+ * - スワイプ完了時に、背面ボタンが完全に表示される位置までのオフセットを計算・保持する。
+ * - スワイプ中の描画で、フォアグラウンドビューの移動量を背面ボタンの幅までに制限し、ボタンが隠れないように制御する。
+ * - ViewHolderが[SwipeableViewHolder]と[BackgroundButtonViewHolder]の両方を実装していることを要求する。
+ *
+ * @param processToFindViewHolder 指定されたポジションのViewHolderを見つけるための関数。
+ * @param processReattachAfterCloseAnimation クローズアニメーションの完了後に、
+ * ViewHolderをItemTouchHelperに再アタッチするためのコールバック。
+ */
 internal open class LeftSwipeBackgroundButtonCallback(
     processToFindViewHolder: (Int) -> RecyclerView.ViewHolder?,
     processReattachAfterCloseAnimation: (RecyclerView.ViewHolder) -> Unit
@@ -14,8 +27,19 @@ internal open class LeftSwipeBackgroundButtonCallback(
     processReattachAfterCloseAnimation
 ) {
 
+    /**
+     * スワイプ完了後に、`ItemTouchHelper`が提供する`dX`の値を補正するためのオフセット値。
+     *
+     *`ItemTouchHelper`はスワイプ完了時、`dX`をViewHolderの幅全体として扱う。
+     * 一方、このクラスはフォアグラウンドビューの移動を背面ボタンの幅に制限しているため、
+     * 両者の座標系にズレが生じる。
+     *
+     * この`swipingOffset`は、そのズレを吸収し、スワイプ完了後もビューが正しい位置に
+     * 描画されるようにするために、[drawViewHolder]内で`dX`に加算される。
+     */
     private var swipingOffset: Float = 0f
 
+    /** スワイプアクションを完了とみなすための閾値を背面ボタンの幅に基づいて計算し、返す。。 */
     override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
         Log.d(logTag, "getSwipeThreshold()_position = " + viewHolder.bindingAdapterPosition)
         if (viewHolder !is BackgroundButtonViewHolder) return super.getSwipeThreshold(viewHolder)
@@ -39,6 +63,7 @@ internal open class LeftSwipeBackgroundButtonCallback(
         return 1 - threshold
     }
 
+    /** スワイプが完了した際に、描画オフセットを計算する。 */
     override fun onSwipedHook(viewHolder: RecyclerView.ViewHolder) {
         val recyclerView = viewHolder.itemView.parent as? RecyclerView ?: return
         if (viewHolder !is BackgroundButtonViewHolder) return
@@ -47,12 +72,15 @@ internal open class LeftSwipeBackgroundButtonCallback(
             (recyclerView.width - viewHolder.backgroundButtonView.width).toFloat()
     }
 
+    /** フォアグラウンドビューの移動量を背面ボタンの幅に制限して描画する。 */
     override fun drawViewHolder(viewHolder: RecyclerView.ViewHolder, dX: Float) {
         if (viewHolder !is SwipeableViewHolder) return
         if (viewHolder !is BackgroundButtonViewHolder) return
 
         val backgroundButtonWidth = viewHolder.backgroundButtonView.width.toFloat()
-        val translationValueX =
+
+        // TODO:上手く処理されるか確認
+        /*val translationValueX =
             if (swipedAdapterPosition == viewHolder.getBindingAdapterPosition()) {
                 min(
                     0.0,
@@ -63,7 +91,19 @@ internal open class LeftSwipeBackgroundButtonCallback(
                     0.0,
                     max(-backgroundButtonWidth.toDouble(), dX.toDouble())
                 ).toFloat()
-            }
+            }*/
+        // 1. まず、現在のスワイプ量（dX）を計算する
+        //    スワイプ完了後であれば、保存しておいたオフセット値で補正する
+        val currentDx = if (swipedAdapterPosition == viewHolder.bindingAdapterPosition) {
+            dX + swipingOffset
+        } else {
+            dX
+        }
+
+        // 2. 計算したスワイプ量を、0.0f（元の位置）から -backgroundButtonWidth（ボタンの左端）の範囲内に収める
+        //    これにより、ビューがそれ以上右や左に行き過ぎるのを防ぐ
+        val translationValueX = currentDx.coerceIn(-backgroundButtonWidth, 0.0f)
+
         viewHolder.foregroundView.translationX = translationValueX
     }
 }

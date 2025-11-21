@@ -1,12 +1,17 @@
 package com.websarva.wings.android.zuboradiary.ui.model.message
 
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
+/**
+ * 日記一覧画面([DiaryListFragment])で表示される、固有のアプリケーションメッセージを表すsealed class。
+ */
 @Parcelize
 sealed class DiaryListAppMessage : AppMessage {
 
+    /** 日記リストの読み込みに失敗したことを示すメッセージ。 */
     data object DiaryListLoadFailure : DiaryListAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
@@ -14,6 +19,7 @@ sealed class DiaryListAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_list_app_message_diary_list_load_failure
     }
 
+    /** 日記の削除に失敗したことを示すメッセージ。 */
     data object DiaryDeleteFailure : DiaryListAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
@@ -21,6 +27,7 @@ sealed class DiaryListAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_list_app_message_diary_delete_failure
     }
 
+    /** 添付画像の削除に失敗したことを示すメッセージ。 */
     data object DiaryImageDeleteFailure : DiaryListAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
@@ -28,6 +35,7 @@ sealed class DiaryListAppMessage : AppMessage {
         override val dialogMessageStringResId: Int = R.string.dialog_diary_list_app_message_diary_image_delete_failure
     }
 
+    /** 日記情報の読み込みに失敗したことを示すメッセージ。 */
     data object DiaryInfoLoadFailure : DiaryListAppMessage() {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error

@@ -21,12 +21,19 @@ import com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
 import com.websarva.wings.android.zuboradiary.ui.view.custom.WindowInsetsViewHolder
 import java.time.LocalDate
 
+/**
+ * アプリケーション全体で使用されるカスタムBinding Adapterを定義するオブジェクト。
+ */
 internal object BindingAdapters {
-    // MEMO:既存"app:drawableStartCompat"は"@drawable/～"を代入すれば反映されるが、
-    //      Drawable型の変数を代入した時はBuildエラーが発生する。これは引数にDrawable型が対応されていない為である。
-    //      対策として下記メソッド作成。
-    //      (初めは"android:drawableStart"を使用していたが、IDEの警告より"app:drawableStartCompat"に変更。
-    //       しかし、現状layoutの構成ではDrawable型の変数を代入したかった為、このような対策をとる。)
+    /**
+     * [TextView]に[Drawable]を開始アイコンとして設定する。
+     *
+     * 標準の`app:drawableStartCompat`はXMLリソース（`@drawable/...`）の直接指定はサポートするが、
+     * DataBindingからの[Drawable]オブジェクトは対応していない為、このカスタムアダプターを使用する。
+     *
+     * @param textView 対象のTextView。
+     * @param drawable 設定するDrawable。nullの場合は何もしない。
+     */
     @JvmStatic
     @BindingAdapter("drawableStartCompat")
     fun setDrawableStartCompat(textView: TextView, drawable: Drawable?) {
@@ -34,12 +41,22 @@ internal object BindingAdapters {
         textView.setCompoundDrawablesRelativeWithIntrinsicBounds(drawable, null, null, null)
     }
 
+    /**
+     * [MaterialToolbar]のナビゲーションアイコンにクリックリスナーを設定する。
+     * @param toolbar 対象のToolbar。
+     * @param listener 設定するクリックリスナー。
+     */
     @JvmStatic
     @BindingAdapter("onNavigationIconClick")
     fun setOnNavigationIconClickListener(toolbar: MaterialToolbar, listener: View.OnClickListener) {
         toolbar.setNavigationOnClickListener(listener)
     }
 
+    /**
+     * [AutoCompleteTextView](ドロップダウンリストのアイテム等)にクリックリスナーを設定する。
+     * @param view 対象のAutoCompleteTextView。
+     * @param listener 設定するアイテムクリックリスナー。
+     */
     @JvmStatic
     @BindingAdapter("onItemClick")
     fun setOnItemClick(
@@ -48,6 +65,11 @@ internal object BindingAdapters {
         view.onItemClickListener = listener
     }
 
+    /**
+     * [TextInputLayout]に、指定された[InputTextValidationState]に基づいたエラーメッセージを設定する。
+     * @param layout 対象のTextInputLayout。
+     * @param state バリデーションの状態。`Valid`または`null`の場合はエラーをクリアする。
+     */
     @JvmStatic
     @BindingAdapter("textValidationState")
     fun setTextValidation(
@@ -69,12 +91,22 @@ internal object BindingAdapters {
             }
     }
 
+    /**
+     * [ImageProgressView]に、指定されたファイルパスから画像を読み込む。
+     * @param imageView 対象のImageProgressView。
+     * @param filePath 読み込む画像のファイルパス。
+     */
     @JvmStatic
     @BindingAdapter("imagePath")
     fun setImageProgressViewLoadImagePath(imageView: ImageProgressView, filePath: String?) {
         imageView.loadImage(filePath)
     }
 
+    /**
+     * [LocalDate]を日本語の日付書式にフォーマットし、[TextView]に設定する。
+     * @param textView 対象のTextView。
+     * @param date フォーマットする日付。
+     */
     @JvmStatic
     @BindingAdapter("dateText")
     fun setDateText(textView: TextView, date: LocalDate) {
@@ -84,6 +116,11 @@ internal object BindingAdapters {
         }
     }
 
+    /**
+     * [LocalDate]を日本語の日付書式にフォーマットし、[Toolbar]のタイトルとして設定する。
+     * @param toolbar 対象のToolbar。
+     * @param selectedCalendarDate フォーマットする日付。
+     */
     @JvmStatic
     @BindingAdapter("dateTitle")
     fun setDateTitle(toolbar: Toolbar, selectedCalendarDate: LocalDate) {
@@ -105,7 +142,8 @@ internal object BindingAdapters {
      * **RecyclerViewのアイテムビューで使用する場合の重要な注意点:**
      *  このBindingAdapterがアイテムの初期表示時にインセットを確実に反映するためには、
      *  対応するViewHolder([WindowInsetsViewHolder]) を継承する必要あり。
-     *  これにより、ViewHolderのItemViewがウィンドウにアタッチされた際にインセットの適用が要求され、初期表示時にインセットが反映。
+     *  これにより、ViewHolderのItemViewがウィンドウにアタッチされた際にインセットの適用が要求され、
+     *  初期表示時にインセットが反映。
      *
      * @param view マージンを調整するView。
      * @param applyLeft trueの場合、左マージンにインセットを適用します。
@@ -164,7 +202,8 @@ internal object BindingAdapters {
      * **RecyclerViewのアイテムビューで使用する場合の重要な注意点:**
      *  このBindingAdapterがアイテムの初期表示時にインセットを確実に反映するためには、
      *  対応するViewHolder([WindowInsetsViewHolder]) を継承する必要あり。
-     *  これにより、ViewHolderのItemViewがウィンドウにアタッチされた際にインセットの適用が要求され、初期表示時にインセットが反映。
+     *  これにより、ViewHolderのItemViewがウィンドウにアタッチされた際にインセットの適用が要求され、
+     *  初期表示時にインセットが反映。
      *
      * @param view パディングを調整するView。
      * @param applyLeft trueの場合、左パディングにインセットを適用します。

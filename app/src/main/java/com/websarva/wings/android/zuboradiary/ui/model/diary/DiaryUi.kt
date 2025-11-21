@@ -7,7 +7,7 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 
 /**
- * 日記を表すデータクラス。
+ * 日記を表すUIモデル。
  *
  * このクラスは、特定の日付の日記の内容（天気、体調、タイトル、項目、画像ファイル名など）を保持する。
  *

@@ -5,6 +5,14 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
+/**
+ * [AppCompatActivity]のライフサイクルイベントをLogcatに出力する機能を持つ抽象基底クラス。
+ *
+ * デバッグ目的でActivityのライフサイクルの遷移を追跡したい場合に、
+ * このクラスを継承して使用する。
+ * 各ライフサイクルメソッド（[onCreate], [onStart]など）が呼ばれるたびに、
+ * そのメソッド名をログに出力する。
+ */
 abstract class LoggingActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {

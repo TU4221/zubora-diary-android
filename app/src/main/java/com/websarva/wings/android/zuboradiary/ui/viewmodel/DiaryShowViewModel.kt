@@ -30,6 +30,14 @@ import kotlinx.coroutines.flow.onEach
 import java.time.LocalDate
 import javax.inject.Inject
 
+/**
+ * 日記表示画面のUIロジックと状態([DiaryShowUiState])管理を担うViewModel。
+ *
+ * 以下の責務を持つ:
+ * - [SavedStateHandle]から受け取ったIDに基づき、特定の日記データを読み込む
+ * - ユーザー操作（編集、削除メニューなど）に応じたイベント処理と画面遷移の発行
+ * - 日記の読み込み失敗や削除処理の結果をハンドリングし、適切なUIフィードバックを行う
+ */
 @HiltViewModel
 class DiaryShowViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
@@ -41,19 +49,22 @@ class DiaryShowViewModel @Inject internal constructor(
 ) {
 
     //region Properties
+    /** このViewModelが操作を受け入れ可能な状態かを示す。 */
     override val isReadyForOperation
         get() = !currentUiState.isInputDisabled
                 && (currentUiState.diaryLoadState is LoadState.Success)
 
+    /** UI状態から正常に読み込まれた日記データのみを抽出して提供するFlow。 */
     private val diaryFlow =
         uiState.distinctUntilChanged { old, new ->
             old.diaryLoadState == new.diaryLoadState
         }.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
+    /** 読み込んだ日記データへのアクセスを提供する。 */
     private val diary
         get() = (currentUiState.diaryLoadState as LoadState.Success).data
 
-    // キャッシュパラメータ
+    /** 削除処理が保留中であることを示すためのパラメータキャッシュ。 */
     private var pendingDiaryDeleteParameters: DiaryDeleteParameters? = null
     //endregion
 
@@ -63,6 +74,7 @@ class DiaryShowViewModel @Inject internal constructor(
         collectUiStates()
     }
 
+    /** [SavedStateHandle]からIDと日付を取得し、日記データの初期化を開始する。 */
     private fun initializeDiaryData() {
         val id = handle.get<String>(ARGUMENT_DIARY_ID_KEY)?.let { DiaryId(it) } ?: throw IllegalArgumentException()
         val date = handle.get<LocalDate>(ARGUMENT_DIARY_DATE_KEY) ?: throw IllegalArgumentException()
@@ -71,12 +83,14 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
+    /** UI状態の監視を開始する。 */
     private fun collectUiStates() {
         collectWeather2Visible()
         collectNumVisibleDiaryItems()
         collectImageFilePath()
     }
 
+    /** 天気2の表示/非表示状態の変更を監視し、UIに反映させる。 */
     private fun collectWeather2Visible() {
         diaryFlow.distinctUntilChanged{ old, new ->
             old.weather1 == new.weather1 && old.weather2 == new.weather2
@@ -87,6 +101,7 @@ class DiaryShowViewModel @Inject internal constructor(
         }.launchIn(viewModelScope)
     }
 
+    /** 表示する日記項目数の変更を監視し、UIに反映させる。 */
     private fun collectNumVisibleDiaryItems() {
         diaryFlow.distinctUntilChanged{ old, new ->
             old.itemTitles == new.itemTitles
@@ -97,6 +112,7 @@ class DiaryShowViewModel @Inject internal constructor(
         }.launchIn(viewModelScope)
     }
 
+    /** 添付画像のファイルパスの変更を監視し、UIに反映させる。 */
     private fun collectImageFilePath() {
         diaryFlow.distinctUntilChanged{ old, new ->
             old.imageFileName == new.imageFileName
@@ -120,7 +136,10 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
-    // Viewクリック処理
+    /**
+     * 編集メニューがクリックされた時に呼び出される事を想定。
+     * 日記編集画面へ遷移するイベントを発行する。
+     */
     internal fun onDiaryEditMenuClick() {
         if (!isReadyForOperation) return
 
@@ -133,6 +152,10 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 削除メニューがクリックされた時に呼び出される事を想定。
+     * 日記削除確認ダイアログへ遷移するイベントを発行する。
+     */
     internal fun onDiaryDeleteMenuClick() {
         if (!isReadyForOperation) return
 
@@ -146,6 +169,10 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * ナビゲーションアイコンがクリックされた時に呼び出される事を想定。
+     * 前の画面へ戻るイベントを発行する。
+     */
     fun onNavigationIconClick() {
         if (!isReadyForOperation) return
 
@@ -155,8 +182,13 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
-    // Fragmentからの結果受取処理
-    internal fun onDiaryLoadFailureDialogResultReceived(result: DialogResult<Unit>) {when (result) {
+    /**
+     * 日記読み込み失敗ダイアログから結果を受け取った時に呼び出される事を想定。
+     * 前の画面に戻るイベントを発行する。
+     * @param result ダイアログからの結果
+     */
+    internal fun onDiaryLoadFailureDialogResultReceived(result: DialogResult<Unit>) {
+        when (result) {
             is DialogResult.Positive<Unit>,
             DialogResult.Negative,
             DialogResult.Cancel -> {
@@ -169,6 +201,11 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 日記削除確認ダイアログから結果を受け取った時に呼び出される事を想定。
+     * Positiveの場合のみ、日記の削除処理を実行する。
+     * @param result ダイアログからの結果
+     */
     internal fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
         when (result) {
             is DialogResult.Positive<Unit> -> {
@@ -182,6 +219,10 @@ class DiaryShowViewModel @Inject internal constructor(
         clearPendingDiaryDeleteParameters()
     }
 
+    /**
+     * 日記削除確認ダイアログからのPositive結果を処理し、日記を削除する。
+     * @param parameters 削除に必要なパラメータ
+     */
     private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters?) {
         launchWithUnexpectedErrorHandler {
             parameters?.let {
@@ -192,6 +233,11 @@ class DiaryShowViewModel @Inject internal constructor(
     //endregion
 
     //region Business Logic
+    /**
+     * IDに基づいて保存されている日記を読み込む。
+     * @param id 読み込む日記のID
+     * @param date 読み込む日記の日付（エラー時のダイアログ表示用）
+     */
     private suspend fun loadSavedDiary(id: DiaryId, date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
@@ -219,6 +265,11 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 日記を削除し、前の画面へ戻るイベントを発行する。
+     * @param id 削除対象の日記ID
+     * @param date 削除対象の日記の日付
+     */
     private suspend fun deleteDiary(id: DiaryId, date: LocalDate) {
         val logMsg = "日記削除"
         Log.i(logTag, "${logMsg}_開始")
@@ -252,6 +303,10 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * 前の画面に戻るためのナビゲーションイベントを発行する。
+     * @param diaryDate 遷移元に返す日記の日付
+     */
     private suspend fun navigatePreviousFragment(diaryDate: LocalDate) {
         emitNavigatePreviousFragmentEvent(
             FragmentResult.Some(diaryDate)
@@ -260,18 +315,31 @@ class DiaryShowViewModel @Inject internal constructor(
     //endregion
 
     //region UI State Update
+    /**
+     * 天気2の表示状態を更新する。
+     * @param isVisible 表示する場合はtrue
+     */
     private fun updateIsWeather2Visible(isVisible: Boolean) {
         updateUiState { it.copy(isWeather2Visible = isVisible) }
     }
 
+    /**
+     * 表示されている日記項目数を更新する。
+     * @param count 表示する日記項目の数
+     */
     private fun updateNumVisibleDiaryItems(count: Int) {
         updateUiState { it.copy(numVisibleDiaryItems = count) }
     }
 
+    /**
+     * 添付画像のファイルパスを更新する。
+     * @param path 新しいファイルパス
+     */
     private fun updateDiaryImageFilePath(path: FilePathUi?) {
         updateUiState { it.copy(diaryImageFilePath = path) }
     }
 
+    /** UIを日記読み込み中の状態に更新する。 */
     private fun updateToDiaryLoadingState() {
         updateUiState {
             it.copy(
@@ -282,6 +350,10 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
+    /**
+     * UIを日記読み込み成功の状態に更新する。
+     * @param diary 読み込んだ日記データ
+     */
     private fun updateToDiaryLoadSuccessState(diary: DiaryUi) {
         updateUiState {
             it.copy(
@@ -292,6 +364,7 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
+    /** UIを日記読み込み失敗の状態に更新する。 */
     private fun updateToDiaryLoadErrorState() {
         updateUiState {
             it.copy(
@@ -302,6 +375,7 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
+    /** UIを処理中の状態に更新する。 */
     private fun updateToProgressVisibleState() {
         updateUiState {
             it.copy(
@@ -311,6 +385,7 @@ class DiaryShowViewModel @Inject internal constructor(
         }
     }
 
+    /** UIを処理完了の状態に更新する。 */
     private fun updateToProgressInvisibleState() {
         updateUiState {
             it.copy(
@@ -322,14 +397,25 @@ class DiaryShowViewModel @Inject internal constructor(
     //endregion
 
     //region Pending Diary Delete Parameters
+    /**
+     * 保留中の日記削除パラメータを更新する。
+     * @param id 削除対象の日記ID
+     * @param date 削除対象の日記の日付
+     */
     private fun updatePendingDiaryDeleteParameters(id: DiaryId, date: LocalDate) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
 
+    /** 保留中の日記削除パラメータをクリアする。 */
     private fun clearPendingDiaryDeleteParameters() {
         pendingDiaryDeleteParameters = null
     }
 
+    /**
+     * 日記削除処理に必要なパラメータを保持するデータクラス。
+     * @property id 削除対象の日記ID
+     * @property date 削除対象の日記の日付
+     * */
     private data class DiaryDeleteParameters(
         val id: DiaryId,
         val date: LocalDate
@@ -337,7 +423,10 @@ class DiaryShowViewModel @Inject internal constructor(
     //endregion
 
     private companion object {
+        /** ナビゲーションコンポーネントで受け渡される日記IDのキー。 */
         const val ARGUMENT_DIARY_ID_KEY = "diary_id"
+
+        /** ナビゲーションコンポーネントで受け渡される日記日付のキー。 */
         const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
     }
 }

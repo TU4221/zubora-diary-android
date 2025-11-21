@@ -40,9 +40,10 @@
         app:applySystemInsetsToPaddingRight="@{true}" >
 
         <!-- HACK:警告で"android:drawableStart"から"app:drawableStartCompat"に変更するように促されるが、
-                  "app:drawableStartCompat"はリソースしか受け付けない為、"android:drawableStart"を使用
+                  "app:drawableStartCompat"はリソースからの直接指定しか受け付けない為、BindingAdaptersで対応。
+                  toolsは"tools:drawableStart"を使用して警告が発生しない。
                   この警告は"android:drawableStart"がAPIレベルが27以上でないと対応してないことから起きており、
-                  本アプリはAPIレベル21が対応最小レベルとなるのでこのまま使用する。 -->
+                  本アプリはAPIレベル26が対応最小レベルとなるのでこのまま使用する。 -->
         <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
         <TextView
             android:id="@+id/text_title"

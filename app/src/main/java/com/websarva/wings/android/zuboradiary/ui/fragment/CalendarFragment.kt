@@ -39,6 +39,14 @@ import java.util.stream.Collectors
 import java.util.stream.Stream
 import kotlin.math.absoluteValue
 
+/**
+ * カレンダー表示と選択された日付の日記を表示するフラグメント。
+ *
+ * 以下の責務を持つ:
+ * - カレンダーUIの表示と更新
+ * - 日付の選択と、選択された日付に対応する日記の表示
+ * - 新しい日記を作成するための画面遷移
+ */
 @AndroidEntryPoint
 class CalendarFragment :
     BaseFragment<FragmentCalendarBinding, CalendarUiEvent>(),
@@ -56,6 +64,7 @@ class CalendarFragment :
     //endregion
 
     //region Fragment Lifecycle
+    /** 追加処理として、カレンダービューの初期設定を行う。*/
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -75,6 +84,7 @@ class CalendarFragment :
             }
     }
 
+    /** カレンダーのBinderとListenerもnullに設定する。 */
     override fun clearViewBindings() {
         with(binding.calendar) {
             dayBinder = null
@@ -92,6 +102,7 @@ class CalendarFragment :
         observeDiaryEditFragmentResult()
     }
 
+    /** [DiaryShowFragment]からの結果を監視する。 */
     private fun observeDiaryShowFragmentResult() {
         observeFragmentResult(
             DiaryShowFragment.RESULT_KEY
@@ -100,6 +111,7 @@ class CalendarFragment :
         }
     }
 
+    /** [DiaryEditFragment]からの結果を監視する。 */
     private fun observeDiaryEditFragmentResult() {
         observeFragmentResult(
             DiaryEditFragment.RESULT_KEY
@@ -159,6 +171,7 @@ class CalendarFragment :
         observeUiEventFromActivity()
     }
 
+    /** 選択日付の変更を監視し、カレンダーのUIを更新する。 */
     private fun observeSelectedDate() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
@@ -172,6 +185,7 @@ class CalendarFragment :
         }
     }
 
+    /** 週の開始曜日の変更を監視し、カレンダーを再描画する。 */
     private fun observeCalendarStartDayOfWeek() {
         launchAndRepeatOnViewLifeCycleStarted {
             mainViewModel.uiState.distinctUntilChanged { old, new ->
@@ -185,6 +199,7 @@ class CalendarFragment :
         }
     }
 
+    /** ActivityからのUIイベントを監視する。 */
     private fun observeUiEventFromActivity() {
         fragmentHelper.observeActivityUiEvent(
             this,
@@ -195,6 +210,7 @@ class CalendarFragment :
     //endregion
 
     //region View Manipulation
+    /** BottomNavigationViewの同じタブが再選択されたときに呼び出される。 */
     private fun onBottomNavigationItemReselected() {
         if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
             scrollToTop()
@@ -203,12 +219,17 @@ class CalendarFragment :
         mainViewModel.onBottomNavigationItemReselect()
     }
 
+    /** 画面の最上部までスムーズにスクロールする。 */
     private fun scrollToTop() {
         binding.nestedScrollFullScreen.smoothScrollTo(0, 0)
     }
     //endregion
 
     //region Calendar View - Setup
+    /**
+     * カレンダービューの初期設定を行う。
+     * 表示範囲、曜日のリスト、各種Binderを設定する。
+     */
     private fun setupCalendar() {
         val calendar = binding.calendar
 
@@ -221,6 +242,10 @@ class CalendarFragment :
         calendar.setup(startMonth, endMonth, daysOfWeek[0])
     }
 
+    /**
+     * 設定に基づいた週の開始曜日が先頭に来るようにソートされた曜日のリストを生成する。
+     * @return ソートされた[DayOfWeek]のリスト
+     */
     private fun createDayOfWeekList(): List<DayOfWeek> {
         val daysOfWeek = DayOfWeek.entries.toTypedArray()
         val startDayOfWeek = mainViewModel.uiState.value.calendarStartDayOfWeek
@@ -239,7 +264,11 @@ class CalendarFragment :
             .collect(Collectors.toList())
     }
 
-    // カレンダーBind設定
+    /**
+     * カレンダーのヘッダーと日付セルのBinderを設定する。
+     * @param daysOfWeek 表示する曜日のリスト
+     * @param themeColor 現在のテーマカラー
+     */
     private fun configureCalendarBinders(daysOfWeek: List<DayOfWeek>, themeColor: ThemeColorUi) {
         with (binding.calendar) {
             val format = getString(R.string.fragment_calendar_month_header_format)
@@ -257,12 +286,19 @@ class CalendarFragment :
         }
     }
 
+    /**
+     * カレンダーの月ヘッダーの描画を担うBinder。
+     * @property daysOfWeek 表示する曜日のリスト
+     * @property themeColor 現在のテーマカラー
+     * @property headerDateFormat 年月を表示するためのフォーマット文字列
+     */
     private class CalendarMonthHeaderFooterBinder(
         private val daysOfWeek: List<DayOfWeek>,
         private val themeColor: ThemeColorUi,
         private val headerDateFormat: String
     ) : MonthHeaderFooterBinder<MonthViewContainer> {
 
+        /** 月ヘッダービューがバインドされるときに呼び出される。 */
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun bind(container: MonthViewContainer, calendarMonth: CalendarMonth) {
             container.bind(
@@ -273,18 +309,29 @@ class CalendarFragment :
             )
         }
 
+        /** 月ヘッダーのViewContainerを生成する。 */
         override fun create(view: View): MonthViewContainer {
             return MonthViewContainer(view)
         }
     }
 
-    // カレンダー月単位コンテナ
+    /**
+     * カレンダーの月ヘッダーのビューを保持するコンテナ。
+     * @param view コンテナのルートビュー
+     */
     private class MonthViewContainer(view: View) : ViewContainer(view) {
 
         private val binding: LayoutCalendarHeaderBinding = LayoutCalendarHeaderBinding.bind(view)
 
         private val themeColorChanger = CalendarThemeColorChanger()
 
+        /**
+         * ヘッダービューに年月と曜日を描画する。
+         * @param yearMonth 表示する年月
+         * @param daysOfWeek 表示する曜日のリスト
+         * @param headerDateFormat 年月を表示するためのフォーマット
+         * @param themeColor 現在のテーマカラー
+         */
         fun bind(
             yearMonth: YearMonth,
             daysOfWeek: List<DayOfWeek>,
@@ -314,6 +361,12 @@ class CalendarFragment :
             }
         }
 
+        /**
+         * 曜日に応じてテキストの色を設定する。
+         * @param dayOfWeek 対象の曜日
+         * @param dayOfWeekText 色を設定するTextView
+         * @param themeColor 現在のテーマカラー
+         */
         private fun setupDayOfWeekColor(
             dayOfWeek: DayOfWeek,
             dayOfWeekText: TextView,
@@ -334,20 +387,30 @@ class CalendarFragment :
         }
     }
 
+    /**
+     * カレンダーの日付セルの描画を担うBinder。
+     * @property themeColor 現在のテーマカラー
+     * @property onDateClick 日付クリック時のコールバック
+     * @property checkDiaryExists 日記の存在確認を行うコールバック
+     */
     private class CalendarMonthDayBinder(
         private val themeColor: ThemeColorUi,
         private val onDateClick: (date: LocalDate) -> Unit,
         private val checkDiaryExists: (date: LocalDate) -> Unit
     ) : MonthDayBinder<DayViewContainer> {
 
+        /** 現在選択されている日付。 */
         private var selectedDate: LocalDate = LocalDate.now()
 
+        /** 日付ごとのドット表示状態をキャッシュするマップ。 */
         private val dayDotVisibilityCache = mutableMapOf<LocalDate, Boolean>()
 
+        /** 日付セルのViewContainerを生成する。 */
         override fun create(view: View): DayViewContainer {
             return DayViewContainer(view)
         }
 
+        /** 日付セルビューがバインドされるときに呼び出される。 */
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override fun bind(container: DayViewContainer, calendarDay: CalendarDay) {
             container.view.setOnClickListener {
@@ -384,22 +447,34 @@ class CalendarFragment :
             )
         }
 
+        /** 選択されている日付を更新する。 */
         fun updateSelectedDate(date: LocalDate) {
             selectedDate = date
         }
 
+        /** 日付のドット表示状態のキャッシュを更新する。 */
         fun updateDayDotVisibilityCache(date: LocalDate, isVisible: Boolean) {
             dayDotVisibilityCache[date] = isVisible
         }
     }
 
-    // カレンダー日単位コンテナ
+    /**
+     * カレンダーの日付セルのビューを保持するコンテナ。
+     * @param view コンテナのルートビュー
+     */
     private class DayViewContainer(view: View) : ViewContainer(view) {
 
         private val binding: LayoutCalendarDayBinding = LayoutCalendarDayBinding.bind(view)
 
         private val themeColorChanger = CalendarThemeColorChanger()
 
+        /**
+         * 日付セルビューに日付とドットを描画し、状態に応じてスタイルを適用する。
+         * @param calendarDay 描画する日付の情報
+         * @param dayState 日付の状態（選択、今日など）
+         * @param dotIsVisible ドットを表示するかどうか
+         * @param themeColor 現在のテーマカラー
+         */
         fun bind(
             calendarDay: CalendarDay,
             dayState: DayState,
@@ -445,6 +520,7 @@ class CalendarFragment :
             }
         }
 
+        /** 日付セルの状態を表すenum。 */
         enum class DayState {
             SELECTED,
             TODAY,
@@ -456,6 +532,10 @@ class CalendarFragment :
     //endregion
 
     //region Calendar View Manipulation
+    /**
+     * 指定された日付が含まれる月にカレンダーをスクロールする。
+     * @param date スクロール先のターゲット日付
+     */
     private fun scrollCalendar(date: LocalDate) {
         val calendar = binding.calendar
         val targetYearMonth = YearMonth.of(date.year, date.monthValue)
@@ -465,6 +545,11 @@ class CalendarFragment :
         binding.calendar.scrollToMonth(targetYearMonth)
     }
 
+    /**
+     * 指定された日付が含まれる月にカレンダーをスムーズにスクロールする。
+     * 月が3ヶ月以上離れている場合は、アニメーションなしで即座にスクロールする。
+     * @param date スクロール先のターゲット日付
+     */
     private fun smoothScrollCalendar(date: LocalDate) {
         val calendar = binding.calendar
         val targetYearMonth = YearMonth.of(date.year, date.monthValue)
@@ -490,12 +575,22 @@ class CalendarFragment :
         }
     }
 
+    /**
+     * 特定の日付のドット表示を更新する。
+     * @param date ドット表示を更新する日付
+     * @param isVisible ドットを表示する場合はtrue
+     */
     private fun updateCalendarDayDotVisibility(date: LocalDate, isVisible: Boolean) {
         val calendarMonthDayBinder = binding.calendar.dayBinder as CalendarMonthDayBinder
         calendarMonthDayBinder.updateDayDotVisibilityCache(date, isVisible)
         binding.calendar.notifyDateChanged(date)
     }
 
+    /**
+     * 選択された日付のUIを更新する。
+     * @param selectedDate 新しく選択された日付
+     * @param previousSelectedDate 以前に選択されていた日付
+     */
     private fun updateCalendarSelectedDate(
         selectedDate: LocalDate,
         previousSelectedDate: LocalDate?
@@ -510,6 +605,11 @@ class CalendarFragment :
     //endregion
 
     //region Navigation Helpers
+    /**
+     * 日記編集画面([DiaryEditFragment])へ遷移する。
+     * @param id 編集する日記のID（新規作成の場合はnull）
+     * @param date 対象の日付
+     *  */
     private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {
         val directions =
             CalendarFragmentDirections

@@ -1,23 +1,25 @@
 package com.websarva.wings.android.zuboradiary.ui.view.custom
 
 import android.view.View
+import androidx.core.view.OnApplyWindowInsetsListener
 import androidx.core.view.ViewCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.websarva.wings.android.zuboradiary.ui.view.BindingAdapters
 
 /**
- * [itemView] がウィンドウにアタッチされた時に、WindowInsetsの適用を要求する [RecyclerView.ViewHolder]。
+ * `RecyclerView`のアイテムビューに適用された[BindingAdapters.applySystemInsetsToMargin]が、
+ * ビューの再利用時にインセットを再適用するようにトリガーをかけるための抽象`ViewHolder`。
  *
- * RecyclerViewのアイテムビューが最初に表示される際、インセット関連のリスナー
- * ([View.OnApplyWindowInsetsListener] など) が確実に呼び出されるようにします。(Edge-to-Edge対応)
+ * `RecyclerView`のアイテムビューは再利用されるため、
+ * [BindingAdapters.applySystemInsetsToMargin]で適用された[OnApplyWindowInsetsListener]は
+ * 一度しか呼び出されないことがある。その結果、ビューが再アタッチされた際にインセットが正しく適用されない問題が発生する。
  *
- * [itemView]がアタッチされると [ViewCompat.requestApplyInsets] を呼び出し、
- * 現在のインセットでリスナーがトリガーされることを促します。
+ * この`ViewHolder`を継承することで、アイテムビューがウィンドウにアタッチされるたびに
+ * [ViewCompat.requestApplyInsets]が呼び出され、
+ * [OnApplyWindowInsetsListener]がインセットを再計算・再適用する機会が与えられる。
+ * これにより、Edge-to-Edge対応のレイアウトでスクロールやデータ更新時にインセットが失われる問題を防ぐ。
  *
- * 使用方法: このViewHolderを継承して使用します。
- *
- * @param itemView RecyclerView内のアイテムビュー。
- * @see ViewCompat.requestApplyInsets
- * @see View.OnApplyWindowInsetsListener
+ * @param itemView ViewHolderが保持するアイテムのビュー。
  */
 internal abstract class WindowInsetsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
@@ -25,13 +27,17 @@ internal abstract class WindowInsetsViewHolder(itemView: View) : RecyclerView.Vi
         itemView.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
 
             /**
-             * ItemViewがウィンドウにアタッチされた時、インセットの適用を要求。
-             * これにより、初期表示時にインセットが正しく反映されることを保証。
+             * ビューがウィンドウにアタッチされたときに呼び出される。
+             * インセットの再適用を要求し、`BindingAdapter`がインセットを再評価するようトリガーする。
              */
             override fun onViewAttachedToWindow(v: View) {
                 ViewCompat.requestApplyInsets(v)
             }
 
+            /**
+             * ビューがウィンドウからデタッチされたときに呼び出される。
+             * この実装では特に処理は不要。
+             */
             override fun onViewDetachedFromWindow(v: View) {
                 // 処理不要
             }

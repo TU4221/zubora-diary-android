@@ -9,8 +9,19 @@ import com.websarva.wings.android.zuboradiary.ui.utils.formatHourMinuteString
 import java.time.DayOfWeek
 import java.time.LocalTime
 
+/**
+ * 設定画面に関連するカスタムBinding Adapterを定義するオブジェクト。
+ */
 internal object SettingsUiBindingAdapters {
 
+    /**
+     * `Any?`型の値を、その型に応じた適切な文字列にフォーマットして[TextView]に設定する。
+     *
+     * [ThemeColorUi]、[DayOfWeek]、[LocalTime]など、複数の型を単一のBinding Adapterで処理するために使用される。
+     *
+     * @param textView 対象のTextView。
+     * @param value フォーマットして表示する値。nullの場合は空文字列が設定される。
+     */
     @JvmStatic
     @BindingAdapter("settingValueText")
     fun setSettingValueText(textView: TextView, value: Any?) {

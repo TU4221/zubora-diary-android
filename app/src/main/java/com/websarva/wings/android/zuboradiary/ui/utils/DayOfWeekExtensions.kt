@@ -4,6 +4,10 @@ import android.content.Context
 import com.websarva.wings.android.zuboradiary.R
 import java.time.DayOfWeek
 
+/**
+ * [DayOfWeek]を、設定画面のカレンダー開始曜日の設定値として表示するための文字列（例: "日曜"）に変換する。
+ * @param context 文字列リソースを取得するためのコンテキスト。
+ */
 internal fun DayOfWeek.asCalendarStartDayOfWeekString(context: Context): String {
     val resId = when (this) {
         DayOfWeek.SUNDAY -> R.string.enum_day_of_week_name_sunday
@@ -17,6 +21,10 @@ internal fun DayOfWeek.asCalendarStartDayOfWeekString(context: Context): String 
     return context.getString(resId)
 }
 
+/**
+ *  [DayOfWeek]を、日記リストアイテムの日付欄に表示するための文字列（例: "日"）に変換する。
+ * @param context 文字列リソースを取得するためのコンテキスト。
+ */
 internal fun DayOfWeek.asDiaryListDayOfWeekString(context: Context): String {
     val resId = when (this) {
         DayOfWeek.SUNDAY -> R.string.enum_day_of_week_short_name_sunday

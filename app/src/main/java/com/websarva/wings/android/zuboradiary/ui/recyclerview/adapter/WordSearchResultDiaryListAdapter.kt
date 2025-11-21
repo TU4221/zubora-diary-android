@@ -20,6 +20,14 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asOnTertiaryContainerColo
 import com.websarva.wings.android.zuboradiary.ui.utils.asTertiaryContainerColorInt
 import java.text.NumberFormat
 
+/**
+ * ワード検索結果リスト(`RecyclerView`)に表示されるリストのアダプター。
+ *
+ * [DiaryListBaseAdapter]を継承し、検索結果のリストアイテムに特化したViewHolderの生成とデータバインドを実装する。
+ *
+ * @param themeColor アイテムのViewに適用するテーマカラー。
+ * @param onDiaryClick 日記アイテムがクリックされた際のコールバック。
+ */
 internal class WordSearchResultDiaryListAdapter (
     themeColor: ThemeColorUi,
     private val onDiaryClick: (DiaryListItemContainerUi.WordSearchResult) -> Unit
@@ -46,12 +54,24 @@ internal class WordSearchResultDiaryListAdapter (
         }
     }
 
+    /**
+     * ワード検索結果のリストアイテムデータ([DiaryListItemContainerUi.WordSearchResult])を
+     * 表示するためのViewHolder。
+     *
+     * @property binding View Bindingのインスタンス。
+     * @property themeColor アイテムのViewに適用するテーマカラー。
+     * @property onDiaryClick 日記アイテムがクリックされた際のコールバック。
+     */
     data class DiaryListWordSearchResultViewHolder(
         private val binding: RowDiaryListWordSearchResultBinding,
         private val themeColor: ThemeColorUi,
         private val onDiaryClick: (DiaryListItemContainerUi.WordSearchResult) -> Unit
     ) : DiaryListViewHolder(binding.root) {
 
+        /**
+         * 検索結果アイテムのデータをViewにバインドする。
+         * @param item 表示する検索結果アイテム。
+         */
         fun bind(item: DiaryListItemContainerUi.WordSearchResult) {
             with(binding) {
                 val context = root.context
@@ -73,21 +93,51 @@ internal class WordSearchResultDiaryListAdapter (
             }
         }
 
-        private fun DiaryListItemContainerUi.WordSearchResult
-                .createTitleSpannableString(context: Context, themeColor: ThemeColorUi): SpannableString {
+        /**
+         * 日記タイトル内の検索ワードをハイライトした[SpannableString]を生成する。
+         * @param context コンテキスト。
+         * @param themeColor テーマカラー。
+         * @return ハイライトされたタイトル文字列。
+         */
+        private fun DiaryListItemContainerUi.WordSearchResult.createTitleSpannableString(
+            context: Context,
+            themeColor: ThemeColorUi
+        ): SpannableString {
             return toSpannableString(context, title, searchWord, themeColor)
         }
 
+        /**
+         * 項目タイトル内の検索ワードをハイライトした[SpannableString]を生成する。
+         * @param context コンテキスト。
+         * @param themeColor テーマカラー。
+         * @return ハイライトされた項目タイトル文字列。
+         */
         private fun DiaryListItemContainerUi.WordSearchResult
                 .createItemTitleSpannableString(context: Context, themeColor: ThemeColorUi): SpannableString {
             return toSpannableString(context, itemTitle, searchWord, themeColor)
         }
 
-        private fun DiaryListItemContainerUi.WordSearchResult
-                .createItemCommentSpannableString(context: Context, themeColor: ThemeColorUi): SpannableString {
+        /**
+         * 項目コメント内の検索ワードをハイライトした[SpannableString]を生成する。
+         * @param context コンテキスト。
+         * @param themeColor テーマカラー。
+         * @return ハイライトされた項目コメント文字列。
+         */
+        private fun DiaryListItemContainerUi.WordSearchResult.createItemCommentSpannableString(
+            context: Context,
+            themeColor: ThemeColorUi
+        ): SpannableString {
             return toSpannableString(context, itemComment, searchWord, themeColor)
         }
 
+        /**
+         * 指定された文字列内の[targetWord]に一致するすべての部分をハイライトした[SpannableString]を返す。
+         * @param context コンテキスト。
+         * @param string 対象の文字列。
+         * @param targetWord ハイライトするワード。
+         * @param themeColor テーマカラー。
+         * @return ハイライトされたSpannableString。
+         */
         // 対象ワードをマーキング
         private fun toSpannableString(
             context: Context,

@@ -7,6 +7,22 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 
+/**
+ * RecyclerViewのアイテムを左方向にスワイプするための、[ItemTouchHelper.Callback]の抽象基底クラス。
+ *
+ * 以下の責務を持つ:
+ * - スワイプ方向を左のみに限定する。
+ * - スワイプ状態（スワイプ中、スワイプ完了後）の位置情報を管理する。
+ * - スワイプ機能の有効/無効を動的に切り替える。
+ * - 他のアイテムがスワイプされている場合に、新たなスワイプを無効にする。
+ * - スワイプされたアイテムを閉じる（元の位置に戻す）アニメーションを提供する。
+ * - スワイプ中のビューの描画処理をサブクラスに委譲する。
+ *
+ * @param findViewHolder 指定されたポジションのViewHolderを見つけるための関数。
+ * @param reattachViewHolderAfterCloseAnimation クローズアニメーションの完了後に、
+ *        ViewHolderをItemTouchHelperに再アタッチするためのコールバック。
+ * @param onSwiped アイテムが完全にスワイプされたときに呼び出されるコールバック。
+ */
 internal abstract class BaseLeftSwipeCallback(
     private val findViewHolder: (position: Int) -> RecyclerView.ViewHolder?,
     private val reattachViewHolderAfterCloseAnimation: (RecyclerView.ViewHolder) -> Unit,
@@ -16,30 +32,50 @@ internal abstract class BaseLeftSwipeCallback(
     ItemTouchHelper.LEFT
 ) {
 
+    /**
+     * スワイプ機能が現在有効であるかを示すフラグ。
+     * RecyclerViewの更新中など、一時的にスワイプを無効化するために使用する。
+     */
     // MEMO:スワイプ時、タッチ状態を継続したままRecyclerViewを更新するとonSwiped()が起動するが、
     //      対象ViewHolderのItemPositionが-1となるため、Overrideで記述したコードで例外が発生する。
     //      その為、RecyclerViewを更新時はgetSwipeDirs()をOverrideしてスワイプ機能を無効にする。
     private var isItemSwipeEnabled = true
 
     private val initializePosition = -1
+    /** 現在ユーザーがスワイプ操作中のアイテムのアダプターポジション。操作中でなければ`-1`。 */
     private var swipingAdapterPosition: Int = initializePosition
+
+    /** ユーザーの操作が離れ、スワイプされたままになっているアイテムのアダプターポジション。存在しなければ`-1`。 */
     var swipedAdapterPosition: Int = initializePosition
         private set
 
+    /** スワイプ中およびスワイプ完了後のアイテムポジションをすべてリセットする。 */
     fun resetSwipeStatePositions() {
         resetSwipingAdapterPosition()
         resetSwipedAdapterPosition()
     }
 
+    /** 現在スワイプされている（またはスワイプ中の）アイテムを閉じるアニメーションを開始する。 */
     fun closeSwipedItem() {
         if (swipingAdapterPosition != initializePosition) closeSwipedViewHolder(swipingAdapterPosition)
         if (swipedAdapterPosition != initializePosition) closeSwipedViewHolder(swipedAdapterPosition)
     }
 
+    /**
+     * スワイプ機能の有効/無効状態を更新する。
+     * @param enabled 有効にする場合は`true`。
+     */
     fun updateItemSwipeEnabledState(enabled: Boolean) {
         isItemSwipeEnabled = enabled
     }
 
+    /**
+     * 追加処理として、以下の条件を満たさない場合はスワイプを無効化する。
+     * - `SwipeableViewHolder`を実装していること
+     * - スワイプ機能が有効であること ([isItemSwipeEnabled])
+     * - 他のアイテムがスワイプ中でないこと
+     * - アイテムがクローズアニメーション中でないこと
+     */
     override fun getMovementFlags(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder
@@ -63,6 +99,10 @@ internal abstract class BaseLeftSwipeCallback(
         return super.getMovementFlags(recyclerView, viewHolder)
     }
 
+    /**
+     * 追加処理として、スワイプ操作が開始された場合、そのアイテムのポジションをスワイプ中の状態として記録する。
+     * また、もし他のアイテムがすでにスワイプされたままの状態であれば、そのアイテムを閉じるアニメーションを開始する。
+     */
     // MEMO:タッチダウン、アップで呼び出し
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
         val position = viewHolder?.bindingAdapterPosition ?: initializePosition
@@ -87,6 +127,7 @@ internal abstract class BaseLeftSwipeCallback(
         }
     }
 
+    /** ドラッグ＆ドロップはサポートしないため、常に`false`を返す。 */
     override fun onMove(
         recyclerView: RecyclerView,
         viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder
@@ -95,6 +136,7 @@ internal abstract class BaseLeftSwipeCallback(
         return false
     }
 
+    /** アイテムが完全にスワイプされた時に呼び出され、状態を更新し、イベントメソッドに通知する。 */
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         Log.d(logTag, "onSwiped()_position:${viewHolder.bindingAdapterPosition}")
         if (direction != ItemTouchHelper.LEFT) return
@@ -106,12 +148,21 @@ internal abstract class BaseLeftSwipeCallback(
         onSwipedHook(viewHolder)
     }
 
+    /**
+     * サブクラスでスワイプ完了時の追加処理を実装するために使用する。[onSwiped]から呼び出される。
+     * @param viewHolder スワイプされたViewHolder。
+     */
     protected open fun onSwipedHook(viewHolder: RecyclerView.ViewHolder) {
         // サブクラスがこのメソッドをオーバーライドして、
         // スワイプ完了時の追加処理を実装する。
         // デフォルトでは何もしない。
     }
 
+    /**
+     * このメソッドは、RecyclerViewのアイテムが動いている間のフレームごとに呼び出される。
+     * スワイプ操作でない場合や、アニメーション中、右方向へのスワイプなどの
+     * 不要なケースを除外した後、[drawViewHolder]を呼び出す。
+     */
     override fun onChildDraw(
         c: Canvas,
         recyclerView: RecyclerView,
@@ -128,8 +179,12 @@ internal abstract class BaseLeftSwipeCallback(
                     + "_isCurrentlyActive:$isCurrentlyActive"
         )
         if (viewHolder !is SwipeableViewHolder) return
-        if (!isItemSwipeEnabled)
-            if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return
+
+        // TODO:下記どちらが正しいか後で確認
+        /*if (!isItemSwipeEnabled)
+            if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return*/
+        if (!isItemSwipeEnabled) return
+        if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return
 
         // アニメーション中は無効
         if (viewHolder.isRollingBack) return
@@ -139,8 +194,17 @@ internal abstract class BaseLeftSwipeCallback(
         drawViewHolder(viewHolder, dX)
     }
 
+    /**
+     * ViewHolderの具体的な描画処理をサブクラスに委譲する。[onChildDraw]から呼び出される。
+     * @param viewHolder 対象のViewHolder。
+     * @param dX X方向への移動量。
+     */
     protected abstract fun drawViewHolder(viewHolder: RecyclerView.ViewHolder, dX: Float)
 
+    /**
+     * 追加処理として、ユーザーがスワイプ操作を途中でやめて元の位置に戻した場合などに、
+     * スワイプ中またはスワイプ完了後として記録されていた状態をリセットする。
+     */
     // MEMO:clearView()起動タイミング
     //      ・スワイプ状態でスワイプ操作開始
     //      ・スワイプ操作でアイテムをスワイプ前の状態に戻した時
@@ -161,6 +225,10 @@ internal abstract class BaseLeftSwipeCallback(
         }
     }
 
+    /**
+     * 指定されたポジションの、スワイプされたViewHolderを閉じるアニメーションを開始する。
+     * @param position 閉じる対象のViewHolderのアダプターポジション。
+     */
     // MEMO:スワイプメニューを閉じるアニメーション中も onChildDraw が反応する
     //
     //      1、閉じる前に clearView すると onChildDraw は反応しなくなるが、アニメーションが効かなくなって半開きのまま再利用されてしまう
@@ -178,6 +246,11 @@ internal abstract class BaseLeftSwipeCallback(
         animateCloseSwipedViewHolder(position, viewHolder)
     }
 
+    /**
+     * ViewHolderを閉じる実際のアニメーションを実行する。
+     * @param position 閉じる対象のViewHolderのアダプターポジション。
+     * @param viewHolder 閉じる対象のViewHolder。
+     */
     private fun animateCloseSwipedViewHolder(position: Int, viewHolder: RecyclerView.ViewHolder) {
         Log.d(logTag, "animateCloseSwipedViewHolder()_position:$position")
 
@@ -203,14 +276,21 @@ internal abstract class BaseLeftSwipeCallback(
             .start()
     }
 
+    /** スワイプ中のアイテムポジションをリセットする。 */
     private fun resetSwipingAdapterPosition() {
         swipingAdapterPosition = initializePosition
     }
 
+    /** スワイプ完了後のアイテムポジションをリセットする。 */
     private fun resetSwipedAdapterPosition() {
         swipedAdapterPosition = initializePosition
     }
 
+    /**
+     * [ItemTouchHelper]のアクションステート定数を、デバッグ用の文字列に変換する。
+     * @param actionState 変換対象のアクションステート。
+     * @return アクションステートを表す文字列。
+     */
     private fun toStringItemTouchHelperActionState(actionState: Int): String {
         when (actionState) {
             ItemTouchHelper.ACTION_STATE_IDLE -> return "ACTION_STATE_IDLE"

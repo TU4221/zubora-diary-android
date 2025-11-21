@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.notification
 
+import android.Manifest.permission.POST_NOTIFICATIONS
 import android.app.Notification
 import android.app.PendingIntent
 import android.content.Context
@@ -8,6 +9,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.navigation.NavDeepLinkBuilder
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 
 /**
  * リマインダー通知の表示を管理するクラス。
@@ -65,8 +67,7 @@ internal class ReminderNotificationManager(
     /**
      * 通知がタップされたときに起動する [PendingIntent] を作成する。
      *
-     * このPendingIntentは、日記一覧画面 ([R.id.navigation_diary_list_fragment]) への
-     * ディープリンクとして機能する。
+     * このPendingIntentは、日記一覧画面 ([DiaryListFragment]) へのディープリンクとして機能する。
      *
      * @return 作成された [PendingIntent]。
      */
@@ -80,7 +81,7 @@ internal class ReminderNotificationManager(
     /**
      * 構築済みのリマインダー通知をユーザーに表示する。
      *
-     * このメソッドを呼び出すには、`android.permission.POST_NOTIFICATIONS` 権限が許可されている必要がある。
+     * このメソッドを呼び出すには、[POST_NOTIFICATIONS] 権限が許可されている必要がある。
      * 権限チェックは、このメソッドの呼び出し元で行われることを想定している。
      *
      * @throws SecurityException 必要な権限がない場合。
