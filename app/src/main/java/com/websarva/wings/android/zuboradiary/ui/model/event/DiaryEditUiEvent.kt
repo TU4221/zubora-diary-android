@@ -21,8 +21,7 @@ sealed class DiaryEditUiEvent : UiEvent {
      * 日記項目タイトル編集ダイアログへ遷移することを示すイベント。
      * @property diaryItemTitleSelection 編集対象のタイトル情報。
      */
-    //TODO:Fragment -> Dialog
-    data class NavigateDiaryItemTitleEditFragment(
+    data class NavigateDiaryItemTitleEditDialog(
         val diaryItemTitleSelection: DiaryItemTitleSelectionUi
     ) : DiaryEditUiEvent()
 

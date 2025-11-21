@@ -150,7 +150,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     //region Fragment Result Observation Setup
     override fun setupFragmentResultObservers() {
-        observeDiaryItemTitleEditFragmentResult()
+        observeDiaryItemTitleEditDialogResult()
         observeDiaryLoadDialogResult()
         observeDiaryLoadFailureDialogResult()
         observeDiaryUpdateDialogResult()
@@ -163,11 +163,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     /** 日記項目タイトル編集ダイアログからの結果を監視する。 */
-    private fun observeDiaryItemTitleEditFragmentResult() {
+    private fun observeDiaryItemTitleEditDialogResult() {
         observeFragmentResult(
             DiaryItemTitleEditDialog.RESULT_KEY
         ) { result: FragmentResult<DiaryItemTitleSelectionUi> ->
-            mainViewModel.onItemTitleEditFragmentResultReceived(result)
+            mainViewModel.onItemTitleEditDialogResultReceived(result)
         }
     }
 
@@ -259,7 +259,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             is DiaryEditUiEvent.NavigateDiaryShowFragment -> {
                 navigateDiaryShowFragment(event.id, event.date)
             }
-            is DiaryEditUiEvent.NavigateDiaryItemTitleEditFragment -> {
+            is DiaryEditUiEvent.NavigateDiaryItemTitleEditDialog -> {
                 navigateDiaryItemTitleEditDialog(event.diaryItemTitleSelection)
             }
             is DiaryEditUiEvent.NavigateDiaryLoadDialog -> {

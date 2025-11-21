@@ -396,7 +396,7 @@ class DiaryEditViewModel @Inject internal constructor(
 
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                DiaryEditUiEvent.NavigateDiaryItemTitleEditFragment(
+                DiaryEditUiEvent.NavigateDiaryItemTitleEditDialog(
                     DiaryItemTitleSelectionUi(
                         itemNumberInt,
                         itemTitleId,
@@ -787,7 +787,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * 項目タイトルを更新する。
      * @param result ダイアログからの結果
      */
-    internal fun onItemTitleEditFragmentResultReceived(result: FragmentResult<DiaryItemTitleSelectionUi>) {
+    internal fun onItemTitleEditDialogResultReceived(result: FragmentResult<DiaryItemTitleSelectionUi>) {
         when (result) {
             is FragmentResult.Some -> {
                 updateItemTitle(result.data)
