@@ -1,5 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.recyclerview.callback.diffUtil
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -31,7 +32,15 @@ internal class GenericDiffUtilItemCallback<T: Any> : DiffUtil.ItemCallback<T>() 
         return result
     }
 
-    /** 2つのアイテムのデータ内容が同じであるかを判定する。 */
+    /**
+     *2つのアイテムのデータ内容が同じであるかを判定する。
+     *
+     * `T`がdata classの場合は内容の等価性で比較され、
+     * そうでない場合は参照の等価性で比較される。
+     */
+    // HACK:@SuppressLintは"oldItem == newItem"に対しての
+    //      警告"Suspicious equality check: equals() is not implemented in T"を抑制。
+    @SuppressLint("DiffUtilEquals")
     override fun areContentsTheSame(oldItem: T, newItem: T): Boolean {
         val result = oldItem == newItem
         Log.d(
