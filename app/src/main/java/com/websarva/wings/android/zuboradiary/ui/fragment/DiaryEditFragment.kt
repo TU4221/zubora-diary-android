@@ -286,8 +286,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             DiaryEditUiEvent.NavigateDiaryImageDeleteDialog -> {
                 navigateDiaryImageDeleteDialog()
             }
-            is DiaryEditUiEvent.NavigateExitWithoutDiarySaveConfirmationDialog -> {
-                navigateExitWithoutDiarySaveConfirmationDialog()
+            is DiaryEditUiEvent.NavigateExitWithoutDiarySaveDialog -> {
+                navigateExitWithoutDiarySaveDialog()
             }
             is DiaryEditUiEvent.NavigatePreviousFragmentOnDiaryDelete -> {
                 navigatePreviousFragmentOnDiaryDelete(event.result)
@@ -952,10 +952,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     /** 日記を保存せずに終了することを確認するダイアログ([ExitWithoutDiarySaveDialogFragment])へ遷移する。 */
-    private fun navigateExitWithoutDiarySaveConfirmationDialog() {
+    private fun navigateExitWithoutDiarySaveDialog() {
         val directions =
             DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToExitWithoutDiarySaveConfirmationDialog()
+                .actionDiaryEditFragmentToExitWithoutDiarySaveDialog()
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 

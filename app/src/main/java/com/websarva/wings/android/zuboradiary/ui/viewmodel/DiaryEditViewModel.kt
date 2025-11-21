@@ -1438,7 +1438,7 @@ class DiaryEditViewModel @Inject internal constructor(
         if (shouldRequest) {
             updatePendingPreviousNavigationParameter(originalDiary.date)
             emitUiEvent(
-                DiaryEditUiEvent.NavigateExitWithoutDiarySaveConfirmationDialog
+                DiaryEditUiEvent.NavigateExitWithoutDiarySaveDialog
             )
         } else {
             clearDiaryImageCacheFile()

@@ -383,7 +383,7 @@
                 app:destination="@id/navigation_diary_image_delete_dialog"/>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_exit_without_diary_save_confirmation_dialog"
+                android:id="@+id/action_diary_edit_fragment_to_exit_without_diary_save_dialog"
                 app:destination="@id/navigation_exit_without_diary_save_dialog"/>
 
             <action

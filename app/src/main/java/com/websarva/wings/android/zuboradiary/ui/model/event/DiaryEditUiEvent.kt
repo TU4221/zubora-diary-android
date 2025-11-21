@@ -70,9 +70,8 @@ sealed class DiaryEditUiEvent : UiEvent {
     /** 添付画像削除確認ダイアログへ遷移することを示すイベント。 */
     data object NavigateDiaryImageDeleteDialog : DiaryEditUiEvent()
 
-    //TODO:Confirmation不要かも？他で使用してない
     /** 未保存終了確認ダイアログへ遷移することを示すイベント。 */
-    data object NavigateExitWithoutDiarySaveConfirmationDialog : DiaryEditUiEvent()
+    data object NavigateExitWithoutDiarySaveDialog : DiaryEditUiEvent()
 
     /**
      * 日記削除後に前の画面へ遷移することを示すイベント。
