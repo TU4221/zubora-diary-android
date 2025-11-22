@@ -128,7 +128,12 @@ class FragmentHelper {
                     Log.d(logTag, "Common_UiEvent_Collect(): $event")
                     event ?: return@collect
 
-                    handler.onCommonUiEventReceived(event)
+                    when (event) {
+                        is CommonUiEvent.NavigatePreviousFragment<*> ->
+                            handler.navigatePreviousFragment(event.result)
+                        is CommonUiEvent.NavigateAppMessage ->
+                            handler.navigateAppMessageDialog(event.message)
+                    }
                 }
         }
     }

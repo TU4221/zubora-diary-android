@@ -9,7 +9,6 @@ import androidx.viewbinding.ViewBinding
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.MainUiEventHandler
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AppMessageDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -202,12 +201,6 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
                 result
             )
     }
-
-    /**
-     * アプリケーションメッセージダイアログ([AppMessageDialogFragment])へ遷移する。
-     * @param appMessage 表示するメッセージ
-     */
-    protected abstract fun navigateAppMessageDialog(appMessage: AppMessage)
     //endregion
 
     //region Internal Helpers

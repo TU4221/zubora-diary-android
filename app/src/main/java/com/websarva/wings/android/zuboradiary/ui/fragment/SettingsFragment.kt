@@ -28,10 +28,10 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.Reminder
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -274,17 +274,6 @@ class SettingsFragment :
         }
     }
 
-    override fun onCommonUiEventReceived(event: CommonUiEvent) {
-        when (event) {
-            is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
-            }
-            is CommonUiEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-        }
-    }
-
     override fun onActivityCallbackUiEventReceived(event: ActivityCallbackUiEvent) {
         when (event) {
             ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
@@ -325,6 +314,18 @@ class SettingsFragment :
             mainActivityViewModel,
             this
         )
+    }
+    //endregion
+
+    //region CommonUiEventHandler Overrides
+    override fun navigatePreviousFragment(result: FragmentResult<*>) {
+        mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
+    }
+
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val directions =
+            SettingsFragmentDirections.actionSettingsFragmentToAppMessageDialog(appMessage)
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 
@@ -505,12 +506,6 @@ class SettingsFragment :
         val directions =
             SettingsFragmentDirections.actionSettingsFragmentToAllDataDeleteDialog()
         navigateFragmentOnce(NavigationCommand.To(directions))
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            SettingsFragmentDirections.actionSettingsFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
     /** OSSライセンスダイアログ([OpenSourceSoftwareLicensesDialogFragment])へ遷移する。 */

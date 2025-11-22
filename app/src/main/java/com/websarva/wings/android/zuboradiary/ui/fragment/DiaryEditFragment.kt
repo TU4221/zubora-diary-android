@@ -40,7 +40,6 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -313,17 +312,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         }
     }
 
-    override fun onCommonUiEventReceived(event: CommonUiEvent) {
-        when (event) {
-            is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                navigatePreviousFragmentOnce(RESULT_KEY, event.result)
-            }
-            is CommonUiEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-        }
-    }
-
     override fun setupUiStateObservers() {
         super.setupUiStateObservers()
 
@@ -383,6 +371,18 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 updateConditionDropdownAdapter(it)
             }
         }
+    }
+    //endregion
+
+    //region CommonUiEventHandler Overrides
+    override fun navigatePreviousFragment(result: FragmentResult<*>) {
+        navigatePreviousFragmentOnce(RESULT_KEY, result)
+    }
+
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val directions =
+            DiaryEditFragmentDirections.actionDiaryEditFragmentToAppMessageDialog(appMessage)
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 
@@ -943,12 +943,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         val directions =
             DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryImageDeleteDialog()
         navigateFragmentOnce(NavigationCommand.To(directions))
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
     /** 日記を保存せずに終了することを確認するダイアログ([ExitWithoutDiarySaveDialogFragment])へ遷移する。 */

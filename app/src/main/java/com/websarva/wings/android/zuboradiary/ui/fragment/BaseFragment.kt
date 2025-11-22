@@ -19,7 +19,6 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHa
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.MainUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AppMessageDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -432,13 +431,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
                 mainViewModel
             )
     }
-
-    // TODO:下記は現在の構成では記述場所が適していない。CommonUiEventHandlerを実装させてヘルパークラスで処理するように変更する。
-    /**
-     * アプリケーションメッセージダイアログ([AppMessageDialogFragment])へ遷移する。
-     * @param appMessage 表示するメッセージ情報
-     */
-    protected abstract fun navigateAppMessageDialog(appMessage: AppMessage)
     //endregion
 
     //region Internal Helpers

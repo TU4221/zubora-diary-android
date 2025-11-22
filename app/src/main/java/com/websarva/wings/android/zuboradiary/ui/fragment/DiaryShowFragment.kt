@@ -12,9 +12,9 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBindi
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
@@ -114,16 +114,17 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
             }
         }
     }
+    //endregion
 
-    override fun onCommonUiEventReceived(event: CommonUiEvent) {
-        when (event) {
-            is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                navigatePreviousFragmentOnce(RESULT_KEY, event.result)
-            }
-            is CommonUiEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-        }
+    //region CommonUiEventHandler Overrides
+    override fun navigatePreviousFragment(result: FragmentResult<*>) {
+        navigatePreviousFragmentOnce(RESULT_KEY, result)
+    }
+
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val directions =
+            DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 
@@ -177,12 +178,6 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
         val directions =
             DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteDialog(date)
         navigateFragmentOnce(NavigationCommand.To(directions))
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 

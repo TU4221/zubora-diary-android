@@ -25,7 +25,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -139,17 +139,6 @@ class CalendarFragment :
         }
     }
 
-    override fun onCommonUiEventReceived(event: CommonUiEvent) {
-        when (event) {
-            is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
-            }
-            is CommonUiEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-        }
-    }
-
     override fun onActivityCallbackUiEventReceived(event: ActivityCallbackUiEvent) {
         when (event) {
             ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect -> {
@@ -206,6 +195,18 @@ class CalendarFragment :
             mainActivityViewModel,
             this
         )
+    }
+    //endregion
+
+    //region CommonUiEventHandler Overrides
+    override fun navigatePreviousFragment(result: FragmentResult<*>) {
+        mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
+    }
+
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val directions =
+            CalendarFragmentDirections.actionCalendarFragmentToAppMessageDialog(appMessage)
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 
@@ -615,12 +616,6 @@ class CalendarFragment :
             CalendarFragmentDirections
                 .actionNavigationCalendarFragmentToDiaryEditFragment(id, date)
         navigateFragmentOnce(NavigationCommand.To(directions))
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            CalendarFragmentDirections.actionCalendarFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 }

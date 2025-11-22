@@ -15,8 +15,8 @@ import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.DiaryListSe
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -123,17 +123,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         }
     }
 
-    override fun onCommonUiEventReceived(event: CommonUiEvent) {
-        when (event) {
-            is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                navigatePreviousFragmentOnce()
-            }
-            is CommonUiEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-        }
-    }
-
     override fun setupUiStateObservers() {
         super.setupUiStateObservers()
 
@@ -151,6 +140,18 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
                 updateWordSearchResultList(it)
             }
         }
+    }
+    //endregion
+
+    //region CommonUiEventHandler Overrides
+    override fun navigatePreviousFragment(result: FragmentResult<*>) {
+        navigatePreviousFragmentOnce()
+    }
+
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val directions =
+            WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 
@@ -226,12 +227,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
             WordSearchFragmentDirections
                 .actionNavigationWordSearchFragmentToDiaryShowFragment(id, date)
         navigateFragmentOnce(NavigationCommand.To(directions))
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 }

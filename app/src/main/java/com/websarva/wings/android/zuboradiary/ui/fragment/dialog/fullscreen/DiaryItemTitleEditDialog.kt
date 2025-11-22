@@ -19,7 +19,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditU
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -119,18 +118,6 @@ class DiaryItemTitleEditDialog :
         }
     }
 
-    override fun onCommonUiEventReceived(event: CommonUiEvent) {
-        when (event) {
-            is CommonUiEvent.NavigatePreviousFragment<*> -> {
-                navigatePreviousFragment()
-            }
-
-            is CommonUiEvent.NavigateAppMessage -> {
-                navigateAppMessageDialog(event.message)
-            }
-        }
-    }
-
     override fun setupUiStateObservers() {
         super.setupUiStateObservers()
 
@@ -145,6 +132,20 @@ class DiaryItemTitleEditDialog :
             }.mapNotNull { (it.titleSelectionHistoriesLoadState as? LoadState.Success)?.data }
                 .collect { selectionHistoryListAdapter?.submitList(it.itemList) }
         }
+    }
+    //endregion
+
+    //region CommonUiEventHandler Overrides
+    override fun navigatePreviousFragment(result: FragmentResult<*>) {
+        navigatePreviousFragment()
+    }
+
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val directions =
+            DiaryItemTitleEditDialogDirections.actionDiaryItemTitleEditDialogToAppMessageDialog(
+                appMessage
+            )
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 
@@ -198,14 +199,6 @@ class DiaryItemTitleEditDialog :
             DiaryItemTitleEditDialogDirections
                 .actionDiaryItemTitleEditDialogToDiaryItemTitleSelectionHistoryDeleteDialog(itemTitle)
         navigateFragmentOnce(NavigationCommand.To(directions))
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            DiaryItemTitleEditDialogDirections.actionDiaryItemTitleEditDialogToAppMessageDialog(
-                appMessage
-            )
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 
