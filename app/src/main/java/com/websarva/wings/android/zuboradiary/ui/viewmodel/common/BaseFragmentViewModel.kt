@@ -152,6 +152,7 @@ abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> inte
         emitCommonAppMessageEvent(CommonAppMessage.Unexpected(e))
     }
 
+    // TODO:NavigatePreviousFragmentEventはResult無しで統一して、Resultが必要なものは個別でEventを用意
     /**
      * 前の画面へ戻るための共通UIイベント([CommonUiEvent.NavigatePreviousFragment])を発行する。
      * @param resultData 遷移元へ返す結果データ。返す結果が無い場合はnullを代入する。
