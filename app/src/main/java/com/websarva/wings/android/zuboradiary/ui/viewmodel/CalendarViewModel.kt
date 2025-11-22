@@ -260,6 +260,7 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
+    // TODO:Fragment・DialogResultのアンラップをFragment側で対応するように修正(他ViewModel同様)
     /**
      * 日記表示画面から戻ってきた時に呼び出される事を想定。
      * 選択された日付を更新する。
