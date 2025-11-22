@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
@@ -194,7 +193,7 @@ class DiaryShowViewModel @Inject internal constructor(
             DialogResult.Cancel -> {
                 launchWithUnexpectedErrorHandler {
                     emitUiEvent(
-                        DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryLoadFailed()
+                        DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryLoadFailed
                     )
                 }
             }
@@ -280,9 +279,7 @@ class DiaryShowViewModel @Inject internal constructor(
                 Log.i(logTag, "${logMsg}_完了")
                 updateToProgressInvisibleState()
                 emitUiEvent(
-                    DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryDeleted(
-                        FragmentResult.Some(date)
-                    )
+                    DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryDeleted(date)
                 )
             }
             is UseCaseResult.Failure -> {
@@ -308,9 +305,7 @@ class DiaryShowViewModel @Inject internal constructor(
      * @param diaryDate 遷移元に返す日記の日付
      */
     private suspend fun navigatePreviousFragment(diaryDate: LocalDate) {
-        emitNavigatePreviousFragmentEvent(
-            FragmentResult.Some(diaryDate)
-        )
+        emitNavigatePreviousFragmentEvent(diaryDate)
     }
     //endregion
 

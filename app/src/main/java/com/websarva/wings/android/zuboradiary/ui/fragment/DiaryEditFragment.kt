@@ -289,10 +289,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 navigateExitWithoutDiarySaveDialog()
             }
             is DiaryEditUiEvent.NavigatePreviousFragmentOnDiaryDelete -> {
-                navigatePreviousFragmentOnDiaryDelete(event.result)
+                navigatePreviousFragmentOnDiaryDelete(event.date)
             }
             is DiaryEditUiEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed -> {
-                navigatePreviousFragmentWithRetry(RESULT_KEY, event.result)
+                navigatePreviousFragmentWithRetry(FragmentResult.None)
             }
             is DiaryEditUiEvent.UpdateDiaryItemLayout -> {
                 renderItemLayouts(event.numVisibleItems)
@@ -375,8 +375,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment(result: FragmentResult<*>) {
-        navigatePreviousFragmentOnce(RESULT_KEY, result)
+    override fun <T> navigatePreviousFragment(resultData: T?) {
+        checkNotNull(resultData)
+        navigatePreviousFragmentOnce(
+            FragmentResult.Some(RESULT_KEY, resultData)
+        )
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {
@@ -955,9 +958,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
 
     /**
      * 前の画面へ戻る（日記削除時専用）。
-     * @param result 遷移元へ返す結果
+     * @param date 削除された日記の日付
      */
-    private fun navigatePreviousFragmentOnDiaryDelete(result: FragmentResult.Some<LocalDate>) {
+    private fun navigatePreviousFragmentOnDiaryDelete(date: LocalDate) {
         val destinationId =
             try {
                 findNavController().getBackStackEntry(R.id.navigation_calendar_fragment)
@@ -969,8 +972,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             NavigationCommand.PopTo(
                 destinationId,
                 false,
-                RESULT_KEY,
-                result
+                FragmentResult.Some(RESULT_KEY, date)
             )
         )
     }

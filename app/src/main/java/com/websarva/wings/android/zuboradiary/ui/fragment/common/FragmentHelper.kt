@@ -130,7 +130,7 @@ class FragmentHelper {
 
                     when (event) {
                         is CommonUiEvent.NavigatePreviousFragment<*> ->
-                            handler.navigatePreviousFragment(event.result)
+                            handler.navigatePreviousFragment(event.resultData)
                         is CommonUiEvent.NavigateAppMessage ->
                             handler.navigateAppMessageDialog(event.message)
                     }
@@ -274,23 +274,26 @@ class FragmentHelper {
                 navController.navigate(command.directions)
             }
             is NavigationCommand.Up<*> -> {
-                if (command.resultKey != null) {
+                val result = command.result
+                if (result is FragmentResult.Some<*>) {
                     val previousBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-                    previousBackStackEntry.savedStateHandle[command.resultKey] = command.result
+                    previousBackStackEntry.savedStateHandle[result.key] = result
                 }
                 navController.navigateUp()
             }
             is NavigationCommand.Pop<*> -> {
-                if (command.resultKey != null) {
+                val result = command.result
+                if (result is FragmentResult.Some<*>) {
                     val previousBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-                    previousBackStackEntry.savedStateHandle[command.resultKey] = command.result
+                    previousBackStackEntry.savedStateHandle[result.key] = result
                 }
                 navController.popBackStack()
             }
             is NavigationCommand.PopTo<*> -> {
-                if (command.resultKey != null) {
+                val result = command.result
+                if (result is FragmentResult.Some<*>) {
                     val previousBackStackEntry = navController.getBackStackEntry(command.destinationId)
-                    previousBackStackEntry.savedStateHandle[command.resultKey] = command.result
+                    previousBackStackEntry.savedStateHandle[result.key] = result
                 }
                 navController.popBackStack(command.destinationId, command.inclusive)
             }
@@ -316,19 +319,17 @@ class FragmentHelper {
      * 前の画面に一度だけ戻る。
      * @param navController 画面遷移を管理するNavController
      * @param fragmentDestinationId 現在のフラグメントのDestination ID
-     * @param resultKey 遷移元に渡す結果のキー
      * @param result 遷移元に渡す結果データ
      */
     fun navigatePreviousFragmentOnce(
         navController: NavController,
         fragmentDestinationId: Int,
-        resultKey: String?,
         result: FragmentResult<*>
     ) {
         navigateFragmentOnce(
             navController,
             fragmentDestinationId,
-            createPreviousFragmentCommand(resultKey, result)
+            createPreviousFragmentCommand(result)
         )
     }
 
@@ -336,14 +337,12 @@ class FragmentHelper {
      * 前の画面に戻る遷移を試み、失敗した場合はリトライする。
      * @param navController 画面遷移を管理するNavController
      * @param fragmentDestinationId 現在のフラグメントのDestination ID
-     * @param resultKey 遷移元に渡す結果のキー
      * @param result 遷移元に渡す結果データ
      * @param mainViewModel 失敗時にコマンドを保持するViewModel
      */
     fun navigatePreviousFragmentWithRetry(
         navController: NavController,
         fragmentDestinationId: Int,
-        resultKey: String?,
         result: FragmentResult<*>,
         mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>,
     ) {
@@ -351,25 +350,17 @@ class FragmentHelper {
             navController,
             fragmentDestinationId,
             mainViewModel,
-            createPreviousFragmentCommand(resultKey, result)
+            createPreviousFragmentCommand(result)
         )
     }
 
     /**
      * 前の画面に戻るためのNavigationCommandを生成する。
-     * @param resultKey 遷移元に渡す結果のキー
      * @param result 遷移元に渡す結果データ
      * @return 生成されたNavigationCommand
      */
-    private fun createPreviousFragmentCommand(
-        resultKey: String?,
-        result: FragmentResult<*>
-        ): NavigationCommand {
-         return if (resultKey == null) {
-             NavigationCommand.Up<Nothing>()
-         } else {
-             NavigationCommand.Up(resultKey, result)
-         }
+    private fun createPreviousFragmentCommand(result: FragmentResult<*>): NavigationCommand {
+         return NavigationCommand.Up(result)
     }
     //endregion
 

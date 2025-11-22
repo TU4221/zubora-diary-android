@@ -31,7 +31,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiE
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -318,7 +317,7 @@ class SettingsFragment :
     //endregion
 
     //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment(result: FragmentResult<*>) {
+    override fun <T> navigatePreviousFragment(resultData: T?) {
         mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
     }
 

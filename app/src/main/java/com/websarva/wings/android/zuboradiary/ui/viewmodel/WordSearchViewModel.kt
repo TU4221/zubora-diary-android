@@ -171,7 +171,7 @@ class WordSearchViewModel @Inject internal constructor(
 
     override fun onBackPressed() {
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            emitNavigatePreviousFragmentEvent(null)
         }
     }
 
@@ -181,7 +181,7 @@ class WordSearchViewModel @Inject internal constructor(
      */
     fun onNavigationIconButtonClick() {
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            emitNavigatePreviousFragmentEvent(null)
         }
     }
 

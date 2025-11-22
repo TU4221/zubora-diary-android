@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.model.event
 
 import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import java.time.LocalDate
 
 /**
@@ -75,16 +74,14 @@ sealed class DiaryEditUiEvent : UiEvent {
 
     /**
      * 日記削除後に前の画面へ遷移することを示すイベント。
-     * @property result 前の画面へ返す結果。
+     * @property date 削除された日記の日付。
      */
     data class NavigatePreviousFragmentOnDiaryDelete(
-        val result: FragmentResult.Some<LocalDate>
+        val date: LocalDate
     ) : DiaryEditUiEvent()
 
     /** 日記の初期読み込み失敗後に前の画面へ遷移することを示すイベント。 */
-    data class NavigatePreviousFragmentOnInitialDiaryLoadFailed(
-        val result: FragmentResult.None = FragmentResult.None
-    ) : DiaryEditUiEvent()
+    data object NavigatePreviousFragmentOnInitialDiaryLoadFailed : DiaryEditUiEvent()
 
     /**
      * 日記項目のレイアウトを更新することを示すイベント。

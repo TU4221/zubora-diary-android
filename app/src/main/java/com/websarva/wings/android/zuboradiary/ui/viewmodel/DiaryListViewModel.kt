@@ -178,7 +178,7 @@ class DiaryListViewModel @Inject internal constructor(
         //      BaseFragmentでOnBackPressedCallbackを登録せずにNavigation機能のデフォルト戻る機能を使用する。
         //      そのため、本メソッドは呼び出されない。
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            emitNavigatePreviousFragmentEvent(null)
         }
     }
 

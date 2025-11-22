@@ -150,7 +150,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     //region UI Event Handlers
     override fun onBackPressed() {
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            emitNavigatePreviousFragmentEvent(null)
         }
     }
 
@@ -160,7 +160,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
      */
     fun onNavigationIconClick() {
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            emitNavigatePreviousFragmentEvent(null)
         }
     }
 

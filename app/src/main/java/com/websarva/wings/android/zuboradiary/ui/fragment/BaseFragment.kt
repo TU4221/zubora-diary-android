@@ -397,36 +397,26 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
 
     /**
      * 前の画面に一度だけ戻る。
-     * @param resultKey 結果を渡すためのキー
      * @param result 渡す結果データ
      */
-    protected fun navigatePreviousFragmentOnce(
-        resultKey: String? = null,
-        result: FragmentResult<*> = FragmentResult.None
-    ) {
+    protected fun navigatePreviousFragmentOnce(result: FragmentResult<*>) {
         fragmentHelper
             .navigatePreviousFragmentOnce(
                 findNavController(),
                 destinationId,
-                resultKey,
                 result
             )
     }
 
     /**
      * 前の画面に戻ることを試み、失敗した場合は再試行する。
-     * @param resultKey 結果を渡すためのキー
      * @param result 渡す結果データ
      */
-    protected fun navigatePreviousFragmentWithRetry(
-        resultKey: String? = null,
-        result: FragmentResult<*> = FragmentResult.None
-    ) {
+    protected fun navigatePreviousFragmentWithRetry(result: FragmentResult<*>) {
         fragmentHelper
             .navigatePreviousFragmentWithRetry(
                 findNavController(),
                 destinationId,
-                resultKey,
                 result,
                 mainViewModel
             )

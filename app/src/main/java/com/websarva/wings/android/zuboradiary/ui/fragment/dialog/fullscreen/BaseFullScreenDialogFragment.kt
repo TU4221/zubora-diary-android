@@ -186,18 +186,13 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
 
     /**
      * 前の画面に戻る。
-     * @param resultKey 遷移元に渡す結果のキー
      * @param result 渡す結果データ
      */
-    protected fun navigatePreviousFragment(
-        resultKey: String? = null,
-        result: FragmentResult<*> = FragmentResult.None
-    ) {
+    protected fun navigatePreviousFragment(result: FragmentResult<*>) {
         fragmentHelper
             .navigatePreviousFragmentOnce(
                 findNavController(),
                 destinationId,
-                resultKey,
                 result
             )
     }

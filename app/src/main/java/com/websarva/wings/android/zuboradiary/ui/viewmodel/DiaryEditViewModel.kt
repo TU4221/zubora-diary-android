@@ -664,7 +664,7 @@ class DiaryEditViewModel @Inject internal constructor(
             DialogResult.Cancel -> {
                 launchWithUnexpectedErrorHandler {
                     emitUiEvent(
-                        DiaryEditUiEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed()
+                        DiaryEditUiEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed
                     )
                 }
             }
@@ -1032,10 +1032,7 @@ class DiaryEditViewModel @Inject internal constructor(
                 updateToIdleState()
                 clearDiaryImageCacheFile()
                 emitUiEvent(
-                    DiaryEditUiEvent
-                        .NavigatePreviousFragmentOnDiaryDelete(
-                            FragmentResult.Some(date)
-                        )
+                    DiaryEditUiEvent.NavigatePreviousFragmentOnDiaryDelete(date)
                 )
             }
             is UseCaseResult.Failure -> {
@@ -1451,9 +1448,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param originalDiaryDate 遷移元に返す日付
      */
     private suspend fun navigatePreviousFragment(originalDiaryDate: LocalDate) {
-        emitNavigatePreviousFragmentEvent(
-            FragmentResult.Some(originalDiaryDate)
-        )
+        emitNavigatePreviousFragmentEvent(originalDiaryDate)
     }
     //endregion
 

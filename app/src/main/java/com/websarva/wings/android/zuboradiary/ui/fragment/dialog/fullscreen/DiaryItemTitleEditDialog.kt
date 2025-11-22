@@ -136,7 +136,7 @@ class DiaryItemTitleEditDialog :
     //endregion
 
     //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment(result: FragmentResult<*>) {
+    override fun <T> navigatePreviousFragment(resultData: T?) {
         navigatePreviousFragment()
     }
 
@@ -185,8 +185,7 @@ class DiaryItemTitleEditDialog :
      */
     private fun completeItemTitleEdit(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
         navigatePreviousFragment(
-            RESULT_KEY,
-            FragmentResult.Some(diaryItemTitleSelection)
+            FragmentResult.Some(RESULT_KEY, diaryItemTitleSelection)
         )
     }
 

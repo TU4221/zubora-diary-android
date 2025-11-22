@@ -144,8 +144,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     //endregion
 
     //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment(result: FragmentResult<*>) {
-        navigatePreviousFragmentOnce()
+    override fun <T> navigatePreviousFragment(resultData: T?) {
+        navigatePreviousFragmentOnce(FragmentResult.None)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {

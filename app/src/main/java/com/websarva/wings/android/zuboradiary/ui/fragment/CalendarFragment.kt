@@ -25,7 +25,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -199,7 +198,7 @@ class CalendarFragment :
     //endregion
 
     //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment(result: FragmentResult<*>) {
+    override fun <T> navigatePreviousFragment(resultData: T?) {
         mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
     }
 

@@ -6,7 +6,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.PendingNavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
@@ -155,12 +154,13 @@ abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> inte
 
     /**
      * 前の画面へ戻るための共通UIイベント([CommonUiEvent.NavigatePreviousFragment])を発行する。
-     * @param result 遷移元へ返す結果
+     * @param resultData 遷移元へ返す結果データ。返す結果が無い場合はnullを代入する。
+     * @param T 遷移元へ返す結果データの型。
      */
-    protected suspend fun emitNavigatePreviousFragmentEvent(
-        result: FragmentResult<*> = FragmentResult.None
+    protected suspend fun <T> emitNavigatePreviousFragmentEvent(
+        resultData: T?
     ) {
-        emitCommonUiEvent(CommonUiEvent.NavigatePreviousFragment(result))
+        emitCommonUiEvent(CommonUiEvent.NavigatePreviousFragment(resultData))
     }
 
     /**
