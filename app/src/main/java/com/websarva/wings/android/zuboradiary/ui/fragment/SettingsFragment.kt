@@ -145,7 +145,14 @@ class SettingsFragment :
         observeDialogResult(
             ThemeColorPickerDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onThemeColorSettingDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel
+                        .onThemeColorSettingDialogPositiveResultReceived(result.data)
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> { /* 処理なし */ }
+            }
         }
     }
 
@@ -154,7 +161,16 @@ class SettingsFragment :
         observeDialogResult(
             CalendarStartDayPickerDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onCalendarStartDayOfWeekSettingDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel
+                        .onCalendarStartDayOfWeekSettingDialogPositiveResultReceived(
+                            result.data
+                        )
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> { /* 処理なし */ }
+            }
         }
     }
 
@@ -163,43 +179,76 @@ class SettingsFragment :
         observeDialogResult(
             ReminderNotificationTimePickerDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onReminderNotificationSettingDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel
+                        .onReminderNotificationSettingDialogPositiveResultReceived(result.data)
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onReminderNotificationSettingDialogNegativeResultReceived()
+                }
+            }
         }
     }
 
     /** 権限要求の理由説明ダイアログからの結果を監視する。 */
     private fun observePermissionDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             PermissionDialogFragment.RESULT_KEY
-        ) { result: DialogResult<Unit> ->
-            mainViewModel.onPermissionDialogResultReceived(result)
+        ) { result ->
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onPermissionDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> { /*処理なし*/ }
+            }
         }
     }
 
     /** 全日記削除確認ダイアログからの結果を監視する。 */
     private fun observeAllDiariesDeleteDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             AllDiariesDeleteDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onAllDiariesDeleteDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive<Unit> -> {
+                    mainViewModel.onAllDiariesDeleteDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> { /* 処理なし */ }
+            }
         }
     }
 
     /** 全設定初期化確認ダイアログからの結果を監視する。 */
     private fun observeAllSettingsInitializationDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             AllSettingsInitializationDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onAllSettingsInitializationDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive<Unit> -> {
+                    mainViewModel.onAllSettingsInitializationDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> { /* 処理なし */ }
+            }
         }
     }
 
     /** 全データ削除確認ダイアログからの結果を監視する。 */
     private fun observeAllDataDeleteDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             AllDataDeleteDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onAllDataDeleteDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onAllDataDeleteDialogResultPositiveReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> { /* 処理なし */ }
+            }
         }
     }
     //endregion

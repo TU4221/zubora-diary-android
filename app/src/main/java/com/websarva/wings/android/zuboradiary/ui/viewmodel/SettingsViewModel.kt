@@ -37,7 +37,6 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.SettingsAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
@@ -436,86 +435,43 @@ class SettingsViewModel @Inject internal constructor(
 
     //region UI Event Handlers - Results
     /**
-     * テーマカラー選択ダイアログから結果を受け取った時に呼び出される事を想定。
-     * 結果に応じてテーマカラーを保存する。
-     * @param result ダイアログからの結果
-     */
-    internal fun onThemeColorSettingDialogResultReceived(result: DialogResult<ThemeColorUi>) {
-        when (result) {
-            is DialogResult.Positive<ThemeColorUi> -> {
-                handleThemeColorSettingDialogPositiveResult(result.data)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> { /* 処理なし */ }
-        }
-    }
-
-    /**
-     * テーマカラー選択ダイアログからのPositive結果を処理し、テーマカラー設定を保存する。
+     * テーマカラー選択ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * テーマカラー設定を保存する。
      * @param themeColor 選択されたテーマカラー
      */
-    private fun handleThemeColorSettingDialogPositiveResult(themeColor: ThemeColorUi) {
+    internal fun onThemeColorSettingDialogPositiveResultReceived(themeColor: ThemeColorUi) {
         launchWithUnexpectedErrorHandler {
             saveThemeColor(themeColor.toDomainModel())
         }
     }
 
     /**
-     * カレンダー開始曜日選択ダイアログから結果を受け取った時に呼び出される事を想定。
-     * 結果に応じて週の開始曜日を保存する。
-     * @param result ダイアログからの結果
-     */
-    internal fun onCalendarStartDayOfWeekSettingDialogResultReceived(result: DialogResult<DayOfWeek>) {
-        when (result) {
-            is DialogResult.Positive<DayOfWeek> -> {
-                handleCalendarStartDayOfWeekSettingDialogPositiveResult(result.data)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> { /* 処理なし */ }
-        }
-    }
-
-    /**
-     * カレンダー開始曜日選択ダイアログからのPositive結果を処理し、週の開始曜日設定を保存する。
+     * カレンダー開始曜日選択ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 週の開始曜日設定を保存する。
      * @param dayOfWeek 選択された週の開始曜日
      */
-    private fun handleCalendarStartDayOfWeekSettingDialogPositiveResult(dayOfWeek: DayOfWeek) {
+    internal fun onCalendarStartDayOfWeekSettingDialogPositiveResultReceived(dayOfWeek: DayOfWeek) {
         launchWithUnexpectedErrorHandler {
             saveCalendarStartDayOfWeek(dayOfWeek)
         }
     }
 
     /**
-     * リマインダー通知時間選択ダイアログから結果を受け取った時に呼び出される事を想定。
-     * 結果に応じてリマインダー通知時間を保存する。
-     * @param result ダイアログからの結果
-     */
-    internal fun onReminderNotificationSettingDialogResultReceived(result: DialogResult<LocalTime>) {
-        when (result) {
-            is DialogResult.Positive<LocalTime> -> {
-                handleReminderNotificationSettingDialogPositiveResult(result.data)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                handleReminderNotificationSettingDialogNegativeResult()
-            }
-        }
-    }
-
-    /**
-     * リマインダー通知時間選択ダイアログからのPositive結果を処理し、リマインダー通知を有効にする設定を保存する。
+     * リマインダー通知時間選択ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * リマインダー通知を有効にする設定を保存する。
      * @param time 保存する通知時刻
      * */
-    private fun handleReminderNotificationSettingDialogPositiveResult(time: LocalTime) {
+    internal fun onReminderNotificationSettingDialogPositiveResultReceived(time: LocalTime) {
         launchWithUnexpectedErrorHandler {
             saveReminderNotificationValid(time)
         }
     }
 
     /**
-     * リマインダー通知時間選択ダイアログからのNegative結果を処理し、リマインダー通知設定スイッチをOffにする。
+     * リマインダー通知時間選択ダイアログからNegative結果を受け取った時に呼び出される事を想定。
+     * リマインダー通知設定スイッチをOffにする。
      * */
-    private fun handleReminderNotificationSettingDialogNegativeResult() {
+    internal fun onReminderNotificationSettingDialogNegativeResultReceived() {
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsUiEvent.TurnReminderNotificationSettingSwitch(false)
@@ -524,92 +480,40 @@ class SettingsViewModel @Inject internal constructor(
     }
 
     /**
-     * 全日記削除確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、全日記の削除を実行する。
-     * @param result ダイアログからの結果
+     * 全日記削除確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 全日記の削除を実行する。
      */
-    internal fun onAllDiariesDeleteDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                handleAllDiariesDeleteDialogPositiveResult()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> { /* 処理なし */ }
-        }
-    }
-
-    /**
-     * 全日記削除確認ダイアログからのPositive結果を処理し、全ての日記を削除する。
-     * */
-    private fun handleAllDiariesDeleteDialogPositiveResult() {
+    internal fun onAllDiariesDeleteDialogPositiveResultReceived() {
         launchWithUnexpectedErrorHandler {
             deleteAllDiaries()
         }
     }
 
     /**
-     * 全設定初期化確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、全設定の初期化を実行する。
-     * @param result ダイアログからの結果
+     * 全設定初期化確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 全設定の初期化を実行する。
      */
-    internal fun onAllSettingsInitializationDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                handleAllSettingsInitializationDialogPositiveResult()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> { /* 処理なし */ }
-        }
-    }
-
-    /**
-     * 全設定初期化確認ダイアログからのPositive結果を処理し、全ての設定を初期化する。
-     * */
-    private fun handleAllSettingsInitializationDialogPositiveResult() {
+    internal fun onAllSettingsInitializationDialogPositiveResultReceived() {
         launchWithUnexpectedErrorHandler {
             initializeAllSettings()
         }
     }
 
     /**
-     * 全データ削除確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、全データの削除を実行する。
-     * @param result ダイアログからの結果
+     * 全データ削除確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 全データの削除を実行する。
      */
-    internal fun onAllDataDeleteDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                handleAllDataDeleteDialogPositiveResult()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> { /* 処理なし */ }
-        }
-    }
-
-    /** 全データ削除確認ダイアログからのPositive結果を処理し、全てのアプリケーションデータを削除する。 */
-    private fun handleAllDataDeleteDialogPositiveResult() {
+    internal fun onAllDataDeleteDialogResultPositiveReceived() {
         launchWithUnexpectedErrorHandler {
             deleteAllData()
         }
     }
 
     /**
-     * 権限確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、アプリケーションの詳細設定画面を表示する。
-     * @param result ダイアログからの結果
+     * 権限確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * アプリケーションの詳細設定画面を表示する。
      */
-    internal fun onPermissionDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                handlePermissionDialogPositiveResult()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> { /*処理なし*/ }
-        }
-    }
-
-    /** 権限確認ダイアログからのPositive結果を処理し、アプリケーションの詳細設定画面を表示する。 */
-    private fun handlePermissionDialogPositiveResult() {
+    internal fun onPermissionDialogPositiveResultReceived() {
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 SettingsUiEvent.ShowApplicationDetailsSettings

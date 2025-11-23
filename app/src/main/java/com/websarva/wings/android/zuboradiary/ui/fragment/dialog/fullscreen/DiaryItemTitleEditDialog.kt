@@ -19,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditU
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -91,10 +92,20 @@ class DiaryItemTitleEditDialog :
 
     /** 履歴項目削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryItemTitleDeleteDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             DiaryItemTitleSelectionHistoryDeleteDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel
+                        .onDiaryItemTitleSelectionHistoryDeleteDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel
+                        .onDiaryItemTitleSelectionHistoryDeleteDialogNegativeResultReceived()
+                }
+            }
         }
     }
     //endregion

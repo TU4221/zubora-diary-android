@@ -9,7 +9,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDa
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
 import com.websarva.wings.android.zuboradiary.ui.model.message.CalendarAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
@@ -260,33 +259,22 @@ class CalendarViewModel @Inject internal constructor(
         }
     }
 
-    // TODO:Fragment・DialogResultのアンラップをFragment側で対応するように修正(他ViewModel同様)
     /**
      * 日記表示画面から戻ってきた時に呼び出される事を想定。
      * 選択された日付を更新する。
-     * @param result 日記表示画面からの戻り値
+     * @param date 日記表示画面の表示されていた日記の日付
      */
-    internal fun onDiaryShowFragmentResultReceived(result: FragmentResult<LocalDate>) {
-        when (result) {
-            is FragmentResult.Some -> updateSelectedDate(result.data)
-            FragmentResult.None -> {
-                // 処理なし
-            }
-        }
+    internal fun onDiaryShowFragmentResultReceived(date: LocalDate) {
+        updateSelectedDate(date)
     }
 
     /**
      * 日記編集画面から戻ってきた時に呼び出される事を想定。
      * 選択された日付を更新する。
-     * @param result 日記編集画面からの戻り値
+     * @param date 日記編集画面の編集元日記の日付
      */
-    internal fun onDiaryEditFragmentResultReceived(result: FragmentResult<LocalDate>) {
-        when (result) {
-            is FragmentResult.Some -> updateSelectedDate(result.data)
-            FragmentResult.None -> {
-                // 処理なし
-            }
-        }
+    internal fun onDiaryEditFragmentResultReceived(date: LocalDate) {
+        updateSelectedDate(date)
     }
     //endregion
 

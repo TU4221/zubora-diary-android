@@ -42,8 +42,6 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryEditAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
@@ -508,311 +506,222 @@ class DiaryEditViewModel @Inject internal constructor(
     //endregion
 
     //region UI Event Handlers - Results
+
+    //region Diary Load Dialog Results
     /**
-     * 日記読み込み確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * 結果に応じて日記の読み込み、または天気情報の取得処理を開始する。
-     * @param result ダイアログからの結果
+     * 日記読み込み確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 日記データを読み込む。
      */
-    internal fun onDiaryLoadDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive -> {
-                handleDiaryLoadDialogPositiveResult(pendingDiaryLoadParameters)
-            }
-            is DialogResult.Negative,
-            is DialogResult.Cancel -> {
-                handleDiaryLoadDialogNegativeResult(pendingDiaryLoadParameters)
-            }
-        }
+    internal fun onDiaryLoadDialogPositiveResultReceived() {
+        val parameters = checkNotNull(pendingDiaryLoadParameters)
         clearPendingDiaryLoadParameters()
-    }
-
-    /**
-     * 日記読み込み確認ダイアログからのPositive結果を処理し、日記データを読み込む。
-     * @param parameters 読み込みに必要なパラメータ
-     */
-    private fun handleDiaryLoadDialogPositiveResult(parameters: DiaryLoadParameters?) {
         launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                loadDiaryByDate(it.date)
-            } ?: throw IllegalStateException()
+            loadDiaryByDate(parameters.date)
         }
     }
 
     /**
-     * 日記読み込み確認ダイアログからのNegative結果を処理し、天気情報を取得する。
-     * @param parameters 天気情報取得に必要なパラメータ
+     * 日記読み込み確認ダイアログからNegative結果を受け取った時に呼び出される事を想定。
+     * 天気情報を取得する。
      */
-    private fun handleDiaryLoadDialogNegativeResult(parameters: DiaryLoadParameters?) {
+    internal fun onDiaryLoadDialogNegativeResultReceived() {
+        val parameters = checkNotNull(pendingDiaryLoadParameters)
+        clearPendingDiaryLoadParameters()
         launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                fetchWeatherInfo(it.date, it.previousDate)
-            } ?: throw IllegalStateException()
+            fetchWeatherInfo(parameters.date, parameters.previousDate)
+        }
+    }
+    //endregion
+
+    //region Diary Update Dialog Results
+    /**
+     * 日記上書き確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 日記を保存する。
+     */
+    internal fun onDiaryUpdateDialogPositiveResultReceived() {
+        val parameters = checkNotNull(pendingDiaryUpdateParameters)
+        clearPendingDiaryUpdateParameters()
+        launchWithUnexpectedErrorHandler {
+            saveDiary(
+                parameters.diary,
+                parameters.diaryItemTitleSelectionHistoryList,
+                parameters.originalDiary,
+                parameters.isNewDiary
+            )
         }
     }
 
     /**
-     * 日記上書き確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、日記の保存処理を開始する。
-     * @param result ダイアログからの結果
+     * 日記上書き確認ダイアログからNegative結果を受け取った時に呼び出される事を想定。
+     * 日記更新パラメータ（[pendingDiaryUpdateParameters]）をクリアする。
      */
-    internal fun onDiaryUpdateDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive -> {
-                handleDiaryUpdateDialogPositiveResult(pendingDiaryUpdateParameters)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
-        }
+    internal fun onDiaryUpdateDialogNegativeResultReceived() {
         clearPendingDiaryUpdateParameters()
     }
+    //endregion
 
+    //region Diary Delete Dialog Results
     /**
-     * 日記上書き確認ダイアログからのPositive結果を処理し、日記を保存する。
-     * @param parameters 保存に必要なパラメータ
+     * 日記削除確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 日記を削除する。
      */
-    private fun handleDiaryUpdateDialogPositiveResult(parameters: DiaryUpdateParameters?) {
+    internal fun onDiaryDeleteDialogPositiveResultReceived() {
+        val parameters = checkNotNull(pendingDiaryDeleteParameters)
+        clearPendingDiaryDeleteParameters()
         launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                saveDiary(
-                    it.diary,
-                    it.diaryItemTitleSelectionHistoryList,
-                    it.originalDiary,
-                    it.isNewDiary
-                )
-            } ?: throw IllegalStateException()
+            deleteDiary(parameters.id, parameters.date)
         }
     }
 
     /**
-     * 日記削除確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、日記の削除処理を開始する。
-     * @param result ダイアログからの結果
+     * 日記削除確認ダイアログからNegative結果を受け取った時に呼び出される事を想定。
+     * 日記削除パレメータ（[pendingDiaryDeleteParameters]）をクリアする。
      */
-    internal fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive -> {
-                handleDiaryDeleteDialogPositiveResult(pendingDiaryDeleteParameters)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
-        }
+    internal fun onDiaryDeleteDialogNegativeResultReceived() {
         clearPendingDiaryDeleteParameters()
     }
+    //endregion
 
+    //region Date Picker Dialog Results
     /**
-     * 日記削除確認ダイアログからのPositive結果を処理し、日記を削除する。
-     * @param parameters 削除に必要なパラメータ
+     * 日付選択ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 日記の日付を変更する。
+     * @param date 選択された新しい日付
      */
-    private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters?) {
+    internal fun onDatePickerDialogPositiveResultReceived(date: LocalDate) {
+        val parameters = checkNotNull(pendingDiaryDateUpdateParameters)
+        clearPendingDiaryDateUpdateParameters()
         launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                deleteDiary(it.id, it.date)
-            } ?: throw IllegalStateException()
+            processChangedDiaryDate(date, parameters.originalDate, parameters.isNewDiary)
         }
     }
 
     /**
-     * 日付選択ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、日記の日付変更処理を開始する。
-     * @param result ダイアログからの結果
+     * 日付選択ダイアログからNegative結果を受け取った時に呼び出される事を想定。
+     * 日記日付更新パラメータ（[pendingDiaryDateUpdateParameters]）をクリアする。
      */
-    internal fun onDatePickerDialogResultReceived(result: DialogResult<LocalDate>) {
-        when (result) {
-            is DialogResult.Positive<LocalDate> -> {
-                handleDatePickerDialogPositiveResult(
-                    result.data,
-                    pendingDiaryDateUpdateParameters
-                )
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
-        }
+    internal fun onDatePickerDialogNegativeResultReceived() {
         clearPendingDiaryDateUpdateParameters()
     }
+    //endregion
 
-    /**
-     * 日付選択ダイアログからのPositive結果を処理し、日記の日付を変更する。
-     * @param date 選択された新しい日付
-     * @param parameters 日付変更処理に必要なパラメータ
-     */
-    private fun handleDatePickerDialogPositiveResult(
-        date: LocalDate,
-        parameters: DiaryDateUpdateParameters?
-    ) {
-        launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                processChangedDiaryDate(date, it.originalDate, it.isNewDiary)
-            } ?: throw IllegalStateException()
-        }
-    }
-
+    //region Diary Load Failure Dialog Results
     /**
      * 日記読み込み失敗ダイアログから結果を受け取った時に呼び出される事を想定。
      * 前の画面へ戻るイベントを発行する。
-     * @param result ダイアログからの結果
      */
-    internal fun onDiaryLoadFailureDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive<Unit>,
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                launchWithUnexpectedErrorHandler {
-                    emitUiEvent(
-                        DiaryEditUiEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed
-                    )
-                }
-            }
+    internal fun onDiaryLoadFailureDialogResultReceived() {
+        launchWithUnexpectedErrorHandler {
+            emitUiEvent(
+                DiaryEditUiEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed
+            )
         }
     }
+    //endregion
 
+    //region Weather Info Fetch Dialog Results
     /**
-     * 天気情報取得確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、権限確認処理を開始する。
-     * @param result ダイアログからの結果
+     * 天気情報取得確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 権限を確認する。
      */
-    internal fun onWeatherInfoFetchDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive -> {
-                handleWeatherInfoFetchDialogPositiveResult()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                clearPendingWeatherInfoFetchParameters()
-            }
-        }
-    }
-
-    /** 天気情報取得確認ダイアログからのPositive結果を処理し、権限を確認する。 */
-    private fun handleWeatherInfoFetchDialogPositiveResult() {
+    internal fun onWeatherInfoFetchDialogPositiveResultReceived() {
         launchWithUnexpectedErrorHandler {
             checkPermissionBeforeWeatherInfoFetch()
         }
     }
 
     /**
-     * 日記項目削除確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、日記項目の削除アニメーションを開始する。
-     * @param result ダイアログからの結果
+     * 天気情報取得確認ダイアログからNegative結果を受け取った時に呼び出される事を想定。
+     * 天気情報取得パラメータ（[pendingWeatherInfoFetchParameters]）をクリアする。
      */
-    internal fun onDiaryItemDeleteDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive -> {
-                handleDiaryItemDeleteDialogPositiveResult(pendingDiaryItemDeleteParameters)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
+    internal fun onWeatherInfoFetchDialogNegativeResultReceived() {
+        clearPendingWeatherInfoFetchParameters()
+    }
+    //endregion
+
+    //region Diary Item Delete Dialog Results
+    /**
+     * 日記項目削除確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 日記項目削除アニメーションを実行する。
+     */
+    internal fun onDiaryItemDeleteDialogPositiveResultReceived() {
+        val parameters = checkNotNull(pendingDiaryItemDeleteParameters)
+        clearPendingDiaryItemDeleteParameters()
+        launchWithUnexpectedErrorHandler {
+            requestDiaryItemDeleteTransition(parameters.itemNumber)
         }
+    }
+
+    /**
+     * 日記項目削除確認ダイアログからNegative結果を受け取った時に呼び出される事を想定。
+     * 日記項目削除パラメータ（[pendingDiaryItemDeleteParameters]）をクリアする。
+     */
+    internal fun onDiaryItemDeleteDialogNegativeResultReceived() {
         clearPendingDiaryItemDeleteParameters()
     }
+    //endregion
 
+    //region Diary Image Delete Dialog Results
     /**
-     * 日記項目削除確認ダイアログからのPositive結果を処理し、日記項目削除アニメーションを実行する。
-     * @param parameters 項目削除に必要なパラメータ
+     * 添付画像削除確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 添付画像を削除する。
      */
-    private fun handleDiaryItemDeleteDialogPositiveResult(parameters: DiaryItemDeleteParameters?) {
-        launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                requestDiaryItemDeleteTransition(it.itemNumber)
-            } ?: throw IllegalStateException()
-        }
-    }
-
-    /**
-     * 添付画像削除確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、画像の削除処理を実行する。
-     * @param result ダイアログからの結果
-     */
-    internal fun onDiaryImageDeleteDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                handleDiaryImageDeleteDialogPositiveResult()
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
-        }
-    }
-
-    /** 添付画像削除確認ダイアログからのPositive結果を処理し、 添付画像を削除する。*/
-    private fun handleDiaryImageDeleteDialogPositiveResult() {
+    internal fun onDiaryImageDeleteDialogPositiveResultReceived() {
         launchWithUnexpectedErrorHandler {
             deleteImage()
         }
     }
+    //endregion
 
+    //region Exit Without Diary Save Dialog Results
     /**
-     * 未保存終了確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、前の画面へ戻る。
-     * @param result ダイアログからの結果
+     * 未保存終了確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 前の画面へ遷移する。
      */
-    internal fun onExitWithoutDiarySaveDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive -> {
-                handleExitWithoutDiarySaveDialogPositiveResult(pendingPreviousNavigationParameters)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
-        }
+    internal fun onExitWithoutDiarySaveDialogPositiveResultReceived() {
+        val parameters = checkNotNull(pendingPreviousNavigationParameters)
         clearPendingPreviousNavigationParameters()
-    }
-
-    /**
-     * 未保存終了確認ダイアログからのPositive結果を処理し、前の画面へ遷移する。
-     * @param parameters 前の画面へ戻るために必要なパラメータ
-     */
-    private fun handleExitWithoutDiarySaveDialogPositiveResult(
-        parameters: PreviousNavigationParameters?
-    ) {
         launchWithUnexpectedErrorHandler {
             clearDiaryImageCacheFile()
-            parameters?.let {
-                navigatePreviousFragment(it.originalDiaryDate)
-            } ?: throw IllegalStateException()
+            navigatePreviousFragment(parameters.originalDiaryDate)
         }
     }
 
     /**
-     * 日記項目タイトル編集ダイアログから結果を受け取った時に呼び出される事を想定。
-     * 項目タイトルを更新する。
-     * @param result ダイアログからの結果
+     * 未保存終了確認ダイアログからNegative結果を受け取った時に呼び出される事を想定。
+     * 前の画面へ渡すパラメータ（[pendingPreviousNavigationParameters]）をクリアする。
      */
-    internal fun onItemTitleEditDialogResultReceived(result: FragmentResult<DiaryItemTitleSelectionUi>) {
-        when (result) {
-            is FragmentResult.Some -> {
-                updateItemTitle(result.data)
-            }
-            FragmentResult.None -> {
-                // 処理なし
-            }
-        }
+    internal fun onExitWithoutDiarySaveDialogNegativeResultReceived() {
+        clearPendingPreviousNavigationParameters()
     }
+    //endregion
 
+    //region Item Title Edit Dialog Results
+    /**
+     * 日記項目タイトル編集ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 項目タイトルを更新する。
+     * @param selection 選択されたタイトル情報
+     */
+    internal fun onItemTitleEditDialogPositiveResultReceived(selection: DiaryItemTitleSelectionUi) {
+        updateItemTitle(selection)
+    }
+    //endregion
+
+    //region Open Document Results
     /**
      * ギャラリーから画像を選択した結果を受け取った時に呼び出される事を想定。
      * 選択された画像のキャッシュ処理を開始する。
      * @param uri 選択された画像のURI（未選択の場合はnull）
      */
-    // MEMO:未選択時null
-    internal fun onOpenDocumentResultImageUriReceived(uri: Uri?) {
-        val parameters = pendingDiaryImageUpdateParameters
+    internal fun onOpenDocumentImageUriResultReceived(uri: Uri?) {
+        val parameters = checkNotNull(pendingDiaryImageUpdateParameters)
         clearPendingDiaryImageUpdateParameters()
         launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                cacheDiaryImage(uri, parameters.id)
-            } ?: throw IllegalStateException()
+            cacheDiaryImage(uri, parameters.id)
         }
     }
+    //endregion
+
     //endregion
 
     //region UI Event Handlers - Permissions

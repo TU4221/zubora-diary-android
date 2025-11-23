@@ -17,7 +17,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItem
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.InputTextValidationState
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.common.InputTextValidation
@@ -231,46 +230,23 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     }
 
     /**
-     * 履歴アイテム削除確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * 結果に応じて履歴の削除、またはUIの復元を行う。
-     * @param result ダイアログからの結果
+     * 履歴アイテム削除確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 選択された日記項目タイトル選択履歴を削除する。
      */
-    internal fun onDiaryItemTitleSelectionHistoryDeleteDialogResultReceived(
-        result: DialogResult<Unit>
-    ) {
-        when (result) {
-            is DialogResult.Positive -> {
-                handleDiaryItemTitleSelectionHistoryDeleteDialogPositiveResult(
-                    pendingHistoryItemDeleteParameters
-                )
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                handleDiaryItemTitleSelectionHistoryDeleteDialogNegativeResult()
-            }
-        }
+    internal fun onDiaryItemTitleSelectionHistoryDeleteDialogPositiveResultReceived() {
+        val parameters =checkNotNull(pendingHistoryItemDeleteParameters)
         clearPendingHistoryItemDeleteParameters()
-    }
-
-    /**
-     * 履歴アイテム削除確認ダイアログからのPositive結果を処理し、選択された日記項目タイトル選択履歴を削除する。
-     * @param parameters 削除に必要なパラメータ
-     */
-    private fun handleDiaryItemTitleSelectionHistoryDeleteDialogPositiveResult(
-        parameters: HistoryItemDeleteParameters?
-    ) {
         launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                deleteDiaryItemTitleSelectionHistory(it.itemId, it.itemTitle)
-            }
+            deleteDiaryItemTitleSelectionHistory(parameters.itemId, parameters.itemTitle)
         }
     }
 
     /**
-     * 履歴アイテム削除確認ダイアログからのNegative結果を処理し、
+     * 履歴アイテム削除確認ダイアログからNegative結果を受け取った時に呼び出される事を想定。
      * 選択された日記項目タイトル選択履歴のスワイプ状態を復元する。
      */
-    private fun handleDiaryItemTitleSelectionHistoryDeleteDialogNegativeResult() {
+    internal fun onDiaryItemTitleSelectionHistoryDeleteDialogNegativeResultReceived() {
+        clearPendingHistoryItemDeleteParameters()
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
                 DiaryItemTitleEditUiEvent.CloseSwipedItem

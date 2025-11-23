@@ -25,7 +25,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryListAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
@@ -283,57 +282,37 @@ class DiaryListViewModel @Inject internal constructor(
 
     //region UI Event Handlers - Results
     /**
-     * 開始年月選択ダイアログから結果を受け取った時に呼び出される事を想定。
-     * 結果に応じてソート条件日付を更新する。
-     * */
-    internal fun onDatePickerDialogResultReceived(result: DialogResult<YearMonth>) {
-        when (result) {
-            is DialogResult.Positive<YearMonth> -> {
-                handleDatePickerDialogPositiveResult(result.data)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
-        }
-    }
-
-    /** 開始年月選択ダイアログからからのPositive結果を処理し、ソート条件日付を更新する。 */
-    private fun handleDatePickerDialogPositiveResult(yearMonth: YearMonth) {
+     * 開始年月選択ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * ソート条件日付を更新する。
+     */
+    internal fun onDatePickerDialogPositiveResultReceived(yearMonth: YearMonth) {
         val sortConditionDate =
             yearMonth.atDay(1).with(TemporalAdjusters.lastDayOfMonth())
         updateSortConditionDate(sortConditionDate)
     }
 
     /**
-     * 日記削除確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * 結果に応じて日記の削除処理を実行する。
-     * */
-    internal fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
-        Log.d("20251004", "onDiaryDeleteDialogResultReceived")
-        when (result) {
-            is DialogResult.Positive -> {
-                handleDiaryDeleteDialogPositiveResult(pendingDiaryDeleteParameters)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
-        }
+     * 日記削除確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 日記の削除を実行する。
+     */
+    internal fun onDiaryDeleteDialogPositiveResultReceived() {
+        val parameters = checkNotNull(pendingDiaryDeleteParameters)
         clearPendingDiaryDeleteParameters()
+        launchWithUnexpectedErrorHandler {
+            deleteDiary(
+                parameters.id,
+                parameters.currentList,
+                parameters.sortConditionDate
+            )
+        }
     }
 
-    /** 日記削除確認ダイアログからのPositive結果を処理し、日記の削除を実行する。 */
-    private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters?) {
-        launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                deleteDiary(
-                    it.id,
-                    it.currentList,
-                    it.sortConditionDate
-                )
-            } ?: throw IllegalStateException()
-        }
+    /**
+     * 日記削除確認ダイアログからNegative結果を受け取った時に呼び出される事を想定。
+     * 日記削除パラメータ([pendingDiaryDeleteParameters])をクリアする。
+     */
+    internal fun onDiaryDeleteDialogNegativeResultReceived() {
+        clearPendingDiaryDeleteParameters()
     }
     //endregion
 

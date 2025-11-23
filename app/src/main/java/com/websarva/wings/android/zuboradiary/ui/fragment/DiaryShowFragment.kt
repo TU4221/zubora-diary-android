@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDele
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -77,19 +78,33 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
 
     /** 日記読み込み失敗ダイアログからの結果を監視する。 */
     private fun observeDiaryLoadFailureDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             DiaryLoadFailureDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryLoadFailureDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive,
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onDiaryLoadFailureDialogResultReceived()
+                }
+            }
         }
     }
 
     /** 日記削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryDeleteDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             DiaryDeleteDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryDeleteDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onDiaryDeleteDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onDiaryDeleteDialogNegativeResultReceived()
+                }
+            }
         }
     }
     //endregion

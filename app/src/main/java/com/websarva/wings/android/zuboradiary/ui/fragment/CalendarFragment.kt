@@ -25,6 +25,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -106,7 +107,12 @@ class CalendarFragment :
         observeFragmentResult(
             DiaryShowFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryShowFragmentResultReceived(result)
+            when (result) {
+                is FragmentResult.Some -> {
+                    mainViewModel.onDiaryShowFragmentResultReceived(result.data)
+                }
+                is FragmentResult.None -> { /*処理なし*/ }
+            }
         }
     }
 
@@ -115,7 +121,12 @@ class CalendarFragment :
         observeFragmentResult(
             DiaryEditFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryEditFragmentResultReceived(result)
+            when (result) {
+                is FragmentResult.Some -> {
+                    mainViewModel.onDiaryEditFragmentResultReceived(result.data)
+                }
+                is FragmentResult.None -> { /*処理なし*/ }
+            }
         }
     }
     //endregion

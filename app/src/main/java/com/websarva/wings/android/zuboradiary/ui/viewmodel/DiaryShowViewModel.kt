@@ -11,7 +11,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByIdException
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
@@ -184,50 +183,33 @@ class DiaryShowViewModel @Inject internal constructor(
     /**
      * 日記読み込み失敗ダイアログから結果を受け取った時に呼び出される事を想定。
      * 前の画面に戻るイベントを発行する。
-     * @param result ダイアログからの結果
      */
-    internal fun onDiaryLoadFailureDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive<Unit>,
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                launchWithUnexpectedErrorHandler {
-                    emitUiEvent(
-                        DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryLoadFailed
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * 日記削除確認ダイアログから結果を受け取った時に呼び出される事を想定。
-     * Positiveの場合のみ、日記の削除処理を実行する。
-     * @param result ダイアログからの結果
-     */
-    internal fun onDiaryDeleteDialogResultReceived(result: DialogResult<Unit>) {
-        when (result) {
-            is DialogResult.Positive<Unit> -> {
-                handleDiaryDeleteDialogPositiveResult(pendingDiaryDeleteParameters)
-            }
-            DialogResult.Negative,
-            DialogResult.Cancel -> {
-                // 処理なし
-            }
-        }
-        clearPendingDiaryDeleteParameters()
-    }
-
-    /**
-     * 日記削除確認ダイアログからのPositive結果を処理し、日記を削除する。
-     * @param parameters 削除に必要なパラメータ
-     */
-    private fun handleDiaryDeleteDialogPositiveResult(parameters: DiaryDeleteParameters?) {
+    internal fun onDiaryLoadFailureDialogResultReceived() {
         launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                deleteDiary(it.id, it.date)
-            } ?: throw IllegalStateException()
+            emitUiEvent(
+                DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryLoadFailed
+            )
         }
+    }
+
+    /**
+     * 日記削除確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
+     * 日記を削除する。
+     */
+    internal fun onDiaryDeleteDialogPositiveResultReceived() {
+        val parameters = checkNotNull(pendingDiaryDeleteParameters)
+        clearPendingDiaryDeleteParameters()
+        launchWithUnexpectedErrorHandler {
+            deleteDiary(parameters.id, parameters.date)
+        }
+    }
+
+    /**
+     * 日記削除確認ダイアログからNegative結果を受け取った時に呼び出される事を想定。
+     * 日記削除パラメータ([clearPendingDiaryDeleteParameters])をクリアする。
+     */
+    internal fun onDiaryDeleteDialogNegativeResultReceived() {
+        clearPendingDiaryDeleteParameters()
     }
     //endregion
 

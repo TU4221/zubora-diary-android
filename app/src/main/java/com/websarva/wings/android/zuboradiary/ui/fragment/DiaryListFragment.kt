@@ -23,6 +23,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemC
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -123,16 +124,30 @@ class DiaryListFragment :
         observeDialogResult(
             StartYearMonthPickerDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDatePickerDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onDatePickerDialogPositiveResultReceived(result.data)
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> { /*処理なし*/ }
+            }
         }
     }
 
     /** 日記削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryDeleteDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             DiaryListDeleteDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryDeleteDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onDiaryDeleteDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onDiaryDeleteDialogNegativeResultReceived()
+                }
+            }
         }
     }
     //endregion

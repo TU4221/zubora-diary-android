@@ -40,6 +40,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -105,7 +106,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     private val openDocumentResultLauncher = registerForActivityResult(
         ActivityResultContracts.OpenDocument()
     ) { uri: Uri? ->
-        mainViewModel.onOpenDocumentResultImageUriReceived(uri)
+        mainViewModel.onOpenDocumentImageUriResultReceived(uri)
     }
     //endregion
 
@@ -165,44 +166,79 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     private fun observeDiaryItemTitleEditDialogResult() {
         observeFragmentResult(
             DiaryItemTitleEditDialog.RESULT_KEY
-        ) { result: FragmentResult<DiaryItemTitleSelectionUi> ->
-            mainViewModel.onItemTitleEditDialogResultReceived(result)
+        ) { result ->
+            when (result) {
+                is FragmentResult.Some -> {
+                    mainViewModel.onItemTitleEditDialogPositiveResultReceived(result.data)
+                }
+                FragmentResult.None -> { /*処理なし*/ }
+            }
         }
     }
 
     /** 既存日記読込ダイアログからの結果を監視する。 */
     private fun observeDiaryLoadDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             DiaryLoadDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryLoadDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onDiaryLoadDialogPositiveResultReceived()
+                }
+                is DialogResult.Negative,
+                is DialogResult.Cancel -> {
+                    mainViewModel.onDiaryLoadDialogNegativeResultReceived()
+                }
+            }
         }
     }
 
     /** 日記読込失敗確認ダイアログからの結果を監視する。 */
     private fun observeDiaryLoadFailureDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             DiaryLoadFailureDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryLoadFailureDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive<Unit>,
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onDiaryLoadFailureDialogResultReceived()
+                }
+            }
         }
     }
 
     /** 既存日記上書きダイアログからの結果を監視する。 */
     private fun observeDiaryUpdateDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             DiaryUpdateDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryUpdateDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onDiaryUpdateDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onDiaryUpdateDialogNegativeResultReceived()
+                }
+            }
         }
     }
 
     /** 日記削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryDeleteDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             DiaryDeleteDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryDeleteDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onDiaryDeleteDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onDiaryDeleteDialogNegativeResultReceived()
+                }
+            }
         }
     }
 
@@ -211,43 +247,81 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         observeDialogResult(
             DatePickerDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDatePickerDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onDatePickerDialogPositiveResultReceived(result.data)
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onDatePickerDialogNegativeResultReceived()
+                }
+            }
         }
     }
 
     /** 天気情報読込ダイアログからの結果を監視する。 */
     private fun observeUpWeatherInfoFetchDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             WeatherInfoFetchDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onWeatherInfoFetchDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onWeatherInfoFetchDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onWeatherInfoFetchDialogNegativeResultReceived()
+                }
+            }
         }
     }
 
     /** 項目削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryItemDeleteDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             DiaryItemDeleteDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryItemDeleteDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onDiaryItemDeleteDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onDiaryItemDeleteDialogNegativeResultReceived()
+                }
+            }
         }
     }
 
     /** 添付画像削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryImageDeleteDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             DiaryImageDeleteDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onDiaryImageDeleteDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive<Unit> -> {
+                    mainViewModel.onDiaryImageDeleteDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> { /*処理なし*/ }
+            }
         }
     }
 
     /** 未保存終了確認ダイアログからの結果を監視する。 */
     private fun observeExitWithoutDiarySaveDialogResult() {
-        observeDialogResult(
+        observeDialogResult<Unit>(
             ExitWithoutDiarySaveDialogFragment.RESULT_KEY
         ) { result ->
-            mainViewModel.onExitWithoutDiarySaveDialogResultReceived(result)
+            when (result) {
+                is DialogResult.Positive -> {
+                    mainViewModel.onExitWithoutDiarySaveDialogPositiveResultReceived()
+                }
+                DialogResult.Negative,
+                DialogResult.Cancel -> {
+                    mainViewModel.onExitWithoutDiarySaveDialogNegativeResultReceived()
+                }
+            }
         }
     }
     //endregion
