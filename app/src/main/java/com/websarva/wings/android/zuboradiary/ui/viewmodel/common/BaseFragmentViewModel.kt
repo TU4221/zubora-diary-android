@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationComm
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.PendingNavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.fragment.common.OnBackPressedHandler
 import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.message.CommonAppMessage
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,7 +24,6 @@ import kotlinx.coroutines.flow.update
  * - [BaseViewModel]の機能の継承
  * - 画面遷移に失敗した場合の再試行ロジックを管理するための、保留中ナビゲーションコマンドのリスト管理
  * - 複数の画面で共通のUIイベント([CommonUiEvent])の発行
- * - バックプレス処理のハンドリング
  *
  * @param S このViewModelが管理するUI状態の型。
  * @param E このViewModelが発行するUIイベントの型。
@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.update
  */
 abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> internal constructor(
     initialViewUiState: S
-) : BaseViewModel<S, E, M>(initialViewUiState) {
+) : BaseViewModel<S, E, M>(initialViewUiState), OnBackPressedHandler {
 
     //region Properties
     /** 画面遷移に失敗し、再試行を待つナビゲーションコマンドのリストを保持するStateFlow。 */
@@ -46,15 +46,6 @@ abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> inte
     /** 画面遷移や共通メッセージ表示など、複数の画面で共有されるUIイベントを通知するためのSharedFlow。 */
     private val _commonUiEvent = MutableSharedFlow<ConsumableEvent<CommonUiEvent>>(replay = 1)
     internal val commonUiEvent get() = _commonUiEvent.asSharedFlow()
-    //endregion
-
-    //region UI Event Handlers
-    //TODO:クラス内で参照されていない為、記述場所検討
-    /**
-     * バックボタンが押下された時に、`Fragment`から呼び出される事を想定。
-     * バックプレスイベントを処理する。
-     */
-    abstract fun onBackPressed()
     //endregion
 
     //region Navigation Event Handlers

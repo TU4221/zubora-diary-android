@@ -368,11 +368,11 @@ class FragmentHelper {
     /**
      * バックプレスイベントをViewModelに委譲するためのコールバックを登録する。
      * @param fragment ライフサイクルスコープのオーナーとなるFragment
-     * @param mainViewModel バックプレスイベントを処理するViewModel
+     * @param handler バックプレスイベントを処理するハンドラ
      */
     fun registerOnBackPressedCallback(
         fragment: Fragment,
-        mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
+        handler: OnBackPressedHandler
     ) {
         fragment.requireActivity().onBackPressedDispatcher
             .addCallback(
@@ -382,7 +382,7 @@ class FragmentHelper {
                         if (fragment.viewLifecycleOwner
                                 .lifecycle.currentState != Lifecycle.State.RESUMED) return
 
-                        mainViewModel.onBackPressed()
+                        handler.onBackPressed()
                     }
                 }
             )
