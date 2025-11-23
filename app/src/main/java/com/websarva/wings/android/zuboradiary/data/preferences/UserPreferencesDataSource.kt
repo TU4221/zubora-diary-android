@@ -41,7 +41,7 @@ import javax.inject.Inject
  */
 internal class UserPreferencesDataSource @Inject constructor(
     private val preferencesDataStore: DataStore<Preferences>,
-    @ApplicationScope private val appScope: CoroutineScope,
+    @ApplicationScope appScope: CoroutineScope,
     private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
