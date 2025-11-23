@@ -6,7 +6,6 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingLoadException
 import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
-import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.flow.Flow
@@ -41,32 +40,24 @@ internal class LoadWeatherInfoFetchSettingUseCase(
     operator fun invoke(): Flow<UseCaseResult<WeatherInfoFetchSetting, WeatherInfoFetchSettingLoadException>> {
         Log.i(logTag, "${logMsg}開始")
 
+        val defaultSettingValue = WeatherInfoFetchSetting.default()
         return settingsRepository
             .loadWeatherInfoFetchSetting()
-            .map { setting: WeatherInfoFetchSetting ->
+            .map { setting ->
                 Log.d(
                     logTag,
-                    "${logMsg}読込成功 (設定値: ${setting})"
+                    "${logMsg}読込成功 (${setting?.let { "設定値: $it" } ?: "未設定"})"
                 )
                 val result: UseCaseResult<WeatherInfoFetchSetting, WeatherInfoFetchSettingLoadException> =
-                    UseCaseResult.Success(setting)
+                    UseCaseResult.Success(setting ?: defaultSettingValue)
                 result
             }.catch { cause: Throwable ->
-                val defaultSettingValue = WeatherInfoFetchSetting.default()
                 val result =
                     when (cause) {
-                        is ResourceNotFoundException -> {
-                            Log.i(
-                                logTag,
-                                "${logMsg}_データ未発見_" +
-                                        "デフォルト値を設定値として使用 (デフォルト値: $defaultSettingValue)"
-                            )
-                            UseCaseResult.Success(defaultSettingValue)
-                        }
                         is UnknownException -> {
                             Log.w(
                                 logTag,
-                                "${logMsg}失敗_原因不明、" +
+                                "${logMsg}失敗_原因不明 (データ層)、" +
                                         "フォールバック値使用 (デフォルト値: $defaultSettingValue)",
                                 cause
                             )

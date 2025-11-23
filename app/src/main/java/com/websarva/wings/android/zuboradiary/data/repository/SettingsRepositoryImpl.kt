@@ -19,10 +19,10 @@ internal class SettingsRepositoryImpl(
     private val settingsRepositoryExceptionMapper: SettingsRepositoryExceptionMapper
 ) : SettingsRepository {
 
-    override fun loadThemeColorSetting(): Flow<ThemeColorSetting> {
+    override fun loadThemeColorSetting(): Flow<ThemeColorSetting?> {
         return userPreferencesDataSource.loadThemeColorPreference()
             .map { preference ->
-                preference.toDomainModel()
+                preference?.toDomainModel()
             }.catch { cause ->
                 throw if (cause is Exception) {
                     settingsRepositoryExceptionMapper.toDomainException(cause)
@@ -32,10 +32,10 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    override fun loadCalendarStartDayOfWeekSetting(): Flow<CalendarStartDayOfWeekSetting> {
+    override fun loadCalendarStartDayOfWeekSetting(): Flow<CalendarStartDayOfWeekSetting?> {
         return userPreferencesDataSource.loadCalendarStartDayOfWeekPreference()
             .map { preference ->
-                preference.toDomainModel()
+                preference?.toDomainModel()
             }.catch { cause ->
                 throw if (cause is Exception) {
                     settingsRepositoryExceptionMapper.toDomainException(cause)
@@ -45,10 +45,10 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    override fun loadReminderNotificationSetting(): Flow<ReminderNotificationSetting> {
+    override fun loadReminderNotificationSetting(): Flow<ReminderNotificationSetting?> {
         return userPreferencesDataSource.loadReminderNotificationPreference()
             .map { preference ->
-                preference.toDomainModel()
+                preference?.toDomainModel()
             }.catch { cause ->
                 throw if (cause is Exception) {
                     settingsRepositoryExceptionMapper.toDomainException(cause)
@@ -58,10 +58,10 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    override fun loadPasscodeLockSetting(): Flow<PasscodeLockSetting> {
+    override fun loadPasscodeLockSetting(): Flow<PasscodeLockSetting?> {
         return userPreferencesDataSource.loadPasscodeLockPreference()
             .map { preference ->
-                preference.toDomainModel()
+                preference?.toDomainModel()
             }.catch { cause ->
                 throw if (cause is Exception) {
                     settingsRepositoryExceptionMapper.toDomainException(cause)
@@ -71,10 +71,10 @@ internal class SettingsRepositoryImpl(
             }
     }
 
-    override fun loadWeatherInfoFetchSetting(): Flow<WeatherInfoFetchSetting> {
+    override fun loadWeatherInfoFetchSetting(): Flow<WeatherInfoFetchSetting?> {
         return userPreferencesDataSource.loadWeatherInfoFetchPreference()
             .map { preference ->
-                preference.toDomainModel()
+                preference?.toDomainModel()
             }.catch { cause ->
                 throw if (cause is Exception) {
                     settingsRepositoryExceptionMapper.toDomainException(cause)

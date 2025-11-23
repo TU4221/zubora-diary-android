@@ -8,7 +8,6 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSe
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
-import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundException
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -22,47 +21,42 @@ internal interface SettingsRepository {
     /**
      * テーマカラー設定を読み込む。
      *
-     * @return テーマカラー設定 ([ThemeColorSetting]) を放出するFlow。
+     * @return テーマカラー設定 ([ThemeColorSetting]) を放出するFlow。未設定の場合は`null`を放出する。
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
-     * @throws ResourceNotFoundException 保存された設定値が見つからなかった場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadThemeColorSetting(): Flow<ThemeColorSetting>
+    fun loadThemeColorSetting(): Flow<ThemeColorSetting?>
 
     /**
      * カレンダーの開始曜日設定を読み込む。
      *
-     * @return カレンダー開始曜日設定 ([CalendarStartDayOfWeekSetting]) を放出するFlow。
+     * @return カレンダー開始曜日設定 ([CalendarStartDayOfWeekSetting]) を放出するFlow。未設定の場合は`null`を放出する。
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
-     * @throws ResourceNotFoundException 保存された設定値が見つからなかった場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadCalendarStartDayOfWeekSetting(): Flow<CalendarStartDayOfWeekSetting>
+    fun loadCalendarStartDayOfWeekSetting(): Flow<CalendarStartDayOfWeekSetting?>
 
     /**
      * リマインダー通知設定を読み込む。
      *
-     * @return リマインダー通知設定 ([ReminderNotificationSetting]) を放出するFlow。
+     * @return リマインダー通知設定 ([ReminderNotificationSetting]) を放出するFlow。未設定の場合は`null`を放出する。
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
-     * @throws ResourceNotFoundException 保存された設定値が見つからなかった場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadReminderNotificationSetting(): Flow<ReminderNotificationSetting>
+    fun loadReminderNotificationSetting(): Flow<ReminderNotificationSetting?>
 
     /**
      * パスコードロック設定を読み込む。
      *
-     * @return パスコードロック設定 ([PasscodeLockSetting]) を放出するFlow。
+     * @return パスコードロック設定 ([PasscodeLockSetting]) を放出するFlow。未設定の場合は`null`を放出する。
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
-     * @throws ResourceNotFoundException 保存された設定値が見つからなかった場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadPasscodeLockSetting(): Flow<PasscodeLockSetting>
+    fun loadPasscodeLockSetting(): Flow<PasscodeLockSetting?>
 
     /**
      * 天気情報取得設定を読み込む。
      *
-     * @return 天気情報取得設定 ([WeatherInfoFetchSetting]) を放出するFlow。
+     * @return 天気情報取得設定 ([WeatherInfoFetchSetting]) を放出するFlow。未設定の場合は`null`を放出する。
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
-     * @throws ResourceNotFoundException 保存された設定値が見つからなかった場合。([Flow] 内部で発生する可能性がある)
      */
-    fun loadWeatherInfoFetchSetting(): Flow<WeatherInfoFetchSetting>
+    fun loadWeatherInfoFetchSetting(): Flow<WeatherInfoFetchSetting?>
 
     /**
      * テーマカラー設定を更新する。
