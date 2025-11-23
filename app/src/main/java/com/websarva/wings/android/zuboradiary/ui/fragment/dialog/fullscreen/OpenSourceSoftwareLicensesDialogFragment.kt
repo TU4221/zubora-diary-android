@@ -49,7 +49,7 @@ class OpenSourceSoftwareLicensesDialogFragment
     private fun setupToolBar() {
         binding.materialToolbarTopAppBar
             .setNavigationOnClickListener {
-                navigatePreviousFragment()
+                dismissWithNavigateUp()
             }
     }
 

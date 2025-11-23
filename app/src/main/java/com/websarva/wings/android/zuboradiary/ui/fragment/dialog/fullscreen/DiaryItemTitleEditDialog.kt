@@ -147,8 +147,8 @@ class DiaryItemTitleEditDialog :
     //endregion
 
     //region CommonUiEventHandler Overrides
-    override fun <T> navigatePreviousFragment(resultData: T?) {
-        navigatePreviousFragment()
+    override fun navigatePreviousFragment() {
+        navigatePreviousFragment(FragmentResult.None)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {

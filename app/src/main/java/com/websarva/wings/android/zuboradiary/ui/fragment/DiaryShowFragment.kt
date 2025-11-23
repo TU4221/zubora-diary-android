@@ -121,6 +121,11 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
             is DiaryShowUiEvent.NavigateDiaryDeleteDialog -> {
                 navigateDiaryDeleteDialog(event.date)
             }
+            is DiaryShowUiEvent.NavigatePreviousFragmentWithResult -> {
+                navigatePreviousFragmentOnce(
+                    FragmentResult.Some(RESULT_KEY, event.date)
+                )
+            }
             is DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryDeleted -> {
                 navigatePreviousFragmentWithRetry(
                     FragmentResult.Some(RESULT_KEY, event.date)
@@ -134,11 +139,8 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     //endregion
 
     //region CommonUiEventHandler Overrides
-    override fun <T> navigatePreviousFragment(resultData: T?) {
-        checkNotNull(resultData)
-        navigatePreviousFragmentOnce(
-            FragmentResult.Some(RESULT_KEY, resultData)
-        )
+    override fun navigatePreviousFragment() {
+        navigatePreviousFragmentOnce(FragmentResult.None)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {

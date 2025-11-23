@@ -1357,7 +1357,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param originalDiaryDate 遷移元に返す日付
      */
     private suspend fun navigatePreviousFragment(originalDiaryDate: LocalDate) {
-        emitNavigatePreviousFragmentEvent(originalDiaryDate)
+        emitUiEvent(DiaryEditUiEvent.NavigatePreviousFragmentWithResult(originalDiaryDate))
     }
     //endregion
 

@@ -362,6 +362,11 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             is DiaryEditUiEvent.NavigateExitWithoutDiarySaveDialog -> {
                 navigateExitWithoutDiarySaveDialog()
             }
+            is DiaryEditUiEvent.NavigatePreviousFragmentWithResult -> {
+                navigatePreviousFragmentOnce(
+                    FragmentResult.Some(RESULT_KEY, event.originalDiaryDate)
+                )
+            }
             is DiaryEditUiEvent.NavigatePreviousFragmentOnDiaryDelete -> {
                 navigatePreviousFragmentOnDiaryDelete(event.date)
             }
@@ -449,11 +454,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region CommonUiEventHandler Overrides
-    override fun <T> navigatePreviousFragment(resultData: T?) {
-        checkNotNull(resultData)
-        navigatePreviousFragmentOnce(
-            FragmentResult.Some(RESULT_KEY, resultData)
-        )
+    override fun navigatePreviousFragment() {
+        navigatePreviousFragmentOnce(FragmentResult.None)
     }
 
     override fun navigateAppMessageDialog(appMessage: AppMessage) {

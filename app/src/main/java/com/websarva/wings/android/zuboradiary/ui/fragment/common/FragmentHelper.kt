@@ -129,8 +129,8 @@ class FragmentHelper {
                     event ?: return@collect
 
                     when (event) {
-                        is CommonUiEvent.NavigatePreviousFragment<*> ->
-                            handler.navigatePreviousFragment(event.resultData)
+                        is CommonUiEvent.NavigatePreviousFragment ->
+                            handler.navigatePreviousFragment()
                         is CommonUiEvent.NavigateAppMessage ->
                             handler.navigateAppMessageDialog(event.message)
                     }

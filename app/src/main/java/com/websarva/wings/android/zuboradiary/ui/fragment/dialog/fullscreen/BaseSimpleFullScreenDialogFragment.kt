@@ -101,7 +101,7 @@ abstract class BaseSimpleFullScreenDialogFragment<T: ViewBinding>: DialogFragmen
 
     //region Navigation Helpers
     /** 前の画面へ遷移する。 */
-    protected fun navigatePreviousFragment() {
+    protected fun dismissWithNavigateUp() {
         findNavController().navigateUp()
     }
     //endregion

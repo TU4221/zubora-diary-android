@@ -209,7 +209,7 @@ class CalendarFragment :
     //endregion
 
     //region CommonUiEventHandler Overrides
-    override fun <T> navigatePreviousFragment(resultData: T?) {
+    override fun navigatePreviousFragment() {
         mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
     }
 

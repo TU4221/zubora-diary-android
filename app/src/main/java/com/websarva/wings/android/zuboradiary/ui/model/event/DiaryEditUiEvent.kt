@@ -73,6 +73,14 @@ sealed class DiaryEditUiEvent : UiEvent {
     data object NavigateExitWithoutDiarySaveDialog : DiaryEditUiEvent()
 
     /**
+     * 前の画面へデータを渡し、遷移することを示すイベント。
+     * @param originalDiaryDate 遷移元に返す編集元日記の日付
+     */
+    data class NavigatePreviousFragmentWithResult(
+        val originalDiaryDate: LocalDate
+    ) : DiaryEditUiEvent()
+
+    /**
      * 日記削除後に前の画面へ遷移することを示すイベント。
      * @property date 削除された日記の日付。
      */

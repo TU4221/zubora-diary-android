@@ -28,6 +28,12 @@ sealed class DiaryShowUiEvent : UiEvent {
     data class NavigateDiaryDeleteDialog(val date: LocalDate) : DiaryShowUiEvent()
 
     /**
+     * 前の画面へデータを渡し、遷移することを示すイベント。
+     * @property date 遷移元へ渡す日記の日付。
+     */
+    data class NavigatePreviousFragmentWithResult(val date: LocalDate) : DiaryShowUiEvent()
+
+    /**
      * 日記削除後に前の画面へ遷移することを示すイベント。
      * @property date 削除された日記の日付。
      */

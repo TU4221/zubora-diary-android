@@ -12,10 +12,8 @@ interface CommonUiEventHandler {
 
     /**
      * 前の画面へ遷移する。
-     * @param resultData 遷移元に渡す結果データ。渡す結果が無い場合はnullを代入する。
-     * @param T 遷移元へ返す結果データの型。
      */
-    fun <T> navigatePreviousFragment(resultData: T?)
+    fun navigatePreviousFragment()
 
     /**
      * アプリケーションメッセージダイアログ([AppMessageDialogFragment])へ遷移する。

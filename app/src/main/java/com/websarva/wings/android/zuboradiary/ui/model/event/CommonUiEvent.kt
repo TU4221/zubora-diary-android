@@ -14,8 +14,6 @@ sealed class CommonUiEvent : UiEvent {
 
     /**
      * 前の画面へ遷移することを示すイベント。
-     * @param resultData 遷移元の画面へ返す結果データ。返す結果が無い場合はnullを代入する。
-     * @param T 遷移元へ返す結果データの型。
      */
-    data class NavigatePreviousFragment<T>(val resultData: T?) : CommonUiEvent()
+    data object NavigatePreviousFragment : CommonUiEvent()
 }

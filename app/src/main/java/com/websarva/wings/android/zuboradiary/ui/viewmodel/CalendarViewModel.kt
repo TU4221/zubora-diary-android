@@ -179,7 +179,7 @@ class CalendarViewModel @Inject internal constructor(
         if (!isReadyForOperation) return
 
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent(null)
+            emitNavigatePreviousFragmentEvent()
         }
     }
 
