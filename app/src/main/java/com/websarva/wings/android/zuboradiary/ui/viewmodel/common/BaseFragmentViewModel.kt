@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.update
  */
 abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> internal constructor(
     initialViewUiState: S
-) : BaseViewModel<S, E, M>(initialViewUiState), OnBackPressedHandler {
+) : BaseViewModel<S, E>(initialViewUiState), OnBackPressedHandler {
 
     //region Properties
     /** 画面遷移に失敗し、再試行を待つナビゲーションコマンドのリストを保持するStateFlow。 */
@@ -131,11 +131,19 @@ abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> inte
     //endregion
 
     //region UI Event Emission
-    override suspend fun emitAppMessageEvent(appMessage: M) {
+    /**
+     * 画面固有のアプリケーションメッセージ([AppMessage])をUIに通知するイベントを発行する。
+     * @param appMessage 表示するメッセージ。
+     */
+    protected suspend fun emitAppMessageEvent(appMessage: M) {
         emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
     }
 
-    override suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
+    /**
+     * アプリケーション共通のメッセージ([CommonAppMessage])をUIに通知するイベントを発行する。
+     * @param appMessage 表示する共通メッセージ。
+     */
+    protected suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
         emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
     }
 

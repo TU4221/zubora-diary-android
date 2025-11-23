@@ -45,7 +45,7 @@ import javax.inject.Inject
 class MainActivityViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
-) : BaseViewModel<MainActivityUiState, MainActivityUiEvent, MainActivityAppMessage>(
+) : BaseViewModel<MainActivityUiState, MainActivityUiEvent>(
     handle.get<MainActivityUiState>(SAVED_STATE_UI_KEY)?.let {
         MainActivityUiState.fromSavedState(it)
     } ?: MainActivityUiState()
@@ -98,10 +98,8 @@ class MainActivityViewModel @Inject internal constructor(
                     is UseCaseResult.Failure -> {
                         when (it.exception) {
                             is ThemeColorSettingLoadException.LoadFailure -> {
-                                emitUiEvent(
-                                    MainActivityUiEvent.NavigateAppMessage(
-                                        MainActivityAppMessage.SettingsLoadFailure
-                                    )
+                                emitMainActivityAppMessageEvent(
+                                    MainActivityAppMessage.SettingsLoadFailure
                                 )
                             }
                             is ThemeColorSettingLoadException.Unknown -> {
@@ -348,21 +346,30 @@ class MainActivityViewModel @Inject internal constructor(
     //endregion
 
     //region UI Event Emission
-    override suspend fun emitAppMessageEvent(appMessage: MainActivityAppMessage) {
-        emitUiEvent(
-            MainActivityUiEvent.NavigateAppMessage(appMessage)
-        )
-    }
-
     override suspend fun emitUnexpectedAppMessage(e: Exception) {
         emitCommonAppMessageEvent(
             CommonAppMessage.Unexpected(e)
         )
     }
 
-    override suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
+    /**
+     * MainActivity固有のアプリケーションメッセージ([MainActivityAppMessage])をUIに通知するイベントを発行する。
+     * @param appMessage 表示する共通メッセージ。
+     */
+    private suspend fun emitMainActivityAppMessageEvent(appMessage: MainActivityAppMessage) {
         emitUiEvent(
-            MainActivityUiEvent.NavigateAppMessage(appMessage)
+            MainActivityUiEvent.NavigateMainActivityAppMessage(appMessage)
+        )
+    }
+
+
+    /**
+     * アプリケーション共通のメッセージ([CommonAppMessage])をUIに通知するイベントを発行する。
+     * @param appMessage 表示する共通メッセージ。
+     */
+    private suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
+        emitUiEvent(
+            MainActivityUiEvent.NavigateCommonAppMessage(appMessage)
         )
     }
 

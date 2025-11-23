@@ -170,7 +170,10 @@ class MainActivity : LoggingActivity() {
                     .collectLatest { value: ConsumableEvent<MainActivityUiEvent> ->
                         val event = value.getContentIfNotHandled() ?: return@collectLatest
                         when (event) {
-                            is MainActivityUiEvent.NavigateAppMessage -> {
+                            is MainActivityUiEvent.NavigateMainActivityAppMessage -> {
+                                navigateAppMessageDialog(event.message)
+                            }
+                            is MainActivityUiEvent.NavigateCommonAppMessage -> {
                                 navigateAppMessageDialog(event.message)
                             }
                             MainActivityUiEvent.NavigateStartTabFragment -> {

@@ -3,12 +3,10 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel.common
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
-import com.websarva.wings.android.zuboradiary.ui.model.message.CommonAppMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
@@ -33,9 +31,8 @@ import kotlin.coroutines.cancellation.CancellationException
  *
  * @param S このViewModelが管理するUI状態の型。
  * @param E このViewModelが発行するUIイベントの型。
- * @param M このViewModelが発行する固有のアプリケーションメッセージの型。
  */
-abstract class BaseViewModel<S: UiState, E: UiEvent, M: AppMessage> internal constructor(
+abstract class BaseViewModel<S: UiState, E: UiEvent> internal constructor(
     initialViewUiState: S
 ) : ViewModel() {
 
@@ -76,20 +73,6 @@ abstract class BaseViewModel<S: UiState, E: UiEvent, M: AppMessage> internal con
     //endregion
 
     //region UI Event Emission
-    //TODO:クラス内で参照されていない為、記述場所検討
-    /**
-     * 画面固有のアプリケーションメッセージ([AppMessage])をUIに通知するイベントを発行する。
-     * @param appMessage 表示するメッセージ。
-     */
-    protected abstract suspend fun emitAppMessageEvent(appMessage: M)
-
-    //TODO:クラス内で参照されていない為、記述場所検討
-    /**
-     * アプリケーション共通のメッセージ([CommonAppMessage])をUIに通知するイベントを発行する。
-     * @param appMessage 表示する共通メッセージ。
-     */
-    protected abstract suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage)
-
     /**
      * [launchWithUnexpectedErrorHandler]や[catchUnexpectedError]で補足された予期せぬ例外をUIに通知する。
      * @param e 補足された例外。
