@@ -619,6 +619,9 @@ class SettingsViewModel @Inject internal constructor(
                     SettingsUiEvent.ShowRequestAccessLocationPermissionRationale
                 )
             } else {
+                emitUiEvent(
+                    SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch(false)
+                )
                 emitUiEvent(SettingsUiEvent.NavigateLocationPermissionDialog)
             }
         }
