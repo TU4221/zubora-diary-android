@@ -188,7 +188,7 @@
             app:defaultIcon="@drawable/ic_image_24px"
             app:errorIcon="@drawable/ic_hide_image_24px"
             app:iconTint="?attr/colorOnSurfaceVariant"
-            app:imageScaleType="fitCenter"
+            app:imageScaleType="centerInside"
             app:imageContentDescription="@string/layout_diary_show_attached_image_description"
             app:imageAdjustViewBounds="true"
             app:imagePath="@{diaryImageFilePath.path}"

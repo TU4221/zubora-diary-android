@@ -380,7 +380,7 @@
                             app:defaultIcon="@drawable/ic_photo_library_24px"
                             app:errorIcon="@drawable/ic_hide_image_24px"
                             app:iconTint="?attr/colorOnSurfaceVariant"
-                            app:imageScaleType="fitCenter"
+                            app:imageScaleType="centerInside"
                             app:imageContentDescription="@string/fragment_diary_edit_attached_image_attachment"
                             app:imageAdjustViewBounds="true"
                             app:imagePath="@{viewModel.uiState.diaryImageFilePath.path}" />

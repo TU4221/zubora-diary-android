@@ -60,7 +60,7 @@
                 app:defaultIcon="@drawable/ic_image_24px"
                 app:errorIcon="@drawable/ic_hide_image_24px"
                 app:iconTint="?attr/colorOnSecondaryContainer"
-                app:imageScaleType="centerCrop"
+                app:imageScaleType="fitXY"
                 app:imageContentDescription="@string/row_diary_list_standard_image_description" />
 
         </LinearLayout>
