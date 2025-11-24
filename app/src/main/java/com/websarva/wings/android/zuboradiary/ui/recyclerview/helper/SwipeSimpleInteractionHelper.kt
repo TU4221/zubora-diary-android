@@ -11,12 +11,12 @@ import com.websarva.wings.android.zuboradiary.ui.recyclerview.callback.touch.Sim
  *
  * @param recyclerView インタラクションを適用するRecyclerView。
  * @param listAdapter 対象となるRecyclerViewのアダプター。
- * @param handleOnSwiped アイテムが完全にスワイプされたときに実行されるコールバック。
+ * @param onSwiped アイテムが完全にスワイプされたときに実行されるコールバック。
  */
 internal class SwipeSimpleInteractionHelper(
     recyclerView: RecyclerView,
     listAdapter: ListBaseAdapter<*, *>,
-    private val handleOnSwiped: (Int) -> Unit = {} // TODO:名称handle不要
+    private val onSwiped: (Int) -> Unit = {}
 ) : BaseSwipeInteractionHelper<
         RecyclerView,
         ListBaseAdapter<*, *>,
@@ -36,7 +36,7 @@ internal class SwipeSimpleInteractionHelper(
                 itemTouchHelper?.onChildViewDetachedFromWindow(it.itemView)
                 itemTouchHelper?.onChildViewAttachedToWindow(it.itemView)
             },
-            handleOnSwiped
+            onSwiped
         )
     }
 }
