@@ -4,6 +4,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePaddingRelative
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
@@ -170,11 +173,8 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
         val headerPosition = findHeaderPositionFor(itemPosition)
         if (headerPosition == -1) return null
 
-        // ヘッダーポジションに対応するViewHolderを、再利用プールから取得する
-        val headerDataItem = getItem(headerPosition) as? DiaryListItemUi.Header<*> ?: return null
-        val holder = findOrCreateHeaderViewHolder(recyclerView, headerPosition)
-        holder.bind(headerDataItem)
-        return holder.itemView
+        // ヘッダーポジションに対応するViewHolderを取得、Viewを返す
+        return findOrCreateHeaderViewHolder(recyclerView, headerPosition).itemView
     }
 
     /**
@@ -201,27 +201,48 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
         parent: RecyclerView,
         position: Int
     ): DiaryListHeaderViewHolder {
-        val existingHolder = parent.findViewHolderForAdapterPosition(position) as? DiaryListHeaderViewHolder
+        // 表示中HeaderViewHolder取得
+        val existingHolder =
+            parent.findViewHolderForAdapterPosition(position) as? DiaryListHeaderViewHolder
         if (existingHolder != null) return existingHolder
 
-        val newHolder = createViewHolder(parent, ViewType.HEADER.viewTypeNumber) as DiaryListHeaderViewHolder
-        measureAndLayoutViewHolder(newHolder, parent)
-
+        // HeaderViewHolder新規作成
+        val newHolder =
+            createViewHolder(parent, ViewType.HEADER.viewTypeNumber) as DiaryListHeaderViewHolder
+        val headerDataItem = getItem(position) as? DiaryListItemUi.Header<*>
+        if (headerDataItem != null) newHolder.bind(headerDataItem)
+        measureAndLayoutHeaderViewHolder(newHolder, parent)
         return newHolder
     }
 
     /**
-     * 指定されたViewHolderのViewのサイズを測定し、レイアウトする。
-     * @param holder レイアウトするViewHolder。
+     * 指定された[DiaryListHeaderViewHolder]のViewのサイズを測定し、レイアウトする。
+     * @param holder レイアウトする[DiaryListHeaderViewHolder]。
      * @param parent 親となるRecyclerView。
      */
-    private fun measureAndLayoutViewHolder(holder: RecyclerView.ViewHolder, parent: RecyclerView) {
+    private fun measureAndLayoutHeaderViewHolder(
+        holder: DiaryListHeaderViewHolder,
+        parent: RecyclerView
+    ) {
         with(holder.itemView) {
             val widthSpec =
-                View.MeasureSpec.makeMeasureSpec(parent.width, View.MeasureSpec.EXACTLY)
+                View.MeasureSpec
+                    .makeMeasureSpec(parent.width, View.MeasureSpec.EXACTLY)
             val heightSpec =
-                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
+                View.MeasureSpec
+                    .makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED)
             measure(widthSpec, heightSpec)
+
+            // インセット(システムバー)考慮して、Viewの余白調整
+            val rootInsets = ViewCompat.getRootWindowInsets(parent)
+            if (rootInsets != null) {
+                val systemBarsInsets =
+                    rootInsets.getInsets(WindowInsetsCompat.Type.systemBars())
+                updatePaddingRelative(
+                    start = paddingStart + systemBarsInsets.left
+                )
+            }
+
             layout(0, 0, measuredWidth, measuredHeight)
         }
     }

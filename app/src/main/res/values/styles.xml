@@ -410,8 +410,10 @@
         <item name="android:scrollbars">none</item>
     </style>
 
-    <style name="DiaryListHeaderTextViewStyle" parent="AppTextViewStyle">
+    <style name="DiaryListHeaderLayoutStyle">
         <item name="android:background">?attr/colorSecondary</item>
+    </style>
+    <style name="DiaryListHeaderTextViewStyle" parent="Widget.AppCompat.TextView">
     </style>
     <style name="DiaryListHeaderTextAppearance" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textColor">?attr/colorOnSecondary</item>
