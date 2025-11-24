@@ -9,6 +9,7 @@
     <dimen name="fragment_padding_bottom_for_fab">96dp</dimen>
     <dimen name="fab_margin_end">16dp</dimen>
     <dimen name="fab_margin_bottom">16dp</dimen>
+    <dimen name="recycler_margin_vertical_between_items">8dp</dimen>
     <!-- endregion -->
 
 
@@ -36,7 +37,6 @@
     <!-- region row_diary_list -->
     <dimen name="row_diary_list_height">72dp</dimen>
     <dimen name="row_diary_list_image_height">64dp</dimen>
-    <dimen name="row_diary_list_layout_margin_vertical_between_items">8dp</dimen>
     <dimen name="row_diary_list_layout_margin_horizontal_between_items">16dp</dimen>
     <dimen name="row_diary_list_layout_padding">8dp</dimen>
 

@@ -19,10 +19,7 @@ internal class SpacingItemDecoration(
 ) : RecyclerView.ItemDecoration() {
 
     /** アイテム間に適用される垂直方向の間隔（ピクセル単位）。 */
-    private val itemSpacing =
-        context.resources.getDimensionPixelSize(
-            R.dimen.row_diary_list_layout_margin_vertical_between_items
-        )
+    private val itemSpacing = context.resources.getDimensionPixelSize(R.dimen.recycler_margin_vertical_between_items)
 
     /** 各アイテムのオフセット（マージン）を設定する。 */
     override fun getItemOffsets(
@@ -37,18 +34,9 @@ internal class SpacingItemDecoration(
 
         val provider = parent.adapter as? SpacingItemProvider ?: return
 
-        if (position == 0) {
-            // リスト最初のヘッダー(またはアイテム)のtopのmarginは0
-            outRect.top = 0
-        } else {
-            if (provider.isSpacingItem(position)) {
-                // positionが1以上の全てのアイテムの上側に、統一の間隔を設定する
-                outRect.top = itemSpacing
-            }
-            if (!provider.isSpacingItem(position + 1)) {
-                // positionが1以上の全てのアイテムの上側に、統一の間隔を設定する
-                outRect.bottom = itemSpacing
-            }
+        if (provider.isSpacingItem(position)) {
+            outRect.bottom = itemSpacing
         }
+
     }
 }

@@ -150,8 +150,7 @@ internal abstract class DiaryListBaseAdapter<T, VH> (
 
     /** [SpacingItemProvider]の実装。指定されたポジションのアイテムが、間隔を設けるべき対象か判定する。 */
     override fun isSpacingItem(itemPosition: Int): Boolean {
-        if (itemPosition !in 0..<itemCount) return false
-        return getItem(itemPosition) is DiaryListItemUi.Diary
+        return itemPosition in 0..<itemCount
     }
 
     /** [StickyHeaderAdapter]の実装。指定されたポジションのアイテムがヘッダーか判定する。 */
