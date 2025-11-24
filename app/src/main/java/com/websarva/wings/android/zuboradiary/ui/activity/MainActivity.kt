@@ -269,20 +269,21 @@ class MainActivity : LoggingActivity() {
     private fun setupNavigation() {
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
-        val bottomNavigationView =
-            binding.bottomNavigation.apply {
-                setOnItemSelectedListener { menuItem: MenuItem ->
-                    Log.i(logTag, "ボトムナビゲーション_セレクト")
-                    mainActivityViewModel.onBottomNavigationItemSelect()
-                    onNavDestinationSelected(menuItem, navController)
-                }
-                setOnItemReselectedListener { 
-                    Log.i(logTag, "ボトムナビゲーション_リセレクト")
-                    mainActivityViewModel.onBottomNavigationItemReselect()
-                }
+        val bottomNavigationView = binding.bottomNavigation
+        setupWithNavController(bottomNavigationView, navController)
+        bottomNavigationView.run {
+            // MEMO:setupWithNavController()で設定したOnItemSelectedListenerを下記で上書き
+            setOnItemSelectedListener { menuItem: MenuItem ->
+                Log.i(logTag, "ボトムナビゲーション_セレクト")
+                mainActivityViewModel.onBottomNavigationItemSelect()
+                onNavDestinationSelected(menuItem, navController)
             }
 
-        setupWithNavController(bottomNavigationView, navController)
+            setOnItemReselectedListener {
+                Log.i(logTag, "ボトムナビゲーション_リセレクト")
+                mainActivityViewModel.onBottomNavigationItemReselect()
+            }
+        }
     }
 
     /** [BottomNavigationView]の開始タブに遷移する。 */
