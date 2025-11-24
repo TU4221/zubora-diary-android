@@ -87,18 +87,17 @@ internal open class ThemeColorChanger {
         applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
     }
 
-    // TODO:メソッド名REd -> Error 変更
     /**
      * 複数の[TextView]に、アプリケーションの基本的なエラーを示す色のテキストカラーを適用する。
      * @param textViewList 対象のTextViewのリスト。
      * @param themeColor 適用するテーマカラー。
      */
-    fun applyRedTextColorOnBackground(textViewList: List<TextView>, themeColor: ThemeColorUi) {
+    fun applyTextErrorColor(textViewList: List<TextView>, themeColor: ThemeColorUi) {
         require(textViewList.isNotEmpty())
 
         val resources = textViewList.first().resources
-        val onSurfaceColor = themeColor.asErrorColorInt(resources)
-        applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
+        val errorColor = themeColor.asErrorColorInt(resources)
+        applyTextViewsColorOnlyText(textViewList, errorColor)
     }
 
     /**

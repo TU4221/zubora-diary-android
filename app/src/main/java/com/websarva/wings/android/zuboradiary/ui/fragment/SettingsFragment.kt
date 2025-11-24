@@ -439,7 +439,7 @@ class SettingsFragment :
             themeColor
         )
 
-        changer.applyRedTextColorOnBackground(
+        changer.applyTextErrorColor(
             binding.run {
                 listOf(
                     includeAllDiariesDeleteSetting.textTitle,
