@@ -2,8 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.recyclerview.helper
 
 import android.graphics.Rect
 import android.view.MotionEvent
-import android.view.View
-import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.ListBaseAdapter
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.callback.touch.BackgroundButtonViewHolder
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.callback.touch.LeftSwipeBackgroundButtonCallback
@@ -66,13 +64,15 @@ internal class SwipeBackgroundButtonInteractionHelper(
      * 背景ボタンの領域がクリックされた場合はボタンの`performClick`を呼び出し、
      * それ以外のフォアグラウンド領域がクリックされた場合はスワイプ状態を閉じる。
      *
-     * @param v タッチイベントが発生したビュー（RecyclerView）。
+     * @param recyclerView タッチイベントが発生した[SwipeBackgroundButtonRecyclerView]。
      * @param event 発生した[MotionEvent]。
      * @return イベントを消費した場合は`true`。
      */
-    private fun handleSwipedViewHolderClick(v: View, event: MotionEvent): Boolean {
+    private fun handleSwipedViewHolderClick(
+        recyclerView: SwipeBackgroundButtonRecyclerView,
+        event: MotionEvent
+    ): Boolean {
         // タッチViewHolder取得
-        val recyclerView = v as? RecyclerView ?: return false
         val childView = recyclerView.findChildViewUnder(event.x, event.y) ?: return false
 
         // スワイプ中ViewHolder取得
@@ -82,7 +82,7 @@ internal class SwipeBackgroundButtonInteractionHelper(
         if (viewHolder !is SwipeableViewHolder) return false
         if (viewHolder !is BackgroundButtonViewHolder) return false
 
-        val tolerance = (3 * v.resources.displayMetrics.density).toInt() // スワイプ位置誤差許容値
+        val tolerance = (3 * recyclerView.resources.displayMetrics.density).toInt() // スワイプ位置誤差許容値
         val foregroundView = viewHolder.foregroundView
         val backgroundButtonView = viewHolder.backgroundButtonView
 

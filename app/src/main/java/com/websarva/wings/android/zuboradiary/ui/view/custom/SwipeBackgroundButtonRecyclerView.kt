@@ -3,7 +3,6 @@ package com.websarva.wings.android.zuboradiary.ui.view.custom
 import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.View
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 
@@ -90,17 +89,16 @@ internal class SwipeBackgroundButtonRecyclerView @JvmOverloads constructor(
         onPerformClickListener = listener
     }
 
-    // TODO:引数RecyclerViewにする
     /**
      * [SwipeBackgroundButtonRecyclerView]のクリックイベントを受け取るためのリスナーインターフェース。
      */
     fun interface OnPerformClickListener {
         /**
          * Viewがクリックされたときに呼び出される。
-         * @param view クリックされたView（このRecyclerView自身）。
+         * @param view クリックされた[SwipeBackgroundButtonRecyclerView]。
          * @param event クリックを構成した`ACTION_UP`イベントの[MotionEvent]。
          * @return イベントが処理された場合は`true`。
          */
-        fun onPerformClick(view: View, event: MotionEvent): Boolean
+        fun onPerformClick(view: SwipeBackgroundButtonRecyclerView, event: MotionEvent): Boolean
     }
 }
