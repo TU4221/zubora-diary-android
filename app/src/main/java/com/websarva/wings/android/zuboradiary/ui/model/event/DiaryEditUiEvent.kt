@@ -92,10 +92,10 @@ sealed class DiaryEditUiEvent : UiEvent {
     data object NavigatePreviousFragmentOnInitialDiaryLoadFailed : DiaryEditUiEvent()
 
     /**
-     * 日記項目のレイアウトを更新することを示すイベント。
-     * @property numVisibleItems 表示する項目の数。
+     * 日記項目を表示（追加）するアニメーションを開始することを示すイベント。
+     * @property itemNumber 表示にする項目の番号。
      */
-    data class UpdateDiaryItemLayout(val numVisibleItems: Int) : DiaryEditUiEvent()
+    data class TransitionDiaryItemToVisible(val itemNumber: Int) : DiaryEditUiEvent()
 
     /**
      * 日記項目を非表示（削除）にするアニメーションを開始することを示すイベント。
@@ -105,9 +105,6 @@ sealed class DiaryEditUiEvent : UiEvent {
 
     /** 天気情報を取得する前に、位置情報権限を確認することを示すイベント。 */
     data object CheckAccessLocationPermissionBeforeWeatherInfoFetch : DiaryEditUiEvent()
-
-    /** 日記項目を表示（追加）するアニメーション処理の準備を示すイベント。 */
-    data object PrepareDiaryItemVisibleTransition : DiaryEditUiEvent()
 
     /** ギャラリーから画像を選択する処理を開始することを示すイベント。 */
     data object SelectImage : DiaryEditUiEvent()

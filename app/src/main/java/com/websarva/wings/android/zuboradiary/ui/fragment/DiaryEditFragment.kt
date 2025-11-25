@@ -80,9 +80,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     /** 各日記項目のMotionLayoutリスナーを保持する配列。 */
     private var itemMotionLayoutListeners: Array<ItemMotionLayoutListener>? = null
 
-    /** 日記項目追加時のアニメーション実行を制御するフラグ。 */
-    private var shouldTransitionItemMotionLayout = false
-
     /** ソフトウェアキーボードを制御するマネージャークラス。 */
     private lateinit var keyboardManager: KeyboardManager
 
@@ -373,17 +370,14 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             is DiaryEditUiEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed -> {
                 navigatePreviousFragmentWithRetry(FragmentResult.None)
             }
-            is DiaryEditUiEvent.UpdateDiaryItemLayout -> {
-                renderItemLayouts(event.numVisibleItems)
+            is DiaryEditUiEvent.TransitionDiaryItemToVisible -> {
+                transitionDiaryItemToVisible(event.itemNumber, false)
             }
             is DiaryEditUiEvent.TransitionDiaryItemToInvisible -> {
                 transitionDiaryItemToInvisible(event.itemNumber, false)
             }
             is DiaryEditUiEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch -> {
                 checkAccessLocationPermissionBeforeWeatherInfoFetch()
-            }
-            is DiaryEditUiEvent.PrepareDiaryItemVisibleTransition -> {
-                shouldTransitionItemMotionLayout = true
             }
             is DiaryEditUiEvent.SelectImage -> {
                 openDocumentResultLauncher.launch(arrayOf("image/*"))
@@ -398,6 +392,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
         observeWeather1DropdownOptions()
         observeWeather2DropdownOptions()
         observeConditionDropdownOptions()
+        observeDiaryItem()
     }
 
     /** ツールバーメニューの表示状態を監視する。 */
@@ -448,6 +443,20 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 it.conditionOptions
             }.collect {
                 updateConditionDropdownAdapter(it)
+            }
+        }
+    }
+
+    /** 日記項目数を監視する。 */
+    private fun observeDiaryItem() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.numVisibleDiaryItems == new.numVisibleDiaryItems
+            }.map {
+                it.numVisibleDiaryItems
+            }.collect {
+                if (it == countVisibleItems() && validateVisibleItemStatesContinuity()) return@collect
+                renderItemLayouts(it)
             }
         }
     }
@@ -607,7 +616,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                             arraySize,
                             init + 1,
                             { mainViewModel.onDiaryItemInvisibleStateTransitionCompleted(it) },
-                            { mainViewModel.onDiaryItemVisibleStateTransitionCompleted() },
+                            { mainViewModel.onDiaryItemVisibleStateTransitionCompleted(it) },
                             { selectItemMotionLayout(it) },
                             { dx, dy, scrollDurationMs ->
                                 binding.nestedScrollFullScreen.smoothScrollBy(dx, dy, scrollDurationMs)
@@ -775,19 +784,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
      * @param numVisibleItems 表示すべき日記項目の総数。
      */
     private fun renderItemLayouts(numVisibleItems: Int) {
-        Log.d(logTag, "setupItemsLayout()_numItems = $numVisibleItems")
-
-        // MEMO:削除処理はObserverで適切なモーション削除処理を行うのは難しいのでここでは処理せず、削除ダイアログから処理する。
-        if (shouldTransitionItemMotionLayout) {
-            shouldTransitionItemMotionLayout = false
-            val currentNumVisibleItems = countVisibleItems()
-            val differenceValue = numVisibleItems - currentNumVisibleItems
-            if (numVisibleItems > currentNumVisibleItems && differenceValue == 1) {
-                transitionDiaryItemToVisible(numVisibleItems, false)
-                return
-            }
-        }
-
         itemMotionLayouts?.let {
             for (i in it.indices) {
                 val itemNumber = i + 1
@@ -905,6 +901,35 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 motionLayout.currentState == R.id.motion_scene_edit_diary_item_visible_state
             }
         } ?: 0
+    }
+
+    /**
+     * 表示されている日記項目の連続性を検証する。
+     * 最初の項目が表示状態であり、かつ表示されている項目間に非表示のものが挟まっていないことを確認する。
+     * @return 検証を通過した場合は`true`、それ以外は`false`。
+     */
+    private fun validateVisibleItemStatesContinuity(): Boolean {
+        val layouts = itemMotionLayouts ?: return false
+        if (layouts.isEmpty()) return false
+
+        // 最初の項目が「表示」状態でなければならない
+        if (layouts.first().currentState != R.id.motion_scene_edit_diary_item_visible_state) {
+            return false
+        }
+
+        // 「表示」状態の最後のインデックスを見つける
+        val lastVisibleIndex = layouts.indexOfLast {
+            it.currentState == R.id.motion_scene_edit_diary_item_visible_state
+        }
+
+        // 最初の項目から最後の表示項目まで、全てが表示状態でなければならない
+        for (i in 0..lastVisibleIndex) {
+            if (layouts[i].currentState != R.id.motion_scene_edit_diary_item_visible_state) {
+                return false
+            }
+        }
+
+        return true
     }
     //endregion
 

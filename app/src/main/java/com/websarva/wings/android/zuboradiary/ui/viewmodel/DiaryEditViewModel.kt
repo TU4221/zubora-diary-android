@@ -221,9 +221,6 @@ class DiaryEditViewModel @Inject internal constructor(
             diaryUiStateHelper.calculateNumVisibleDiaryItems(it.itemTitles)
         }.distinctUntilChanged().onEach { numVisibleDiaryItems ->
             updateNumVisibleItems(numVisibleDiaryItems)
-            emitUiEvent(
-                DiaryEditUiEvent.UpdateDiaryItemLayout(numVisibleDiaryItems)
-            )
         }.launchIn(viewModelScope)
     }
 
@@ -498,9 +495,18 @@ class DiaryEditViewModel @Inject internal constructor(
 
     /**
      * 日記項目を表示(追加)するアニメーションが完了した時に呼び出される事を想定。
-     * UIをアイドル状態にする
+     * 日記項目データを追加する。
+     * @param itemNumberInt 対象の項目番号
      * */
-    internal fun onDiaryItemVisibleStateTransitionCompleted() {
+    internal fun onDiaryItemVisibleStateTransitionCompleted(itemNumberInt: Int) {
+        updateUiState {
+            it.copy(
+                editingDiary = it.editingDiary.copy(
+                    itemTitles = it.editingDiary.itemTitles + (itemNumberInt to ""),
+                    itemComments = it.editingDiary.itemComments + (itemNumberInt to "")
+                )
+            )
+        }
         updateToIdleState()
     }
     //endregion
@@ -1172,21 +1178,11 @@ class DiaryEditViewModel @Inject internal constructor(
     }
 
     /** 日記に新しい項目を追加する。 */
-    // 項目関係
-    // MEMO:日記項目追加処理完了時のUi更新(編集中)は日記項目追加完了イベントメソッドにて処理
     private suspend fun addDiaryItem() {
         updateToInputDisabledState()
-        emitUiEvent(DiaryEditUiEvent.PrepareDiaryItemVisibleTransition)
         val numVisibleItems = currentUiState.numVisibleDiaryItems
         val additionItemNumber = numVisibleItems + 1
-        updateUiState {
-            it.copy(
-                editingDiary = it.editingDiary.copy(
-                    itemTitles = it.editingDiary.itemTitles + (additionItemNumber to ""),
-                    itemComments = it.editingDiary.itemComments + (additionItemNumber to "")
-                )
-            )
-        }
+        emitUiEvent(DiaryEditUiEvent.TransitionDiaryItemToVisible(additionItemNumber))
     }
 
     /**
