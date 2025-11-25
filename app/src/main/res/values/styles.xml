@@ -7,7 +7,6 @@
     <!-- ===================================================================================== -->
 
     <!-- region Root View -->
-    <!-- MEMO:Viewのデフォルトスタイルなし -->
     <style name="AppRootViewStyle">
         <item name="android:background">?attr/colorSurface</item>
     </style>
@@ -15,7 +14,7 @@
 
 
     <!-- region App Bar Layout -->
-    <style name="AppAppBarLayout" parent="Widget.Material3.AppBarLayout">
+    <style name="AppAppBarLayout">
         <item name="android:fitsSystemWindows">true</item>
     </style>
     <!-- endregion -->
@@ -43,7 +42,7 @@
 
 
     <!-- region Text View -->
-    <style name="AppTextViewStyle" parent="Widget.AppCompat.TextView">
+    <style name="AppTextViewStyle">
         <!-- HACK:"android:textColorHint"はTextAppearanceでは反映されない為、Styleに記述 -->
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
     </style>
@@ -84,11 +83,10 @@
 
 
     <!-- region Text Input Edit Text -->
-    <style name="AppTextInputEditTextStyle" parent="Widget.AppCompat.EditText">
+    <style name="AppTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
         <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
         <item name="android:textColor">@color/text_color_on_surface</item>
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
-        <item name="android:inputType">text</item>
     </style>
     <style name="AppTextInputEditTextNoInputStyle" parent="AppTextInputEditTextStyle">
         <item name="android:focusable">false</item> <!-- MEMO:一回のタッチでクリック処理を起動 -->
@@ -105,9 +103,7 @@
 
     
     <!-- region Ime Action Handling Text Input Edit Text -->
-    <style name="AppImeActionHandlingTextInputEditTextStyle" parent="Widget.Material3.TextInputEditText.OutlinedBox">
-        <item name="android:textColor">@color/text_color_on_surface</item>
-        <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
+    <style name="AppImeActionHandlingTextInputEditTextStyle" parent="AppTextInputEditTextStyle">
     </style>
     <style name="AppImeDoneActionHandlingTextInputEditTextStyle" parent="AppImeActionHandlingTextInputEditTextStyle">
         <item name="android:imeOptions">actionDone</item>
@@ -167,7 +163,7 @@
 
 
     <!-- region Image Button -->
-    <style name="AppImageButtonStyle" parent="Widget.AppCompat.ImageButton">
+    <style name="AppImageButtonStyle">
         <item name="android:background">@android:color/transparent</item>
         <item name="android:foreground">@drawable/ripple_effect_oval</item>
         <item name="tint">?attr/colorOnSurfaceVariant</item>
@@ -176,7 +172,6 @@
 
 
     <!-- region Image View -->
-    <!-- MEMO:ImageViewのデフォルトスタイルなし -->
     <style name="AppImageViewStyle">
     </style>
     <!-- endregion -->
@@ -192,7 +187,6 @@
 
 
     <!-- region Recycler View -->
-    <!-- MEMO:RecyclerViewのデフォルトスタイルなし -->
     <style name="AppRecyclerViewStyle">
         <item name="android:transitionGroup">true</item>
     </style>
@@ -200,7 +194,6 @@
 
     
     <!-- region Number Pickers -->
-    <!-- MEMO:NumberPickerのデフォルトスタイルなし -->
     <style name="NumberPickerStyle" >
         <item name="android:descendantFocusability">blocksDescendants</item>
     </style>
@@ -413,26 +406,22 @@
     <style name="DiaryListHeaderLayoutStyle">
         <item name="android:background">?attr/colorSecondary</item>
     </style>
-    <style name="DiaryListHeaderTextViewStyle" parent="Widget.AppCompat.TextView">
+    <style name="DiaryListHeaderTextViewStyle" parent="AppTextViewStyle">
     </style>
     <style name="DiaryListHeaderTextAppearance" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textColor">?attr/colorOnSecondary</item>
     </style>
 
-    <!-- MEMO:Viewのデフォルトスタイルなし -->
-    <style name="DiaryListBackgroundViewStyle">
+    <style name="DiaryListItemLayoutStyle" parent="AppRootViewStyle">
         <item name="android:background">?attr/colorSecondaryContainer</item>
-    </style>
 
-    <!-- MEMO:Layout系のデフォルトスタイルなし -->
-    <style name="DiaryListItemLayoutStyle" parent="DiaryListBackgroundViewStyle">
         <!-- 波紋エフェクト設定 -->
         <item name="android:foreground">?attr/selectableItemBackground</item>
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
     </style>
 
-    <style name="DiaryListTextViewStyle" parent="Widget.AppCompat.TextView">
+    <style name="DiaryListTextViewStyle" parent="AppTextViewStyle">
         <item name="android:textColorHint">@color/hint_text_color_on_secondary_container</item>
     </style>
     <style name="DiaryListTextAppearance" parent="TextAppearance.AppCompat.Body1">
@@ -505,7 +494,7 @@
     </style>
     <style name="SettingsItemValueTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance"/>
 
-    <style name="SettingsItemValueSwitchStyle" parent="Widget.Material3.CompoundButton.MaterialSwitch">
+    <style name="SettingsItemValueSwitchStyle">
         <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
         <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
         <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
