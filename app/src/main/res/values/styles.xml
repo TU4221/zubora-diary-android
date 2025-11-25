@@ -189,6 +189,7 @@
     <!-- region Recycler View -->
     <style name="AppRecyclerViewStyle">
         <item name="android:transitionGroup">true</item>
+        <item name="android:scrollbars">vertical</item>
     </style>
     <!-- endregion -->
 
@@ -399,10 +400,6 @@
     <!-- ===================================================================================== -->
 
     <!-- region Diary List -->
-    <style name="DiaryListRecyclerViewStyle" parent="AppRecyclerViewStyle">
-        <item name="android:scrollbars">none</item>
-    </style>
-
     <style name="DiaryListHeaderLayoutStyle">
         <item name="android:background">?attr/colorSecondary</item>
     </style>

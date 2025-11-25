@@ -58,12 +58,11 @@
                 <!-- MEMO:スクロールバーを表示させたいが、子RecyclerViewに反応してスクロールバーの長さが安定しない。
                           その為、"android:scrollbars="none"" とする。 -->
                 <com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeBackgroundButtonRecyclerView
-                    style="@style/DiaryListRecyclerViewStyle"
+                    style="@style/AppRecyclerViewStyle"
                     android:id="@+id/recycler_diary_list"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:visibility="@{viewModel.uiState.hasNoDiaries ? View.INVISIBLE : View.VISIBLE}"
-                    android:scrollbars="none"
                     tools:visibility="visible"/>
 
             </FrameLayout>
