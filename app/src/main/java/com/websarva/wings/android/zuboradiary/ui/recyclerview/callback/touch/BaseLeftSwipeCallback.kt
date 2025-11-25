@@ -212,15 +212,25 @@ internal abstract class BaseLeftSwipeCallback(
     override fun clearView(
         recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder
     ) {
-        Log.d(logTag, "clearView()_position:${viewHolder.bindingAdapterPosition}")
+        val position = viewHolder.bindingAdapterPosition
+        Log.d(logTag, "clearView()_position:${position}")
         super.clearView(recyclerView, viewHolder)
 
-        // ユーザーがスワイプ操作でアイテムをスワイプ前に戻した時
+        // スワイプ状態のアイテムを削除した時（削除したViewHolderはpositionが-1となる）
+        if (position == -1) {
+            if (viewHolder is SwipeableViewHolder) {
+                viewHolder.foregroundView.translationX = 0f
+                viewHolder.isRollingBack = false
+            }
+            return
+        }
+
+        // スワイプ状態のアイテムをスワイプ前に戻した時
         if (swipedAdapterPosition == swipingAdapterPosition
-            && swipedAdapterPosition == viewHolder.getBindingAdapterPosition()) {
+            && swipedAdapterPosition == position) {
             resetSwipedAdapterPosition()
         }
-        if (swipingAdapterPosition == viewHolder.getBindingAdapterPosition()) {
+        if (swipingAdapterPosition == position) {
             resetSwipingAdapterPosition()
         }
     }
