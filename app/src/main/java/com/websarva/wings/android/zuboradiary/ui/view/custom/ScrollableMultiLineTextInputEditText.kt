@@ -17,7 +17,7 @@ import com.websarva.wings.android.zuboradiary.ui.view.edittext.EditTextConfigura
 internal class ScrollableMultiLineTextInputEditText @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = com.google.android.material.R.attr.textInputStyle
 ) : ImeActionHandlingTextInputEditText(context, attrs, defStyleAttr) {
 
     init {

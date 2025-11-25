@@ -11,20 +11,11 @@ import com.websarva.wings.android.zuboradiary.ui.view.edittext.EditTextConfigura
  *
  * このViewは、内部で[EditTextConfigurator]を利用して、キーボード制御をセットアップする。
  */
-internal open class ImeActionHandlingTextInputEditText : TextInputEditText {
-
-    // MEMO:デフォルトスタイル属性 (defStyleAttr) を指定せずにインスタンス化する場合のコンストラクタ。
-    //      スーパークラスが自身のデフォルトスタイルを適用する。
-    @JvmOverloads constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-    ) : super(context, attrs)
-
-    constructor(
-        context: Context,
-        attrs: AttributeSet? = null,
-        defStyleAttr: Int
-    ) : super(context, attrs, defStyleAttr)
+internal open class ImeActionHandlingTextInputEditText @JvmOverloads constructor(
+    context: Context,
+    attrs: AttributeSet? = null,
+    defStyleAttr: Int = androidx.appcompat.R.attr.editTextStyle
+) : TextInputEditText(context, attrs, defStyleAttr) {
 
     init {
         EditTextConfigurator().setupKeyboardCloseOnEnter(this)

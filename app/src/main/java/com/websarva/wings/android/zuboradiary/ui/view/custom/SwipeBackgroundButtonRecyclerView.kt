@@ -27,7 +27,7 @@ import androidx.recyclerview.widget.RecyclerView
 internal class SwipeBackgroundButtonRecyclerView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = androidx.recyclerview.R.attr.recyclerViewStyle
 ) : RecyclerView(context, attrs, defStyleAttr) {
 
     /** [MotionEvent]を一時的に保持するプロパティの初期値。 */
