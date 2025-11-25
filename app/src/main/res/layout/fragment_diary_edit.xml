@@ -46,6 +46,7 @@
                 android:layout_height="wrap_content" />
 
             <androidx.core.widget.NestedScrollView
+                style="@style/AppNestedScrollViewStyle"
                 android:id="@+id/nested_scroll_full_screen"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">

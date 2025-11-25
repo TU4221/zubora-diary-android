@@ -186,6 +186,13 @@
     <!-- endregion -->
 
 
+    <!-- region Nested Scroll View -->
+    <style name="AppNestedScrollViewStyle">
+        <item name="android:scrollbars">vertical</item>
+    </style>
+    <!-- endregion -->
+
+
     <!-- region Recycler View -->
     <style name="AppRecyclerViewStyle">
         <item name="android:transitionGroup">true</item>
