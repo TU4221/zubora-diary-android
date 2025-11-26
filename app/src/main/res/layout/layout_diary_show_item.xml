@@ -33,7 +33,7 @@
             android:id="@+id/text_item_number"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_diary_show_item_large_margin_top"
+            android:layout_marginTop="@dimen/layout_diary_show_item_content_large_spacing_vertical"
             android:textAppearance="@style/AppTextViewTextAppearance"
             android:text="@{itemNumber}"
             android:textSize="@dimen/layout_diary_show_small_text_size"
@@ -45,7 +45,7 @@
             android:id="@+id/text_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top"
+            android:layout_marginTop="@dimen/layout_diary_show_item_content_small_spacing_vertical"
             android:textAppearance="@style/AppTextViewTextAppearance"
             android:textSize="@dimen/layout_diary_show_item_text_size"
             android:hint="@string/layout_diary_show_item_title_hint"
@@ -56,14 +56,14 @@
         <com.google.android.material.divider.MaterialDivider
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top" />
+            android:layout_marginTop="@dimen/layout_diary_show_item_content_small_spacing_vertical" />
 
         <TextView
             style="@style/AppTextViewStyle"
             android:id="@+id/text_comment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/layout_diary_show_item_small_margin_top"
+            android:layout_marginTop="@dimen/layout_diary_show_item_content_small_spacing_vertical"
             android:textAppearance="@style/AppTextViewTextAppearance"
             android:textSize="@dimen/layout_diary_show_item_text_size"
             android:hint="@string/layout_diary_show_item_comment_hint"

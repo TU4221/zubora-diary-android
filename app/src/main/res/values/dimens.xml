@@ -4,12 +4,12 @@
     <!-- ===================================================================================== -->
 
     <!-- region Margin & Padding -->
-    <dimen name="fragment_padding_horizontal">16dp</dimen>
-    <dimen name="fragment_padding_vertical">8dp</dimen>
-    <dimen name="fragment_padding_bottom_for_fab">96dp</dimen>
-    <dimen name="fab_margin_end">16dp</dimen>
-    <dimen name="fab_margin_bottom">16dp</dimen>
-    <dimen name="recycler_margin_vertical_between_items">8dp</dimen>
+    <dimen name="screen_spacing_horizontal">16dp</dimen>
+    <dimen name="screen_spacing_vertical">8dp</dimen>
+    <dimen name="screen_bottom_spacing_for_fab">96dp</dimen>
+    <dimen name="fab_end_spacing">16dp</dimen>
+    <dimen name="fab_bottom_spacing">16dp</dimen>
+    <dimen name="recycler_item_spacing_vertical">8dp</dimen>
     <!-- endregion -->
 
 
@@ -21,9 +21,7 @@
     <!-- endregion -->
 
     <!-- region dialog_fragment_number_picker -->
-    <dimen name="dialog_fragment_number_picker_layout_margin_horizontal">16dp</dimen>
-    <dimen name="dialog_fragment_number_picker_layout_margin_horizontal_between_items">8dp</dimen>
-    <dimen name="dialog_fragment_number_picker_layout_margin_vertical">8dp</dimen>
+    <dimen name="dialog_fragment_number_picker_content_spacing_horizontal">8dp</dimen>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->
@@ -37,10 +35,8 @@
     <!-- region row_diary_list -->
     <dimen name="row_diary_list_height">72dp</dimen>
     <dimen name="row_diary_list_image_height">64dp</dimen>
-    <dimen name="row_diary_list_layout_margin_horizontal_between_items">16dp</dimen>
-    <dimen name="row_diary_list_layout_padding">8dp</dimen>
 
-    <dimen name="row_diary_list_word_search_result_views_layout_margin">8dp</dimen>
+    <dimen name="row_diary_list_word_search_result_content_spacing">8dp</dimen>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->
@@ -52,7 +48,7 @@
     <!-- ===================================================================================== -->
 
     <!-- region fragment_calendar -->
-    <dimen name="fragment_calendar_margin_top">16dp</dimen>
+    <dimen name="fragment_calendar_content_spacing_vertical">16dp</dimen>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->
@@ -68,9 +64,8 @@
 
     <dimen name="fragment_settings_section_layout_min_height">56dp</dimen>
 
-    <dimen name="fragment_settings_item_padding_horizontal">16dp</dimen>
-    <dimen name="fragment_settings_item_padding_vertical">8dp</dimen>
-    <dimen name="fragment_settings_item_drawable_padding">16dp</dimen>
+    <dimen name="fragment_settings_content_spacing_horizontal">16dp</dimen>
+    <dimen name="fragment_settings_content_spacing_vertical">8dp</dimen>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->
@@ -85,23 +80,23 @@
     <dimen name="fragment_diary_show_text_size">@dimen/layout_diary_show_text_size</dimen>
 
     <!-- MEMO:includeタグにはMarginの設定ができないため、includeタグの上のタグのBottomMarginの設定を行う。-->
-    <dimen name="fragment_diary_show_margin_bottom">@dimen/layout_diary_show_margin_top</dimen>
+    <dimen name="fragment_diary_show_content_spacing_vertical">@dimen/layout_diary_show_content_spacing_vertical</dimen>
     <!-- endregion -->
 
 
     <!-- region layout_diary_show -->
     <dimen name="layout_diary_show_text_size">18sp</dimen>
     <dimen name="layout_diary_show_small_text_size">14sp</dimen>
-    <dimen name="layout_diary_show_margin_top">16dp</dimen>
-    <dimen name="layout_diary_show_large_margin_top">32dp</dimen>
-    <dimen name="layout_diary_show_small_margin_top">4dp</dimen>
+    <dimen name="layout_diary_show_content_spacing_vertical">16dp</dimen>
+    <dimen name="layout_diary_show_content_large_spacing_vertical">32dp</dimen>
+    <dimen name="layout_diary_show_content_small_spacing_vertical">4dp</dimen>
     <!-- endregion -->
 
 
     <!-- region layout_diary_show_item -->
     <dimen name="layout_diary_show_item_text_size">@dimen/layout_diary_show_text_size</dimen>
-    <dimen name="layout_diary_show_item_large_margin_top">@dimen/layout_diary_show_large_margin_top</dimen>
-    <dimen name="layout_diary_show_item_small_margin_top">@dimen/layout_diary_show_small_margin_top</dimen>
+    <dimen name="layout_diary_show_item_content_large_spacing_vertical">@dimen/layout_diary_show_content_large_spacing_vertical</dimen>
+    <dimen name="layout_diary_show_item_content_small_spacing_vertical">@dimen/layout_diary_show_content_small_spacing_vertical</dimen>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->
@@ -115,22 +110,22 @@
     <!-- region fragment_diary_edit -->
     <dimen name="fragment_diary_edit_text_size">18sp</dimen>
     <dimen name="fragment_diary_edit_small_text_size">14sp</dimen>
-    <dimen name="fragment_diary_edit_margin_start">8dp</dimen>
-    <dimen name="fragment_diary_edit_margin_top">16dp</dimen>
+    <dimen name="fragment_diary_edit_content_spacing_horizontal">8dp</dimen>
+    <dimen name="fragment_diary_edit_content_spacing_vertical">16dp</dimen>
     <dimen name="fragment_diary_edit_image_button_layout_width">48dp</dimen>
     <dimen name="fragment_diary_edit_image_button_layout_height">@dimen/fragment_diary_edit_image_button_layout_width</dimen>
-    <dimen name="fragment_diary_edit_image_button_vertical_center_adjust_padding">4dp</dimen>
-    <dimen name="fragment_diary_edit_image_padding">16dp</dimen>
+    <dimen name="fragment_diary_edit_image_button_vertical_center_adjust_spacing">4dp</dimen>
+    <dimen name="fragment_diary_edit_image_spacing_for_outline_rounded">16dp</dimen>
     <!-- endregion -->
 
 
     <!-- region layout_diary_edit_item -->
     <dimen name="layout_diary_edit_item_text_size">@dimen/fragment_diary_edit_text_size</dimen>
-    <dimen name="layout_diary_edit_item_margin_start">@dimen/fragment_diary_edit_margin_start</dimen>
-    <dimen name="layout_diary_edit_item_margin_top">@dimen/fragment_diary_edit_margin_top</dimen>
-    <dimen name="layout_diary_edit_item_delete_button_layout_width">@dimen/fragment_diary_edit_image_button_layout_width</dimen>
-    <dimen name="layout_diary_edit_item_delete_button_layout_height">@dimen/fragment_diary_edit_image_button_layout_height</dimen>
-    <dimen name="layout_diary_edit_item_image_button_vertical_center_adjust_padding">@dimen/fragment_diary_edit_image_button_vertical_center_adjust_padding</dimen>
+    <dimen name="layout_diary_edit_item_content_spacing_horizontal">@dimen/fragment_diary_edit_content_spacing_horizontal</dimen>
+    <dimen name="layout_diary_edit_item_content_spacing_vertical">@dimen/fragment_diary_edit_content_spacing_vertical</dimen>
+    <dimen name="layout_diary_edit_item_image_button_layout_width">@dimen/fragment_diary_edit_image_button_layout_width</dimen>
+    <dimen name="layout_diary_edit_item_image_button_layout_height">@dimen/fragment_diary_edit_image_button_layout_height</dimen>
+    <dimen name="layout_diary_edit_item_image_button_vertical_center_adjust_spacing">@dimen/fragment_diary_edit_image_button_vertical_center_adjust_spacing</dimen>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->
@@ -142,16 +137,9 @@
     <!-- ===================================================================================== -->
 
     <!-- region dialog_diary_item_title_edit -->
-    <!--TODO: 名称start,top -> horizontal、vertical に変更(他のも)-->
     <dimen name="dialog_diary_item_title_edit_text_size">18sp</dimen>
     <dimen name="dialog_diary_item_title_edit_spacing_horizontal">8dp</dimen>
     <dimen name="dialog_diary_item_title_edit_spacing_vertical">16dp</dimen>
-    <!-- endregion -->
-
-    <!-- region layout_diary_item_title_edit_toolbar -->
-    <dimen name="layout_diary_item_title_edit_toolbar_text_size">@dimen/dialog_diary_item_title_edit_text_size</dimen>
-    <dimen name="layout_diary_item_title_edit_toolbar_spacing_horizontal">@dimen/dialog_diary_item_title_edit_spacing_horizontal</dimen>
-    <dimen name="layout_diary_item_title_edit_toolbar_spacing_vertical">@dimen/dialog_diary_item_title_edit_spacing_vertical</dimen>
     <!-- endregion -->
 
     <!-- region layout_diary_item_title_edit_history -->

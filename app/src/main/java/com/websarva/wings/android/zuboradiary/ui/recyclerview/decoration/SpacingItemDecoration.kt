@@ -19,7 +19,7 @@ internal class SpacingItemDecoration(
 ) : RecyclerView.ItemDecoration() {
 
     /** アイテム間に適用される垂直方向の間隔（ピクセル単位）。 */
-    private val itemSpacing = context.resources.getDimensionPixelSize(R.dimen.recycler_margin_vertical_between_items)
+    private val itemSpacing = context.resources.getDimensionPixelSize(R.dimen.recycler_item_spacing_vertical)
 
     /** 各アイテムのオフセット（マージン）を設定する。 */
     override fun getItemOffsets(

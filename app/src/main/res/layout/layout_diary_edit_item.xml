@@ -52,7 +52,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
+                android:layout_marginTop="@dimen/layout_diary_edit_item_content_spacing_vertical"
                 android:orientation="horizontal">
 
                 <TextView
@@ -69,10 +69,10 @@
                 <ImageButton
                     style="@style/AppImageButtonStyle"
                     android:id="@+id/image_button_item_delete"
-                    android:layout_width="@dimen/layout_diary_edit_item_delete_button_layout_width"
-                    android:layout_height="@dimen/layout_diary_edit_item_delete_button_layout_height"
+                    android:layout_width="@dimen/layout_diary_edit_item_image_button_layout_width"
+                    android:layout_height="@dimen/layout_diary_edit_item_image_button_layout_height"
                     android:layout_gravity="center_vertical"
-                    android:paddingTop="@dimen/layout_diary_edit_item_image_button_vertical_center_adjust_padding"
+                    android:paddingTop="@dimen/layout_diary_edit_item_image_button_vertical_center_adjust_spacing"
                     android:src="@drawable/ic_delete_forever_24px"
                     android:contentDescription="@string/layout_diary_edit_item_delete"
                     android:onClick="@{onItemDeleteButtonClick}"/>
@@ -85,7 +85,7 @@
                 android:id="@+id/text_input_layout_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
+                android:layout_marginTop="@dimen/layout_diary_edit_item_content_spacing_vertical"
                 android:hint="@string/layout_diary_edit_item_title"
                 app:counterEnabled="true"
                 app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length"
@@ -111,7 +111,7 @@
                 android:id="@+id/text_input_layout_comment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_diary_edit_item_margin_top"
+                android:layout_marginTop="@dimen/layout_diary_edit_item_content_spacing_vertical"
                 android:hint="@string/layout_diary_edit_item_comment"
                 app:counterEnabled="true"
                 app:counterMaxLength="@integer/layout_diary_edit_item_comment_max_length">

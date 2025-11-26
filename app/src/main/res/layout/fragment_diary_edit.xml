@@ -62,8 +62,8 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingHorizontal="@dimen/fragment_padding_horizontal"
-                        android:paddingVertical="@dimen/fragment_padding_vertical"
+                        android:paddingHorizontal="@dimen/screen_spacing_horizontal"
+                        android:paddingVertical="@dimen/screen_spacing_vertical"
                         android:orientation="vertical"
                         app:applySystemInsetsToPaddingLeft="@{true}"
                         app:applySystemInsetsToPaddingRight="@{true}"
@@ -93,7 +93,7 @@
                             style="@style/AppTextInputLayoutOutlinedBoxStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:layout_marginTop="@dimen/fragment_diary_edit_content_spacing_vertical"
                             android:hint="@string/fragment_diary_edit_date" >
 
                             <com.google.android.material.textfield.TextInputEditText
@@ -112,7 +112,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:layout_marginTop="@dimen/fragment_diary_edit_content_spacing_vertical"
                             android:orientation="horizontal">
 
                             <TextView
@@ -130,7 +130,7 @@
                                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
+                                android:layout_marginStart="@dimen/fragment_diary_edit_content_spacing_horizontal"
                                 android:layout_weight="1">
 
                                 <AutoCompleteTextView
@@ -151,7 +151,7 @@
                                 style="@style/AppTextViewStyle"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
+                                android:layout_marginStart="@dimen/fragment_diary_edit_content_spacing_horizontal"
                                 android:labelFor="@id/auto_complete_text_weather_2"
                                 android:text="@string/fragment_diary_edit_weather_slush"
                                 android:textAppearance="@style/AppTextViewTextAppearance"
@@ -162,7 +162,7 @@
                                 style="@style/AppTextInputLayoutDropdownMenuStyle"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/fragment_diary_edit_margin_start"
+                                android:layout_marginStart="@dimen/fragment_diary_edit_content_spacing_horizontal"
                                 android:layout_weight="1"
                                 android:enabled="@{viewModel.uiState.weather2Enabled}">
 
@@ -186,7 +186,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:layout_marginTop="@dimen/fragment_diary_edit_content_spacing_vertical"
                             android:orientation="horizontal">
 
                             <TextView
@@ -204,7 +204,7 @@
                                 style="@style/AppTextInputLayoutDropdownMenuStyle"
                                 android:layout_width="match_parent"
                                 android:layout_height="wrap_content"
-                                android:layout_marginStart="@dimen/fragment_diary_edit_margin_start">
+                                android:layout_marginStart="@dimen/fragment_diary_edit_content_spacing_horizontal">
 
                                 <AutoCompleteTextView
                                     android:id="@+id/auto_complete_text_condition"
@@ -227,7 +227,7 @@
                             style="@style/AppTextInputLayoutClearTextStyle"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:layout_marginTop="@dimen/fragment_diary_edit_content_spacing_vertical"
                             android:hint="@string/fragment_diary_edit_title"
                             app:counterEnabled="true"
                             app:counterMaxLength="@integer/fragment_diary_edit_title_max_length"
@@ -331,7 +331,7 @@
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="@dimen/fragment_diary_edit_margin_top"
+                            android:layout_marginTop="@dimen/fragment_diary_edit_content_spacing_vertical"
                             android:orientation="horizontal">
 
                             <TextView
@@ -359,7 +359,7 @@
                                 android:layout_width="@dimen/fragment_diary_edit_image_button_layout_width"
                                 android:layout_height="@dimen/fragment_diary_edit_image_button_layout_height"
                                 android:layout_gravity="center_vertical"
-                                android:paddingTop="@dimen/fragment_diary_edit_image_button_vertical_center_adjust_padding"
+                                android:paddingTop="@dimen/fragment_diary_edit_image_button_vertical_center_adjust_spacing"
                                 android:contentDescription="@string/fragment_diary_edit_attached_image_delete"
                                 android:src="@{viewModel.uiState.editingDiary.imageFileName != null ? @drawable/ic_delete_forever_24px : @drawable/ic_delete_forever_disabled_24px}"
                                 android:clickable="@{viewModel.uiState.editingDiary.imageFileName != null}"
@@ -372,7 +372,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:layout_gravity="center"
-                            android:padding="@dimen/fragment_diary_edit_image_padding"
+                            android:padding="@dimen/fragment_diary_edit_image_spacing_for_outline_rounded"
                             android:background="@drawable/bg_outline_rounded_corners_12dp"
                             android:foreground="@drawable/ripple_effect_rounded_corners_12dp"
                             android:clickable="true"

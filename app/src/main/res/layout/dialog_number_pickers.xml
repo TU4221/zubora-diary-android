@@ -36,8 +36,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginHorizontal="@dimen/dialog_fragment_number_picker_layout_margin_horizontal"
-        android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical">
+        android:layout_marginHorizontal="@dimen/screen_spacing_horizontal"
+        android:layout_marginVertical="@dimen/screen_spacing_vertical">
 
         <NumberPicker
             style="@style/AppNumberPickerStyle"
@@ -52,14 +52,14 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items" />
+            android:layout_marginStart="@dimen/dialog_fragment_number_picker_content_spacing_horizontal" />
 
         <NumberPicker
             android:id="@+id/number_picker_third"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:layout_marginStart="@dimen/dialog_fragment_number_picker_layout_margin_horizontal_between_items"/>
+            android:layout_marginStart="@dimen/dialog_fragment_number_picker_content_spacing_horizontal"/>
 
     </LinearLayout>
 

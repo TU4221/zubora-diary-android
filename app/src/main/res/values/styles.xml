@@ -479,17 +479,17 @@
     <!-- region Screen - Settings -->
     <!-- ===================================================================================== -->
     <style name="SettingsItemBaseTextViewStyle" parent="AppTextViewStyle">
-        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
-        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingStart">@dimen/screen_spacing_horizontal</item>
+        <item name="android:paddingEnd">@dimen/fragment_settings_content_spacing_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_content_spacing_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_content_spacing_vertical</item>
     </style>
     <style name="SettingsItemBaseTextViewTextAppearance" parent="AppTextViewTextAppearance">
         <item name="android:textSize">@dimen/fragment_settings_text_size</item>
     </style>
 
     <style name="SettingsItemTextViewStyle" parent="SettingsItemBaseTextViewStyle">
-        <item name="android:drawablePadding">@dimen/fragment_settings_item_drawable_padding</item>
+        <item name="android:drawablePadding">@dimen/fragment_settings_content_spacing_horizontal</item>
         <item name="android:gravity">center_vertical</item>
     </style>
     <style name="SettingsItemTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance"/>
@@ -503,20 +503,20 @@
     </style>
 
     <style name="SettingsItemValueTextViewStyle" parent="AppTextViewStyle">
-        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
-        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingStart">@dimen/fragment_settings_content_spacing_horizontal</item>
+        <item name="android:paddingEnd">@dimen/screen_spacing_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_content_spacing_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_content_spacing_vertical</item>
         <item name="android:gravity">center_vertical|end</item>
         <item name="android:hint">@string/fragment_settings_item_value_not_set</item>
     </style>
     <style name="SettingsItemValueTextViewTextAppearance" parent="SettingsItemBaseTextViewTextAppearance"/>
 
     <style name="SettingsItemValueSwitchStyle">
-        <item name="android:paddingStart">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingEnd">@dimen/fragment_settings_item_padding_horizontal</item>
-        <item name="android:paddingTop">@dimen/fragment_settings_item_padding_vertical</item>
-        <item name="android:paddingBottom">@dimen/fragment_settings_item_padding_vertical</item>
+        <item name="android:paddingStart">@dimen/fragment_settings_content_spacing_horizontal</item>
+        <item name="android:paddingEnd">@dimen/screen_spacing_horizontal</item>
+        <item name="android:paddingTop">@dimen/fragment_settings_content_spacing_vertical</item>
+        <item name="android:paddingBottom">@dimen/fragment_settings_content_spacing_vertical</item>
     </style>
 
     <!-- ===================================================================================== -->

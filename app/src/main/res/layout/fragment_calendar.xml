@@ -55,9 +55,9 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingHorizontal="@dimen/fragment_padding_horizontal"
-                    android:paddingTop="@dimen/fragment_padding_vertical"
-                    android:paddingBottom="@dimen/fragment_padding_bottom_for_fab"
+                    android:paddingHorizontal="@dimen/screen_spacing_horizontal"
+                    android:paddingTop="@dimen/screen_spacing_vertical"
+                    android:paddingBottom="@dimen/screen_bottom_spacing_for_fab"
                     android:orientation="vertical">
 
                     <com.kizitonwose.calendar.view.CalendarView
@@ -70,13 +70,13 @@
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="@dimen/fragment_calendar_margin_top"/>
+                        android:layout_marginTop="@dimen/fragment_calendar_content_spacing_vertical"/>
 
                     <!-- 日記ありなしでFrameLayout内のViewを表示切替 -->
                     <FrameLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="@dimen/fragment_calendar_margin_top">
+                        android:layout_marginTop="@dimen/fragment_calendar_content_spacing_vertical">
 
                         <!-- MEMO:コードからはincludeのVisibilityを操作できないので下記LinerLayoutを使用して操作する。 -->
                         <FrameLayout
@@ -123,8 +123,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="end|bottom"
-            android:layout_marginEnd="@dimen/fab_margin_end"
-            android:layout_marginBottom="@dimen/fab_margin_bottom"
+            android:layout_marginEnd="@dimen/fab_end_spacing"
+            android:layout_marginBottom="@dimen/fab_bottom_spacing"
             android:src="@drawable/ic_edit_24px"
             android:contentDescription="@string/fragment_calendar_fab_content_description"
             android:onClick="@{() -> viewModel.onDiaryEditButtonClick()}"

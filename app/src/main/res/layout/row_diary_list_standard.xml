@@ -17,14 +17,14 @@
             android:id="@+id/include_background"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/row_diary_list_layout_margin_horizontal_between_items" />
+            android:layout_marginHorizontal="@dimen/screen_spacing_horizontal" />
 
         <LinearLayout
             style="@style/DiaryListItemLayoutStyle"
             android:id="@+id/liner_layout_foreground"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="@dimen/row_diary_list_layout_margin_horizontal_between_items"
+            android:layout_marginHorizontal="@dimen/screen_spacing_horizontal"
             android:minHeight="@dimen/row_diary_list_height"
             android:orientation="horizontal"
             android:padding="8dp">
