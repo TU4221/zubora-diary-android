@@ -79,7 +79,7 @@
                             app:settingIcon="@{@drawable/ic_palette_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_theme_color}"
                             app:settingValue="@{viewModel.uiState.themeColor}"
-                            app:onClickListener="@{() -> viewModel.onThemeColorSettingButtonClick()}" />
+                            app:onClickListener="@{() -> viewModel.onThemeColorSettingItemClick()}" />
 
                     </LinearLayout>
 
@@ -114,7 +114,7 @@
                             app:settingIcon="@{@drawable/ic_calendar_month_24px}"
                             app:settingTitle="@{@string/fragment_settings_item_title_calendar_start_day}"
                             app:settingValue="@{viewModel.uiState.calendarStartDayOfWeek}"
-                            app:onClickListener="@{() -> viewModel.onCalendarStartDayOfWeekSettingButtonClick()}" />
+                            app:onClickListener="@{() -> viewModel.onCalendarStartDayOfWeekSettingItemClick()}" />
 
                         <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_reminder_notification_setting"

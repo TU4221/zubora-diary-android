@@ -251,12 +251,11 @@ class SettingsViewModel @Inject internal constructor(
         }
     }
 
-    // TODO:Button -> Itemに名称変更
     /**
      * テーマカラー設定項目がクリックされた時に呼び出される事を想定。
      * テーマカラー選択ダイアログへ遷移するイベントを発行する。
      */
-    fun onThemeColorSettingButtonClick() {
+    fun onThemeColorSettingItemClick() {
         if (!canExecuteOperation()) return
 
         launchWithUnexpectedErrorHandler {
@@ -270,7 +269,7 @@ class SettingsViewModel @Inject internal constructor(
      * カレンダー開始曜日設定項目がクリックされた時に呼び出される事を想定。
      * カレンダー開始曜日選択ダイアログへ遷移するイベントを発行する。
      */
-    fun onCalendarStartDayOfWeekSettingButtonClick() {
+    fun onCalendarStartDayOfWeekSettingItemClick() {
         if (!canExecuteOperation()) return
 
         val dayOfWeek = currentUiState.calendarStartDayOfWeek ?: return
