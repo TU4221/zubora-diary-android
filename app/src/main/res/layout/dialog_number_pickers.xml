@@ -40,14 +40,14 @@
         android:layout_marginVertical="@dimen/dialog_fragment_number_picker_layout_margin_vertical">
 
         <NumberPicker
-            style="@style/NumberPickerStyle"
+            style="@style/AppNumberPickerStyle"
             android:id="@+id/number_picker_first"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
 
         <NumberPicker
-            style="@style/NumberPickerStyle"
+            style="@style/AppNumberPickerStyle"
             android:id="@+id/number_picker_second"
             android:layout_width="0dp"
             android:layout_height="wrap_content"

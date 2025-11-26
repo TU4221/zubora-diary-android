@@ -201,7 +201,7 @@
     <!-- endregion -->
 
     <!-- region Number Pickers -->
-    <style name="NumberPickerStyle" >
+    <style name="AppNumberPickerStyle" >
         <item name="android:descendantFocusability">blocksDescendants</item>
     </style>
     <!-- endregion -->
