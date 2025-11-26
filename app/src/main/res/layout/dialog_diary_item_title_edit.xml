@@ -20,7 +20,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingBottom="@dimen/dialog_diary_item_title_edit_spacing_vertical"
             android:orientation="vertical">
 
             <include
@@ -30,20 +29,30 @@
                 android:layout_height="wrap_content"
                 app:viewModel="@{viewModel}" />
 
-            <include
-                layout="@layout/layout_diary_item_title_edit_input"
-                android:id="@+id/include_input"
+            <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:viewModel="@{viewModel}" />
+                android:layout_height="match_parent"
+                android:orientation="vertical"
+                android:paddingHorizontal="@dimen/screen_spacing_horizontal"
+                android:paddingVertical="@dimen/screen_spacing_vertical" >
 
-            <include
-                layout="@layout/layout_diary_item_title_edit_history"
-                android:id="@+id/include_history"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                app:viewModel="@{viewModel}" />
+                <include
+                    layout="@layout/layout_diary_item_title_edit_input"
+                    android:id="@+id/include_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:viewModel="@{viewModel}" />
+
+                <include
+                    layout="@layout/layout_diary_item_title_edit_history"
+                    android:id="@+id/include_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    android:layout_marginTop="@dimen/dialog_diary_item_title_edit_content_spacing_vertical"
+                    app:viewModel="@{viewModel}" />
+
+            </LinearLayout>
 
         </LinearLayout>
 

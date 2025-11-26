@@ -138,20 +138,18 @@
 
     <!-- region dialog_diary_item_title_edit -->
     <dimen name="dialog_diary_item_title_edit_text_size">18sp</dimen>
-    <dimen name="dialog_diary_item_title_edit_spacing_horizontal">8dp</dimen>
-    <dimen name="dialog_diary_item_title_edit_spacing_vertical">16dp</dimen>
+    <dimen name="dialog_diary_item_title_edit_content_spacing_horizontal">8dp</dimen>
+    <dimen name="dialog_diary_item_title_edit_content_spacing_vertical">16dp</dimen>
     <!-- endregion -->
 
     <!-- region layout_diary_item_title_edit_history -->
     <dimen name="layout_diary_item_title_edit_input_text_size">@dimen/dialog_diary_item_title_edit_text_size</dimen>
-    <dimen name="layout_diary_item_title_edit_input_spacing_horizontal">@dimen/dialog_diary_item_title_edit_spacing_horizontal</dimen>
-    <dimen name="layout_diary_item_title_edit_input_spacing_vertical">@dimen/dialog_diary_item_title_edit_spacing_vertical</dimen>
+    <dimen name="layout_diary_item_title_edit_input_content_spacing_vertical">@dimen/dialog_diary_item_title_edit_content_spacing_vertical</dimen>
     <!-- endregion -->
 
     <!-- region layout_diary_item_title_edit_history -->
     <dimen name="layout_diary_item_title_edit_history_text_size">@dimen/dialog_diary_item_title_edit_text_size</dimen>
-    <dimen name="layout_diary_item_title_edit_history_spacing_horizontal">@dimen/dialog_diary_item_title_edit_spacing_horizontal</dimen>
-    <dimen name="layout_diary_item_title_edit_history_spacing_vertical">@dimen/dialog_diary_item_title_edit_spacing_vertical</dimen>
+    <dimen name="layout_diary_item_title_edit_history_content_spacing_vertical">@dimen/dialog_diary_item_title_edit_content_spacing_vertical</dimen>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->
