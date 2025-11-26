@@ -62,6 +62,7 @@
                     app:applySystemInsetsToPaddingRight="@{true}"
                     app:applySystemInsetsToPaddingBottom="@{true}" >
 
+                    <!-- MEMO:includeタグにはMarginの設定ができないため、includeタグの上のタグのBottomMarginの設定を行う。-->
                     <TextView
                         style="@style/AppTextViewStyle"
                         android:id="@+id/text_date"
