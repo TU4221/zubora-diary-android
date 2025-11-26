@@ -352,13 +352,19 @@
     <!-- region Screen - Diary Item Title Edit -->
     <!-- ===================================================================================== -->
 
-    <!-- region Layout - dialog_diary_item_title_edit -->
-    <string name="dialog_diary_item_title_edit_toolbar_title_tools_value">項目1タイトル編集中</string>
-    <string name="dialog_diary_item_title_edit_new_item_title">新規項目タイトル</string>
-    <string name="dialog_diary_item_title_edit_new_item_title_hint">未入力</string>
-    <string name="dialog_diary_item_title_edit_new_item_title_selection_button">新規選択</string>
-    <string name="dialog_diary_item_title_edit_title_selection_history">選択履歴</string>
-    <string name="dialog_diary_item_title_edit_no_diary_item_title_selection_history_message">履歴はありません。</string>
+    <!-- region Layout - layout_diary_item_title_edit_toolbar -->
+    <string name="layout_diary_item_title_edit_toolbar_title_tools_value">項目1タイトル編集中</string>
+    <!-- endregion -->
+
+    <!-- region Layout - layout_diary_item_title_edit_input -->
+    <string name="layout_diary_item_title_edit_input_new_item_title">新規項目タイトル</string>
+    <string name="layout_diary_item_title_edit_input_new_item_title_hint">未入力</string>
+    <string name="layout_diary_item_title_edit_input_new_item_title_selection_button">新規選択</string>
+    <!-- endregion -->
+
+    <!-- region Layout - layout_diary_item_title_edit_history -->
+    <string name="layout_diary_item_title_edit_history_selection_history">選択履歴</string>
+    <string name="layout_diary_item_title_edit_history_no_history_message">履歴はありません。</string>
     <!-- endregion -->
 
     <!-- region Dialog - Diary Item Title Edit Dialog -->

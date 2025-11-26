@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="40dp" >
 
         <include
             layout="@layout/row_left_swipe_action_background"
@@ -17,14 +16,12 @@
             style="@style/DiaryItemSelectionHistoryTextViewStyle"
             android:id="@+id/text_title"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
+            android:layout_height="match_parent"
             android:textAppearance="@style/AppTextViewTextAppearance"
             android:gravity="center_vertical"
             android:paddingHorizontal="8dp"
             android:paddingVertical="4dp"
-            tools:text="item title"
-            app:applySystemInsetsToPaddingLeft="@{true}"
-            app:applySystemInsetsToPaddingRight="@{true}" />
+            tools:text="item title" />
 
     </FrameLayout>
 </layout>

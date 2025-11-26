@@ -30,23 +30,38 @@
                 android:layout_height="wrap_content"
                 app:viewModel="@{viewModel}" />
 
-            <include
-                layout="@layout/layout_diary_item_title_edit_input"
-                android:id="@+id/include_input"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:viewModel="@{viewModel}" />
-
-            <include
-                layout="@layout/layout_diary_item_title_edit_history"
-                android:id="@+id/include_history"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="1"
-                app:viewModel="@{viewModel}" />
+                android:orientation="horizontal">
+
+                <include
+                    layout="@layout/layout_diary_item_title_edit_input"
+                    android:id="@+id/include_input"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    app:viewModel="@{viewModel}" />
+
+                <com.google.android.material.divider.MaterialDivider
+                    android:id="@+id/material_divider_toolbar"
+                    android:layout_width="1dp"
+                    android:layout_height="match_parent"/>
+
+                <include
+                    layout="@layout/layout_diary_item_title_edit_history"
+                    android:id="@+id/include_history"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    app:viewModel="@{viewModel}" />
+
+            </LinearLayout>
 
         </LinearLayout>
 
     </FrameLayout>
+
 
 </layout>

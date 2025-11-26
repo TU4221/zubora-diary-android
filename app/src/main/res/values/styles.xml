@@ -200,10 +200,24 @@
     </style>
     <!-- endregion -->
 
-    
     <!-- region Number Pickers -->
     <style name="NumberPickerStyle" >
         <item name="android:descendantFocusability">blocksDescendants</item>
+    </style>
+    <!-- endregion -->
+
+
+    <!--<item name="cardBackgroundColor">?attr/colorSurface</item>-->
+    <!-- region CardView -->
+    <style name="AppHistoryCardViewStyle">
+        <item name="cardBackgroundColor">?attr/colorSurface</item>
+        <item name="cardElevation">2dp</item>
+        <item name="strokeColor">?attr/colorOutline</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="shapeAppearanceOverlay">@style/AppShapeAppearanceOverlay</item>
+    </style>
+    <style name="AppShapeAppearanceOverlay">
+        <item name="cornerSize">4dp</item>
     </style>
     <!-- endregion -->
 

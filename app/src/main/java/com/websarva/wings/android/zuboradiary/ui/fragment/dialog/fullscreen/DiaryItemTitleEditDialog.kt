@@ -75,7 +75,7 @@ class DiaryItemTitleEditDialog :
     }
 
     override fun clearViewBindings() {
-        binding.recyclerItemTitleSelectionHistory.adapter = null
+        binding.includeHistory.recyclerItemTitleSelectionHistory.adapter = null
         selectionHistoryListAdapter = null
 
         swipeSimpleInteractionHelper?.cleanup()
@@ -163,7 +163,7 @@ class DiaryItemTitleEditDialog :
     //region View Setup
     /** 項目タイトル選択履歴を表示するRecyclerViewの初期設定を行う。 */
     private fun setupItemTitleSelectionHistory() {
-        val recyclerView = binding.recyclerItemTitleSelectionHistory
+        val recyclerView = binding.includeHistory.recyclerItemTitleSelectionHistory
         selectionHistoryListAdapter =
             DiaryItemTitleSelectionHistoryListAdapter(
                 themeColor

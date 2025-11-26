@@ -24,8 +24,8 @@
     <!-- region Screen - Diary Item Title Edit -->
     <!-- ===================================================================================== -->
 
-    <!-- region fragment_diary_item_title_edit -->
-    <integer name="fragment_diary_item_title_edit_item_title_max_length">@integer/layout_diary_edit_item_title_max_length</integer>
+    <!-- region layout_diary_item_title_edit_input -->
+    <integer name="layout_diary_item_title_edit_input_item_title_max_length">@integer/layout_diary_edit_item_title_max_length</integer>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->

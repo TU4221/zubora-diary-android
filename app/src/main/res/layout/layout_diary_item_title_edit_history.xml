@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+        <import type="android.view.View" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.LoadState" />
+        <variable
+            name="viewModel"
+            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel" />
+    </data>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingHorizontal="@dimen/layout_diary_item_title_edit_history_spacing_horizontal"
+        android:paddingTop="@dimen/layout_diary_item_title_edit_history_spacing_vertical"
+        android:orientation="vertical"
+        app:applySystemInsetsToPaddingBottom="@{true}" >
+
+        <TextView
+            style="@style/AppTextViewStyle"
+            android:id="@+id/text_item_title_history"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="@style/AppTextViewTextAppearance"
+            android:text="@string/layout_diary_item_title_edit_history_selection_history"
+            android:textSize="@dimen/layout_diary_item_title_edit_history_text_size" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="@style/AppHistoryCardViewStyle"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="@dimen/layout_diary_item_title_edit_history_spacing_vertical">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    style="@style/AppTextViewStyle"
+                    android:id="@+id/text_no_diary_item_title_selection_history_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:textAppearance="@style/AppTextViewTextAppearance"
+                    android:text="@string/layout_diary_item_title_edit_history_no_history_message"
+                    android:gravity="center"
+                    android:visibility="@{viewModel.uiState.titleSelectionHistoriesLoadState instanceof LoadState.Error ? View.VISIBLE : View.GONE}"
+                    app:applySystemInsetsToPaddingLeft="@{true}"
+                    app:applySystemInsetsToPaddingRight="@{true}" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    style="@style/AppRecyclerViewStyle"
+                    android:id="@+id/recycler_item_title_selection_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:visibility="@{viewModel.uiState.titleSelectionHistoriesLoadState instanceof LoadState.Error ? View.GONE : View.VISIBLE}" />
+
+            </FrameLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</layout>
