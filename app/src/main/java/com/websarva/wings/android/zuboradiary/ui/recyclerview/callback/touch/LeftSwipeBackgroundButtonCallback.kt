@@ -78,32 +78,11 @@ internal open class LeftSwipeBackgroundButtonCallback(
         if (viewHolder !is BackgroundButtonViewHolder) return
 
         val backgroundButtonWidth = viewHolder.backgroundButtonView.width.toFloat()
-
-        // TODO:上手く処理されるか確認
-        /*val translationValueX =
-            if (swipedAdapterPosition == viewHolder.getBindingAdapterPosition()) {
-                min(
-                    0.0,
-                    max(-backgroundButtonWidth.toDouble(), (dX + swipingOffset).toDouble())
-                ).toFloat()
-            } else {
-                min(
-                    0.0,
-                    max(-backgroundButtonWidth.toDouble(), dX.toDouble())
-                ).toFloat()
-            }*/
-        // 1. まず、現在のスワイプ量（dX）を計算する
-        //    スワイプ完了後であれば、保存しておいたオフセット値で補正する
         val currentDx = if (swipedAdapterPosition == viewHolder.bindingAdapterPosition) {
             dX + swipingOffset
         } else {
             dX
         }
-
-        // 2. 計算したスワイプ量を、0.0f（元の位置）から -backgroundButtonWidth（ボタンの左端）の範囲内に収める
-        //    これにより、ビューがそれ以上右や左に行き過ぎるのを防ぐ
-        val translationValueX = currentDx.coerceIn(-backgroundButtonWidth, 0.0f)
-
-        viewHolder.foregroundView.translationX = translationValueX
+        viewHolder.foregroundView.translationX =  currentDx.coerceIn(-backgroundButtonWidth, 0.0f)
     }
 }
