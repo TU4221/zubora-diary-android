@@ -484,7 +484,7 @@ class DiaryListViewModel @Inject internal constructor(
             sortConditionDate
         )
         emitUiEvent(
-            DiaryListUiEvent.NavigateDiaryDeleteDialog(date)
+            DiaryListUiEvent.ShowDiaryDeleteDialog(date)
         )
     }
 
@@ -537,7 +537,7 @@ class DiaryListViewModel @Inject internal constructor(
         val newestYear = Year.of(newestDiaryDate.year)
         val oldestYear = Year.of(oldestDiaryDate.year)
         emitUiEvent(
-            DiaryListUiEvent.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
+            DiaryListUiEvent.ShowStartYearMonthPickerDialog(newestYear, oldestYear)
         )
     }
 
@@ -578,7 +578,7 @@ class DiaryListViewModel @Inject internal constructor(
      * 画面遷移イベントを発行する。
      */
     private suspend fun requestNavigateWordSearchScreen() {
-        emitUiEvent(DiaryListUiEvent.NavigateWordSearchFragment)
+        emitUiEvent(DiaryListUiEvent.NavigateWordSearchScreen)
     }
 
     /**
@@ -589,7 +589,7 @@ class DiaryListViewModel @Inject internal constructor(
      * @param date 表示対象の日記の日付。
      */
     private suspend fun requestNavigateDiaryShowScreen(id: String, date: LocalDate) {
-        emitUiEvent(DiaryListUiEvent.NavigateDiaryShowFragment(id, date))
+        emitUiEvent(DiaryListUiEvent.NavigateDiaryShowScreen(id, date))
     }
 
     /**
@@ -598,7 +598,7 @@ class DiaryListViewModel @Inject internal constructor(
      */
     private suspend fun requestNavigateNewDiaryEditScreen() {
         val today = LocalDate.now()
-        emitUiEvent(DiaryListUiEvent.NavigateDiaryEditFragment(date = today))
+        emitUiEvent(DiaryListUiEvent.NavigateDiaryEditScreen(date = today))
     }
     //endregion
 

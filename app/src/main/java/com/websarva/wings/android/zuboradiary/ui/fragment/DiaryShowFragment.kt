@@ -112,27 +112,27 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: DiaryShowUiEvent) {
         when (event) {
-            is DiaryShowUiEvent.NavigateDiaryEditFragment -> {
+            is DiaryShowUiEvent.NavigateDiaryEditScreen -> {
                 navigateDiaryEditFragment(event.id, event.date)
             }
-            is DiaryShowUiEvent.NavigateDiaryLoadFailureDialog -> {
-                navigateDiaryLoadFailureDialog(event.date)
-            }
-            is DiaryShowUiEvent.NavigateDiaryDeleteDialog -> {
-                navigateDiaryDeleteDialog(event.date)
-            }
-            is DiaryShowUiEvent.NavigatePreviousFragmentWithResult -> {
+            is DiaryShowUiEvent.NavigatePreviousScreenWithResult -> {
                 navigatePreviousFragmentOnce(
                     FragmentResult.Some(RESULT_KEY, event.date)
                 )
             }
-            is DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryDeleted -> {
+            is DiaryShowUiEvent.NavigatePreviousScreenOnDiaryDeleted -> {
                 navigatePreviousFragmentWithRetry(
                     FragmentResult.Some(RESULT_KEY, event.date)
                 )
             }
-            is DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryLoadFailed -> {
+            is DiaryShowUiEvent.NavigatePreviousScreenOnDiaryLoadFailed -> {
                 navigatePreviousFragmentWithRetry(FragmentResult.None)
+            }
+            is DiaryShowUiEvent.ShowDiaryLoadFailureDialog -> {
+                navigateDiaryLoadFailureDialog(event.date)
+            }
+            is DiaryShowUiEvent.ShowDiaryDeleteDialog -> {
+                navigateDiaryDeleteDialog(event.date)
             }
         }
     }

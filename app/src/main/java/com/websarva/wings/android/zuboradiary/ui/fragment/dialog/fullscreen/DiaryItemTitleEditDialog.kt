@@ -123,7 +123,7 @@ class DiaryItemTitleEditDialog :
                 )
             }
 
-            is DiaryItemTitleEditUiEvent.NavigateSelectionHistoryItemDeleteDialog -> {
+            is DiaryItemTitleEditUiEvent.ShowSelectionHistoryItemDeleteDialog -> {
                 navigateDiaryItemTitleDeleteDialog(event.itemTitle)
             }
         }

@@ -134,7 +134,7 @@ class CalendarFragment :
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: CalendarUiEvent) {
         when (event) {
-            is CalendarUiEvent.NavigateDiaryEditFragment -> {
+            is CalendarUiEvent.NavigateDiaryEditScreen -> {
                 navigateDiaryEditFragment(event.id, event.date)
             }
             is CalendarUiEvent.ScrollCalendar -> {

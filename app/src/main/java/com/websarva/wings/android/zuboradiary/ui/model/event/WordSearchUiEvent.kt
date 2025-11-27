@@ -13,7 +13,7 @@ sealed class WordSearchUiEvent : UiEvent {
      * @property id 表示対象の日記ID。
      * @property date 対象の日記の日付。
      */
-    data class NavigateDiaryShowFragment(val id: String, val date: LocalDate) : WordSearchUiEvent()
+    data class NavigateDiaryShowScreen(val id: String, val date: LocalDate) : WordSearchUiEvent()
 
     /** ソフトウェアキーボードを表示することを示すイベント。 */
     data object ShowKeyboard : WordSearchUiEvent()

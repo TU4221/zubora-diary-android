@@ -9,18 +9,18 @@ import com.websarva.wings.android.zuboradiary.ui.model.message.MainActivityAppMe
  */
 sealed class MainActivityUiEvent : UiEvent {
 
+    /** BottomNavigationViewの開始タブの画面に遷移することを示すイベント。 */
+    data object NavigateStartTabScreen : MainActivityUiEvent()
+
     /**
-     * MainActivity固有のアプリケーションメッセージを表示することを示すイベント。
+     * MainActivity固有のアプリケーションメッセージダイアログを表示することを示すイベント。
      * @property message 表示するメッセージのコンテンツを保持する[MainActivityAppMessage]。
      */
-    data class NavigateMainActivityAppMessage(val message: MainActivityAppMessage) : MainActivityUiEvent()
+    data class ShowMainActivityAppMessageDialog(val message: MainActivityAppMessage) : MainActivityUiEvent()
 
     /**
-     * アプリケーション共通のメッセージを表示することを示すイベント。
+     * アプリケーション共通のメッセージダイアログを表示することを示すイベント。
      * @property message 表示するメッセージのコンテンツを保持する[CommonAppMessage]。
      */
-    data class NavigateCommonAppMessage(val message: CommonAppMessage) : MainActivityUiEvent()
-
-    /** BottomNavigationViewの開始タブのFragmentに遷移することを示すイベント。 */
-    data object NavigateStartTabFragment : MainActivityUiEvent()
+    data class ShowCommonAppMessageDialog(val message: CommonAppMessage) : MainActivityUiEvent()
 }

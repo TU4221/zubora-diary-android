@@ -155,19 +155,19 @@ class DiaryListFragment :
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: DiaryListUiEvent) {
         when (event) {
-            is DiaryListUiEvent.NavigateDiaryShowFragment -> {
+            is DiaryListUiEvent.NavigateDiaryShowScreen -> {
                 navigateDiaryShowFragment(event.id, event.date)
             }
-            is DiaryListUiEvent.NavigateDiaryEditFragment -> {
+            is DiaryListUiEvent.NavigateDiaryEditScreen -> {
                 navigateDiaryEditFragment(event.id, event.date)
             }
-            is DiaryListUiEvent.NavigateWordSearchFragment -> {
+            is DiaryListUiEvent.NavigateWordSearchScreen -> {
                 navigateWordSearchFragment()
             }
-            is DiaryListUiEvent.NavigateStartYearMonthPickerDialog -> {
+            is DiaryListUiEvent.ShowStartYearMonthPickerDialog -> {
                 navigateStartYearMonthPickerDialog(event.maxYear, event.minYear)
             }
-            is DiaryListUiEvent.NavigateDiaryDeleteDialog -> {
+            is DiaryListUiEvent.ShowDiaryDeleteDialog -> {
                 navigateDiaryDeleteDialog(event.date)
             }
         }

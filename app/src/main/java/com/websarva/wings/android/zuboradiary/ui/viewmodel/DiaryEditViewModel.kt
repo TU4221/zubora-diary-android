@@ -592,7 +592,7 @@ class DiaryEditViewModel @Inject internal constructor(
     internal fun onDiaryLoadFailureDialogResultReceived() {
         launchWithUnexpectedErrorHandler {
             emitUiEvent(
-                DiaryEditUiEvent.NavigatePreviousFragmentOnInitialDiaryLoadFailed
+                DiaryEditUiEvent.NavigatePreviousScreenOnInitialDiaryLoadFailed
             )
         }
     }
@@ -836,7 +836,7 @@ class DiaryEditViewModel @Inject internal constructor(
                     //      取りこぼされる可能性がある。これを防ぐため、間に確認ダイアログを挟み、
                     //      ユーザーの応答を待ってから画面遷移を実行する。
                     emitUiEvent(
-                        DiaryEditUiEvent.NavigateDiaryLoadFailureDialog(date)
+                        DiaryEditUiEvent.ShowDiaryLoadFailureDialog(date)
                     )
                 } else {
                     updateUiState { previousState }
@@ -877,7 +877,7 @@ class DiaryEditViewModel @Inject internal constructor(
                 clearDiaryImageCacheFile()
                 emitUiEvent(
                     DiaryEditUiEvent
-                        .NavigateDiaryShowFragment(diary.id.value, diary.date)
+                        .NavigateDiaryShowScreen(diary.id.value, diary.date)
                 )
             }
             is UseCaseResult.Failure -> {
@@ -913,7 +913,7 @@ class DiaryEditViewModel @Inject internal constructor(
             date
         )
         emitUiEvent(
-            DiaryEditUiEvent.NavigateDiaryDeleteDialog(date)
+            DiaryEditUiEvent.ShowDiaryDeleteDialog(date)
         )
     }
 
@@ -936,7 +936,7 @@ class DiaryEditViewModel @Inject internal constructor(
                 updateToIdleState()
                 clearDiaryImageCacheFile()
                 emitUiEvent(
-                    DiaryEditUiEvent.NavigatePreviousFragmentOnDiaryDelete(date)
+                    DiaryEditUiEvent.NavigatePreviousScreenOnDiaryDelete(date)
                 )
             }
             is UseCaseResult.Failure -> {
@@ -979,7 +979,7 @@ class DiaryEditViewModel @Inject internal constructor(
                 if (result.value) {
                     updatePendingDiaryLoadParameters(date, previousDate)
                     emitUiEvent(
-                        DiaryEditUiEvent.NavigateDiaryLoadDialog(date)
+                        DiaryEditUiEvent.ShowDiaryLoadDialog(date)
                     )
                 } else {
                     fetchWeatherInfo(date, previousDate)
@@ -1028,7 +1028,7 @@ class DiaryEditViewModel @Inject internal constructor(
                         isNewDiary
                     )
                     emitUiEvent(
-                        DiaryEditUiEvent.NavigateDiaryUpdateDialog(diary.date)
+                        DiaryEditUiEvent.ShowDiaryUpdateDialog(diary.date)
                     )
                 } else {
                     saveDiary(
@@ -1070,7 +1070,7 @@ class DiaryEditViewModel @Inject internal constructor(
     ) {
         updatePendingDiaryDateUpdateParameters(originalDate, isNewDiary)
         emitUiEvent(
-            DiaryEditUiEvent.NavigateDatePickerDialog(currentDate)
+            DiaryEditUiEvent.ShowDatePickerDialog(currentDate)
         )
     }
 
@@ -1103,7 +1103,7 @@ class DiaryEditViewModel @Inject internal constructor(
         if (shouldRequest) {
             updatePendingWeatherInfoFetchParameters(date)
             emitUiEvent(
-                DiaryEditUiEvent.NavigateWeatherInfoFetchDialog(date)
+                DiaryEditUiEvent.ShowWeatherInfoFetchDialog(date)
             )
         } else {
             val shouldLoad = shouldFetchWeatherInfoUseCase(date, previousDate).value
@@ -1225,7 +1225,7 @@ class DiaryEditViewModel @Inject internal constructor(
         // MEMO:日記項目タイトルIDは受取用でここでは不要の為、nullとする。
         val itemTitleId = null
         emitUiEvent(
-            DiaryEditUiEvent.NavigateDiaryItemTitleEditDialog(
+            DiaryEditUiEvent.ShowDiaryItemTitleEditDialog(
                 DiaryItemTitleSelectionUi(
                     itemNumber,
                     itemTitleId,
@@ -1244,7 +1244,7 @@ class DiaryEditViewModel @Inject internal constructor(
     private suspend fun requestDiaryItemDeletion(itemNumber: DiaryItemNumber) {
         updatePendingDiaryItemDeleteParameters(itemNumber)
         emitUiEvent(
-            DiaryEditUiEvent.NavigateDiaryItemDeleteDialog(itemNumber.value)
+            DiaryEditUiEvent.ShowDiaryItemDeleteDialog(itemNumber.value)
         )
     }
 
@@ -1304,7 +1304,7 @@ class DiaryEditViewModel @Inject internal constructor(
     private suspend fun requestImageSelection(diaryId: DiaryId) {
         updateToProcessingState()
         updatePendingDiaryImageUpdateParameters(diaryId)
-        emitUiEvent(DiaryEditUiEvent.SelectImage)
+        emitUiEvent(DiaryEditUiEvent.ShowImageSelectionGallery)
     }
 
     /**
@@ -1313,7 +1313,7 @@ class DiaryEditViewModel @Inject internal constructor(
      */
     private suspend fun requestAttachedImageDeletion() {
         emitUiEvent(
-            DiaryEditUiEvent.NavigateDiaryImageDeleteDialog
+            DiaryEditUiEvent.ShowDiaryImageDeleteDialog
         )
     }
 
@@ -1396,7 +1396,7 @@ class DiaryEditViewModel @Inject internal constructor(
         if (shouldRequest) {
             updatePendingPreviousNavigationParameter(originalDiary.date)
             emitUiEvent(
-                DiaryEditUiEvent.NavigateExitWithoutDiarySaveDialog
+                DiaryEditUiEvent.ShowExitWithoutDiarySaveDialog
             )
         } else {
             requestNavigatePreviousScreen(originalDiary.date)
@@ -1410,7 +1410,7 @@ class DiaryEditViewModel @Inject internal constructor(
      */
     private suspend fun requestNavigatePreviousScreen(originalDiaryDate: LocalDate) {
         clearDiaryImageCacheFile()
-        emitUiEvent(DiaryEditUiEvent.NavigatePreviousFragmentWithResult(originalDiaryDate))
+        emitUiEvent(DiaryEditUiEvent.NavigatePreviousScreenWithResult(originalDiaryDate))
     }
     //endregion
 

@@ -114,7 +114,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: WordSearchUiEvent) {
         when (event) {
-            is WordSearchUiEvent.NavigateDiaryShowFragment -> {
+            is WordSearchUiEvent.NavigateDiaryShowScreen -> {
                 navigateDiaryShowFragment(event.id, event.date)
             }
             WordSearchUiEvent.ShowKeyboard -> {

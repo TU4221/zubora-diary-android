@@ -433,7 +433,7 @@ class WordSearchViewModel @Inject internal constructor(
      */
     private suspend fun requestNavigateDiaryShowScreen(id: String, date: LocalDate) {
         emitUiEvent(
-            WordSearchUiEvent.NavigateDiaryShowFragment(id, date)
+            WordSearchUiEvent.NavigateDiaryShowScreen(id, date)
         )
     }
     //endregion

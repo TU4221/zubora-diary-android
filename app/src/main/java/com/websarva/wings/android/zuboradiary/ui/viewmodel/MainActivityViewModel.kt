@@ -173,7 +173,7 @@ class MainActivityViewModel @Inject internal constructor(
      */
     internal fun onNavigateBackFromBottomNavigationTab() {
         viewModelScope.launch {
-            emitUiEvent(MainActivityUiEvent.NavigateStartTabFragment)
+            emitUiEvent(MainActivityUiEvent.NavigateStartTabScreen)
         }
     }
     //endregion
@@ -358,7 +358,7 @@ class MainActivityViewModel @Inject internal constructor(
      */
     private suspend fun emitMainActivityAppMessageEvent(appMessage: MainActivityAppMessage) {
         emitUiEvent(
-            MainActivityUiEvent.NavigateMainActivityAppMessage(appMessage)
+            MainActivityUiEvent.ShowMainActivityAppMessageDialog(appMessage)
         )
     }
 
@@ -369,7 +369,7 @@ class MainActivityViewModel @Inject internal constructor(
      */
     private suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
         emitUiEvent(
-            MainActivityUiEvent.NavigateCommonAppMessage(appMessage)
+            MainActivityUiEvent.ShowCommonAppMessageDialog(appMessage)
         )
     }
 

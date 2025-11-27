@@ -76,7 +76,7 @@ class SettingsFragment :
             val recheck = requireContext().isPostNotificationsGranted()
 
             mainViewModel
-                .onRequestPostNotificationsPermissionRationaleResultReceived(
+                .onRequestPostNotificationsPermissionRationaleDialogResultReceived(
                     isGranted && recheck
                 )
         }
@@ -256,32 +256,43 @@ class SettingsFragment :
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: SettingsUiEvent) {
         when (event) {
-            is SettingsUiEvent.NavigateThemeColorPickerDialog -> {
+            is SettingsUiEvent.ShowThemeColorPickerDialog -> {
                 navigateThemeColorPickerDialog()
             }
-            is SettingsUiEvent.NavigateCalendarStartDayPickerDialog -> {
+            is SettingsUiEvent.ShowCalendarStartDayPickerDialog -> {
                 navigateCalendarStartDayPickerDialog(event.dayOfWeek)
             }
-            is SettingsUiEvent.NavigateReminderNotificationTimePickerDialog -> {
+            is SettingsUiEvent.ShowReminderNotificationTimePickerDialog -> {
                 navigateReminderNotificationTimePickerDialog()
             }
-            is SettingsUiEvent.NavigateNotificationPermissionDialog -> {
+            is SettingsUiEvent.ShowNotificationPermissionDialog -> {
                 navigateNotificationPermissionDialog()
             }
-            is SettingsUiEvent.NavigateLocationPermissionDialog -> {
+            is SettingsUiEvent.ShowLocationPermissionDialog -> {
                 navigateLocationPermissionDialog()
             }
-            is SettingsUiEvent.NavigateAllDiariesDeleteDialog -> {
+            is SettingsUiEvent.ShowAllDiariesDeleteDialog -> {
                 navigateAllDiariesDeleteDialog()
             }
-            is SettingsUiEvent.NavigateAllSettingsInitializationDialog -> {
+            is SettingsUiEvent.ShowAllSettingsInitializationDialog -> {
                 navigateAllSettingsInitializationDialog()
             }
-            is SettingsUiEvent.NavigateAllDataDeleteDialog -> {
+            is SettingsUiEvent.ShowAllDataDeleteDialog -> {
                 navigateAllDataDeleteDialog()
             }
-            is SettingsUiEvent.NavigateOSSLicensesDialog -> {
+            is SettingsUiEvent.ShowOSSLicensesDialog -> {
                 navigateOpenSourceSoftwareLicensesDialog()
+            }
+            is SettingsUiEvent.ShowRequestPostNotificationsPermissionRationale -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    showRequestPostNotificationsPermissionRationale()
+                }
+            }
+            is SettingsUiEvent.ShowRequestAccessLocationPermissionRationale -> {
+                showRequestAccessLocationPermissionRationale()
+            }
+            is SettingsUiEvent.ShowApplicationDetailsSettingsScreen -> {
+                showApplicationDetailsSettings()
             }
             is SettingsUiEvent.CheckPostNotificationsPermission -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -293,19 +304,11 @@ class SettingsFragment :
                     checkShouldShowRequestPostNotificationsPermissionRationale()
                 }
             }
-            is SettingsUiEvent.ShowRequestPostNotificationsPermissionRationale -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    showRequestPostNotificationsPermissionRationale()
-                }
-            }
             is SettingsUiEvent.CheckAccessLocationPermission -> {
                 checkAccessLocationPermission()
             }
             is SettingsUiEvent.CheckShouldShowRequestAccessLocationPermissionRationale -> {
                 checkShouldShowRequestAccessLocationPermissionRationale()
-            }
-            is SettingsUiEvent.ShowRequestAccessLocationPermissionRationale -> {
-                showRequestAccessLocationPermissionRationale()
             }
             is SettingsUiEvent.TurnReminderNotificationSettingSwitch -> {
                 binding.includeReminderNotificationSetting.materialSwitch.isChecked = event.isChecked
@@ -315,9 +318,6 @@ class SettingsFragment :
             }
             is SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch -> {
                 binding.includeWeatherInfoFetchSetting.materialSwitch.isChecked = event.isChecked
-            }
-            is SettingsUiEvent.ShowApplicationDetailsSettings -> {
-                showApplicationDetailsSettings()
             }
         }
     }
@@ -623,7 +623,7 @@ class SettingsFragment :
             ) && ActivityCompat.shouldShowRequestPermissionRationale(
                 requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION
             )
-        mainViewModel.onShouldShowRequestAccessLocationPermissionRationaleChecked(shouldShowRequest)
+        mainViewModel.onShouldShowRequestAccessLocationPermissionRationaleDialogChecked(shouldShowRequest)
     }
 
     /** 位置情報権限を要求する。 */

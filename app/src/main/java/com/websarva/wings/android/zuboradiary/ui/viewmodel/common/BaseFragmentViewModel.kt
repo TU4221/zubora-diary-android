@@ -136,7 +136,7 @@ abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> inte
      * @param appMessage 表示するメッセージ。
      */
     protected suspend fun emitAppMessageEvent(appMessage: M) {
-        emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
+        emitCommonUiEvent(CommonUiEvent.ShowAppMessageDialog(appMessage))
     }
 
     /**
@@ -144,7 +144,7 @@ abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> inte
      * @param appMessage 表示する共通メッセージ。
      */
     protected suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
-        emitCommonUiEvent(CommonUiEvent.NavigateAppMessage(appMessage))
+        emitCommonUiEvent(CommonUiEvent.ShowAppMessageDialog(appMessage))
     }
 
     override suspend fun emitUnexpectedAppMessage(e: Exception) {
@@ -152,10 +152,10 @@ abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> inte
     }
 
     /**
-     * 前の画面へ戻るための共通UIイベント([CommonUiEvent.NavigatePreviousFragment])を発行する。
+     * 前の画面へ戻るための共通UIイベント([CommonUiEvent.NavigatePreviousScreen])を発行する。
      */
     protected suspend fun emitNavigatePreviousFragmentEvent() {
-        emitCommonUiEvent(CommonUiEvent.NavigatePreviousFragment)
+        emitCommonUiEvent(CommonUiEvent.NavigatePreviousScreen)
     }
 
     /**

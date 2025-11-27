@@ -374,7 +374,7 @@ class CalendarViewModel @Inject internal constructor(
      */
     private suspend fun requestNavigateDiaryEditScreen(id: String?, date: LocalDate) {
         emitUiEvent(
-            CalendarUiEvent.NavigateDiaryEditFragment(id, date)
+            CalendarUiEvent.NavigateDiaryEditScreen(id, date)
         )
     }
     //endregion

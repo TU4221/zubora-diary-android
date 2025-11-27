@@ -285,7 +285,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         )
         emitUiEvent(
             DiaryItemTitleEditUiEvent
-                .NavigateSelectionHistoryItemDeleteDialog(
+                .ShowSelectionHistoryItemDeleteDialog(
                     historyTitle
                 )
         )

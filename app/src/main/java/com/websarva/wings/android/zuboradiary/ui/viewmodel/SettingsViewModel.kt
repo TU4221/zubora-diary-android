@@ -492,7 +492,7 @@ class SettingsViewModel @Inject internal constructor(
         launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 emitUiEvent(
-                    SettingsUiEvent.NavigateReminderNotificationTimePickerDialog
+                    SettingsUiEvent.ShowReminderNotificationTimePickerDialog
                 )
             } else {
                 emitUiEvent(
@@ -521,7 +521,7 @@ class SettingsViewModel @Inject internal constructor(
                     SettingsUiEvent.TurnReminderNotificationSettingSwitch(false)
                 )
                 emitUiEvent(
-                    SettingsUiEvent.NavigateNotificationPermissionDialog
+                    SettingsUiEvent.ShowNotificationPermissionDialog
                 )
             }
         }
@@ -533,11 +533,11 @@ class SettingsViewModel @Inject internal constructor(
      * @param isGranted 権限が許可された場合はtrue
      */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    internal fun onRequestPostNotificationsPermissionRationaleResultReceived(isGranted: Boolean) {
+    internal fun onRequestPostNotificationsPermissionRationaleDialogResultReceived(isGranted: Boolean) {
         launchWithUnexpectedErrorHandler {
             if (isGranted) {
                 emitUiEvent(
-                    SettingsUiEvent.NavigateReminderNotificationTimePickerDialog
+                    SettingsUiEvent.ShowReminderNotificationTimePickerDialog
                 )
             } else {
                 emitUiEvent(
@@ -569,7 +569,7 @@ class SettingsViewModel @Inject internal constructor(
      * 結果に応じて、権限要求の表示またはアプリ設定画面への遷移を促すダイアログを表示する。
      * @param shouldShowRequest 理由を表示する必要がある場合はtrue
      */
-    internal fun onShouldShowRequestAccessLocationPermissionRationaleChecked(
+    internal fun onShouldShowRequestAccessLocationPermissionRationaleDialogChecked(
         shouldShowRequest: Boolean
     ) {
         launchWithUnexpectedErrorHandler {
@@ -581,7 +581,7 @@ class SettingsViewModel @Inject internal constructor(
                 emitUiEvent(
                     SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch(false)
                 )
-                emitUiEvent(SettingsUiEvent.NavigateLocationPermissionDialog)
+                emitUiEvent(SettingsUiEvent.ShowLocationPermissionDialog)
             }
         }
     }
@@ -654,7 +654,7 @@ class SettingsViewModel @Inject internal constructor(
      */
     private suspend fun requestThemeColorSelection() {
         emitUiEvent(
-            SettingsUiEvent.NavigateThemeColorPickerDialog
+            SettingsUiEvent.ShowThemeColorPickerDialog
         )
     }
 
@@ -693,7 +693,7 @@ class SettingsViewModel @Inject internal constructor(
      */
     private suspend fun requestCalendarStartDayOfWeekSelection(dayOfWeek: DayOfWeek) {
         emitUiEvent(
-            SettingsUiEvent.NavigateCalendarStartDayPickerDialog(dayOfWeek)
+            SettingsUiEvent.ShowCalendarStartDayPickerDialog(dayOfWeek)
         )
     }
 
@@ -751,7 +751,7 @@ class SettingsViewModel @Inject internal constructor(
                 )
             } else {
                 emitUiEvent(
-                    SettingsUiEvent.NavigateReminderNotificationTimePickerDialog
+                    SettingsUiEvent.ShowReminderNotificationTimePickerDialog
                 )
             }
         } else {
@@ -926,7 +926,7 @@ class SettingsViewModel @Inject internal constructor(
      */
     private suspend fun requestAllDiariesDeletion() {
         emitUiEvent(
-            SettingsUiEvent.NavigateAllDiariesDeleteDialog
+            SettingsUiEvent.ShowAllDiariesDeleteDialog
         )
     }
 
@@ -961,7 +961,7 @@ class SettingsViewModel @Inject internal constructor(
      */
     private suspend fun requestAllSettingsInitialization() {
         emitUiEvent(
-            SettingsUiEvent.NavigateAllSettingsInitializationDialog
+            SettingsUiEvent.ShowAllSettingsInitializationDialog
         )
     }
 
@@ -994,7 +994,7 @@ class SettingsViewModel @Inject internal constructor(
      */
     private suspend fun requestAllDataDeletion() {
         emitUiEvent(
-            SettingsUiEvent.NavigateAllDataDeleteDialog
+            SettingsUiEvent.ShowAllDataDeleteDialog
         )
     }
 
@@ -1043,7 +1043,7 @@ class SettingsViewModel @Inject internal constructor(
      */
     private suspend fun requestNavigateOssLicensesScreen() {
         emitUiEvent(
-            SettingsUiEvent.NavigateOSSLicensesDialog
+            SettingsUiEvent.ShowOSSLicensesDialog
         )
     }
 
@@ -1053,7 +1053,7 @@ class SettingsViewModel @Inject internal constructor(
      */
     private suspend fun requestNavigateApplicationDetailsSettings() {
         emitUiEvent(
-            SettingsUiEvent.ShowApplicationDetailsSettings
+            SettingsUiEvent.ShowApplicationDetailsSettingsScreen
         )
     }
     //endregion

@@ -157,7 +157,7 @@ class DiaryShowViewModel @Inject internal constructor(
      */
     private suspend fun requestNavigateToDiaryEditScreen(id: String, date: LocalDate) {
         emitUiEvent(
-            DiaryShowUiEvent.NavigateDiaryEditFragment(id, date)
+            DiaryShowUiEvent.NavigateDiaryEditScreen(id, date)
         )
     }
 
@@ -241,7 +241,7 @@ class DiaryShowViewModel @Inject internal constructor(
                 when (result.exception) {
                     is DiaryLoadByIdException.LoadFailure -> {
                         updateToDiaryLoadErrorState()
-                        emitUiEvent(DiaryShowUiEvent.NavigateDiaryLoadFailureDialog(date))
+                        emitUiEvent(DiaryShowUiEvent.ShowDiaryLoadFailureDialog(date))
                     }
                     is DiaryLoadByIdException.Unknown -> {
                         updateToDiaryLoadErrorState()
@@ -262,7 +262,7 @@ class DiaryShowViewModel @Inject internal constructor(
     private suspend fun requestDiaryDeletion(id: DiaryId, date: LocalDate) {
         updatePendingDiaryDeleteParameters(id, date)
         emitUiEvent(
-            DiaryShowUiEvent.NavigateDiaryDeleteDialog(date)
+            DiaryShowUiEvent.ShowDiaryDeleteDialog(date)
         )
     }
 
@@ -281,7 +281,7 @@ class DiaryShowViewModel @Inject internal constructor(
                 Log.i(logTag, "${logMsg}_完了")
                 updateToProgressInvisibleState()
                 emitUiEvent(
-                    DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryDeleted(date)
+                    DiaryShowUiEvent.NavigatePreviousScreenOnDiaryDeleted(date)
                 )
             }
             is UseCaseResult.Failure -> {
@@ -308,7 +308,7 @@ class DiaryShowViewModel @Inject internal constructor(
      * @param diaryDate 遷移元に返す日記の日付
      */
     private suspend fun requestNavigatePreviousScreen(diaryDate: LocalDate) {
-        emitUiEvent(DiaryShowUiEvent.NavigatePreviousFragmentWithResult(diaryDate))
+        emitUiEvent(DiaryShowUiEvent.NavigatePreviousScreenWithResult(diaryDate))
     }
 
     /**
@@ -316,7 +316,7 @@ class DiaryShowViewModel @Inject internal constructor(
      * 画面遷移イベントを発行する。
      */
     private suspend fun requestNavigatePreviousScreenOnDiaryLoadFailed() {
-        emitUiEvent(DiaryShowUiEvent.NavigatePreviousFragmentOnDiaryLoadFailed)
+        emitUiEvent(DiaryShowUiEvent.NavigatePreviousScreenOnDiaryLoadFailed)
     }
     //endregion
 

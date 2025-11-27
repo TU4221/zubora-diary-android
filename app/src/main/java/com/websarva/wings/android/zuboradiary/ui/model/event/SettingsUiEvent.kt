@@ -8,35 +8,44 @@ import java.time.DayOfWeek
  */
 sealed class SettingsUiEvent : UiEvent {
 
-    /** テーマカラー選択ダイアログへ遷移することを示すイベント。 */
-    data object NavigateThemeColorPickerDialog : SettingsUiEvent()
+    /** テーマカラー選択ダイアログを表示することを示すイベント。 */
+    data object ShowThemeColorPickerDialog : SettingsUiEvent()
 
     /**
-     * カレンダー開始曜日選択ダイアログへ遷移することを示すイベント。
+     * カレンダー開始曜日選択ダイアログを表示することを示すイベント。
      * @property dayOfWeek 現在設定されている週の開始曜日。
      */
-    data class NavigateCalendarStartDayPickerDialog(val dayOfWeek: DayOfWeek) : SettingsUiEvent()
+    data class ShowCalendarStartDayPickerDialog(val dayOfWeek: DayOfWeek) : SettingsUiEvent()
 
-    /** リマインダー通知時間選択ダイアログへ遷移することを示すイベント。 */
-    data object NavigateReminderNotificationTimePickerDialog : SettingsUiEvent()
+    /** リマインダー通知時間選択ダイアログを表示することを示すイベント。 */
+    data object ShowReminderNotificationTimePickerDialog : SettingsUiEvent()
 
-    /** 通知権限要求の理由説明ダイアログへ遷移することを示すイベント。 */
-    data object NavigateNotificationPermissionDialog : SettingsUiEvent()
+    /** 通知権限要求の理由説明ダイアログを表示することを示すイベント。 */
+    data object ShowNotificationPermissionDialog : SettingsUiEvent()
 
-    /** 位置情報権限要求の理由説明ダイアログへ遷移することを示すイベント。 */
-    data object NavigateLocationPermissionDialog : SettingsUiEvent()
+    /** 位置情報権限要求の理由説明ダイアログを表示することを示すイベント。 */
+    data object ShowLocationPermissionDialog : SettingsUiEvent()
 
-    /** 全日記削除確認ダイアログへ遷移することを示すイベント。 */
-    data object NavigateAllDiariesDeleteDialog : SettingsUiEvent()
+    /** 全日記削除確認ダイアログを表示することを示すイベント。 */
+    data object ShowAllDiariesDeleteDialog : SettingsUiEvent()
 
-    /** 全設定初期化確認ダイアログへ遷移することを示すイベント。 */
-    data object NavigateAllSettingsInitializationDialog : SettingsUiEvent()
+    /** 全設定初期化確認ダイアログを表示することを示すイベント。 */
+    data object ShowAllSettingsInitializationDialog : SettingsUiEvent()
 
-    /** 全データ削除確認ダイアログへ遷移することを示すイベント。 */
-    data object NavigateAllDataDeleteDialog : SettingsUiEvent()
+    /** 全データ削除確認ダイアログを表示することを示すイベント。 */
+    data object ShowAllDataDeleteDialog : SettingsUiEvent()
 
-    /** OSSライセンスダイアログへ遷移することを示すイベント。 */
-    data object NavigateOSSLicensesDialog : SettingsUiEvent()
+    /** OSSライセンスダイアログを表示することを示すイベント。 */
+    data object ShowOSSLicensesDialog : SettingsUiEvent()
+
+    /** 通知権限を要求するダイアログを表示することを示すイベント。 */
+    data object ShowRequestPostNotificationsPermissionRationale : SettingsUiEvent()
+
+    /** 位置情報権限を要求するダイアログを表示することを示すイベント。 */
+    data object ShowRequestAccessLocationPermissionRationale : SettingsUiEvent()
+
+    /** アプリケーションの詳細設定画面を表示することを示すイベント。 */
+    data object ShowApplicationDetailsSettingsScreen : SettingsUiEvent()
 
     /** 通知権限を確認することを示すイベント。 */
     data object CheckPostNotificationsPermission : SettingsUiEvent()
@@ -44,17 +53,11 @@ sealed class SettingsUiEvent : UiEvent {
     /** 通知権限要求の理由を表示する必要があるか確認することを示すイベント。 */
     data object CheckShouldShowRequestPostNotificationsPermissionRationale : SettingsUiEvent()
 
-    /** 通知権限を要求するダイアログを表示することを示すイベント。 */
-    data object ShowRequestPostNotificationsPermissionRationale : SettingsUiEvent()
-
     /** 位置情報権限を確認することを示すイベント。 */
     data object CheckAccessLocationPermission : SettingsUiEvent()
 
     /** 位置情報権限要求の理由を表示する必要があるか確認することを示すイベント。 */
     data object CheckShouldShowRequestAccessLocationPermissionRationale : SettingsUiEvent()
-
-    /** 位置情報権限を要求するダイアログを表示することを示すイベント。 */
-    data object ShowRequestAccessLocationPermissionRationale : SettingsUiEvent()
 
     /**
      * リマインダー通知設定のスイッチの状態を変更することを示すイベント。
@@ -73,7 +76,4 @@ sealed class SettingsUiEvent : UiEvent {
      * @property isChecked スイッチをONにする場合は`true`。
      */
     data class TurnWeatherInfoFetchSettingSwitch(val isChecked: Boolean) : SettingsUiEvent()
-
-    /** アプリケーションの詳細設定画面を表示することを示すイベント。 */
-    data object ShowApplicationDetailsSettings : SettingsUiEvent()
 }

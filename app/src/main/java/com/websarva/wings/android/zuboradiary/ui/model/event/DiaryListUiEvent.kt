@@ -14,34 +14,34 @@ sealed class DiaryListUiEvent : UiEvent {
      * @property id 表示対象の日記ID。
      * @property date 対象の日記の日付。
      */
-    data class NavigateDiaryShowFragment(val id: String, val date: LocalDate) : DiaryListUiEvent()
+    data class NavigateDiaryShowScreen(val id: String, val date: LocalDate) : DiaryListUiEvent()
 
     /**
      * 日記編集画面へ遷移することを示すイベント。
      * @property id 編集対象の日記ID。新規作成の場合は`null`。
      * @property date 対象の日記の日付。
      */
-    data class NavigateDiaryEditFragment(
+    data class NavigateDiaryEditScreen(
         val id: String? = null,
         val date: LocalDate
     ) : DiaryListUiEvent()
 
+    /** ワード検索画面へ遷移することを示すイベント。 */
+    data object NavigateWordSearchScreen : DiaryListUiEvent()
+
     /**
-     * 開始年月選択ダイアログへ遷移することを示すイベント。
+     * 開始年月選択ダイアログを表示することを示すイベント。
      * @property maxYear 選択可能な最大の年。
      * @property minYear 選択可能な最小の年。
      */
-    data class NavigateStartYearMonthPickerDialog(
+    data class ShowStartYearMonthPickerDialog(
         val maxYear: Year,
         val minYear: Year
     ) : DiaryListUiEvent()
 
-    /** ワード検索画面へ遷移することを示すイベント。 */
-    data object NavigateWordSearchFragment : DiaryListUiEvent()
-
     /**
-     * 日記削除確認ダイアログへ遷移することを示すイベント。
+     * 日記削除確認ダイアログを表示することを示すイベント。
      * @property date 削除対象の日付。
      */
-    data class NavigateDiaryDeleteDialog(val date: LocalDate) : DiaryListUiEvent()
+    data class ShowDiaryDeleteDialog(val date: LocalDate) : DiaryListUiEvent()
 }

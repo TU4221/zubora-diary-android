@@ -17,10 +17,10 @@ sealed class DiaryItemTitleEditUiEvent : UiEvent {
     ) : DiaryItemTitleEditUiEvent()
 
     /**
-     * 履歴アイテム削除確認ダイアログへ遷移することを示すイベント。
+     * 履歴アイテム削除確認ダイアログを表示することを示すイベント。
      * @property itemTitle 削除対象の項目タイトル。
      */
-    data class NavigateSelectionHistoryItemDeleteDialog(
+    data class ShowSelectionHistoryItemDeleteDialog(
         val itemTitle: String
     ) : DiaryItemTitleEditUiEvent()
 
