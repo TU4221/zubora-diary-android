@@ -180,9 +180,6 @@ internal abstract class BaseLeftSwipeCallback(
         )
         if (viewHolder !is SwipeableViewHolder) return
 
-        // TODO:下記どちらが正しいか後で確認
-        /*if (!isItemSwipeEnabled)
-            if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return*/
         if (!isItemSwipeEnabled) return
         if (actionState != ItemTouchHelper.ACTION_STATE_SWIPE) return
 
