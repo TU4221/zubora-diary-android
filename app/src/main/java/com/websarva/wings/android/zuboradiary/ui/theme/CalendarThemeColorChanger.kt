@@ -30,7 +30,7 @@ internal class CalendarThemeColorChanger : ThemeColorChanger() {
         val resources = textDayOfWeek.resources
 
         val onColor = getOnWeekdaysColor(themeColor, resources)
-        applyTextViewColorOnlyText(textDayOfWeek, onColor)
+        applyTextViewColor(textDayOfWeek, null, onColor, null)
     }
 
     /**
@@ -41,7 +41,7 @@ internal class CalendarThemeColorChanger : ThemeColorChanger() {
         val resources = textDayOfWeek.resources
 
         val onColor = getOnSaturdayColor(resources)
-        applyTextViewColorOnlyText(textDayOfWeek, onColor)
+        applyTextViewColor(textDayOfWeek, null, onColor, null)
     }
 
     /**
@@ -52,7 +52,7 @@ internal class CalendarThemeColorChanger : ThemeColorChanger() {
         val resources = textDayOfWeek.resources
 
         val onColor = getOnSundayColor(resources)
-        applyTextViewColorOnlyText(textDayOfWeek, onColor)
+        applyTextViewColor(textDayOfWeek, null, onColor, null)
     }
     // endregion
 
@@ -145,7 +145,7 @@ internal class CalendarThemeColorChanger : ThemeColorChanger() {
         applyDrawableColor(drawable, color)
         (textDay.parent as? View)?.background = drawable
 
-        applyTextViewColorOnlyText(textDay, onColor)
+        applyTextViewColor(textDay, null, onColor, null)
         applyViewColor(viewDot, onColor)
     }
     // endregion

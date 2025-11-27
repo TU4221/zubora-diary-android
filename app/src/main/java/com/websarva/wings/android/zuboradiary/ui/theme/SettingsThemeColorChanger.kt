@@ -24,7 +24,7 @@ internal class SettingsThemeColorChanger : ThemeColorChanger() {
 
         val color = themeColor.asSecondaryContainerColorInt(resources)
         val onColor = themeColor.asOnSecondaryContainerColorInt(resources)
-        applyTextViewsColor(textViewList, color, onColor)
+        applyTextViewsColor(textViewList, color, onColor, null)
     }
 
     /**
@@ -37,6 +37,6 @@ internal class SettingsThemeColorChanger : ThemeColorChanger() {
         val resources = textViewList.first().resources
 
         val color = themeColor.asOnSurfaceVariantColorInt(resources)
-        applyTextViewsColorOnlyIcon(textViewList, color)
+        applyTextViewsColor(textViewList, null, null, color)
     }
 }

@@ -84,7 +84,7 @@ internal open class ThemeColorChanger {
 
         val resources = textViewList.first().resources
         val onSurfaceColor = themeColor.asOnSurfaceColorInt(resources)
-        applyTextViewsColorOnlyText(textViewList, onSurfaceColor)
+        applyTextViewsColor(textViewList, null, onSurfaceColor, null)
     }
 
     /**
@@ -97,7 +97,7 @@ internal open class ThemeColorChanger {
 
         val resources = textViewList.first().resources
         val errorColor = themeColor.asErrorColorInt(resources)
-        applyTextViewsColorOnlyText(textViewList, errorColor)
+        applyTextViewsColor(textViewList, null, errorColor, null)
     }
 
     /**
@@ -355,80 +355,56 @@ internal open class ThemeColorChanger {
     }
 
     /**
-     * 複数の[TextView]の背景色とテキスト色を設定する共通ヘルパーメソッド。
+     * 複数の[TextView]に色を適用する。
      * @param textViewList 対象のTextViewのリスト。
-     * @param color 適用する背景色。
-     * @param onColor 適用するテキスト色。
+     * @param backgroundColor 背景色として適用する色。nullの場合は変更しない。
+     * @param textColor テキスト色として適用する色。nullの場合は変更しない。
+     * @param iconColor Compound Drawable（アイコン）の色として適用する色。nullの場合は変更しない。
      */
-    protected fun applyTextViewsColor(textViewList: List<TextView>, color: Int, onColor: Int) {
-        textViewList.forEach {
-            applyTextViewColor(it, color, onColor)
-        }
-    }
-
-    /**
-     * [TextView]の背景色とテキスト色を設定する共通ヘルパーメソッド。
-     * @param textView 対象のTextView。
-     * @param color 適用する背景色。
-     * @param onColor 適用するテキスト色。
-     */
-    protected fun applyTextViewColor(textView: TextView, color: Int, onColor: Int) {
-        textView.setBackgroundColor(color)
-        textView.setTextColor(onColor)
-    }
-
-    /**
-     * 複数の[TextView]のテキスト色のみを設定する共通ヘルパーメソッド。
-     * @param textViewList 対象のTextViewのリスト。
-     * @param onColor 適用するテキスト色。
-     */
-    protected fun applyTextViewsColorOnlyText(textViewList: List<TextView>, onColor: Int) {
-        textViewList.forEach {
-            applyTextViewColorOnlyText(it, onColor)
-        }
-    }
-
-    //TODO:applyTextViewColor()にまとめる(引数をnullable)
-    /**
-     * [TextView]のテキスト色のみを設定する共通ヘルパーメソッド。
-     * @param textView 対象のTextView。
-     * @param color 適用するテキスト色。
-     */
-    protected fun applyTextViewColorOnlyText(textView: TextView, color: Int) {
-        textView.setTextColor(color)
-    }
-
-    /**
-     * 複数の[TextView]のCompound Drawable（アイコン）の色合いを設定する共通ヘルパーメソッド。
-     * @param textViewList 対象のTextViewのリスト。
-     * @param color 適用する色。
-     */
-    protected fun applyTextViewsColorOnlyIcon(textViewList: List<TextView>, color: Int) {
-        textViewList.forEach {
-            applyTextViewColorOnlyIcon(it, color)
-        }
-    }
-
-    // TODO:メソッド名変更
-    /**
-     * [TextView]のアイコン（Compound Drawable）の色を設定する共通ヘルパーメソッド。
-     * @param view 対象のTextView。
-     * @param color 適用する色。
-     */
-    protected fun applyTextViewColorOnlyIcon(view: TextView, color: Int) {
-        val drawables = view.compoundDrawablesRelative
-        val wrappedDrawable = arrayOfNulls<Drawable>(drawables.size)
-
-        for (i in drawables.indices) {
-            val drawable = drawables[i]
-            if (drawable != null) {
-                wrappedDrawable[i] = DrawableCompat.wrap(drawable)
-                DrawableCompat.setTint(checkNotNull(wrappedDrawable[i]) , color)
+    protected fun applyTextViewsColor(
+        textViewList: List<TextView>,
+        backgroundColor: Int? = null,
+        textColor: Int? = null,
+        iconColor: Int? = null
+    ) {
+        if (backgroundColor != null || textColor != null || iconColor != null) {
+            textViewList.forEach { textView ->
+                applyTextViewColor(textView, backgroundColor, textColor, iconColor)
             }
         }
-        view.setCompoundDrawablesRelativeWithIntrinsicBounds(
-            wrappedDrawable[0], wrappedDrawable[1], wrappedDrawable[2], wrappedDrawable[3]
-        )
+    }
+
+    /**
+     * 単一の[TextView]に色を適用する。
+     *
+     * @param textView 対象のTextView。
+     * @param backgroundColor 背景色として適用する色。nullの場合は変更しない。
+     * @param textColor テキスト色として適用する色。nullの場合は変更しない。
+     * @param iconColor Compound Drawable（アイコン）の色として適用する色。nullの場合は変更しない。
+     */
+    protected fun applyTextViewColor(
+        textView: TextView,
+        backgroundColor: Int? = null,
+        textColor: Int? = null,
+        iconColor: Int? = null
+    ) {
+        backgroundColor?.let { textView.setBackgroundColor(it) }
+        textColor?.let { textView.setTextColor(it) }
+        iconColor?.let {
+            val drawables = textView.compoundDrawablesRelative
+            val wrappedDrawable = arrayOfNulls<Drawable>(drawables.size)
+
+            for (i in drawables.indices) {
+                val drawable = drawables[i]
+                if (drawable != null) {
+                    wrappedDrawable[i] = DrawableCompat.wrap(drawable).mutate()
+                    DrawableCompat.setTint(checkNotNull(wrappedDrawable[i]), it)
+                }
+            }
+            textView.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                wrappedDrawable[0], wrappedDrawable[1], wrappedDrawable[2], wrappedDrawable[3]
+            )
+        }
     }
 
     /**
