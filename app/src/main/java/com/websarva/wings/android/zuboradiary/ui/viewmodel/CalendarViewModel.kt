@@ -69,8 +69,8 @@ class CalendarViewModel @Inject internal constructor(
             old.diaryLoadState == new.diaryLoadState
         }.mapNotNull { (it.diaryLoadState as? LoadState.Success)?.data }
 
-    /** カレンダーのスクロールをスムーズに行うべきかを示すフラグ。 */
-    private var shouldSmoothScroll = false
+    /** カレンダーのスクロールを抑制するかを示すフラグ。 */
+    private var suppressNextScroll = false
     //endregion
 
     //region Initialization
@@ -272,14 +272,11 @@ class CalendarViewModel @Inject internal constructor(
      * @param date 準備対象の日付
      */
     private suspend fun prepareDiary(date: LocalDate) {
-        val action =
-            if (shouldSmoothScroll) {
-                updateShouldSmoothScroll(false)
-                CalendarUiEvent.SmoothScrollCalendar(date)
-            } else {
-                CalendarUiEvent.ScrollCalendar(date)
-            }
-        emitUiEvent(action)
+        if (suppressNextScroll) {
+            updateSuppressNextScroll(false)
+        } else {
+            emitUiEvent(CalendarUiEvent.ScrollCalendar(date))
+        }
 
         val exists = existsSavedDiary(date)
         if (exists) {
@@ -351,16 +348,12 @@ class CalendarViewModel @Inject internal constructor(
      */
     private suspend fun selectToday(selectedDate: LocalDate) {
         val today = LocalDate.now()
+        emitUiEvent(
+            CalendarUiEvent.SmoothScrollCalendar(today)
+        )
+        if (selectedDate == today) return
 
-        // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
-        //      下記条件でカレンダースクロールのみ処理。
-        if (selectedDate == today) {
-            emitUiEvent(
-                CalendarUiEvent.SmoothScrollCalendar(today)
-            )
-        }
-
-        updateShouldSmoothScroll(true)
+        updateSuppressNextScroll(true) // MEMO:日記読込準備時のスクロールを無効化
         updateSelectedDate(today)
     }
 
@@ -487,11 +480,11 @@ class CalendarViewModel @Inject internal constructor(
 
     //region Internal State Update
     /**
-     * スムーズスクロールが必要かどうかのフラグを更新する。
-     * @param shouldScroll スムーズスクロールが必要な場合はtrue
+     * 次回スクロールを抑制するかどうかのフラグを更新する。
+     * @param shouldScroll 抑制する場合はtrue
      */
-    private fun updateShouldSmoothScroll(shouldScroll: Boolean) {
-        shouldSmoothScroll = shouldScroll
+    private fun updateSuppressNextScroll(shouldScroll: Boolean) {
+        suppressNextScroll = shouldScroll
     }
     //endregion
 
