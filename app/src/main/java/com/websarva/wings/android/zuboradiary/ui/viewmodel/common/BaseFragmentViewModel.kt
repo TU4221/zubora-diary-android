@@ -55,7 +55,7 @@ abstract class BaseFragmentViewModel<S: UiState, E: UiEvent, M: AppMessage> inte
      * @param command 失敗したナビゲーションコマンド
      */
     internal fun onFragmentNavigationFailure(command: NavigationCommand) {
-        val newPendingCommand = PendingNavigationCommand(command)
+        val newPendingCommand = PendingNavigationCommand.createFrom(command)
         Log.d(
             logTag,
             "${logMsgPendingNavi}失敗したナビゲーションを保留リストに追加。コマンド: $newPendingCommand"
