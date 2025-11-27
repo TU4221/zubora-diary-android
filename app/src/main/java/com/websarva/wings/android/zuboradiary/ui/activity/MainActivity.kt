@@ -259,9 +259,9 @@ class MainActivity : LoggingActivity() {
         themeColorChanger.run {
             applyStatusBarIconColor(window, themeColor)
             applyNavigationBarIconColor(window, themeColor)
-            applyBackgroundColor(binding.root, themeColor)
-            applyToolbarColor(binding.materialToolbarTopAppBar, themeColor, binding.appBarLayout)
-            applyBottomNavigationColor(binding.bottomNavigation, themeColor)
+            applyAppBackgroundColor(binding.root, themeColor)
+            applyAppToolbarColor(binding.materialToolbarTopAppBar, themeColor, binding.appBarLayout)
+            applyAppBottomNavigationColor(binding.bottomNavigation, themeColor)
         }
     }
 

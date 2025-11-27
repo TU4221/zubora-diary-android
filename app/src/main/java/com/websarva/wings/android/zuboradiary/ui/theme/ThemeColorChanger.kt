@@ -62,13 +62,12 @@ internal open class ThemeColorChanger {
     // endregion
 
     // region App Main View
-    // TODO:メソッド名にAppを付け加える
     /**
      * [View]の背景色にアプリケーションの基本的な背景色を適用する。
      * @param view 対象のView。
      * @param themeColor 適用するテーマカラー。
      */
-    fun applyBackgroundColor(view: View, themeColor: ThemeColorUi) {
+    fun applyAppBackgroundColor(view: View, themeColor: ThemeColorUi) {
         val resources = view.resources
         val surfaceColor = themeColor.asSurfaceColorInt(resources)
         applyViewColor(view, surfaceColor)
@@ -79,7 +78,7 @@ internal open class ThemeColorChanger {
      * @param textViewList 対象のTextViewのリスト。
      * @param themeColor 適用するテーマカラー。
      */
-    fun applyTextColorOnBackground(textViewList: List<TextView>, themeColor: ThemeColorUi) {
+    fun applyAppTextColorOnBackground(textViewList: List<TextView>, themeColor: ThemeColorUi) {
         require(textViewList.isNotEmpty())
 
         val resources = textViewList.first().resources
@@ -92,7 +91,7 @@ internal open class ThemeColorChanger {
      * @param textViewList 対象のTextViewのリスト。
      * @param themeColor 適用するテーマカラー。
      */
-    fun applyTextErrorColor(textViewList: List<TextView>, themeColor: ThemeColorUi) {
+    fun applyAppTextErrorColor(textViewList: List<TextView>, themeColor: ThemeColorUi) {
         require(textViewList.isNotEmpty())
 
         val resources = textViewList.first().resources
@@ -105,7 +104,7 @@ internal open class ThemeColorChanger {
      * @param dividerList 対象のMaterialDividerのリスト。
      * @param themeColor 適用するテーマカラー。
      */
-    fun applyDividerColor(dividerList: List<MaterialDivider>, themeColor: ThemeColorUi) {
+    fun applyAppDividerColor(dividerList: List<MaterialDivider>, themeColor: ThemeColorUi) {
         require(dividerList.isNotEmpty())
         val resources = dividerList.first().resources
 
@@ -122,23 +121,23 @@ internal open class ThemeColorChanger {
      * @param bottomNavigationView 対象のBottomNavigationView。
      * @param themeColor 適用するテーマカラー。
      */
-    fun applyBottomNavigationColor(
+    fun applyAppBottomNavigationColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
-        applyBottomNavigationBackgroundColor(bottomNavigationView, themeColor)
-        applyBottomNavigationItemRippleColor(bottomNavigationView, themeColor)
-        applyBottomNavigationItemTextColor(bottomNavigationView, themeColor)
-        applyBottomNavigationItemIconColor(bottomNavigationView, themeColor)
-        applyBottomNavigationActiveIndicatorColor(bottomNavigationView, themeColor)
+        applyAppBottomNavigationBackgroundColor(bottomNavigationView, themeColor)
+        applyAppBottomNavigationItemRippleColor(bottomNavigationView, themeColor)
+        applyAppBottomNavigationItemTextColor(bottomNavigationView, themeColor)
+        applyAppBottomNavigationItemIconColor(bottomNavigationView, themeColor)
+        applyAppBottomNavigationActiveIndicatorColor(bottomNavigationView, themeColor)
     }
 
     /**
-     * [applyBottomNavigationColor]から呼び出され、背景色を適用する。
+     * [applyAppBottomNavigationColor]から呼び出され、背景色を適用する。
      * @param bottomNavigationView 対象のBottomNavigationView。
      * @param themeColor 適用するテーマカラー。
      */
-    private fun applyBottomNavigationBackgroundColor(
+    private fun applyAppBottomNavigationBackgroundColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
@@ -149,11 +148,11 @@ internal open class ThemeColorChanger {
     }
 
     /**
-     * [applyBottomNavigationColor]から呼び出され、アイテムの波紋色を適用する。
+     * [applyAppBottomNavigationColor]から呼び出され、アイテムの波紋色を適用する。
      * @param bottomNavigationView 対象のBottomNavigationView。
      * @param themeColor 適用するテーマカラー。
      */
-    private fun applyBottomNavigationItemRippleColor(
+    private fun applyAppBottomNavigationItemRippleColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
@@ -166,11 +165,11 @@ internal open class ThemeColorChanger {
     }
 
     /**
-     * [applyBottomNavigationColor]から呼び出され、アイテムのテキスト色を適用する。
+     * [applyAppBottomNavigationColor]から呼び出され、アイテムのテキスト色を適用する。
      * @param bottomNavigationView 対象のBottomNavigationView。
      * @param themeColor 適用するテーマカラー。
      */
-    private fun applyBottomNavigationItemTextColor(
+    private fun applyAppBottomNavigationItemTextColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
@@ -183,11 +182,11 @@ internal open class ThemeColorChanger {
     }
 
     /**
-     * [applyBottomNavigationColor]から呼び出され、アイテムのアイコン色を適用する。
+     * [applyAppBottomNavigationColor]から呼び出され、アイテムのアイコン色を適用する。
      * @param bottomNavigationView 対象のBottomNavigationView。
      * @param themeColor 適用するテーマカラー。
      */
-    private fun applyBottomNavigationItemIconColor(
+    private fun applyAppBottomNavigationItemIconColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
@@ -200,11 +199,11 @@ internal open class ThemeColorChanger {
     }
 
     /**
-     * [applyBottomNavigationColor]から呼び出され、アクティブなアイテムのインジケータ色を適用する。
+     * [applyAppBottomNavigationColor]から呼び出され、アクティブなアイテムのインジケータ色を適用する。
      * @param bottomNavigationView 対象のBottomNavigationView。
      * @param themeColor 適用するテーマカラー。
      */
-    private fun applyBottomNavigationActiveIndicatorColor(
+    private fun applyAppBottomNavigationActiveIndicatorColor(
         bottomNavigationView: BottomNavigationView,
         themeColor: ThemeColorUi
     ) {
@@ -223,7 +222,11 @@ internal open class ThemeColorChanger {
      * @param themeColor 適用するテーマカラー。
      * @param appBarLayout ツールバーを含むAppBarLayout（任意）。指定された場合、背景色が適用される。
      */
-    fun applyToolbarColor(toolbar: MaterialToolbar, themeColor: ThemeColorUi, appBarLayout: AppBarLayout? = null) {
+    fun applyAppToolbarColor(
+        toolbar: MaterialToolbar,
+        themeColor: ThemeColorUi,
+        appBarLayout: AppBarLayout? = null
+    ) {
         val resources = toolbar.resources
 
         val surfaceColor = themeColor.asSurfaceColorInt(resources)
@@ -231,43 +234,43 @@ internal open class ThemeColorChanger {
         val onSurfaceVariantColor = themeColor.asOnSurfaceVariantColorInt(resources)
         toolbar.setBackgroundColor(surfaceColor)
         toolbar.setTitleTextColor(onSurfaceColor)
-        applyToolbarMenuColor(toolbar, onSurfaceColor)
-        applyToolbarNavigationIconColor(toolbar, onSurfaceVariantColor)
+        applyAppToolbarMenuColor(toolbar, onSurfaceColor)
+        applyAppToolbarNavigationIconColor(toolbar, onSurfaceVariantColor)
 
         appBarLayout?.setBackgroundColor(surfaceColor)
     }
 
     /**
-     * [applyToolbarColor]から呼び出され、ナビゲーションアイコンの色を適用する。
+     * [applyAppToolbarColor]から呼び出され、ナビゲーションアイコンの色を適用する。
      * @param toolbar 対象のMaterialToolbar。
      * @param color 適用する色。
      */
-    private fun applyToolbarNavigationIconColor(toolbar: MaterialToolbar, color: Int) {
+    private fun applyAppToolbarNavigationIconColor(toolbar: MaterialToolbar, color: Int) {
         val navigationIcon = toolbar.navigationIcon ?: return
         navigationIcon.setTint(color)
     }
 
     /**
-     * [applyToolbarColor]から呼び出され、メニュー関連のアイコン（オーバーフロー、折りたたみ）の色を適用する。
+     * [applyAppToolbarColor]から呼び出され、メニュー関連のアイコン（オーバーフロー、折りたたみ）の色を適用する。
      * @param toolbar 対象のMaterialToolbar。
      * @param color 適用する色。
      */
-    private fun applyToolbarMenuColor(toolbar: MaterialToolbar, color: Int) {
+    private fun applyAppToolbarMenuColor(toolbar: MaterialToolbar, color: Int) {
         val menuIcon = toolbar.overflowIcon
         menuIcon?.setTint(color)
 
         val collapseIcon = toolbar.collapseIcon
         collapseIcon?.setTint(color)
 
-        applyToolbarMenuIconColor(toolbar, color)
+        applyAppToolbarMenuIconColor(toolbar, color)
     }
 
     /**
-     * [applyToolbarMenuColor]から呼び出され、ツールバーのメニューアイテムに含まれる各アイコンの色を適用する。
+     * [applyAppToolbarMenuColor]から呼び出され、ツールバーのメニューアイテムに含まれる各アイコンの色を適用する。
      * @param toolbar 対象のMaterialToolbar。
      * @param color 適用する色。
      */
-    private fun applyToolbarMenuIconColor(toolbar: MaterialToolbar, color: Int) {
+    private fun applyAppToolbarMenuIconColor(toolbar: MaterialToolbar, color: Int) {
         val menu = toolbar.menu ?: return
 
         val numMenuIcons = menu.size
@@ -286,18 +289,18 @@ internal open class ThemeColorChanger {
      * @param switchList 対象のMaterialSwitchのリスト。
      * @param themeColor 適用するテーマカラー。
      */
-    fun applySwitchColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
-        applySwitchThumbColor(switchList, themeColor)
-        applySwitchThumbIconColor(switchList, themeColor)
-        applySwitchTrackColor(switchList, themeColor)
+    fun applyAppSwitchColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
+        applyAppSwitchThumbColor(switchList, themeColor)
+        applyAppSwitchThumbIconColor(switchList, themeColor)
+        applyAppSwitchTrackColor(switchList, themeColor)
     }
 
     /**
-     * [applySwitchColor]から呼び出され、スイッチのつまみの色を適用する。
+     * [applyAppSwitchColor]から呼び出され、スイッチのつまみの色を適用する。
      * @param switchList 対象のMaterialSwitchのリスト。
      * @param themeColor 適用するテーマカラー。
      */
-    private fun applySwitchThumbColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
+    private fun applyAppSwitchThumbColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
         require(switchList.isNotEmpty())
         val resources = switchList.first().resources
 
@@ -310,11 +313,11 @@ internal open class ThemeColorChanger {
     }
 
     /**
-     * [applySwitchColor]から呼び出され、スイッチのつまみアイコンの色を適用する。
+     * [applyAppSwitchColor]から呼び出され、スイッチのつまみアイコンの色を適用する。
      * @param switchList 対象のMaterialSwitchのリスト。
      * @param themeColor 適用するテーマカラー。
      */
-    private fun applySwitchThumbIconColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
+    private fun applyAppSwitchThumbIconColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
         require(switchList.isNotEmpty())
         val resources = switchList.first().resources
 
@@ -327,11 +330,11 @@ internal open class ThemeColorChanger {
     }
 
     /**
-     * [applySwitchColor]から呼び出され、スイッチのトラックの色を適用する。
+     * [applyAppSwitchColor]から呼び出され、スイッチのトラックの色を適用する。
      * @param switchList 対象のMaterialSwitchのリスト。
      * @param themeColor 適用するテーマカラー。
      */
-    private fun applySwitchTrackColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
+    private fun applyAppSwitchTrackColor(switchList: List<MaterialSwitch>, themeColor: ThemeColorUi) {
         require(switchList.isNotEmpty())
         val resources = switchList.first().resources
 

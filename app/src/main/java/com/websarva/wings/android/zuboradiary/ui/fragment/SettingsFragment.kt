@@ -385,8 +385,8 @@ class SettingsFragment :
     private fun switchViewColor(themeColor: ThemeColorUi) {
         val changer = SettingsThemeColorChanger()
 
-        changer.applyBackgroundColor(binding.root, themeColor)
-        changer.applyToolbarColor(
+        changer.applyAppBackgroundColor(binding.root, themeColor)
+        changer.applyAppToolbarColor(
             binding.materialToolbarTopAppBar,
             themeColor,
             binding.appBarLayout
@@ -422,7 +422,7 @@ class SettingsFragment :
             themeColor
         )
 
-        changer.applyTextColorOnBackground(
+        changer.applyAppTextColorOnBackground(
             binding.run {
                 listOf(
                     includeThemeColorSetting.textTitle,
@@ -439,7 +439,7 @@ class SettingsFragment :
             themeColor
         )
 
-        changer.applyTextErrorColor(
+        changer.applyAppTextErrorColor(
             binding.run {
                 listOf(
                     includeAllDiariesDeleteSetting.textTitle,
@@ -450,7 +450,7 @@ class SettingsFragment :
             themeColor
         )
 
-        changer.applySwitchColor(
+        changer.applyAppSwitchColor(
             binding.run {
                 listOf(
                     includeReminderNotificationSetting.materialSwitch,
@@ -461,7 +461,7 @@ class SettingsFragment :
             themeColor
         )
 
-        changer.applyDividerColor(
+        changer.applyAppDividerColor(
             binding.run {
                 listOf(
                     materialDividerToolbar,
