@@ -149,7 +149,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     //region UI Event Handlers
     override fun onBackPressed() {
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            requestNavigatePreviousScreen()
         }
     }
 
@@ -159,7 +159,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
      */
     fun onNavigationIconClick() {
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            requestNavigatePreviousScreen()
         }
     }
 
@@ -206,16 +206,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         val itemId = item.id
         val itemTitle = item.title
         launchWithUnexpectedErrorHandler {
-            updatePendingHistoryItemDeleteParameters(
-                DiaryItemTitleSelectionHistoryId(itemId),
-                DiaryItemTitle(itemTitle)
-            )
-            emitUiEvent(
-                DiaryItemTitleEditUiEvent
-                    .NavigateSelectionHistoryItemDeleteDialog(
-                        itemTitle
-                    )
-            )
+            requestHistoryDeletion(itemId, itemTitle)
         }
     }
 
@@ -248,9 +239,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     internal fun onDiaryItemTitleSelectionHistoryDeleteDialogNegativeResultReceived() {
         clearPendingHistoryItemDeleteParameters()
         launchWithUnexpectedErrorHandler {
-            emitUiEvent(
-                DiaryItemTitleEditUiEvent.CloseSwipedItem
-            )
+            requestCloseSwipedItem()
         }
     }
     //endregion
@@ -280,6 +269,26 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
                 updateTitleValidationState(state.toUiModel())
             }
         }
+    }
+
+    /**
+     * 履歴の削除を要求する。
+     * 渡されたパラメータをキャッシュし、削除確認ダイアログへの遷移イベントを発行する。
+     *
+     * @param historyId 削除対象の履歴のID。
+     * @param historyTitle 削除対象の履歴のタイトル。
+     */
+    private suspend fun requestHistoryDeletion(historyId: String, historyTitle: String) {
+        updatePendingHistoryItemDeleteParameters(
+            DiaryItemTitleSelectionHistoryId(historyId),
+            DiaryItemTitle(historyTitle)
+        )
+        emitUiEvent(
+            DiaryItemTitleEditUiEvent
+                .NavigateSelectionHistoryItemDeleteDialog(
+                    historyTitle
+                )
+        )
     }
 
     /**
@@ -313,6 +322,24 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
                 }
             }
         }
+    }
+
+    /**
+     * スワイプされたアイテムを閉じる事を要求する。
+     * UIにスワイプ状態を閉じるようイベントを発行する。
+     */
+    private suspend fun requestCloseSwipedItem() {
+        emitUiEvent(
+            DiaryItemTitleEditUiEvent.CloseSwipedItem
+        )
+    }
+
+    /**
+     * 前の画面への遷移を要求する。
+     * 画面遷移イベントを発行する。
+     */
+    private suspend fun requestNavigatePreviousScreen() {
+        emitNavigatePreviousFragmentEvent()
     }
     //endregion
 

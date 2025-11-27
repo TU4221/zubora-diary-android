@@ -179,7 +179,7 @@ class CalendarViewModel @Inject internal constructor(
         if (!isReadyForOperation) return
 
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            requestNavigatePreviousScreen()
         }
     }
 
@@ -205,7 +205,7 @@ class CalendarViewModel @Inject internal constructor(
 
     /**
      * 日記編集ボタンがクリックされた時に呼び出される事を想定。
-     * 日記編集画面へ遷移するイベントを発行する。
+     * 日記の編集を開始する。
      * */
     fun onDiaryEditButtonClick() {
         if (!isReadyForOperation) return
@@ -230,32 +230,20 @@ class CalendarViewModel @Inject internal constructor(
         }
 
         launchWithUnexpectedErrorHandler {
-            emitUiEvent(
-                CalendarUiEvent.NavigateDiaryEditFragment(id, date)
-            )
+            requestNavigateDiaryEditScreen(id, date)
         }
     }
 
     /**
      * カレンダー画面が表示されている状態で、再度ボトムナビゲーションの同タブが選択された時に呼び出される事を想定。
-     * カレンダーを今日の日付までスクロールさせる。
+     * カレンダーを今日の日付に選択する処理を開始する。
      * */
     internal fun onBottomNavigationItemReselect() {
         if (!isReadyForOperation) return
 
         val selectedDate = currentUiState.selectedDate
-        val today = LocalDate.now()
         launchWithUnexpectedErrorHandler {
-            // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
-            //      下記条件でカレンダースクロールのみ処理。
-            if (selectedDate == today) {
-                emitUiEvent(
-                    CalendarUiEvent.SmoothScrollCalendar(today)
-                )
-            }
-
-            updateShouldSmoothScroll(true)
-            updateSelectedDate(today)
+            selectToday(selectedDate)
         }
     }
 
@@ -353,6 +341,48 @@ class CalendarViewModel @Inject internal constructor(
                 return false
             }
         }
+    }
+
+    /**
+     * 今日の日付を選択する。
+     * 既に今日が選択されている場合は、スクロールイベントのみを発行する。
+     *
+     * @param selectedDate 現在選択されている日付。
+     */
+    private suspend fun selectToday(selectedDate: LocalDate) {
+        val today = LocalDate.now()
+
+        // MEMO:StateFlowに現在値と同じ値を代入してもCollectメソッドに登録した処理が起動しないため、
+        //      下記条件でカレンダースクロールのみ処理。
+        if (selectedDate == today) {
+            emitUiEvent(
+                CalendarUiEvent.SmoothScrollCalendar(today)
+            )
+        }
+
+        updateShouldSmoothScroll(true)
+        updateSelectedDate(today)
+    }
+
+    /**
+     * 前の画面への遷移を要求する。
+     * 画面遷移イベントを発行する。
+     */
+    private suspend fun requestNavigatePreviousScreen() {
+        emitNavigatePreviousFragmentEvent()
+    }
+
+    /**
+     * 日記編集画面への遷移を要求する。
+     * 画面遷移イベントを発行する。
+     *
+     * @param id 編集対象の日記のID。nullの場合は新規作成。
+     * @param date 編集対象の日記の日付。
+     */
+    private suspend fun requestNavigateDiaryEditScreen(id: String?, date: LocalDate) {
+        emitUiEvent(
+            CalendarUiEvent.NavigateDiaryEditFragment(id, date)
+        )
     }
     //endregion
 

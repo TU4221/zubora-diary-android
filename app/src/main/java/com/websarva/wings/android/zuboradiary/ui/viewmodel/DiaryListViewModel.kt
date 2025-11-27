@@ -177,52 +177,45 @@ class DiaryListViewModel @Inject internal constructor(
         //      BaseFragmentでOnBackPressedCallbackを登録せずにNavigation機能のデフォルト戻る機能を使用する。
         //      そのため、本メソッドは呼び出されない。
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            requestNavigatePreviousScreen()
         }
     }
 
     /**
      * ワード検索メニューがクリックされた時に呼び出される事を想定。
-     * ワード検索画面へ遷移するイベントを発行する。
+     * ワード検索画面へ遷移する処理を開始する。
      * */
     internal fun onWordSearchMenuClick() {
         launchWithUnexpectedErrorHandler {
-            emitUiEvent(DiaryListUiEvent.NavigateWordSearchFragment)
+            requestNavigateWordSearchScreen()
         }
     }
 
     /**
      * ナビゲーションアイコン(カレンダーアイコン)がクリックされた時に呼び出される事を想定。
-     * 開始年月選択ダイアログへ遷移するイベントを発行する。
+     * 開始年月選択処理を開始する。
      * */
     fun onNavigationIconClick() {
         launchWithUnexpectedErrorHandler {
-            val dateRange = loadSavedDiaryDateRange()
-            val newestDiaryDate = dateRange.newestDiaryDate
-            val oldestDiaryDate = dateRange.oldestDiaryDate
-            val newestYear = Year.of(newestDiaryDate.year)
-            val oldestYear = Year.of(oldestDiaryDate.year)
-            emitUiEvent(
-                DiaryListUiEvent.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
-            )
+            requestStartYearMonthSelection()
         }
     }
 
     /**
      * 日記リストのアイテムがクリックされた時に呼び出される事を想定。
-     * 日記表示画面へ遷移するイベントを発行する。
+     * 日記表示画面へ遷移する処理を開始する。
      * */
     internal fun onDiaryListItemClick(item: DiaryListItemContainerUi.Standard) {
         val id = item.id
         val date = item.date
         launchWithUnexpectedErrorHandler {
-            emitUiEvent(DiaryListUiEvent.NavigateDiaryShowFragment(id, date))
+            requestNavigateDiaryShowScreen(id, date)
         }
     }
 
     /**
      * 日記リストアイテムの削除ボタンがクリックされた時に呼び出される事を想定。
-     * 日記リストアイテム削除ダイアログへ遷移するイベントを発行する。
+     * 日記リストアイテム削除ダイアログへ遷移する処理を開始する。
      * */
     internal fun onDiaryListItemDeleteButtonClick(item: DiaryListItemContainerUi.Standard) {
         if (!isReadyForOperation) return
@@ -232,25 +225,17 @@ class DiaryListViewModel @Inject internal constructor(
         val currentList = currentUiState.diaryList
         val sortConditionDate = currentUiState.sortConditionDate
         launchWithUnexpectedErrorHandler {
-            updatePendingDiaryDeleteParameters(
-                DiaryId(id),
-                currentList,
-                sortConditionDate
-            )
-            emitUiEvent(
-                DiaryListUiEvent.NavigateDiaryDeleteDialog(date)
-            )
+            requestDiaryDeletion(id, date, currentList, sortConditionDate)
         }
     }
 
     /**
      * 日記編集ボタン(FAB)がクリックされた時に呼び出される事を想定。
-     * 日記編集画面へ遷移するイベントを発行する。
+     * 日記編集画面へ遷移する処理を開始する。
      * */
     fun onDiaryEditButtonClick() {
         launchWithUnexpectedErrorHandler {
-            val today = LocalDate.now()
-            emitUiEvent(DiaryListUiEvent.NavigateDiaryEditFragment(date = today))
+            requestNavigateNewDiaryEditScreen()
         }
     }
 
@@ -479,6 +464,31 @@ class DiaryListViewModel @Inject internal constructor(
     }
 
     /**
+     * 日記の削除を要求する。
+     * 渡されたパラメータをキャッシュし、削除確認ダイアログへの遷移イベントを発行する。
+     *
+     * @param id 削除対象の日記のID。
+     * @param date 削除対象の日記の日付。
+     * @param currentList 削除後のリスト更新に使用する現在のリスト。
+     * @param sortConditionDate 削除後のリスト更新に使用する現在のソート条件。
+     */
+    private suspend fun requestDiaryDeletion(
+        id: String,
+        date: LocalDate,
+        currentList: DiaryListUi<DiaryListItemContainerUi.Standard>,
+        sortConditionDate: LocalDate?
+    ) {
+        updatePendingDiaryDeleteParameters(
+            DiaryId(id),
+            currentList,
+            sortConditionDate
+        )
+        emitUiEvent(
+            DiaryListUiEvent.NavigateDiaryDeleteDialog(date)
+        )
+    }
+
+    /**
      * 日記を削除し、リストをリフレッシュする。
      * @param id 削除対象の日記ID
      * @param currentList 現在の日記リスト
@@ -517,6 +527,21 @@ class DiaryListViewModel @Inject internal constructor(
     }
 
     /**
+     * 開始年月の選択を要求する。
+     * 保存されている日記の日付範囲を読み込み、ダイアログ遷移イベントを発行する。
+     */
+    private suspend fun requestStartYearMonthSelection() {
+        val dateRange = loadSavedDiaryDateRange()
+        val newestDiaryDate = dateRange.newestDiaryDate
+        val oldestDiaryDate = dateRange.oldestDiaryDate
+        val newestYear = Year.of(newestDiaryDate.year)
+        val oldestYear = Year.of(oldestDiaryDate.year)
+        emitUiEvent(
+            DiaryListUiEvent.NavigateStartYearMonthPickerDialog(newestYear, oldestYear)
+        )
+    }
+
+    /**
      * 保存されている日記の最も新しい日付と最も古い日付の範囲を取得する。
      * @return 日付範囲を保持する[SavedDiaryDateRange]
      */
@@ -538,6 +563,42 @@ class DiaryListViewModel @Inject internal constructor(
         }
         updateToIdleState()
         return dateRange
+    }
+
+    /**
+     * 前の画面への遷移を要求する。
+     * 画面遷移イベントを発行する。
+     */
+    private suspend fun requestNavigatePreviousScreen() {
+        emitNavigatePreviousFragmentEvent()
+    }
+
+    /**
+     * ワード検索画面への遷移を要求する。
+     * 画面遷移イベントを発行する。
+     */
+    private suspend fun requestNavigateWordSearchScreen() {
+        emitUiEvent(DiaryListUiEvent.NavigateWordSearchFragment)
+    }
+
+    /**
+     * 日記表示画面への遷移を要求する。
+     * 画面遷移イベントを発行する。
+     *
+     * @param id 表示対象の日記のID。
+     * @param date 表示対象の日記の日付。
+     */
+    private suspend fun requestNavigateDiaryShowScreen(id: String, date: LocalDate) {
+        emitUiEvent(DiaryListUiEvent.NavigateDiaryShowFragment(id, date))
+    }
+
+    /**
+     * 新規日記編集画面への遷移を要求する。
+     * 画面遷移イベントを発行する。
+     */
+    private suspend fun requestNavigateNewDiaryEditScreen() {
+        val today = LocalDate.now()
+        emitUiEvent(DiaryListUiEvent.NavigateDiaryEditFragment(date = today))
     }
     //endregion
 

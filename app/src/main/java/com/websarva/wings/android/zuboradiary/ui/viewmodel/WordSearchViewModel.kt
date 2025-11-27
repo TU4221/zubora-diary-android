@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 import javax.inject.Inject
 
 /**
@@ -171,7 +172,7 @@ class WordSearchViewModel @Inject internal constructor(
 
     override fun onBackPressed() {
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            requestNavigatePreviousScreen()
         }
     }
 
@@ -181,7 +182,7 @@ class WordSearchViewModel @Inject internal constructor(
      */
     fun onNavigationIconButtonClick() {
         launchWithUnexpectedErrorHandler {
-            emitNavigatePreviousFragmentEvent()
+            requestNavigatePreviousScreen()
         }
     }
 
@@ -194,9 +195,7 @@ class WordSearchViewModel @Inject internal constructor(
         val id = item.id
         val date = item.date
         launchWithUnexpectedErrorHandler {
-            emitUiEvent(
-                WordSearchUiEvent.NavigateDiaryShowFragment(id, date)
-            )
+            requestNavigateDiaryShowScreen(id, date)
         }
     }
 
@@ -415,6 +414,27 @@ class WordSearchViewModel @Inject internal constructor(
         updateUiState {
             WordSearchUiState()
         }
+    }
+
+    /**
+     * 前の画面への遷移を要求する。
+     * 画面遷移イベントを発行する。
+     */
+    private suspend fun requestNavigatePreviousScreen() {
+        emitNavigatePreviousFragmentEvent()
+    }
+
+    /**
+     * 日記表示画面への遷移を要求する。
+     * 画面遷移イベントを発行する。
+     *
+     * @param id 表示対象の日記のID。
+     * @param date 表示対象の日記の日付。
+     */
+    private suspend fun requestNavigateDiaryShowScreen(id: String, date: LocalDate) {
+        emitUiEvent(
+            WordSearchUiEvent.NavigateDiaryShowFragment(id, date)
+        )
     }
     //endregion
 
