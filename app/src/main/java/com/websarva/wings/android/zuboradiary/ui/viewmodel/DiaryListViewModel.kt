@@ -302,6 +302,8 @@ class DiaryListViewModel @Inject internal constructor(
     //endregion
 
     //region Business Logic
+
+    //region Diary List Operation
     /** 実行中の日記リスト読み込み処理があればキャンセルする。 */
     private fun cancelPreviousLoadJob() {
         val job = diaryListLoadJob ?: return
@@ -464,6 +466,47 @@ class DiaryListViewModel @Inject internal constructor(
     }
 
     /**
+     * 開始年月の選択を要求する。
+     * 保存されている日記の日付範囲を読み込み、ダイアログ遷移イベントを発行する。
+     */
+    private suspend fun requestStartYearMonthSelection() {
+        val dateRange = loadSavedDiaryDateRange()
+        val newestDiaryDate = dateRange.newestDiaryDate
+        val oldestDiaryDate = dateRange.oldestDiaryDate
+        val newestYear = Year.of(newestDiaryDate.year)
+        val oldestYear = Year.of(oldestDiaryDate.year)
+        emitUiEvent(
+            DiaryListUiEvent.ShowStartYearMonthPickerDialog(newestYear, oldestYear)
+        )
+    }
+
+    /**
+     * 保存されている日記の最も新しい日付と最も古い日付の範囲を取得する。
+     * @return 日付範囲を保持する[SavedDiaryDateRange]
+     */
+    private suspend fun loadSavedDiaryDateRange(): SavedDiaryDateRange {
+        updateToProcessingState()
+        val dateRange = when (val result = loadDiaryListStartYearMonthPickerDateRangeUseCase()) {
+            is UseCaseResult.Success -> result.value
+            is UseCaseResult.Failure -> {
+                when (val exception = result.exception) {
+                    is DiaryListStartYearMonthPickerDateRangeLoadException.DiaryInfoLoadFailure -> {
+                        emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                    }
+                    is DiaryListStartYearMonthPickerDateRangeLoadException.Unknown -> {
+                        emitUnexpectedAppMessage(exception)
+                    }
+                }
+                result.exception.fallbackDateRange
+            }
+        }
+        updateToIdleState()
+        return dateRange
+    }
+    //endregion
+
+    //region Diary Operation
+    /**
      * 日記の削除を要求する。
      * 渡されたパラメータをキャッシュし、削除確認ダイアログへの遷移イベントを発行する。
      *
@@ -525,46 +568,9 @@ class DiaryListViewModel @Inject internal constructor(
             }
         }
     }
+    //endregion
 
-    /**
-     * 開始年月の選択を要求する。
-     * 保存されている日記の日付範囲を読み込み、ダイアログ遷移イベントを発行する。
-     */
-    private suspend fun requestStartYearMonthSelection() {
-        val dateRange = loadSavedDiaryDateRange()
-        val newestDiaryDate = dateRange.newestDiaryDate
-        val oldestDiaryDate = dateRange.oldestDiaryDate
-        val newestYear = Year.of(newestDiaryDate.year)
-        val oldestYear = Year.of(oldestDiaryDate.year)
-        emitUiEvent(
-            DiaryListUiEvent.ShowStartYearMonthPickerDialog(newestYear, oldestYear)
-        )
-    }
-
-    /**
-     * 保存されている日記の最も新しい日付と最も古い日付の範囲を取得する。
-     * @return 日付範囲を保持する[SavedDiaryDateRange]
-     */
-    private suspend fun loadSavedDiaryDateRange(): SavedDiaryDateRange {
-        updateToProcessingState()
-        val dateRange = when (val result = loadDiaryListStartYearMonthPickerDateRangeUseCase()) {
-            is UseCaseResult.Success -> result.value
-            is UseCaseResult.Failure -> {
-                when (val exception = result.exception) {
-                    is DiaryListStartYearMonthPickerDateRangeLoadException.DiaryInfoLoadFailure -> {
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
-                    }
-                    is DiaryListStartYearMonthPickerDateRangeLoadException.Unknown -> {
-                        emitUnexpectedAppMessage(exception)
-                    }
-                }
-                result.exception.fallbackDateRange
-            }
-        }
-        updateToIdleState()
-        return dateRange
-    }
-
+    //region Standalone Navigation
     /**
      * 前の画面への遷移を要求する。
      * 画面遷移イベントを発行する。
@@ -600,6 +606,8 @@ class DiaryListViewModel @Inject internal constructor(
         val today = LocalDate.now()
         emitUiEvent(DiaryListUiEvent.NavigateDiaryEditScreen(date = today))
     }
+    //endregion
+
     //endregion
 
     //region UI State Update

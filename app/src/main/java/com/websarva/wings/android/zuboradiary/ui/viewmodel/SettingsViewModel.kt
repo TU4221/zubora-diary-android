@@ -545,6 +545,8 @@ class SettingsViewModel @Inject internal constructor(
     //endregion
 
     //region Business Logic
+
+    //region Common Operation
     /**
      * 現在のUI状態に基づいて、設定操作が実行可能かどうかを同期的に判定する。
      * 操作不可能な場合は、必要に応じてユーザーにメッセージを表示する。
@@ -559,7 +561,9 @@ class SettingsViewModel @Inject internal constructor(
         }
         return isReadyForOperation
     }
+    //endregion
 
+    //region Theme Color Setting Operation
     /**
      * テーマカラーの選択を要求する。
      * テーマカラー選択ダイアログへの遷移イベントを発行する。
@@ -598,7 +602,9 @@ class SettingsViewModel @Inject internal constructor(
             }
         }
     }
+    //endregion
 
+    //region Calendar Start Day Of Week Setting Operation
     /**
      * カレンダー開始曜日の選択を要求する。
      * カレンダー開始曜日選択ダイアログへの遷移イベントを発行する。
@@ -637,7 +643,9 @@ class SettingsViewModel @Inject internal constructor(
             }
         }
     }
+    //endregion
 
+    //region Reminder Notification Setting Operation
     /**
      * リマインダー通知設定スイッチの状態の変更を要求する。
      * @param isChecked 有効状態にする場合はtrue
@@ -662,13 +670,21 @@ class SettingsViewModel @Inject internal constructor(
                     SettingsUiEvent.CheckPostNotificationsPermission
                 )
             } else {
-                emitUiEvent(
-                    SettingsUiEvent.ShowReminderNotificationTimePickerDialog
-                )
+                requestShowReminderNotificationTimePickerDialog()
             }
         } else {
             saveReminderNotificationInvalidSetting()
         }
+    }
+
+    /**
+     * リマインダ通知時間選択ダイアログの表示を要求する。
+     * 画面遷移イベントを発行する。
+     */
+    private suspend fun requestShowReminderNotificationTimePickerDialog() {
+        emitUiEvent(
+            SettingsUiEvent.ShowReminderNotificationTimePickerDialog
+        )
     }
 
     /**
@@ -727,7 +743,9 @@ class SettingsViewModel @Inject internal constructor(
             }
         }
     }
+    //endregion
 
+    //region Passcode Lock Setting Operation
     /**
      * パスコードロック設定スイッチの状態の変更を要求する。
      * @param isChecked 有効状態にする場合はtrue
@@ -775,7 +793,9 @@ class SettingsViewModel @Inject internal constructor(
             }
         }
     }
+    //endregion
 
+    //region Weather Info Fetch Setting Operation
     /**
      * 天気情報取得設定スイッチの状態の変更を要求する。
      * @param isChecked 有効状態にする場合はtrue
@@ -831,7 +851,9 @@ class SettingsViewModel @Inject internal constructor(
             }
         }
     }
+    //endregion
 
+    //region App Data Operation
     /**
      * 全ての日記の削除を要求する。
      * 全日記削除確認ダイアログへの遷移イベントを発行する。
@@ -940,7 +962,9 @@ class SettingsViewModel @Inject internal constructor(
             }
         }
     }
+    //endregion
 
+    //region Standalone Navigation
     /**
      * 前の画面への遷移を要求する。
      * 画面遷移イベントを発行する。
@@ -959,16 +983,6 @@ class SettingsViewModel @Inject internal constructor(
         )
     }
 
-    /**
-     * リマインダ通知時間選択ダイアログの表示を要求する。
-     * 画面遷移イベントを発行する。
-     */
-    private suspend fun requestShowReminderNotificationTimePickerDialog() {
-        emitUiEvent(
-            SettingsUiEvent.ShowReminderNotificationTimePickerDialog
-        )
-    }
-
     // TODO:不要だが残しておく(最終的に削除)
     /**
      * アプリケーションの詳細設定画面の表示を要求する。
@@ -979,6 +993,8 @@ class SettingsViewModel @Inject internal constructor(
             SettingsUiEvent.ShowApplicationDetailsSettingsScreen
         )
     }
+    //endregion
+
     //endregion
 
     //region UI State Update

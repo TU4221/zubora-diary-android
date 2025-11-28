@@ -237,7 +237,10 @@ class WordSearchViewModel @Inject internal constructor(
     }
     //endregion
 
+
     //region Business Logic
+
+    //region Word Searc hResult List Operation
     /** 実行中の検索結果読み込み処理があればキャンセルする。 */
     private fun cancelPreviousLoadJob() {
         val job = wordSearchResultListLoadJob ?: return
@@ -415,7 +418,9 @@ class WordSearchViewModel @Inject internal constructor(
             WordSearchUiState()
         }
     }
+    //endregion
 
+    //region Standalone Navigation
     /**
      * 前の画面への遷移を要求する。
      * 画面遷移イベントを発行する。
@@ -436,6 +441,8 @@ class WordSearchViewModel @Inject internal constructor(
             WordSearchUiEvent.NavigateDiaryShowScreen(id, date)
         )
     }
+    //endregion
+
     //endregion
 
     //region UI State Update
