@@ -373,10 +373,11 @@ class DiaryEditViewModel @Inject internal constructor(
     fun onItemTitleInputFieldClick(itemNumberInt: Int) {
         if (!isReadyForOperation) return
 
+        val itemNumber = DiaryItemNumber(itemNumberInt)
         val itemTitle =
             currentUiState.editingDiary.itemTitles[itemNumberInt] ?: throw IllegalStateException()
         launchWithUnexpectedErrorHandler {
-            requestItemTitleEditing(itemNumberInt, itemTitle)
+            requestItemTitleEditing(itemNumber, itemTitle)
         }
     }
 
@@ -387,8 +388,9 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param text 変更後のテキスト
      */
     fun onItemTitleTextChanged(itemNumberInt: Int, text: CharSequence) {
+        val itemNumber = DiaryItemNumber(itemNumberInt)
         updateItemTitle(
-            itemNumberInt,
+            itemNumber,
             text.toString()
         )
     }
@@ -412,8 +414,9 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param text 変更後のテキスト
      */
     fun onItemCommentTextChanged(itemNumberInt: Int, text: CharSequence) {
+        val itemNumber = DiaryItemNumber(itemNumberInt)
         updateItemComment(
-            itemNumberInt,
+            itemNumber,
             text.toString()
         )
     }
@@ -472,8 +475,8 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param itemNumberInt 対象の項目番号
      * */
     internal fun onDiaryItemVisibleStateTransitionCompleted(itemNumberInt: Int) {
-        val diaryItemNumber = DiaryItemNumber(itemNumberInt)
-        addItem(diaryItemNumber)
+        val itemNumber = DiaryItemNumber(itemNumberInt)
+        addItem(itemNumber)
         updateToIdleState()
     }
     //endregion
@@ -1105,13 +1108,13 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param itemNumber 編集対象の項目番号。
      * @param currentTitle 現在の項目タイトル。
      */
-    private suspend fun requestItemTitleEditing(itemNumber: Int, currentTitle: String) {
+    private suspend fun requestItemTitleEditing(itemNumber: DiaryItemNumber, currentTitle: String) {
         // MEMO:日記項目タイトルIDは受取用でここでは不要の為、nullとする。
         val itemTitleId = null
         emitUiEvent(
             DiaryEditUiEvent.ShowDiaryItemTitleEditDialog(
                 DiaryItemTitleSelectionUi(
-                    itemNumber,
+                    itemNumber.value,
                     itemTitleId,
                     currentTitle
                 )
@@ -1507,15 +1510,15 @@ class DiaryEditViewModel @Inject internal constructor(
 
     /**
      * 日記項目のタイトルを更新する。
-     * @param itemNumberInt 対象の項目番号
+     * @param itemNumber 対象の項目番号
      * @param title 新しいタイトル
      */
-    private fun updateItemTitle(itemNumberInt: Int, title: String) {
+    private fun updateItemTitle(itemNumber: DiaryItemNumber, title: String) {
         updateUiState {
             it.copy(
                 editingDiary =
                     it.editingDiary.copy(
-                        itemTitles = it.editingDiary.itemTitles + (itemNumberInt to title)
+                        itemTitles = it.editingDiary.itemTitles + (itemNumber.value to title)
                     )
             )
         }
@@ -1549,17 +1552,17 @@ class DiaryEditViewModel @Inject internal constructor(
 
     /**
      * 日記項目のコメントを更新する。
-     * @param itemNumberInt 対象の項目番号
+     * @param itemNumber 対象の項目番号
      * @param comment 新しいコメント
      */
     private fun updateItemComment(
-        itemNumberInt: Int,
+        itemNumber: DiaryItemNumber,
         comment: String
     ) {
         updateUiState {
             it.copy(
                 editingDiary = it.editingDiary.copy(
-                    itemComments = it.editingDiary.itemComments + (itemNumberInt to comment)
+                    itemComments = it.editingDiary.itemComments + (itemNumber.value to comment)
                 )
             )
         }
@@ -1990,14 +1993,15 @@ class DiaryEditViewModel @Inject internal constructor(
                 // 日記項目数と内容を設定
                 updateNumVisibleItems(testData.items.size)
                 testData.items.forEachIndexed { index, item ->
-                    val diaryItemNumber = index + 1
+                    val itemNumberInt = index + 1
                     val selection = DiaryItemTitleSelectionUi(
-                        diaryItemNumber,
+                        itemNumberInt,
                         DiaryItemTitleSelectionHistoryId.generate().value,
                         item.itemTitle
                     )
                     updateItemTitle(selection)
-                    updateItemComment(diaryItemNumber, item.itemComment)
+                    val itemNumber = DiaryItemNumber(itemNumberInt)
+                    updateItemComment(itemNumber, item.itemComment)
                 }
 
 
