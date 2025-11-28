@@ -123,7 +123,12 @@
     <dimen name="layout_diary_edit_item_content_spacing_vertical">@dimen/fragment_diary_edit_content_spacing_vertical</dimen>
     <dimen name="layout_diary_edit_item_image_button_layout_width">@dimen/fragment_diary_edit_image_button_layout_width</dimen>
     <dimen name="layout_diary_edit_item_image_button_layout_height">@dimen/fragment_diary_edit_image_button_layout_height</dimen>
-    <dimen name="layout_diary_edit_item_image_button_vertical_center_adjust_spacing">@dimen/fragment_diary_edit_image_button_vertical_center_adjust_spacing</dimen>
+
+    <!--
+    HACK:MotionLayoutのアニメーションでレイアウトの底面部分が途切れてしまう問題が発生するので下記値で対応。
+         他の描画タイミングと衝突してる可能性があり、タイミングをずらすなどを試してみたが解決しなかったためレイアウト設定で対応。
+     -->
+    <dimen name="layout_diary_edit_item_motion_layout_adjust_bottom_spacing">16dp</dimen>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->

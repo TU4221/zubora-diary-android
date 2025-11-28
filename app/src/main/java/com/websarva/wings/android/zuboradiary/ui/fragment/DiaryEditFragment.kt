@@ -622,7 +622,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                                 binding.nestedScrollFullScreen.smoothScrollBy(dx, dy, scrollDurationMs)
                             },
                             {
-                                binding.includeItem1.linerLayoutDiaryEditItem.height
+                                binding.includeItem1.motionLayoutDiaryEditItem.height
                             }
                         ).also {
                             motionLayoutDiaryEditItems[init].setTransitionListener(it)
@@ -699,7 +699,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             // 対象項目欄削除後の処理
             var completedStateLogMsg = "UnknownState"
             if (currentId == R.id.motion_scene_edit_diary_item_invisible_state) {
-                completedStateLogMsg = "InvisibleState"
+               completedStateLogMsg = "InvisibleState"
                 if (isTriggeredBySmooth) {
                     if (isNextItemInvisibleState()) scrollOnDiaryItemTransitionToInvisible()
                     onDiaryItemTransitionToInvisibleCompleted(itemNumber)

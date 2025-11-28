@@ -32,107 +32,108 @@
         android:id="@+id/motion_layout_diary_edit_item"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/layout_diary_edit_item_content_spacing_vertical"
         app:layoutDescription="@xml/motion_scene_layout_diary_edit_item">
 
-        <LinearLayout
-            android:id="@+id/liner_layout_diary_edit_item"
-            android:layout_width="match_parent"
+        <TextView
+            android:id="@+id/text_item_number"
+            style="@style/AppTextViewStyle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            app:layout_constraintTop_toTopOf="parent"
+            android:text="@{itemNumber}"
+            android:textAppearance="@style/AppTextViewTextAppearance"
+            android:textSize="@dimen/layout_diary_edit_item_text_size"
+
+            app:layout_constraintTop_toTopOf="@id/image_button_item_delete"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
-            <!--
-                android:visibility="@{item.isVisible ? View.VISIBLE : View.GONE}"
-           MEMO:Visibilityを操作すると対象Viewの下にあるViewがちらつくので使用しない。
-                背景が無色かつ、Transitionで高さを最小値にすれば、Visibility使用せずとも対象Viewを
-                非表示にすることができるので今回はこれで対応。
-            -->
+            app:layout_constraintEnd_toStartOf="@id/image_button_item_delete"
+            app:layout_constraintBottom_toBottomOf="@id/image_button_item_delete"
+            app:layout_constraintHorizontal_chainStyle="packed"
+            app:layout_constraintHorizontal_bias="0.0"
+            tools:text="@string/layout_diary_edit_item_1_tools" />
 
-            <LinearLayout
+        <ImageButton
+            android:id="@+id/image_button_item_delete"
+            style="@style/AppImageButtonStyle"
+            android:layout_width="@dimen/layout_diary_edit_item_image_button_layout_width"
+            android:layout_height="@dimen/layout_diary_edit_item_image_button_layout_height"
+            android:contentDescription="@string/layout_diary_edit_item_delete"
+            android:onClick="@{onItemDeleteButtonClick}"
+            android:src="@drawable/ic_delete_forever_24px"
+
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/text_item_number"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/text_input_layout_title"/>
+
+        <com.websarva.wings.android.zuboradiary.ui.view.custom.PersistentClearIconTextInputLayout
+            android:id="@+id/text_input_layout_title"
+            style="@style/AppPersistentClearIconTextInputLayoutStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="@string/layout_diary_edit_item_title"
+            app:counterEnabled="true"
+            app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length"
+
+            app:layout_constraintTop_toBottomOf="@id/image_button_item_delete"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/text_input_layout_comment"
+            tools:ignore="DuplicateIncludedIds">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/textInputEditText_title"
+                style="@style/AppTextInputEditTextNoInputStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_diary_edit_item_content_spacing_vertical"
-                android:orientation="horizontal">
+                android:hint="@string/layout_diary_edit_item_title_hint"
+                android:maxLength="@integer/layout_diary_edit_item_title_max_length"
+                android:onClick="@{onTitleClick}"
+                android:onTextChanged="@{onTitleTextChanged}"
+                android:text="@{title}"
+                android:textAppearance="@style/AppTextInputEditTextTextAppearance"
+                android:textSize="@dimen/layout_diary_edit_item_text_size" />
 
-                <TextView
-                    style="@style/AppTextViewStyle"
-                    android:id="@+id/text_item_number"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:textAppearance="@style/AppTextViewTextAppearance"
-                    android:text="@{itemNumber}"
-                    android:textSize="@dimen/layout_diary_edit_item_text_size"
-                    tools:text="@string/layout_diary_edit_item_1_tools"/>
+        </com.websarva.wings.android.zuboradiary.ui.view.custom.PersistentClearIconTextInputLayout>
 
-                <ImageButton
-                    style="@style/AppImageButtonStyle"
-                    android:id="@+id/image_button_item_delete"
-                    android:layout_width="@dimen/layout_diary_edit_item_image_button_layout_width"
-                    android:layout_height="@dimen/layout_diary_edit_item_image_button_layout_height"
-                    android:layout_gravity="center_vertical"
-                    android:paddingTop="@dimen/layout_diary_edit_item_image_button_vertical_center_adjust_spacing"
-                    android:src="@drawable/ic_delete_forever_24px"
-                    android:contentDescription="@string/layout_diary_edit_item_delete"
-                    android:onClick="@{onItemDeleteButtonClick}"/>
-            </LinearLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_input_layout_comment"
+            style="@style/AppTextInputLayoutOutlinedBoxStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/layout_diary_edit_item_content_spacing_vertical"
+            android:layout_marginBottom="@dimen/layout_diary_edit_item_motion_layout_adjust_bottom_spacing"
+            android:hint="@string/layout_diary_edit_item_comment"
+            app:counterEnabled="true"
+            app:counterMaxLength="@integer/layout_diary_edit_item_comment_max_length"
 
-            <!-- 下記 EditText は項目タイトル入力フラグメントから入力する為、android:text は単一方向データバインディングとする。 -->
-            <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
-            <com.websarva.wings.android.zuboradiary.ui.view.custom.PersistentClearIconTextInputLayout
-                style="@style/AppPersistentClearIconTextInputLayoutStyle"
-                android:id="@+id/text_input_layout_title"
+            app:layout_constraintTop_toBottomOf="@id/text_input_layout_title"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/guideline">
+
+            <com.websarva.wings.android.zuboradiary.ui.view.custom.ScrollableMultiLineTextInputEditText
+                android:id="@+id/text_input_edit_text_comment"
+                style="@style/AppScrollableMultiLineTextInputEditTextStyle"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_diary_edit_item_content_spacing_vertical"
-                android:hint="@string/layout_diary_edit_item_title"
-                app:counterEnabled="true"
-                app:counterMaxLength="@integer/layout_diary_edit_item_title_max_length"
-                tools:ignore="DuplicateIncludedIds">
+                android:hint="@string/layout_diary_edit_item_comment_hint"
+                android:lines="@integer/layout_diary_edit_item_comment_min_lines"
+                android:maxLength="@integer/layout_diary_edit_item_comment_max_length"
+                android:minLines="@integer/layout_diary_edit_item_comment_min_lines"
+                android:onTextChanged="@{onCommentTextChanged}"
+                android:text="@{comment}"
+                android:textAppearance="@style/AppScrollableMultiLineTextInputEditTextTextAppearance"
+                android:textSize="@dimen/layout_diary_edit_item_text_size" />
 
-                <com.google.android.material.textfield.TextInputEditText
-                    style="@style/AppTextInputEditTextNoInputStyle"
-                    android:id="@+id/textInputEditText_title"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/AppTextInputEditTextTextAppearance"
-                    android:text="@{title}"
-                    android:onTextChanged="@{onTitleTextChanged}"
-                    android:onClick="@{onTitleClick}"
-                    android:textSize="@dimen/layout_diary_edit_item_text_size"
-                    android:hint="@string/layout_diary_edit_item_title_hint"
-                    android:maxLength="@integer/layout_diary_edit_item_title_max_length" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            </com.websarva.wings.android.zuboradiary.ui.view.custom.PersistentClearIconTextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/AppTextInputLayoutOutlinedBoxStyle"
-                android:id="@+id/text_input_layout_comment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/layout_diary_edit_item_content_spacing_vertical"
-                android:hint="@string/layout_diary_edit_item_comment"
-                app:counterEnabled="true"
-                app:counterMaxLength="@integer/layout_diary_edit_item_comment_max_length">
-
-                <com.websarva.wings.android.zuboradiary.ui.view.custom.ScrollableMultiLineTextInputEditText
-                    style="@style/AppScrollableMultiLineTextInputEditTextStyle"
-                    android:id="@+id/text_input_edit_text_comment"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="@style/AppScrollableMultiLineTextInputEditTextTextAppearance"
-                    android:text="@{comment}"
-                    android:onTextChanged="@{onCommentTextChanged}"
-                    android:textSize="@dimen/layout_diary_edit_item_text_size"
-                    android:hint="@string/layout_diary_edit_item_comment_hint"
-                    android:maxLength="@integer/layout_diary_edit_item_comment_max_length"
-                    android:minLines="@integer/layout_diary_edit_item_comment_min_lines"
-                    android:lines="@integer/layout_diary_edit_item_comment_min_lines" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-        </LinearLayout>
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/guideline"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintGuide_percent="1.0" />
 
     </androidx.constraintlayout.motion.widget.MotionLayout>
 

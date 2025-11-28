@@ -253,9 +253,12 @@
 
                         </com.google.android.material.textfield.TextInputLayout>
 
+                        <!-- MEMO:MarginTopはincludeタグ先のレイアウトのMotionLayoutの兼合いで、MotionLayout内で設定。 -->
                         <include
-                            android:id="@+id/include_item_1"
                             layout="@layout/layout_diary_edit_item"
+                            android:id="@+id/include_item_1"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             app:itemNumber="@{@string/fragment_diary_edit_item_1}"
                             app:title="@{viewModel.uiState.editingDiary.itemTitles.get(1)}"
                             app:onTitleClick="@{() -> viewModel.onItemTitleInputFieldClick(1)}"
@@ -265,8 +268,10 @@
                             app:onItemDeleteButtonClick="@{() -> viewModel.onItemDeleteButtonClick(1)}" />
 
                         <include
-                            android:id="@+id/include_item_2"
                             layout="@layout/layout_diary_edit_item"
+                            android:id="@+id/include_item_2"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             app:itemNumber="@{@string/fragment_diary_edit_item_2}"
                             app:title="@{viewModel.uiState.editingDiary.itemTitles.get(2)}"
                             app:onTitleClick="@{() -> viewModel.onItemTitleInputFieldClick(2)}"
@@ -276,8 +281,10 @@
                             app:onItemDeleteButtonClick="@{() -> viewModel.onItemDeleteButtonClick(2)}" />
 
                         <include
-                            android:id="@+id/include_item_3"
                             layout="@layout/layout_diary_edit_item"
+                            android:id="@+id/include_item_3"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             app:itemNumber="@{@string/fragment_diary_edit_item_3}"
                             app:title="@{viewModel.uiState.editingDiary.itemTitles.get(3)}"
                             app:onTitleClick="@{() -> viewModel.onItemTitleInputFieldClick(3)}"
@@ -287,8 +294,10 @@
                             app:onItemDeleteButtonClick="@{() -> viewModel.onItemDeleteButtonClick(3)}" />
 
                         <include
-                            android:id="@+id/include_item_4"
                             layout="@layout/layout_diary_edit_item"
+                            android:id="@+id/include_item_4"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             app:itemNumber="@{@string/fragment_diary_edit_item_4}"
                             app:title="@{viewModel.uiState.editingDiary.itemTitles.get(4)}"
                             app:onTitleClick="@{() -> viewModel.onItemTitleInputFieldClick(4)}"
@@ -299,8 +308,10 @@
 
                         <!-- MEMO:ViewBindingを使用している為、tools:ignore="DuplicateIncludedIds"記述 -->
                         <include
-                            android:id="@+id/include_item_5"
                             layout="@layout/layout_diary_edit_item"
+                            android:id="@+id/include_item_5"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
                             app:itemNumber="@{@string/fragment_diary_edit_item_5}"
                             app:title="@{viewModel.uiState.editingDiary.itemTitles.get(5)}"
                             app:onTitleClick="@{() -> viewModel.onItemTitleInputFieldClick(5)}"
@@ -317,6 +328,7 @@
                                  "android:src"でdrawable毎切り換えるように対応した。
                             補足：三項演算子を使用してのalphaのリソース値は取得できなかった。
                         -->
+                        <!-- MEMO:MarginTopは上部includeタグ先のレイアウトのMotionLayoutの兼合いで、MotionLayout内で設定。 -->
                         <ImageButton
                             android:id="@+id/image_button_item_addition"
                             style="@style/AppImageButtonStyle"
@@ -326,7 +338,8 @@
                             android:contentDescription="@string/fragment_diary_edit_item_addition"
                             android:src="@{viewModel.uiState.diaryItemAdditionEnabled ? @drawable/ic_add_circle_24px : @drawable/ic_add_circle_disabled_24px}"
                             android:clickable="@{viewModel.uiState.diaryItemAdditionEnabled}"
-                            android:onClick="@{() -> viewModel.onItemAdditionButtonClick()}"/>
+                            android:onClick="@{() -> viewModel.onItemAdditionButtonClick()}"
+                            tools:src="@drawable/ic_add_circle_24px"/>
 
                         <LinearLayout
                             android:layout_width="match_parent"
