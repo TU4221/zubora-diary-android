@@ -199,7 +199,7 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     }
     //endregion
 
-    //region View Manipulation
+    //region View Control
     /** アダプターに新しい検索結果リストを送信し、UIを更新する。 */
     private fun updateWordSearchResultList(
         list: DiaryListUi<DiaryListItemContainerUi.WordSearchResult>

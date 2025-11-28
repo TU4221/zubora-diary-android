@@ -533,7 +533,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
     //endregion
 
-    //region View Manipulation
+    //region View Control
     /**
      * ツールバーのメニューの各項目の有効/無効を切り替える。
      * @param isDeleteEnabled 削除項目が有効場合はtrue
@@ -773,7 +773,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
     //endregion
 
-    //region Motion Layout Manipulation
+    //region Motion Layout Control
     /**
      * 表示すべき日記項目数に応じて、各項目のレイアウト（表示/非表示）を更新・描画する。
      *

@@ -277,7 +277,7 @@ class DiaryListFragment :
     }
     //endregion
 
-    //region View Manipulation
+    //region View Control
     /** アダプターに新しい日記リストを送信し、UIを更新する。 */
     private fun updateDiaryList(diaryList: DiaryListUi<DiaryListItemContainerUi.Standard>) {
         diaryListAdapter?.submitList(diaryList.itemList) {

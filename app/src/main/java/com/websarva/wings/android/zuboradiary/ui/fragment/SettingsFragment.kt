@@ -358,7 +358,7 @@ class SettingsFragment :
     }
     //endregion
 
-    //region View Manipulation
+    //region View Control
     /**
      * テーマカラーに応じてUIの各要素の色を切り替える。
      * @param themeColor 適用するテーマカラー

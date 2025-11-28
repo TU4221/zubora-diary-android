@@ -220,7 +220,7 @@ class CalendarFragment :
     }
     //endregion
 
-    //region View Manipulation
+    //region View Control
     /** BottomNavigationViewの同じタブが再選択されたときに呼び出される。 */
     private fun onBottomNavigationItemReselected() {
         if (binding.nestedScrollFullScreen.canScrollVertically(-1)) {
@@ -542,7 +542,7 @@ class CalendarFragment :
     }
     //endregion
 
-    //region Calendar View Manipulation
+    //region Calendar View Control
     /**
      * 指定された日付が含まれる月にカレンダーをスクロールする。
      * @param date スクロール先のターゲット日付
