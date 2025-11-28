@@ -206,7 +206,7 @@
     <!-- region Dialog - Permission Dialog -->
     <string name="dialog_permission_title">権限が必要です</string>
     <string name="dialog_permission_first_message">この機能を正常に動作させるためには</string>
-    <string name="dialog_permission_third_message">権限が必要です。設定画面で権限を有効にしてください。</string>
+    <string name="dialog_permission_third_message">権限が必要です。権限を有効にしてください。</string>
     <!-- endregion -->
 
     <!-- region Dialog - All Diaries Delete Dialog -->

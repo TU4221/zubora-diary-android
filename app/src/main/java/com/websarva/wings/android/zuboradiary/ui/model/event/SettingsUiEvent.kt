@@ -20,12 +20,6 @@ sealed class SettingsUiEvent : UiEvent {
     /** リマインダー通知時間選択ダイアログを表示することを示すイベント。 */
     data object ShowReminderNotificationTimePickerDialog : SettingsUiEvent()
 
-    /** 通知権限要求の理由説明ダイアログを表示することを示すイベント。 */
-    data object ShowNotificationPermissionDialog : SettingsUiEvent()
-
-    /** 位置情報権限要求の理由説明ダイアログを表示することを示すイベント。 */
-    data object ShowLocationPermissionDialog : SettingsUiEvent()
-
     /** 全日記削除確認ダイアログを表示することを示すイベント。 */
     data object ShowAllDiariesDeleteDialog : SettingsUiEvent()
 
@@ -38,11 +32,11 @@ sealed class SettingsUiEvent : UiEvent {
     /** OSSライセンスダイアログを表示することを示すイベント。 */
     data object ShowOSSLicensesDialog : SettingsUiEvent()
 
-    /** 通知権限を要求するダイアログを表示することを示すイベント。 */
-    data object ShowRequestPostNotificationsPermissionRationale : SettingsUiEvent()
+    /** 通知権限要求の理由説明ダイアログを表示することを示すイベント。 */
+    data object ShowNotificationPermissionRationaleDialog : SettingsUiEvent()
 
-    /** 位置情報権限を要求するダイアログを表示することを示すイベント。 */
-    data object ShowRequestAccessLocationPermissionRationale : SettingsUiEvent()
+    /** 位置情報権限要求の理由説明ダイアログを表示することを示すイベント。 */
+    data object ShowLocationPermissionRationaleDialog : SettingsUiEvent()
 
     /** アプリケーションの詳細設定画面を表示することを示すイベント。 */
     data object ShowApplicationDetailsSettingsScreen : SettingsUiEvent()
@@ -50,14 +44,8 @@ sealed class SettingsUiEvent : UiEvent {
     /** 通知権限を確認することを示すイベント。 */
     data object CheckPostNotificationsPermission : SettingsUiEvent()
 
-    /** 通知権限要求の理由を表示する必要があるか確認することを示すイベント。 */
-    data object CheckShouldShowRequestPostNotificationsPermissionRationale : SettingsUiEvent()
-
     /** 位置情報権限を確認することを示すイベント。 */
     data object CheckAccessLocationPermission : SettingsUiEvent()
-
-    /** 位置情報権限要求の理由を表示する必要があるか確認することを示すイベント。 */
-    data object CheckShouldShowRequestAccessLocationPermissionRationale : SettingsUiEvent()
 
     /**
      * リマインダー通知設定のスイッチの状態を変更することを示すイベント。

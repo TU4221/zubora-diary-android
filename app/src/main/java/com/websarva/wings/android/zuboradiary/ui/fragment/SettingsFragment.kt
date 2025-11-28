@@ -5,6 +5,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
@@ -13,6 +14,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.activityViewModels
 import com.websarva.wings.android.zuboradiary.R
+import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
@@ -22,7 +24,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDataDe
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDiariesDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllSettingsInitializationDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.CalendarStartDayPickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.PermissionDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.PermissionRationaleDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.OpenSourceSoftwareLicensesDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.ReminderNotificationTimePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
@@ -31,6 +33,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiE
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.model.permission.RequestPermissionType
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -71,14 +74,7 @@ class SettingsFragment :
         registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted: Boolean ->
-
-            // 再確認
-            val recheck = requireContext().isPostNotificationsGranted()
-
-            mainViewModel
-                .onRequestPostNotificationsPermissionRationaleDialogResultReceived(
-                    isGranted && recheck
-                )
+            onPostNotificationsPermissionResult(isGranted)
         }
 
     /** 位置情報権限のリクエスト結果を処理するランチャー。 */
@@ -86,18 +82,10 @@ class SettingsFragment :
         registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
         ) { o: Map<String, Boolean> ->
-            val isGrantedAccessFineLocation = o[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
-            val isGrantedAccessCoarseLocation = o[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
-
-            val isGrantedAll = isGrantedAccessFineLocation && isGrantedAccessCoarseLocation
-
-            // 再確認
-            val recheck = requireContext().isAccessLocationGranted()
-
-            mainViewModel
-                .onRequestAccessLocationPermissionRationaleResultReceived(
-                    isGrantedAll && recheck
-                )
+            val isAccessFineLocationGranted = o[Manifest.permission.ACCESS_FINE_LOCATION] ?: false
+            val isAccessCoarseLocationGranted = o[Manifest.permission.ACCESS_COARSE_LOCATION] ?: false
+            val isAllGranted = isAccessFineLocationGranted && isAccessCoarseLocationGranted
+            onAccessLocationPermissionResult(isAllGranted)
         }
     //endregion
 
@@ -194,12 +182,21 @@ class SettingsFragment :
 
     /** 権限要求の理由説明ダイアログからの結果を監視する。 */
     private fun observePermissionDialogResult() {
-        observeDialogResult<Unit>(
-            PermissionDialogFragment.RESULT_KEY
+        observeDialogResult<RequestPermissionType>(
+            PermissionRationaleDialogFragment.RESULT_KEY
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
-                    mainViewModel.onPermissionDialogPositiveResultReceived()
+                    when (result.data) {
+                        RequestPermissionType.POST_NOTIFICATIONS -> {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                requestPostNotificationsPermission()
+                            }
+                        }
+                        RequestPermissionType.ACCESS_LOCATION -> {
+                            requestAccessLocationPermission()
+                        }
+                    }
                 }
                 DialogResult.Negative,
                 DialogResult.Cancel -> { /*処理なし*/ }
@@ -265,12 +262,6 @@ class SettingsFragment :
             is SettingsUiEvent.ShowReminderNotificationTimePickerDialog -> {
                 navigateReminderNotificationTimePickerDialog()
             }
-            is SettingsUiEvent.ShowNotificationPermissionDialog -> {
-                navigateNotificationPermissionDialog()
-            }
-            is SettingsUiEvent.ShowLocationPermissionDialog -> {
-                navigateLocationPermissionDialog()
-            }
             is SettingsUiEvent.ShowAllDiariesDeleteDialog -> {
                 navigateAllDiariesDeleteDialog()
             }
@@ -283,13 +274,11 @@ class SettingsFragment :
             is SettingsUiEvent.ShowOSSLicensesDialog -> {
                 navigateOpenSourceSoftwareLicensesDialog()
             }
-            is SettingsUiEvent.ShowRequestPostNotificationsPermissionRationale -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    showRequestPostNotificationsPermissionRationale()
-                }
+            is SettingsUiEvent.ShowNotificationPermissionRationaleDialog -> {
+                navigatePostNotificationsPermissionRationaleDialog()
             }
-            is SettingsUiEvent.ShowRequestAccessLocationPermissionRationale -> {
-                showRequestAccessLocationPermissionRationale()
+            is SettingsUiEvent.ShowLocationPermissionRationaleDialog -> {
+                navigateAccessLocationPermissionRationaleDialog()
             }
             is SettingsUiEvent.ShowApplicationDetailsSettingsScreen -> {
                 showApplicationDetailsSettings()
@@ -299,16 +288,8 @@ class SettingsFragment :
                     checkPostNotificationsPermission()
                 }
             }
-            is SettingsUiEvent.CheckShouldShowRequestPostNotificationsPermissionRationale -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                    checkShouldShowRequestPostNotificationsPermissionRationale()
-                }
-            }
             is SettingsUiEvent.CheckAccessLocationPermission -> {
                 checkAccessLocationPermission()
-            }
-            is SettingsUiEvent.CheckShouldShowRequestAccessLocationPermissionRationale -> {
-                checkShouldShowRequestAccessLocationPermissionRationale()
             }
             is SettingsUiEvent.TurnReminderNotificationSettingSwitch -> {
                 binding.includeReminderNotificationSetting.materialSwitch.isChecked = event.isChecked
@@ -519,19 +500,19 @@ class SettingsFragment :
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 通知権限要求の理由説明ダイアログ([PermissionDialogFragment])へ遷移する。 */
-    private fun navigateNotificationPermissionDialog() {
-        val permissionName = getString(R.string.fragment_settings_permission_name_notification)
+    /** 通知権限要求の理由説明ダイアログ([PermissionRationaleDialogFragment])へ遷移する。 */
+    private fun navigatePostNotificationsPermissionRationaleDialog() {
         val directions =
-            SettingsFragmentDirections.actionSettingsFragmentToPermissionDialog(permissionName)
+            SettingsFragmentDirections
+                .actionSettingsFragmentToPermissionRationaleDialog(RequestPermissionType.POST_NOTIFICATIONS)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 位置情報権限要求の理由説明ダイアログ([PermissionDialogFragment])へ遷移する。 */
-    private fun navigateLocationPermissionDialog() {
-        val permissionName = getString(R.string.fragment_settings_permission_name_location)
+    /** 位置情報権限要求の理由説明ダイアログ([PermissionRationaleDialogFragment])へ遷移する。 */
+    private fun navigateAccessLocationPermissionRationaleDialog() {
         val directions =
-            SettingsFragmentDirections.actionSettingsFragmentToPermissionDialog(permissionName)
+            SettingsFragmentDirections
+                .actionSettingsFragmentToPermissionRationaleDialog(RequestPermissionType.ACCESS_LOCATION)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
@@ -573,28 +554,46 @@ class SettingsFragment :
     //endregion
 
     //region Permission Handling - Post Notifications
-    /** 通知権限が付与されているか確認し、ViewModelに通知する。 */
+    /** 通知権限の有無を確認し、権限がない場合はRationale表示または権限要求を行う。 */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private fun checkPostNotificationsPermission() {
-        val isGranted = requireContext().isPostNotificationsGranted()
-        mainViewModel.onPostNotificationsPermissionChecked(isGranted)
-    }
+        val logPrefix = "位置情報権限"
+        Log.d(logTag, "${logPrefix}の確認を開始。")
+        when {
+            requireContext().isPostNotificationsGranted() -> {
+                Log.d(logTag, "${logPrefix}: 許可済み。")
+                mainViewModel.onPostNotificationsPermissionGranted()
+            }
 
-    /** 通知権限要求の理由を提示する必要があるか確認し、ViewModelに通知する。 */
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    private fun checkShouldShowRequestPostNotificationsPermissionRationale() {
-        val shouldShowRequest =
             ActivityCompat.shouldShowRequestPermissionRationale(
                 requireActivity(), Manifest.permission.POST_NOTIFICATIONS
-            )
-        mainViewModel.onShouldShowRequestPostNotificationsPermissionRationaleChecked(shouldShowRequest)
+            ) -> {
+                Log.d(logTag, "${logPrefix}: Rationale表示が必要。")
+                navigatePostNotificationsPermissionRationaleDialog()
+            }
+
+            else -> {
+                Log.d(logTag, "${logPrefix}: 初回要求または永久に拒否済み。ランチャーを起動。")
+                requestPostNotificationsPermission()
+            }
+        }
     }
 
-    /** 通知権限を要求する。 */
+    /** システムの通知権限ダイアログを表示する。 */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    private fun showRequestPostNotificationsPermissionRationale() {
+    private fun requestPostNotificationsPermission() {
         requestPostNotificationsPermissionLauncher
             .launch(Manifest.permission.POST_NOTIFICATIONS)
+    }
+
+    /** 通知権限要求のランチャー結果を処理する。 */
+    private fun onPostNotificationsPermissionResult(isGranted: Boolean) {
+        Log.d(logTag, "システムの通知権限ダイアログの結果: ${if (isGranted) "許可" else "拒否"}")
+        if (isGranted) {
+            mainViewModel.onPostNotificationsPermissionGranted()
+        } else {
+            mainViewModel.onPostNotificationsPermissionDenied()
+        }
     }
 
     /** 端末の通知権限設定とアプリ内のリマインダー設定の同期するよう、ViewModelに通知する。 */
@@ -609,31 +608,50 @@ class SettingsFragment :
     //endregion
 
     //region Permission Handling - Access Location
-    /** 位置情報権限が付与されているか確認し、ViewModelに通知する。 */
+    /** 位置情報権限の有無を確認し、権限がない場合はRationale表示または権限要求を行う。 */
     private fun checkAccessLocationPermission() {
-        val isGranted = requireContext().isAccessLocationGranted()
-        mainViewModel.onAccessLocationPermissionChecked(isGranted)
-    }
+        val logPrefix = "位置情報権限"
+        Log.d(logTag, "${logPrefix}の確認を開始。")
+        when {
+            requireContext().isAccessLocationGranted() -> {
+                Log.d(logTag, "${logPrefix}: 許可済み。")
+                mainViewModel.onAccessLocationPermissionGranted()
+            }
 
-    /** 位置情報権限要求の理由を提示する必要があるか確認し、ViewModelに通知する。 */
-    private fun checkShouldShowRequestAccessLocationPermissionRationale() {
-        val shouldShowRequest =
             ActivityCompat.shouldShowRequestPermissionRationale(
                 requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION
             ) && ActivityCompat.shouldShowRequestPermissionRationale(
                 requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION
-            )
-        mainViewModel.onShouldShowRequestAccessLocationPermissionRationaleDialogChecked(shouldShowRequest)
+            ) -> {
+                Log.d(logTag, "${logPrefix}: Rationale表示が必要。")
+                navigateAccessLocationPermissionRationaleDialog()
+            }
+
+            else -> {
+                Log.d(logTag, "${logPrefix}: 初回要求または永久に拒否済み。ランチャーを起動。")
+                requestAccessLocationPermission()
+            }
+        }
     }
 
-    /** 位置情報権限を要求する。 */
-    private fun showRequestAccessLocationPermissionRationale() {
+    /** システムの位置情報権限ダイアログを表示する。 */
+    private fun requestAccessLocationPermission() {
         val requestPermissions =
             arrayOf(
                 Manifest.permission.ACCESS_FINE_LOCATION,
                 Manifest.permission.ACCESS_COARSE_LOCATION
             )
         requestAccessLocationPermissionLauncher.launch(requestPermissions)
+    }
+
+    /** 位置情報権限要求のランチャー結果を処理する。 */
+    private fun onAccessLocationPermissionResult(isGranted: Boolean) {
+        Log.d(logTag, "システムの位置情報権限ダイアログの結果: ${if (isGranted) "許可" else "拒否"}")
+        if (isGranted) {
+            mainViewModel.onAccessLocationPermissionGranted()
+        } else {
+            mainViewModel.onAccessLocationPermissionDenied()
+        }
     }
 
     /** 端末の位置情報権限設定とアプリ内の天気情報取得設定の同期するよう、ViewModelに通知する。 */

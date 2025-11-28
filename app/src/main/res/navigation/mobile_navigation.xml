@@ -163,8 +163,8 @@
                 app:destination="@id/navigation_reminder_notification_time_picker_dialog"/>
 
             <action
-                android:id="@+id/action_settings_fragment_to_permission_dialog"
-                app:destination="@id/navigation_permission_dialog"/>
+                android:id="@+id/action_settings_fragment_to_permission_rationale_dialog"
+                app:destination="@id/navigation_permission_rationale_dialog"/>
 
             <action
                 android:id="@+id/action_settings_fragment_to_all_diaries_delete_dialog"
@@ -211,11 +211,11 @@
         </dialog>
 
         <dialog
-            android:id="@+id/navigation_permission_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.PermissionDialogFragment">
+            android:id="@+id/navigation_permission_rationale_dialog"
+            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.PermissionRationaleDialogFragment">
             <argument
-                android:name="permission_name"
-                app:argType="string" />
+                android:name="request_permission_type"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.permission.RequestPermissionType" />
         </dialog>
 
         <dialog

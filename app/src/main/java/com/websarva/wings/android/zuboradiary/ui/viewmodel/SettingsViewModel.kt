@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.ui.viewmodel
 
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
@@ -467,139 +466,28 @@ class SettingsViewModel @Inject internal constructor(
             deleteAllData()
         }
     }
-
-    /**
-     * 権限確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
-     * アプリケーションの詳細設定画面を表示する。
-     */
-    internal fun onPermissionDialogPositiveResultReceived() {
-        launchWithUnexpectedErrorHandler {
-            requestNavigateApplicationDetailsSettings()
-        }
-    }
-
-
     //endregion
 
     //region UI Event Handlers - Permissions
+
+    //region PostNotificationsPermission
     /**
-     * 通知権限が許可されているかどうかの確認結果を受け取った時に呼び出される事を想定。
-     * 権限の状態に応じて、ダイアログ表示や時刻選択ダイアログへの遷移を行う。
-     * @param isGranted 通知権限が許可されている場合はtrue
+     * 通知権限の確認で許可された時に呼び出される事を想定。
+     * 時刻選択ダイアログへの遷移を行う。
      */
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    internal fun onPostNotificationsPermissionChecked(isGranted: Boolean) {
+    internal fun onPostNotificationsPermissionGranted() {
         launchWithUnexpectedErrorHandler {
-            if (isGranted) {
-                emitUiEvent(
-                    SettingsUiEvent.ShowReminderNotificationTimePickerDialog
-                )
-            } else {
-                emitUiEvent(
-                    SettingsUiEvent.CheckShouldShowRequestPostNotificationsPermissionRationale
-                )
-            }
+            requestShowReminderNotificationTimePickerDialog()
         }
     }
 
     /**
-     * 通知権限要求を表示する必要があるかどうかの確認結果を受け取った時に呼び出される事を想定。
-     * 結果に応じて、権限要求の表示またはアプリ設定画面への遷移を促すダイアログを表示する。
-     * @param shouldShowRequest 理由を表示する必要がある場合はtrue
+     * 通知権限の確認で許可されなかった時に呼び出される事を想定。
+     * リマインダー通知設定スイッチをOff状態に切り換えるイベントを発行。
      */
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    internal fun onShouldShowRequestPostNotificationsPermissionRationaleChecked(
-        shouldShowRequest: Boolean
-    ) {
+    internal fun onPostNotificationsPermissionDenied() {
         launchWithUnexpectedErrorHandler {
-            if (shouldShowRequest) {
-                emitUiEvent(
-                    SettingsUiEvent.ShowRequestPostNotificationsPermissionRationale
-                )
-            } else {
-                emitUiEvent(
-                    SettingsUiEvent.TurnReminderNotificationSettingSwitch(false)
-                )
-                emitUiEvent(
-                    SettingsUiEvent.ShowNotificationPermissionDialog
-                )
-            }
-        }
-    }
-
-    /**
-     * 通知権限要求ダイアログの表示結果を受け取った時に呼び出される事を想定。
-     * 権限が許可された場合は時刻選択ダイアログへ遷移し、そうでなければスイッチをOFFに戻す。
-     * @param isGranted 権限が許可された場合はtrue
-     */
-    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
-    internal fun onRequestPostNotificationsPermissionRationaleDialogResultReceived(isGranted: Boolean) {
-        launchWithUnexpectedErrorHandler {
-            if (isGranted) {
-                emitUiEvent(
-                    SettingsUiEvent.ShowReminderNotificationTimePickerDialog
-                )
-            } else {
-                emitUiEvent(
-                    SettingsUiEvent.TurnReminderNotificationSettingSwitch(false)
-                )
-            }
-        }
-    }
-
-    /**
-     * 位置情報権限が許可されているかどうかの確認結果を受け取った時に呼び出される事を想定。
-     * 権限の状態に応じて、設定の保存または権限要求を行う。
-     * @param isGranted 位置情報権限が許可されている場合はtrue
-     */
-    internal fun onAccessLocationPermissionChecked(isGranted: Boolean) {
-        launchWithUnexpectedErrorHandler {
-            if (isGranted) {
-                saveWeatherInfoFetchSetting(true)
-            } else {
-                emitUiEvent(
-                    SettingsUiEvent.CheckShouldShowRequestAccessLocationPermissionRationale
-                )
-            }
-        }
-    }
-
-    /**
-     * 位置情報権限要求を表示する必要があるかどうかの確認結果を受け取った時に呼び出される事を想定。
-     * 結果に応じて、権限要求の表示またはアプリ設定画面への遷移を促すダイアログを表示する。
-     * @param shouldShowRequest 理由を表示する必要がある場合はtrue
-     */
-    internal fun onShouldShowRequestAccessLocationPermissionRationaleDialogChecked(
-        shouldShowRequest: Boolean
-    ) {
-        launchWithUnexpectedErrorHandler {
-            if (shouldShowRequest) {
-                emitUiEvent(
-                    SettingsUiEvent.ShowRequestAccessLocationPermissionRationale
-                )
-            } else {
-                emitUiEvent(
-                    SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch(false)
-                )
-                emitUiEvent(SettingsUiEvent.ShowLocationPermissionDialog)
-            }
-        }
-    }
-
-    /**
-     * 位置情報権限要求ダイアログの表示結果を受け取った時に呼び出される事を想定。
-     * 権限が許可されたかどうかを保存し、UIに反映させる。
-     * @param isGranted 権限が許可された場合はtrue
-     */
-    internal fun onRequestAccessLocationPermissionRationaleResultReceived(isGranted: Boolean) {
-        launchWithUnexpectedErrorHandler {
-            if (isGranted) {
-                saveWeatherInfoFetchSetting(true)
-            } else {
-                emitUiEvent(
-                    SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch(false)
-                )
-            }
+            requestChangeReminderSettingSwitch(false)
         }
     }
 
@@ -616,6 +504,28 @@ class SettingsViewModel @Inject internal constructor(
             saveReminderNotificationInvalidSetting()
         }
     }
+    //endregion
+
+    //region AccessLocationPermission
+    /**
+     * 位置情報権限の確認で許可された時に呼び出される事を想定。
+     * 天気情報取得設定(有効)を保存する。
+     */
+    internal fun onAccessLocationPermissionGranted() {
+        launchWithUnexpectedErrorHandler {
+            saveWeatherInfoFetchSetting(true)
+        }
+    }
+
+    /**
+     * 位置情報権限の確認で許可されなかった時に呼び出される事を想定。
+     * 天気情報取得設定スイッチをOff状態に切り換えるイベントを発行。
+     */
+    internal fun onAccessLocationPermissionDenied() {
+        launchWithUnexpectedErrorHandler {
+            requestChangeWeatherInfoFetchSettingSwitch(false)
+        }
+    }
 
     /**
      * OSの位置情報権限の状態を天気情報取得設定に同期させるために呼び出される事を想定。
@@ -630,6 +540,8 @@ class SettingsViewModel @Inject internal constructor(
             saveWeatherInfoFetchSetting(false)
         }
     }
+    //endregion
+
     //endregion
 
     //region Business Logic
@@ -1048,10 +960,21 @@ class SettingsViewModel @Inject internal constructor(
     }
 
     /**
-     * アプリケーションの詳細設定画面への遷移を要求する。
+     * リマインダ通知時間選択ダイアログの表示を要求する。
      * 画面遷移イベントを発行する。
      */
-    private suspend fun requestNavigateApplicationDetailsSettings() {
+    private suspend fun requestShowReminderNotificationTimePickerDialog() {
+        emitUiEvent(
+            SettingsUiEvent.ShowReminderNotificationTimePickerDialog
+        )
+    }
+
+    // TODO:不要だが残しておく(最終的に削除)
+    /**
+     * アプリケーションの詳細設定画面の表示を要求する。
+     * 画面遷移イベントを発行する。
+     */
+    private suspend fun requestShowApplicationDetailsSettings() {
         emitUiEvent(
             SettingsUiEvent.ShowApplicationDetailsSettingsScreen
         )
