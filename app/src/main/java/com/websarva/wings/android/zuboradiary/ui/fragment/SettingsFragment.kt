@@ -180,6 +180,8 @@ class SettingsFragment :
         }
     }
 
+    // TODO:Negative時の処理(スイッチViewクリア)を設定したいが、現時点のダイアログの構成では判断できない。
+    //      権限毎に専用Dialogを作成するか、共通ダイログでResultKey、TiTle、Messageをダイログに渡す構成(クリーン)に変更するか検討
     /** 権限要求の理由説明ダイアログからの結果を監視する。 */
     private fun observePermissionDialogResult() {
         observeDialogResult<RequestPermissionType>(
