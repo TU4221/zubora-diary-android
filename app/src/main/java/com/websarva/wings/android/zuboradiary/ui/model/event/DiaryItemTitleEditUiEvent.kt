@@ -17,13 +17,13 @@ sealed class DiaryItemTitleEditUiEvent : UiEvent {
     ) : DiaryItemTitleEditUiEvent()
 
     /**
-     * 履歴アイテム削除確認ダイアログを表示することを示すイベント。
+     * 選択履歴削除確認ダイアログを表示することを示すイベント。
      * @property itemTitle 削除対象の項目タイトル。
      */
-    data class ShowSelectionHistoryItemDeleteDialog(
+    data class ShowSelectionHistoryDeleteDialog(
         val itemTitle: String
     ) : DiaryItemTitleEditUiEvent()
 
-    /** スワイプされた履歴アイテムの表示を元に戻すことを示すイベント。 */
-    data object CloseSwipedItem : DiaryItemTitleEditUiEvent()
+    /** スワイプされた選択履歴の表示を元に戻すことを示すイベント。 */
+    data object CloseSwipedSelectionHistory : DiaryItemTitleEditUiEvent()
 }

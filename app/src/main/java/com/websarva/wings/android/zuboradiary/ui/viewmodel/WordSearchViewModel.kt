@@ -130,7 +130,7 @@ class WordSearchViewModel @Inject internal constructor(
 
                     if (searchWord.isEmpty()) {
                         emitUiEvent(WordSearchUiEvent.ShowKeyboard)
-                        clearWordSearchResultList()
+                        clearWordSearch()
                     } else {
                         loadNewWordSearchResultList(wordSearchResultList, searchWord)
                     }
@@ -152,7 +152,7 @@ class WordSearchViewModel @Inject internal constructor(
 
         val currentResultList = currentUiState.wordSearchResultList
         val currentSearchWord = currentUiState.searchWord
-        cancelPreviousLoadJob()
+        cancelPreviousListLoadJob()
         wordSearchResultListLoadJob =
             launchWithUnexpectedErrorHandler {
                 refreshWordSearchResultList(
@@ -172,36 +172,36 @@ class WordSearchViewModel @Inject internal constructor(
 
     override fun onBackPressed() {
         launchWithUnexpectedErrorHandler {
-            requestNavigatePreviousScreen()
+            navigatePreviousScreen()
         }
     }
 
     /**
      * ナビゲーションアイコンがクリックされた時に呼び出される事を想定。
-     * 前の画面へ戻るイベントを発行する。
+     * 前の画面へ遷移する。
      */
     fun onNavigationIconButtonClick() {
         launchWithUnexpectedErrorHandler {
-            requestNavigatePreviousScreen()
+            navigatePreviousScreen()
         }
     }
 
     /**
      * 検索結果リストのアイテムがクリックされた時に呼び出される事を想定。
-     * 日記表示画面へ遷移するイベントを発行する。
+     * 日記表示画面へ遷移する。
      * @param item クリックされたリストアイテム
      */
     internal fun onWordSearchResultListItemClick(item: DiaryListItemContainerUi.WordSearchResult) {
         val id = item.id
         val date = item.date
         launchWithUnexpectedErrorHandler {
-            requestNavigateDiaryShowScreen(id, date)
+            navigateDiaryShowScreen(id, date)
         }
     }
 
     /**
      * 検索ワード入力欄のテキストが変更された時に呼び出される事を想定。
-     * UI状態の検索ワードを更新する。
+     * 検索ワードを更新する。
      * @param text 変更後のテキスト
      */
     fun onSearchWordTextChanged(text: CharSequence) {
@@ -218,7 +218,7 @@ class WordSearchViewModel @Inject internal constructor(
 
         val currentResultList = currentUiState.wordSearchResultList
         val searchWord = currentUiState.searchWord
-        cancelPreviousLoadJob()
+        cancelPreviousListLoadJob()
         wordSearchResultListLoadJob =
             launchWithUnexpectedErrorHandler {
                 loadAdditionWordSearchResultList(
@@ -240,9 +240,9 @@ class WordSearchViewModel @Inject internal constructor(
 
     //region Business Logic
 
-    //region Word Searc hResult List Operation
+    //region Word Search Result List Operation
     /** 実行中の検索結果読み込み処理があればキャンセルする。 */
-    private fun cancelPreviousLoadJob() {
+    private fun cancelPreviousListLoadJob() {
         val job = wordSearchResultListLoadJob ?: return
         if (!job.isCompleted) job.cancel()
     }
@@ -410,9 +410,9 @@ class WordSearchViewModel @Inject internal constructor(
         }
     }
 
-    /** 検索結果リストをクリアし、UIを初期状態に戻す。 */
-    private fun clearWordSearchResultList() {
-        cancelPreviousLoadJob()
+    /** ワード検索の状態をクリアし、UIを初期状態に戻す。 */
+    private fun clearWordSearch() {
+        cancelPreviousListLoadJob()
         wordSearchResultListLoadJob = initialWordSearchResultListLoadJob
         updateUiState {
             WordSearchUiState()
@@ -422,21 +422,19 @@ class WordSearchViewModel @Inject internal constructor(
 
     //region Standalone Navigation
     /**
-     * 前の画面への遷移を要求する。
-     * 画面遷移イベントを発行する。
+     * 前の画面へ遷移する（イベント発行）。
      */
-    private suspend fun requestNavigatePreviousScreen() {
+    private suspend fun navigatePreviousScreen() {
         emitNavigatePreviousFragmentEvent()
     }
 
     /**
-     * 日記表示画面への遷移を要求する。
-     * 画面遷移イベントを発行する。
+     * 日記表示画面へ遷移する（イベント発行）。
      *
      * @param id 表示対象の日記のID。
      * @param date 表示対象の日記の日付。
      */
-    private suspend fun requestNavigateDiaryShowScreen(id: String, date: LocalDate) {
+    private suspend fun navigateDiaryShowScreen(id: String, date: LocalDate) {
         emitUiEvent(
             WordSearchUiEvent.NavigateDiaryShowScreen(id, date)
         )

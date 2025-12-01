@@ -77,7 +77,7 @@ class DiaryShowViewModel @Inject internal constructor(
         val id = handle.get<String>(ARGUMENT_DIARY_ID_KEY)?.let { DiaryId(it) } ?: throw IllegalArgumentException()
         val date = handle.get<LocalDate>(ARGUMENT_DIARY_DATE_KEY) ?: throw IllegalArgumentException()
         launchWithUnexpectedErrorHandler {
-            loadSavedDiary(id, date)
+            loadDiary(id, date)
         }
     }
 
@@ -130,13 +130,13 @@ class DiaryShowViewModel @Inject internal constructor(
 
         val date = diary.date
         launchWithUnexpectedErrorHandler {
-            requestNavigatePreviousScreen(date)
+            navigatePreviousScreen(date)
         }
     }
 
     /**
      * 編集メニューがクリックされた時に呼び出される事を想定。
-     * 日記の編集処理を開始する。
+     * 日記編集画面への遷移する。
      */
     internal fun onDiaryEditMenuClick() {
         if (!isReadyForOperation) return
@@ -144,26 +144,13 @@ class DiaryShowViewModel @Inject internal constructor(
         val id = diary.id
         val date = diary.date
         launchWithUnexpectedErrorHandler {
-            requestNavigateToDiaryEditScreen(id, date)
+            navigateDiaryEditScreen(id, date)
         }
     }
 
     /**
-     * 日記編集画面への遷移を要求する。
-     * 画面遷移イベントを発行する。
-     *
-     * @param id 編集対象の日記のID。
-     * @param date 編集対象の日記の日付。
-     */
-    private suspend fun requestNavigateToDiaryEditScreen(id: String, date: LocalDate) {
-        emitUiEvent(
-            DiaryShowUiEvent.NavigateDiaryEditScreen(id, date)
-        )
-    }
-
-    /**
      * 削除メニューがクリックされた時に呼び出される事を想定。
-     * 日記の削除処理を開始する。
+     * 日記の削除ダイアログを表示する。
      */
     internal fun onDiaryDeleteMenuClick() {
         if (!isReadyForOperation) return
@@ -171,30 +158,30 @@ class DiaryShowViewModel @Inject internal constructor(
         val id = diary.id
         val date = diary.date
         launchWithUnexpectedErrorHandler {
-            requestDiaryDeletion(DiaryId(id), date)
+            showDiaryDeleteDialog(DiaryId(id), date)
         }
     }
 
     /**
      * ナビゲーションアイコンがクリックされた時に呼び出される事を想定。
-     * 前の画面へ戻る処理を開始する。
+     * 前の画面へ遷移する。
      */
     fun onNavigationIconClick() {
         if (!isReadyForOperation) return
 
         val date = diary.date
         launchWithUnexpectedErrorHandler {
-            requestNavigatePreviousScreen(date)
+            navigatePreviousScreen(date)
         }
     }
 
     /**
      * 日記読み込み失敗ダイアログから結果を受け取った時に呼び出される事を想定。
-     * 前の画面に戻る処理を開始する。
+     * 前の画面へ遷移する。
      */
     internal fun onDiaryLoadFailureDialogResultReceived() {
         launchWithUnexpectedErrorHandler {
-            requestNavigatePreviousScreenOnDiaryLoadFailed()
+            navigatePreviousScreenOnDiaryLoadFailed()
         }
     }
 
@@ -221,11 +208,11 @@ class DiaryShowViewModel @Inject internal constructor(
 
     //region Business Logic
     /**
-     * IDに基づいて保存されている日記を読み込む。
+     * IDに基づいて日記を読み込む。
      * @param id 読み込む日記のID
      * @param date 読み込む日記の日付（エラー時のダイアログ表示用）
      */
-    private suspend fun loadSavedDiary(id: DiaryId, date: LocalDate) {
+    private suspend fun loadDiary(id: DiaryId, date: LocalDate) {
         val logMsg = "日記読込"
         Log.i(logTag, "${logMsg}_開始")
 
@@ -253,21 +240,21 @@ class DiaryShowViewModel @Inject internal constructor(
     }
 
     /**
-     * 日記の削除を要求する。
-     * 渡されたパラメータをキャッシュし、削除確認ダイアログへの遷移イベントを発行する。
+     * 日記の削除確認ダイアログを表示する。
+     * 渡されたパラメータをキャッシュし、ダイアログを表示する（イベント発行）。
      *
      * @param id 削除対象の日記のID。
      * @param date 削除対象の日記の日付。
      */
-    private suspend fun requestDiaryDeletion(id: DiaryId, date: LocalDate) {
-        updatePendingDiaryDeleteParameters(id, date)
+    private suspend fun showDiaryDeleteDialog(id: DiaryId, date: LocalDate) {
+        cachePendingDiaryDeleteParameters(id, date)
         emitUiEvent(
             DiaryShowUiEvent.ShowDiaryDeleteDialog(date)
         )
     }
 
     /**
-     * 日記を削除し、前の画面へ戻るイベントを発行する。
+     * 日記を削除し、前の画面へ遷移する（イベント発行）。
      * @param id 削除対象の日記ID
      * @param date 削除対象の日記の日付
      */
@@ -303,20 +290,31 @@ class DiaryShowViewModel @Inject internal constructor(
     }
 
     /**
-     * 前の画面への遷移を要求する。
-     * 画面遷移イベントを発行する。
+     * 前の画面へ遷移する（イベント発行）。
      * @param diaryDate 遷移元に返す日記の日付
      */
-    private suspend fun requestNavigatePreviousScreen(diaryDate: LocalDate) {
+    private suspend fun navigatePreviousScreen(diaryDate: LocalDate) {
         emitUiEvent(DiaryShowUiEvent.NavigatePreviousScreenWithResult(diaryDate))
     }
 
     /**
-     * 日記読み込み失敗時の前の画面への遷移を要求する。
-     * 画面遷移イベントを発行する。
+     * 前の画面へ遷移する（イベント発行）。
+     * 日記読み込み失敗時に呼び出す。
      */
-    private suspend fun requestNavigatePreviousScreenOnDiaryLoadFailed() {
+    private suspend fun navigatePreviousScreenOnDiaryLoadFailed() {
         emitUiEvent(DiaryShowUiEvent.NavigatePreviousScreenOnDiaryLoadFailed)
+    }
+
+    /**
+     * 日記編集画面への遷移する（イベント発行）。
+     *
+     * @param id 編集対象の日記のID。
+     * @param date 編集対象の日記の日付。
+     */
+    private suspend fun navigateDiaryEditScreen(id: String, date: LocalDate) {
+        emitUiEvent(
+            DiaryShowUiEvent.NavigateDiaryEditScreen(id, date)
+        )
     }
     //endregion
 
@@ -408,7 +406,7 @@ class DiaryShowViewModel @Inject internal constructor(
      * @param id 削除対象の日記ID
      * @param date 削除対象の日記の日付
      */
-    private fun updatePendingDiaryDeleteParameters(id: DiaryId, date: LocalDate) {
+    private fun cachePendingDiaryDeleteParameters(id: DiaryId, date: LocalDate) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
 

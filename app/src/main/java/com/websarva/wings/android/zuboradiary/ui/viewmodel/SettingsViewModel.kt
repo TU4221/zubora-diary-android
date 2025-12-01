@@ -246,38 +246,38 @@ class SettingsViewModel @Inject internal constructor(
         if (!isReadyForOperation) return
 
         launchWithUnexpectedErrorHandler {
-            requestNavigatePreviousScreen()
+            navigatePreviousScreen()
         }
     }
 
     /**
      * テーマカラー設定項目がクリックされた時に呼び出される事を想定。
-     * テーマカラーの選択を開始する。
+     * テーマカラーの選択ダイアログを表示する。
      */
     fun onThemeColorSettingItemClick() {
         if (!canExecuteOperation()) return
 
         launchWithUnexpectedErrorHandler {
-            requestThemeColorSelection()
+            showThemeColorPickerDialog()
         }
     }
 
     /**
      * カレンダー開始曜日設定項目がクリックされた時に呼び出される事を想定。
-     * カレンダー開始曜日の選択を開始する。
+     * カレンダー開始曜日の選択ダイアログを表示する。
      */
     fun onCalendarStartDayOfWeekSettingItemClick() {
         if (!canExecuteOperation()) return
 
         val dayOfWeek = currentUiState.calendarStartDayOfWeek ?: return
         launchWithUnexpectedErrorHandler {
-            requestCalendarStartDayOfWeekSelection(dayOfWeek)
+            showCalendarStartDayOfWeekPickerDialog(dayOfWeek)
         }
     }
 
     /**
      * リマインダー通知設定のスイッチが切り替えられた時に呼び出される事を想定。
-     * 権限確認または設定保存の処理を開始する。
+     * 設定値の保存プロセスを開始する。
      * @param isChecked スイッチがONになった場合はtrue
      */
     fun onReminderNotificationSettingCheckedChange(isChecked: Boolean) {
@@ -288,13 +288,13 @@ class SettingsViewModel @Inject internal constructor(
 
         if (settingValue == null || !canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
-                requestChangeReminderSettingSwitch(!isChecked)
+                changeReminderSettingSwitch(!isChecked)
             }
             return
         }
 
         launchWithUnexpectedErrorHandler {
-            requestReminderSetting(isChecked)
+            startReminderNotificationSettingSaveProcess(isChecked)
         }
     }
 
@@ -311,7 +311,7 @@ class SettingsViewModel @Inject internal constructor(
 
         if (settingValue == null || !canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
-                requestChangePasscodeLockSettingSwitch(!isChecked)
+                changePasscodeLockSettingSwitch(!isChecked)
             }
             return
         }
@@ -323,7 +323,7 @@ class SettingsViewModel @Inject internal constructor(
 
     /**
      * 天気情報取得設定のスイッチが切り替えられた時に呼び出される事を想定。
-     * 権限確認または設定保存の処理を開始する。
+     * 設定値の保存プロセスを開始する。
      * @param isChecked スイッチがONになった場合はtrue
      */
     fun onWeatherInfoFetchSettingCheckedChange(isChecked: Boolean) {
@@ -334,61 +334,61 @@ class SettingsViewModel @Inject internal constructor(
 
         if (settingValue == null || !canExecuteOperation()) {
             launchWithUnexpectedErrorHandler {
-                requestChangeWeatherInfoFetchSettingSwitch(!isChecked)
+                changeWeatherInfoFetchSettingSwitch(!isChecked)
             }
             return
         }
 
         launchWithUnexpectedErrorHandler {
-            requestWeatherInfoFetchSetting(isChecked)
+            startWeatherInfoFetchSettingSaveProcess(isChecked)
         }
     }
 
     /**
      * 全日記削除項目がクリックされた時に呼び出される事を想定。
-     * 全日記の削除処理を開始する。
+     * 全日記の削除確認ダイアログを表示する
      */
     fun onAllDiariesDeleteButtonClick() {
         if (!canExecuteOperation()) return
 
         launchWithUnexpectedErrorHandler {
-            requestAllDiariesDeletion()
+            showAllDiariesDeleteDialog()
         }
     }
 
     /**
      * 全設定初期化項目がクリックされた時に呼び出される事を想定。
-     * 全設定の初期化処理を開始する。
+     * 全設定の初期化確認ダイアログを表示する
      */
     fun onAllSettingsInitializationButtonClick() {
         if (!canExecuteOperation()) return
 
         launchWithUnexpectedErrorHandler {
-            requestAllSettingsInitialization()
+            showAllSettingsInitializationDialog()
         }
     }
 
     /**
      * 全データ削除項目がクリックされた時に呼び出される事を想定。
-     * 全データの削除処理を開始する。
+     * 全データの削除確認ダイアログを表示する
      */
     fun onAllDataDeleteButtonClick() {
         if (!canExecuteOperation()) return
 
         launchWithUnexpectedErrorHandler {
-            requestAllDataDeletion()
+            showAllDataDeleteDialog()
         }
     }
 
     /**
      * オープンソースソフトウェアライセンス項目がクリックされた時に呼び出される事を想定。
-     * OSSライセンス表示画面へ遷移するイベントを発行する。
+     * OSSライセンスダイアログを表示する。
      */
     fun onOpenSourceLicenseButtonClick() {
         if (!isReadyForOperation) return
 
         launchWithUnexpectedErrorHandler {
-            requestNavigateOssLicensesScreen()
+            showOssLicensesScreen()
         }
     }
     //endregion
@@ -433,13 +433,13 @@ class SettingsViewModel @Inject internal constructor(
      * */
     internal fun onReminderNotificationSettingDialogNegativeResultReceived() {
         launchWithUnexpectedErrorHandler {
-            requestChangeReminderSettingSwitch(false)
+            changeReminderSettingSwitch(false)
         }
     }
 
     /**
      * 全日記削除確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
-     * 全日記の削除を実行する。
+     * 全日記を削除する。
      */
     internal fun onAllDiariesDeleteDialogPositiveResultReceived() {
         launchWithUnexpectedErrorHandler {
@@ -449,7 +449,7 @@ class SettingsViewModel @Inject internal constructor(
 
     /**
      * 全設定初期化確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
-     * 全設定の初期化を実行する。
+     * 全設定を初期化する。
      */
     internal fun onAllSettingsInitializationDialogPositiveResultReceived() {
         launchWithUnexpectedErrorHandler {
@@ -459,7 +459,7 @@ class SettingsViewModel @Inject internal constructor(
 
     /**
      * 全データ削除確認ダイアログからPositive結果を受け取った時に呼び出される事を想定。
-     * 全データの削除を実行する。
+     * 全データを削除する。
      */
     internal fun onAllDataDeleteDialogResultPositiveReceived() {
         launchWithUnexpectedErrorHandler {
@@ -473,21 +473,21 @@ class SettingsViewModel @Inject internal constructor(
     //region PostNotificationsPermission
     /**
      * 通知権限の確認で許可された時に呼び出される事を想定。
-     * 時刻選択ダイアログへの遷移を行う。
+     * 時刻選択ダイアログを表示する。
      */
     internal fun onPostNotificationsPermissionGranted() {
         launchWithUnexpectedErrorHandler {
-            requestShowReminderNotificationTimePickerDialog()
+            showReminderNotificationTimePickerDialog()
         }
     }
 
     /**
      * 通知権限の確認で許可されなかった時に呼び出される事を想定。
-     * リマインダー通知設定スイッチをOff状態に切り換えるイベントを発行。
+     * リマインダー通知設定スイッチをOff状態に切り換える。
      */
     internal fun onPostNotificationsPermissionDenied() {
         launchWithUnexpectedErrorHandler {
-            requestChangeReminderSettingSwitch(false)
+            changeReminderSettingSwitch(false)
         }
     }
 
@@ -519,11 +519,11 @@ class SettingsViewModel @Inject internal constructor(
 
     /**
      * 位置情報権限の確認で許可されなかった時に呼び出される事を想定。
-     * 天気情報取得設定スイッチをOff状態に切り換えるイベントを発行。
+     * 天気情報取得設定スイッチをOff状態に切り換える。
      */
     internal fun onAccessLocationPermissionDenied() {
         launchWithUnexpectedErrorHandler {
-            requestChangeWeatherInfoFetchSettingSwitch(false)
+            changeWeatherInfoFetchSettingSwitch(false)
         }
     }
 
@@ -565,10 +565,9 @@ class SettingsViewModel @Inject internal constructor(
 
     //region Theme Color Setting Operation
     /**
-     * テーマカラーの選択を要求する。
-     * テーマカラー選択ダイアログへの遷移イベントを発行する。
+     * テーマカラーの選択ダイログを表示する（イベント発行）。
      */
-    private suspend fun requestThemeColorSelection() {
+    private suspend fun showThemeColorPickerDialog() {
         emitUiEvent(
             SettingsUiEvent.ShowThemeColorPickerDialog
         )
@@ -606,10 +605,9 @@ class SettingsViewModel @Inject internal constructor(
 
     //region Calendar Start Day Of Week Setting Operation
     /**
-     * カレンダー開始曜日の選択を要求する。
-     * カレンダー開始曜日選択ダイアログへの遷移イベントを発行する。
+     * カレンダー開始曜日の選択ダイアログを表示する（イベント発行）。
      */
-    private suspend fun requestCalendarStartDayOfWeekSelection(dayOfWeek: DayOfWeek) {
+    private suspend fun showCalendarStartDayOfWeekPickerDialog(dayOfWeek: DayOfWeek) {
         emitUiEvent(
             SettingsUiEvent.ShowCalendarStartDayPickerDialog(dayOfWeek)
         )
@@ -647,22 +645,24 @@ class SettingsViewModel @Inject internal constructor(
 
     //region Reminder Notification Setting Operation
     /**
-     * リマインダー通知設定スイッチの状態の変更を要求する。
+     * リマインダー通知設定スイッチの状態を変更する（イベント発行）。
      * @param isChecked 有効状態にする場合はtrue
      */
-    private suspend fun requestChangeReminderSettingSwitch(isChecked: Boolean) {
+    private suspend fun changeReminderSettingSwitch(isChecked: Boolean) {
         emitUiEvent(
             SettingsUiEvent.TurnReminderNotificationSettingSwitch(isChecked)
         )
     }
 
     /**
-     * リマインダー通知設定の変更を要求する。
-     * isCheckedの値に基づいて、有効化または無効化の処理を行う。
+     * リマインダー通知設定の保存プロセスを開始する。
+     * 有効化の場合、Android 13 (APIレベル 33) 以降では通知権限の確認を行い、
+     * それ未満のバージョンでは権限確認をパスして時刻選択ダイアログを表示する。
+     * 無効化の場合、そのまま保存する。
      *
      * @param enable 有効にする場合はtrue
      */
-    private suspend fun requestReminderSetting(enable: Boolean) {
+    private suspend fun startReminderNotificationSettingSaveProcess(enable: Boolean) {
         if (enable) {
             // MEMO:PostNotificationsはApiLevel33で導入されたPermission。33未満は許可取り不要。
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -670,7 +670,7 @@ class SettingsViewModel @Inject internal constructor(
                     SettingsUiEvent.CheckPostNotificationsPermission
                 )
             } else {
-                requestShowReminderNotificationTimePickerDialog()
+                showReminderNotificationTimePickerDialog()
             }
         } else {
             saveReminderNotificationInvalidSetting()
@@ -678,10 +678,9 @@ class SettingsViewModel @Inject internal constructor(
     }
 
     /**
-     * リマインダ通知時間選択ダイアログの表示を要求する。
-     * 画面遷移イベントを発行する。
+     * リマインダ通知時間選択ダイアログを表示する（イベント発行）。
      */
-    private suspend fun requestShowReminderNotificationTimePickerDialog() {
+    private suspend fun showReminderNotificationTimePickerDialog() {
         emitUiEvent(
             SettingsUiEvent.ShowReminderNotificationTimePickerDialog
         )
@@ -747,10 +746,10 @@ class SettingsViewModel @Inject internal constructor(
 
     //region Passcode Lock Setting Operation
     /**
-     * パスコードロック設定スイッチの状態の変更を要求する。
+     * パスコードロック設定スイッチの状態を変更する（イベント発行）。
      * @param isChecked 有効状態にする場合はtrue
      */
-    private suspend fun requestChangePasscodeLockSettingSwitch(isChecked: Boolean) {
+    private suspend fun changePasscodeLockSettingSwitch(isChecked: Boolean) {
         emitUiEvent(
             SettingsUiEvent.TurnPasscodeLockSettingSwitch(isChecked)
         )
@@ -797,22 +796,23 @@ class SettingsViewModel @Inject internal constructor(
 
     //region Weather Info Fetch Setting Operation
     /**
-     * 天気情報取得設定スイッチの状態の変更を要求する。
+     * 天気情報取得設定スイッチの状態を変更する（イベント発行）。
      * @param isChecked 有効状態にする場合はtrue
      */
-    private suspend fun requestChangeWeatherInfoFetchSettingSwitch(isChecked: Boolean) {
+    private suspend fun changeWeatherInfoFetchSettingSwitch(isChecked: Boolean) {
         emitUiEvent(
             SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch(isChecked)
         )
     }
 
     /**
-     * 天気情報取得設定の変更を要求する。
-     * isCheckedの値に基づいて、有効化または無効化の処理を行う。
+     * 天気情報取得設定の保存プロセスを開始する。
+     * 有効化の場合、位置情報権限有無の確認をする（イベント発行）。
+     * 無効化の場合、そのまま保存する。
      *
      * @param enable 有効にする場合はtrue
      */
-    private suspend fun requestWeatherInfoFetchSetting(enable: Boolean) {
+    private suspend fun startWeatherInfoFetchSettingSaveProcess(enable: Boolean) {
         if (enable) {
             emitUiEvent(
                 SettingsUiEvent.CheckAccessLocationPermission
@@ -855,10 +855,9 @@ class SettingsViewModel @Inject internal constructor(
 
     //region App Data Operation
     /**
-     * 全ての日記の削除を要求する。
-     * 全日記削除確認ダイアログへの遷移イベントを発行する。
+     * 全ての日記の削除確認ダイアログを表示する（イベント発行）。
      */
-    private suspend fun requestAllDiariesDeletion() {
+    private suspend fun showAllDiariesDeleteDialog() {
         emitUiEvent(
             SettingsUiEvent.ShowAllDiariesDeleteDialog
         )
@@ -890,10 +889,9 @@ class SettingsViewModel @Inject internal constructor(
     }
 
     /**
-     * 全ての設定の初期化を要求する。
-     * 全設定初期化確認ダイアログへの遷移イベントを発行する。
+     * 全ての設定の初期化確認ダイアログを表示する（イベント発行）。
      */
-    private suspend fun requestAllSettingsInitialization() {
+    private suspend fun showAllSettingsInitializationDialog() {
         emitUiEvent(
             SettingsUiEvent.ShowAllSettingsInitializationDialog
         )
@@ -923,10 +921,9 @@ class SettingsViewModel @Inject internal constructor(
     }
 
     /**
-     * 全てのアプリケーションデータの削除を要求する。
-     * 全データ削除確認ダイアログへの遷移イベントを発行する。
+     * 全てのアプリケーションデータの削除確認ダイアログを表示する（イベント発行）。
      */
-    private suspend fun requestAllDataDeletion() {
+    private suspend fun showAllDataDeleteDialog() {
         emitUiEvent(
             SettingsUiEvent.ShowAllDataDeleteDialog
         )
@@ -966,18 +963,16 @@ class SettingsViewModel @Inject internal constructor(
 
     //region Standalone Navigation
     /**
-     * 前の画面への遷移を要求する。
-     * 画面遷移イベントを発行する。
+     * 前の画面へ遷移する（イベント発行）。
      */
-    private suspend fun requestNavigatePreviousScreen() {
+    private suspend fun navigatePreviousScreen() {
         emitNavigatePreviousFragmentEvent()
     }
 
     /**
-     * OSSライセンス表示画面への遷移を要求する。
-     * 画面遷移イベントを発行する。
+     * OSSライセンス表示ダイアログを表示する（イベント発行）。
      */
-    private suspend fun requestNavigateOssLicensesScreen() {
+    private suspend fun showOssLicensesScreen() {
         emitUiEvent(
             SettingsUiEvent.ShowOSSLicensesDialog
         )
@@ -985,10 +980,9 @@ class SettingsViewModel @Inject internal constructor(
 
     // TODO:不要だが残しておく(最終的に削除)
     /**
-     * アプリケーションの詳細設定画面の表示を要求する。
-     * 画面遷移イベントを発行する。
+     * アプリケーションの詳細設定画面を表示する（イベント発行）。
      */
-    private suspend fun requestShowApplicationDetailsSettings() {
+    private suspend fun showApplicationDetailsSettings() {
         emitUiEvent(
             SettingsUiEvent.ShowApplicationDetailsSettingsScreen
         )

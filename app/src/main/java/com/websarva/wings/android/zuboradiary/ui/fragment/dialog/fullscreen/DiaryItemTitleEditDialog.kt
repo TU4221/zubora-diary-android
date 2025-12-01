@@ -113,7 +113,7 @@ class DiaryItemTitleEditDialog :
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: DiaryItemTitleEditUiEvent) {
         when (event) {
-            DiaryItemTitleEditUiEvent.CloseSwipedItem -> {
+            DiaryItemTitleEditUiEvent.CloseSwipedSelectionHistory -> {
                 swipeSimpleInteractionHelper?.closeSwipedItem()
             }
 
@@ -123,8 +123,8 @@ class DiaryItemTitleEditDialog :
                 )
             }
 
-            is DiaryItemTitleEditUiEvent.ShowSelectionHistoryItemDeleteDialog -> {
-                navigateDiaryItemTitleDeleteDialog(event.itemTitle)
+            is DiaryItemTitleEditUiEvent.ShowSelectionHistoryDeleteDialog -> {
+                navigateDiaryItemTitleSelectionHistoryDeleteDialog(event.itemTitle)
             }
         }
     }
@@ -204,7 +204,7 @@ class DiaryItemTitleEditDialog :
      * 履歴項目削除確認ダイアログ([DiaryItemTitleSelectionHistoryDeleteDialogFragment])へ遷移する。
      * @param itemTitle 削除対象の項目タイトル
      */
-    private fun navigateDiaryItemTitleDeleteDialog(itemTitle: String) {
+    private fun navigateDiaryItemTitleSelectionHistoryDeleteDialog(itemTitle: String) {
         val directions =
             DiaryItemTitleEditDialogDirections
                 .actionDiaryItemTitleEditDialogToDiaryItemTitleSelectionHistoryDeleteDialog(itemTitle)

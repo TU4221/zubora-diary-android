@@ -373,10 +373,10 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
             is DiaryEditUiEvent.ShowImageSelectionGallery -> {
                 openDocumentResultLauncher.launch(arrayOf("image/*"))
             }
-            is DiaryEditUiEvent.TransitionDiaryItemToVisible -> {
+            is DiaryEditUiEvent.startDiaryItemAdditionAnimation -> {
                 transitionDiaryItemToVisible(event.itemNumber, false)
             }
-            is DiaryEditUiEvent.TransitionDiaryItemToInvisible -> {
+            is DiaryEditUiEvent.startDiaryItemDeleteAnimation -> {
                 transitionDiaryItemToInvisible(event.itemNumber, false)
             }
             is DiaryEditUiEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch -> {

@@ -179,7 +179,7 @@ class CalendarViewModel @Inject internal constructor(
         if (!isReadyForOperation) return
 
         launchWithUnexpectedErrorHandler {
-            requestNavigatePreviousScreen()
+            navigatePreviousScreen()
         }
     }
 
@@ -205,7 +205,7 @@ class CalendarViewModel @Inject internal constructor(
 
     /**
      * 日記編集ボタンがクリックされた時に呼び出される事を想定。
-     * 日記の編集を開始する。
+     * 日記編集画面へ遷移する。
      * */
     fun onDiaryEditButtonClick() {
         if (!isReadyForOperation) return
@@ -230,20 +230,20 @@ class CalendarViewModel @Inject internal constructor(
         }
 
         launchWithUnexpectedErrorHandler {
-            requestNavigateDiaryEditScreen(id, date)
+            navigateDiaryEditScreen(id, date)
         }
     }
 
     /**
      * カレンダー画面が表示されている状態で、再度ボトムナビゲーションの同タブが選択された時に呼び出される事を想定。
-     * カレンダーを今日の日付に選択する処理を開始する。
+     * カレンダーを今日の日付へフォーカスする。
      * */
     internal fun onBottomNavigationItemReselect() {
         if (!isReadyForOperation) return
 
         val selectedDate = currentUiState.selectedDate
         launchWithUnexpectedErrorHandler {
-            selectToday(selectedDate)
+            foucusOnToday(selectedDate)
         }
     }
 
@@ -309,7 +309,7 @@ class CalendarViewModel @Inject internal constructor(
     }
 
     /**
-     * 指定された日付のドット表示を、日記の有無に応じて更新するイベントを発行する。
+     * 指定された日付のドット表示を、日記の有無に応じて更新する（イベント発行）。
      * @param date 更新対象の日付
      */
     private suspend fun refreshCalendarDayDot(date: LocalDate) {
@@ -341,12 +341,11 @@ class CalendarViewModel @Inject internal constructor(
     }
 
     /**
-     * 今日の日付を選択する。
-     * 既に今日が選択されている場合は、スクロールイベントのみを発行する。
-     *
+     * 今日の日付がカレンダーに表示されるようにスクロールし、今日の日付を選択する。
+     * 既に今日が選択されている場合は、スクロールのみを行う。
      * @param selectedDate 現在選択されている日付。
      */
-    private suspend fun selectToday(selectedDate: LocalDate) {
+    private suspend fun foucusOnToday(selectedDate: LocalDate) {
         val today = LocalDate.now()
         emitUiEvent(
             CalendarUiEvent.SmoothScrollCalendar(today)
@@ -358,21 +357,19 @@ class CalendarViewModel @Inject internal constructor(
     }
 
     /**
-     * 前の画面への遷移を要求する。
-     * 画面遷移イベントを発行する。
+     * 前の画面へ遷移する（イベント発行）。
      */
-    private suspend fun requestNavigatePreviousScreen() {
+    private suspend fun navigatePreviousScreen() {
         emitNavigatePreviousFragmentEvent()
     }
 
     /**
-     * 日記編集画面への遷移を要求する。
-     * 画面遷移イベントを発行する。
+     * 日記編集画面へ遷移する（イベント発行）。
      *
      * @param id 編集対象の日記のID。nullの場合は新規作成。
      * @param date 編集対象の日記の日付。
      */
-    private suspend fun requestNavigateDiaryEditScreen(id: String?, date: LocalDate) {
+    private suspend fun navigateDiaryEditScreen(id: String?, date: LocalDate) {
         emitUiEvent(
             CalendarUiEvent.NavigateDiaryEditScreen(id, date)
         )

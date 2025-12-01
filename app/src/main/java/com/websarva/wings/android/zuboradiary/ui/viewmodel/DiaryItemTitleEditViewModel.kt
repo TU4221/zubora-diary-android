@@ -56,7 +56,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
 
     //region Properties
     /** 履歴アイテム削除処理が保留中であることを示すためのパラメータキャッシュ。 */
-    private var pendingHistoryItemDeleteParameters: HistoryItemDeleteParameters? = null
+    private var pendingTitleSelectionHistoryDeleteParameters: TitleSelectionHistoryDeleteParameters? = null
     //endregion
 
     //region Initialization
@@ -149,17 +149,17 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     //region UI Event Handlers
     override fun onBackPressed() {
         launchWithUnexpectedErrorHandler {
-            requestNavigatePreviousScreen()
+            navigatePreviousScreen()
         }
     }
 
     /**
      * ナビゲーションアイコンがクリックされた時に呼び出される事を想定。
-     * 前の画面へ戻るイベントを発行する。
+     * 前の画面へ遷移する。
      */
     fun onNavigationIconClick() {
         launchWithUnexpectedErrorHandler {
-            requestNavigatePreviousScreen()
+            navigatePreviousScreen()
         }
     }
 
@@ -171,7 +171,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         val itemNumber = currentUiState.itemNumber
         val itemTitle = currentUiState.title
         launchWithUnexpectedErrorHandler {
-            completeItemTitleEdit(itemNumber, itemTitle = itemTitle)
+            startTitleSelectionProcess(itemNumber, itemTitle = itemTitle)
         }
     }
 
@@ -187,7 +187,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         val itemId = item.id
         val itemTitle = item.title
         launchWithUnexpectedErrorHandler {
-            completeItemTitleEdit(
+            startTitleSelectionProcess(
                 itemNumber,
                 DiaryItemTitleSelectionHistoryId(itemId),
                 itemTitle
@@ -197,7 +197,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
 
     /**
      * 履歴リストのアイテムがスワイプされた時に呼び出される事を想定。
-     * 削除確認ダイアログを表示するイベントを発行する。
+     * 削除確認ダイアログを表示する。
      * @param item スワイプされた履歴リストアイテム
      */
     internal fun onDiaryItemTitleSelectionHistoryListItemSwipe(
@@ -206,7 +206,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         val itemId = item.id
         val itemTitle = item.title
         launchWithUnexpectedErrorHandler {
-            requestHistoryDeletion(itemId, itemTitle)
+            showTitleSelectionHistoryDeleteDialog(itemId, itemTitle)
         }
     }
 
@@ -225,10 +225,10 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
      * 選択された日記項目タイトル選択履歴を削除する。
      */
     internal fun onDiaryItemTitleSelectionHistoryDeleteDialogPositiveResultReceived() {
-        val parameters =checkNotNull(pendingHistoryItemDeleteParameters)
-        clearPendingHistoryItemDeleteParameters()
+        val parameters =checkNotNull(pendingTitleSelectionHistoryDeleteParameters)
+        clearPendingTitleSelectionHistoryDeleteParameters()
         launchWithUnexpectedErrorHandler {
-            deleteDiaryItemTitleSelectionHistory(parameters.itemId, parameters.itemTitle)
+            deleteTitleSelectionHistory(parameters.itemId, parameters.itemTitle)
         }
     }
 
@@ -237,21 +237,23 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
      * 選択された日記項目タイトル選択履歴のスワイプ状態を復元する。
      */
     internal fun onDiaryItemTitleSelectionHistoryDeleteDialogNegativeResultReceived() {
-        clearPendingHistoryItemDeleteParameters()
+        clearPendingTitleSelectionHistoryDeleteParameters()
         launchWithUnexpectedErrorHandler {
-            requestCloseSwipedItem()
+            closeSwipedTitleSelectionHistory()
         }
     }
     //endregion
 
     //region Business Logic
     /**
-     * 入力されたタイトルを検証し、有効であれば編集完了イベントを発行する。
+     * ユーザーによるタイトル選択プロセスを開始する。
+     * 入力されたタイトルを検証し、有効であれば編集を完了する（イベント発行）。
+     * 無効な場合は、エラー状態をUIに反映させる。
      * @param itemNumberInt 項目番号
      * @param itemId 履歴ID（履歴から選択した場合）
      * @param itemTitle 項目タイトル
      */
-    private suspend fun completeItemTitleEdit(
+    private suspend fun startTitleSelectionProcess(
         itemNumberInt: Int,
         itemId: DiaryItemTitleSelectionHistoryId = DiaryItemTitleSelectionHistoryId.generate(),
         itemTitle: String
@@ -272,20 +274,20 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     }
 
     /**
-     * 履歴の削除を要求する。
-     * 渡されたパラメータをキャッシュし、削除確認ダイアログへの遷移イベントを発行する。
+     * 履歴の削除確認ダイアログを表示する。
+     * 渡されたパラメータをキャッシュし、ダイアログを表示する（イベント発行）。
      *
      * @param historyId 削除対象の履歴のID。
      * @param historyTitle 削除対象の履歴のタイトル。
      */
-    private suspend fun requestHistoryDeletion(historyId: String, historyTitle: String) {
-        updatePendingHistoryItemDeleteParameters(
+    private suspend fun showTitleSelectionHistoryDeleteDialog(historyId: String, historyTitle: String) {
+        cachePendingTitleSelectionHistoryDeleteParameters(
             DiaryItemTitleSelectionHistoryId(historyId),
             DiaryItemTitle(historyTitle)
         )
         emitUiEvent(
             DiaryItemTitleEditUiEvent
-                .ShowSelectionHistoryItemDeleteDialog(
+                .ShowSelectionHistoryDeleteDialog(
                     historyTitle
                 )
         )
@@ -296,7 +298,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
      * @param id 削除対象の履歴ID
      * @param title 削除対象のタイトル（ログおよびエラーメッセージ用）
      */
-    private suspend fun deleteDiaryItemTitleSelectionHistory(
+    private suspend fun deleteTitleSelectionHistory(
         id: DiaryItemTitleSelectionHistoryId,
         title: DiaryItemTitle
     ) {
@@ -324,21 +326,16 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }
     }
 
-    /**
-     * スワイプされたアイテムを閉じる事を要求する。
-     * UIにスワイプ状態を閉じるようイベントを発行する。
-     */
-    private suspend fun requestCloseSwipedItem() {
+    // TODO;Event名をメソッド名と統一
+    /** スワイプされた日記項目タイトル選択履歴を閉じる（イベント発行）。 */
+    private suspend fun closeSwipedTitleSelectionHistory() {
         emitUiEvent(
-            DiaryItemTitleEditUiEvent.CloseSwipedItem
+            DiaryItemTitleEditUiEvent.CloseSwipedSelectionHistory
         )
     }
 
-    /**
-     * 前の画面への遷移を要求する。
-     * 画面遷移イベントを発行する。
-     */
-    private suspend fun requestNavigatePreviousScreen() {
+    /** 前の画面へ遷移する（イベント発行）。 */
+    private suspend fun navigatePreviousScreen() {
         emitNavigatePreviousFragmentEvent()
     }
     //endregion
@@ -398,28 +395,28 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
 
     //region Pending History Item Delete Parameters
     /**
-     * 保留中の履歴アイテム削除パラメータを更新する。
+     * 保留中の日記項目選択履歴削除パラメータを更新する。
      * @param itemId 削除対象の履歴ID
      * @param itemTitle 削除対象の項目タイトル
      */
-    private fun updatePendingHistoryItemDeleteParameters(
+    private fun cachePendingTitleSelectionHistoryDeleteParameters(
         itemId: DiaryItemTitleSelectionHistoryId,
         itemTitle: DiaryItemTitle
     ) {
-        pendingHistoryItemDeleteParameters = HistoryItemDeleteParameters(itemId, itemTitle)
+        pendingTitleSelectionHistoryDeleteParameters = TitleSelectionHistoryDeleteParameters(itemId, itemTitle)
     }
 
-    /** 保留中の履歴アイテム削除パラメータをクリアする。 */
-    private fun clearPendingHistoryItemDeleteParameters() {
-        pendingHistoryItemDeleteParameters = null
+    /** 保留中の日記項目選択履歴削除パラメータをクリアする。 */
+    private fun clearPendingTitleSelectionHistoryDeleteParameters() {
+        pendingTitleSelectionHistoryDeleteParameters = null
     }
 
     /**
-     * 履歴アイテム削除処理に必要なパラメータを保持するデータクラス。
+     * 日記項目選択履歴削除処理に必要なパラメータを保持するデータクラス。
      * @property itemId 削除対象の履歴ID
      * @property itemTitle 削除対象の項目タイトル
      */
-    private data class HistoryItemDeleteParameters(
+    private data class TitleSelectionHistoryDeleteParameters(
         val itemId: DiaryItemTitleSelectionHistoryId,
         val itemTitle: DiaryItemTitle
     )

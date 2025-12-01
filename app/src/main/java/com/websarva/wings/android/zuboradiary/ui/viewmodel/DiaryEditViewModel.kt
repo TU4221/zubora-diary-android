@@ -257,7 +257,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val diary = currentUiState.editingDiary.toDomainModel()
         val originalDiary = originalDiary.toDomainModel()
         launchWithUnexpectedErrorHandler {
-            handleBackNavigation(diary, originalDiary)
+            startPreviousScreenNavigationProcess(diary, originalDiary)
         }
     }
 
@@ -276,7 +276,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val originalDiary = originalDiary.toDomainModel()
         val isNewDiary = currentUiState.isNewDiary
         launchWithUnexpectedErrorHandler {
-            requestDiarySave(
+            startDiarySaveProcess(
                 diary,
                 diaryItemTitleSelectionHistoryList,
                 originalDiary,
@@ -287,7 +287,7 @@ class DiaryEditViewModel @Inject internal constructor(
 
     /**
      * 日記削除メニューがクリックされた時に呼び出される事を想定。
-     * 日記の削除処理を開始する。
+     * 日記の削除確認ダイアログを表示する。
      */
     internal fun onDiaryDeleteMenuClick() {
         if (!isReadyForOperation) return
@@ -296,13 +296,13 @@ class DiaryEditViewModel @Inject internal constructor(
         val originalDiaryId = DiaryId(originalDiary.id)
         val originalDiaryDate = originalDiary.date
         launchWithUnexpectedErrorHandler {
-            requestDiaryDeletion(originalDiaryId, originalDiaryDate)
+            showDiaryDeleteDialog(originalDiaryId, originalDiaryDate)
         }
     }
 
     /**
      * ナビゲーションアイコンがクリックされた時に呼び出される事を想定。
-     * 前の画面へ戻る処理を開始する。
+     * 前の画面へ遷移する処理を開始する。
      */
     fun onNavigationClick() {
         if (!isReadyForOperation) return
@@ -310,13 +310,13 @@ class DiaryEditViewModel @Inject internal constructor(
         val diary = currentUiState.editingDiary.toDomainModel()
         val originalDiary = originalDiary.toDomainModel()
         launchWithUnexpectedErrorHandler {
-            handleBackNavigation(diary, originalDiary)
+            startPreviousScreenNavigationProcess(diary, originalDiary)
         }
     }
 
     /**
      * 日付入力欄がクリックされた時に呼び出される事を想定。
-     * 日付選択処理を開始する。
+     * 日付を選択するダイアログを表示する。
      */
     fun onDateInputFieldClick() {
         if (!isReadyForOperation) return
@@ -325,7 +325,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val originalDate = originalDiary.date
         val isNewDiary = currentUiState.isNewDiary
         launchWithUnexpectedErrorHandler {
-            requestDateSelection(date, originalDate, isNewDiary)
+            showDatePickerDialog(date, originalDate, isNewDiary)
         }
     }
 
@@ -367,7 +367,7 @@ class DiaryEditViewModel @Inject internal constructor(
 
     /**
      * 日記項目タイトル入力欄がクリックされた時に呼び出される事を想定。
-     * 日記項目タイトルの編集処理を開始する。
+     * 日記項目タイトルを編集するダイアログを表示する。
      * @param itemNumberInt 対象の項目番号
      */
     fun onItemTitleInputFieldClick(itemNumberInt: Int) {
@@ -377,7 +377,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val itemTitle =
             currentUiState.editingDiary.itemTitles[itemNumberInt] ?: throw IllegalStateException()
         launchWithUnexpectedErrorHandler {
-            requestItemTitleEditing(itemNumber, itemTitle)
+            showDiaryItemTitleEditDialog(itemNumber, itemTitle)
         }
     }
 
@@ -403,7 +403,7 @@ class DiaryEditViewModel @Inject internal constructor(
         if (!isReadyForOperation) return
 
         launchWithUnexpectedErrorHandler {
-            requestTransitionDiaryItemAddition()
+            startDiaryItemAdditionAnimation()
         }
     }
 
@@ -423,39 +423,39 @@ class DiaryEditViewModel @Inject internal constructor(
 
     /**
      * 日記項目削除ボタンがクリックされた時に呼び出される事を想定。
-     * 日記項目入力欄の削除処理を開始する。
+     * 日記項目の削除確認ダイアログを表示する。
      */
     fun onItemDeleteButtonClick(itemNumberInt: Int) {
         if (!isReadyForOperation) return
 
         val itemNumber = DiaryItemNumber(itemNumberInt)
         launchWithUnexpectedErrorHandler {
-            requestDiaryItemDeletion(itemNumber)
+            showDiaryItemDeleteDialog(itemNumber)
         }
     }
 
     /**
      * 添付画像削除ボタンがクリックされた時に呼び出される事を想定。
-     * 添付画像の削除処理を開始する。
+     * 添付画像の削除確認ダイアログを表示する。
      */
     fun onAttachedImageDeleteButtonClick() {
         if (!isReadyForOperation) return
 
         launchWithUnexpectedErrorHandler {
-            requestAttachedImageDeletion()
+            showDiaryImageDeleteDialog()
         }
     }
 
     /**
      * 添付画像欄がクリックされた時に呼び出される事を想定。
-     * 添付する画像を選択する処理を開始する。
+     * 添付する画像を選択するギャラリーを表示する。
      */
     fun onAttachedImageClick() {
         if (!isReadyForOperation) return
 
         val diaryId = currentUiState.editingDiary.id.let { DiaryId(it) }
         launchWithUnexpectedErrorHandler {
-            requestImageSelection(diaryId)
+            showImageSelectionGallery(diaryId)
         }
     }
 
@@ -504,7 +504,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val parameters = checkNotNull(pendingDiaryLoadParameters)
         clearPendingDiaryLoadParameters()
         launchWithUnexpectedErrorHandler {
-            fetchWeatherInfo(parameters.date, parameters.previousDate)
+            startWeatherInfoFetchProcess(parameters.date, parameters.previousDate)
         }
     }
     //endregion
@@ -568,7 +568,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val parameters = checkNotNull(pendingDiaryDateUpdateParameters)
         clearPendingDiaryDateUpdateParameters()
         launchWithUnexpectedErrorHandler {
-            processChangedDiaryDate(date, parameters.originalDate, parameters.isNewDiary)
+            handleDatePickcerDialogResult(date, parameters.originalDate, parameters.isNewDiary)
         }
     }
 
@@ -584,13 +584,11 @@ class DiaryEditViewModel @Inject internal constructor(
     //region Diary Load Failure Dialog Results
     /**
      * 日記読み込み失敗ダイアログから結果を受け取った時に呼び出される事を想定。
-     * 前の画面へ戻るイベントを発行する。
+     * 前の画面へ遷移する（イベント発行）。
      */
     internal fun onDiaryLoadFailureDialogResultReceived() {
         launchWithUnexpectedErrorHandler {
-            emitUiEvent(
-                DiaryEditUiEvent.NavigatePreviousScreenOnInitialDiaryLoadFailed
-            )
+            navigatePreviousScreenOnInitialDiaryLoadFailed()
         }
     }
     //endregion
@@ -602,7 +600,7 @@ class DiaryEditViewModel @Inject internal constructor(
      */
     internal fun onWeatherInfoFetchDialogPositiveResultReceived() {
         launchWithUnexpectedErrorHandler {
-            requestCheckLocationPermissionBeforeWeatherInfoFetch()
+            checkLocationPermissionBeforeWeatherInfoFetch()
         }
     }
 
@@ -624,7 +622,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val parameters = checkNotNull(pendingDiaryItemDeleteParameters)
         clearPendingDiaryItemDeleteParameters()
         launchWithUnexpectedErrorHandler {
-            requestTransitionDiaryItemDelete(parameters.itemNumber)
+            startDiaryItemDeleteAnimation(parameters.itemNumber)
         }
     }
 
@@ -658,7 +656,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val parameters = checkNotNull(pendingPreviousNavigationParameters)
         clearPendingPreviousNavigationParameters()
         launchWithUnexpectedErrorHandler {
-            requestNavigatePreviousScreen(parameters.originalDiaryDate)
+            navigatePreviousScreen(parameters.originalDiaryDate)
         }
     }
 
@@ -685,7 +683,7 @@ class DiaryEditViewModel @Inject internal constructor(
     //region Open Document Results
     /**
      * ギャラリーから画像を選択した結果を受け取った時に呼び出される事を想定。
-     * 選択された画像のキャッシュ処理を開始する。
+     * 選択された画像をキャッシュする。
      * @param uri 選択された画像のURI（未選択の場合はnull）
      */
     internal fun onOpenDocumentImageUriResultReceived(uri: Uri?) {
@@ -702,7 +700,7 @@ class DiaryEditViewModel @Inject internal constructor(
     //region UI Event Handlers - Permissions
     /**
      * 位置情報権限の確認結果を受け取った時に呼び出される事を想定。
-     * 権限が許可されている場合のみ、天気情報の取得処理を開始する。
+     * 権限が許可されている場合のみ、天気情報の取得を実行する。
      * @param isGranted 権限が許可されている場合はtrue
      */
     internal fun onAccessLocationPermissionChecked(
@@ -712,7 +710,7 @@ class DiaryEditViewModel @Inject internal constructor(
         clearPendingWeatherInfoFetchParameters()
         launchWithUnexpectedErrorHandler {
             parameters?.let {
-                executeFetchWeatherInfo(isGranted, it.date)
+                executeWeatherInfoFetchWithPermissionCheck(isGranted, it.date)
             } ?: throw IllegalStateException()
         }
     }
@@ -726,14 +724,11 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param id 既存の日記ID（新規の場合はnull）
      * @param date 対象の日付
      */
-    private suspend fun prepareDiaryEntry(
-        id: DiaryId?,
-        date: LocalDate
-    ) {
+    private suspend fun prepareDiaryEntry(id: DiaryId?, date: LocalDate) {
         if (id == null) {
             prepareNewDiaryEntry(date)
         } else {
-            loadDiaryById(id, date)
+            prepareExsistsDiaryEntry(id, date)
         }
     }
 
@@ -746,7 +741,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val previousDate = currentUiState.previousSelectedDate
         val originalDate = originalDiary.date
         val isNewDiary = currentUiState.isNewDiary
-        requestDiaryLoad(
+        startDiaryCheckProcessBeforeEditing(
             date,
             previousDate,
             originalDate,
@@ -755,15 +750,26 @@ class DiaryEditViewModel @Inject internal constructor(
     }
 
     /**
-     * 日記の読み込みを要求する。
-     * 既存日記の読み込みを確認するダイアログを表示するかどうかを判断し、必要に応じてダイアログを表示するイベントを発行する。
-     * 表示不要の場合は天気情報の取得処理を開始する。
+     * 既存日記エントリの準備を行う。
+     * @param id 既存の日記ID
      * @param date 対象の日付
+     */
+    private suspend fun prepareExsistsDiaryEntry(id: DiaryId, date: LocalDate) {
+        loadDiaryById(id, date)
+    }
+
+    /**
+     * 新規作成編集準備後、編集日記日付変更後の日記状態確認プロセスを開始する。(既存日記編集準備ではこのプロセスは不要)
+     * 日記の日付に対して既存日記が存在する場合は、
+     * 日記の状態をもとに既存日記の読み込みを確認するダイアログを表示するかどうかを判断し、
+     * 必要に応じてダイアログを表示する（イベント発行）。
+     * 表示不要の場合は天気情報の取得処理を開始する。
+     * @param date 編集日記の日付
      * @param previousDate 以前選択されていた日付
      * @param originalDate 元の日記の日付
      * @param isNewDiary 新規日記の場合はtrue
      */
-    private suspend fun requestDiaryLoad(
+    private suspend fun startDiaryCheckProcessBeforeEditing(
         date: LocalDate,
         previousDate: LocalDate?,
         originalDate: LocalDate,
@@ -776,12 +782,12 @@ class DiaryEditViewModel @Inject internal constructor(
             is UseCaseResult.Success -> {
                 updateToIdleState()
                 if (result.value) {
-                    updatePendingDiaryLoadParameters(date, previousDate)
+                    cachePendingDiaryLoadParameters(date, previousDate)
                     emitUiEvent(
                         DiaryEditUiEvent.ShowDiaryLoadDialog(date)
                     )
                 } else {
-                    fetchWeatherInfo(date, previousDate)
+                    startWeatherInfoFetchProcess(date, previousDate)
                 }
             }
             is UseCaseResult.Failure -> {
@@ -890,15 +896,15 @@ class DiaryEditViewModel @Inject internal constructor(
     }
 
     /**
-     * 日記の保存を要求する。
-     * 日記の上書き保存を確認するダイアログを表示するかどうかを判断し、必要に応じてダイアログを表示するイベントを発行する。
-     * 表示不要な場合は保存処理を実行する。
+     * 日記の保存プロゼスを開始する。
+     * 日記の上書き保存を確認するダイアログを表示するかどうかを判断し、必要に応じてダイアログを表示する（イベント発行）。
+     * 表示不要な場合はそのまま保存する。
      * @param diary 保存する日記データ
      * @param diaryItemTitleSelectionHistoryList 項目タイトル選択履歴のリスト
      * @param originalDiary 保存前の元の日記データ
      * @param isNewDiary 新規日記の場合はtrue
      */
-    private suspend fun requestDiarySave(
+    private suspend fun startDiarySaveProcess(
         diary: Diary,
         diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
         originalDiary: Diary,
@@ -911,7 +917,7 @@ class DiaryEditViewModel @Inject internal constructor(
             is UseCaseResult.Success -> {
                 updateToIdleState()
                 if (result.value) {
-                    updatePendingDiaryUpdateParameters(
+                    cachePendingDiaryUpdateParameters(
                         diary,
                         diaryItemTitleSelectionHistoryList,
                         originalDiary,
@@ -1000,14 +1006,14 @@ class DiaryEditViewModel @Inject internal constructor(
     }
 
     /**
-     * 日記の削除を要求する。
-     * 渡されたパラメータをキャッシュし、削除確認ダイアログへの遷移イベントを発行する。
+     * 日記の削除確認ダイアログを表示する。
+     * 渡されたパラメータをキャッシュし、ダイアログを表示する（イベント発行）。
      *
      * @param diaryId 削除対象の日記のID。
      * @param date 削除対象の日記の日付。
      */
-    private suspend fun requestDiaryDeletion(diaryId: DiaryId, date: LocalDate) {
-        updatePendingDiaryDeleteParameters(
+    private suspend fun showDiaryDeleteDialog(diaryId: DiaryId, date: LocalDate) {
+        cachePendingDiaryDeleteParameters(
             diaryId,
             date
         )
@@ -1057,19 +1063,19 @@ class DiaryEditViewModel @Inject internal constructor(
 
     //region Diary Date Operation
     /**
-     * 日付選択を要求する。
-     * 渡されたパラメータをキャッシュし、日付選択ダイアログへの遷移イベントを発行する。
+     * 日付選択ダイアログを表示する。
+     * 渡されたパラメータをキャッシュし、ダイアログを表示する（イベント発行）。
      *
      * @param currentDate 現在選択されている日付。
      * @param originalDate 元の日付。
      * @param isNewDiary 新規日記かどうか。
      */
-    private suspend fun requestDateSelection(
+    private suspend fun showDatePickerDialog(
         currentDate: LocalDate,
         originalDate: LocalDate,
         isNewDiary: Boolean
     ) {
-        updatePendingDiaryDateUpdateParameters(originalDate, isNewDiary)
+        cachePendingDiaryDateUpdateParameters(originalDate, isNewDiary)
         emitUiEvent(
             DiaryEditUiEvent.ShowDatePickerDialog(currentDate)
         )
@@ -1081,7 +1087,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param originalDate 元の日付
      * @param isNewDiary 新規日記の場合はtrue
      */
-    private suspend fun processChangedDiaryDate(
+    private suspend fun handleDatePickcerDialogResult(
         date: LocalDate,
         originalDate: LocalDate,
         isNewDiary: Boolean
@@ -1090,7 +1096,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val previousDate = currentUiState.previousSelectedDate
         // MEMO:下記処理をdate(StateFlow)変数のCollectorから呼び出すと、
         //      画面回転時にも不要に呼び出してしまう為、下記にて処理。
-        requestDiaryLoad(
+        startDiaryCheckProcessBeforeEditing(
             date,
             previousDate,
             originalDate,
@@ -1102,13 +1108,12 @@ class DiaryEditViewModel @Inject internal constructor(
     //region Diary Item Operation
 
     /**
-     * 日記項目タイトルの編集を要求する。
-     * 渡されたパラメータをラップし、日記項目タイトル編集ダイアログへの遷移イベントを発行する。
+     * 日記項目タイトルの編集ダイアログを表示する（イベント発行）。
      *
      * @param itemNumber 編集対象の項目番号。
      * @param currentTitle 現在の項目タイトル。
      */
-    private suspend fun requestItemTitleEditing(itemNumber: DiaryItemNumber, currentTitle: String) {
+    private suspend fun showDiaryItemTitleEditDialog(itemNumber: DiaryItemNumber, currentTitle: String) {
         // MEMO:日記項目タイトルIDは受取用でここでは不要の為、nullとする。
         val itemTitleId = null
         emitUiEvent(
@@ -1123,11 +1128,11 @@ class DiaryEditViewModel @Inject internal constructor(
     }
 
     /** 日記項目の追加アニメーションのイベントを発行する。 */
-    private suspend fun requestTransitionDiaryItemAddition() {
+    private suspend fun startDiaryItemAdditionAnimation() {
         updateToInputDisabledState()
         val numVisibleItems = currentUiState.numVisibleDiaryItems
         val additionItemNumber = numVisibleItems + 1
-        emitUiEvent(DiaryEditUiEvent.TransitionDiaryItemToVisible(additionItemNumber))
+        emitUiEvent(DiaryEditUiEvent.startDiaryItemAdditionAnimation(additionItemNumber))
     }
 
     /**
@@ -1146,25 +1151,25 @@ class DiaryEditViewModel @Inject internal constructor(
     }
 
     /**
-     * 日記項目の削除を要求する。
-     * 渡されたパラメータをキャッシュし、日記項目削除ダイアログへの遷移イベントを発行する。
+     * 日記項目の削除確認ダイアログを表示する。
+     * 渡されたパラメータをキャッシュし、ダイアログを表示する（イベント発行）。
      *
      * @param itemNumber 削除対象の項目番号。
      */
-    private suspend fun requestDiaryItemDeletion(itemNumber: DiaryItemNumber) {
-        updatePendingDiaryItemDeleteParameters(itemNumber)
+    private suspend fun showDiaryItemDeleteDialog(itemNumber: DiaryItemNumber) {
+        cachePendingDiaryItemDeleteParameters(itemNumber)
         emitUiEvent(
             DiaryEditUiEvent.ShowDiaryItemDeleteDialog(itemNumber.value)
         )
     }
 
     /**
-     * 日記項目の削除アニメーションのイベントを発行する。
-     * 削除対象が項目1で、現在表示されている項目が項目1のみの場合、アニメーションイベントを発行せずにデータのみを削除する。
+     * 日記項目の削除アニメーションの開始する（イベント発行）。
+     * 削除対象が項目1で、現在表示されている項目が項目1のみの場合、アニメーションを開始せずにデータのみを削除する。
      * @param itemNumber 削除する項目の番号
      */
     // MEMO:日記項目削除処理完了時のUi更新(編集中)は日記項目削除メソッドにて処理
-    private suspend fun requestTransitionDiaryItemDelete(itemNumber: DiaryItemNumber) {
+    private suspend fun startDiaryItemDeleteAnimation(itemNumber: DiaryItemNumber) {
         val numVisibleItems = currentUiState.numVisibleDiaryItems
 
         updateToInputDisabledState()
@@ -1172,7 +1177,7 @@ class DiaryEditViewModel @Inject internal constructor(
             deleteItem(itemNumber)
         } else {
             emitUiEvent(
-                DiaryEditUiEvent.TransitionDiaryItemToInvisible(itemNumber.value)
+                DiaryEditUiEvent.startDiaryItemDeleteAnimation(itemNumber.value)
             )
         }
     }
@@ -1227,13 +1232,12 @@ class DiaryEditViewModel @Inject internal constructor(
 
     //region Diary Image Operation
     /**
-     * 画像を選択を要求する。
-     * 画像選択画面を開くイベントを発行する。
+     * 画像を選択するギャラリーを表示する（イベント発行）。
      */
     // MEMO:画像選択完了時のUi更新(編集中)は画像選択完了イベントメソッドにて処理
-    private suspend fun requestImageSelection(diaryId: DiaryId) {
+    private suspend fun showImageSelectionGallery(diaryId: DiaryId) {
         updateToProcessingState()
-        updatePendingDiaryImageUpdateParameters(diaryId)
+        cachePendingDiaryImageUpdateParameters(diaryId)
         emitUiEvent(DiaryEditUiEvent.ShowImageSelectionGallery)
     }
 
@@ -1272,17 +1276,14 @@ class DiaryEditViewModel @Inject internal constructor(
         updateToIdleState()
     }
 
-    /**
-     * 添付画像の削除を要求する。
-     * 添付画像削除ダイアログへの遷移イベントを発行する。
-     */
-    private suspend fun requestAttachedImageDeletion() {
+    /** 添付画像の削除確認ダイアログを表示する（イベント発行）。 */
+    private suspend fun showDiaryImageDeleteDialog() {
         emitUiEvent(
             DiaryEditUiEvent.ShowDiaryImageDeleteDialog
         )
     }
 
-    /** 添付画像を削除（UI状態の更新とキャッシュファイルの削除）する。 */
+    /** 添付画像を削除（UI状態の更新とキャッシュファイルを削除）する。 */
     private suspend fun deleteImage() {
         updateImageFileName(null)
         clearDiaryImageCacheFile()
@@ -1313,32 +1314,24 @@ class DiaryEditViewModel @Inject internal constructor(
 
     //region Weather Info Fetch
     /**
-     * 天気情報の取得を開始する。天気情取得設定が無効の場合は何もしない。
+     * 天気情報の取得プロセスを開始する。
+     * 天気情報取得の確認ダイアログを表示するか判断し、必要に応じてダイアログを表示する（イベント発行）。
+     * 表示が不要な場合は、位置情報権限を確認する（イベント発行）。
+     * 天気情取得設定が無効の場合は何もしない。
      * @param date 天気情報を取得する日付
      * @param previousDate 以前選択されていた日付
      */
-    private suspend fun fetchWeatherInfo(date: LocalDate, previousDate: LocalDate?) {
-        val isEnabled = checkWeatherInfoFetchEnabledUseCase().value
-        if (!isEnabled) return
-
-        requestWeatherInfoFetch(date, previousDate)
-    }
-
-    /**
-     * 天気情報の取得を要求する。
-     * 天気情報取得の確認ダイアログを表示するか判断し、必要に応じてダイアログ表示イベントを発行する。
-     * 表示が不要な場合は、権限確認を要求するイベントを発行する。
-     * @param date 天気情報を取得する日付
-     * @param previousDate 以前選択されていた日付
-     */
-    private suspend fun requestWeatherInfoFetch(
+    private suspend fun startWeatherInfoFetchProcess(
         date: LocalDate,
         previousDate: LocalDate?
     ) {
+        val isEnabled = checkWeatherInfoFetchEnabledUseCase().value
+        if (!isEnabled) return
+
         val shouldRequest =
             shouldRequestWeatherInfoConfirmationUseCase(date, previousDate).value
         if (shouldRequest) {
-            updatePendingWeatherInfoFetchParameters(date)
+            cachePendingWeatherInfoFetchParameters(date)
             emitUiEvent(
                 DiaryEditUiEvent.ShowWeatherInfoFetchDialog(date)
             )
@@ -1346,24 +1339,25 @@ class DiaryEditViewModel @Inject internal constructor(
             val shouldLoad = shouldFetchWeatherInfoUseCase(date, previousDate).value
             if (!shouldLoad) return
 
-            updatePendingWeatherInfoFetchParameters(date)
-            requestCheckLocationPermissionBeforeWeatherInfoFetch()
+            cachePendingWeatherInfoFetchParameters(date)
+            checkLocationPermissionBeforeWeatherInfoFetch()
         }
     }
 
-    /** 天気情報取得前の位置情報権限の確認を要求するイベントを発行する。 */
-    private suspend fun requestCheckLocationPermissionBeforeWeatherInfoFetch() {
+    /** 天気情報取得前の位置情報権限の確認を行う（イベント発行）。 */
+    private suspend fun checkLocationPermissionBeforeWeatherInfoFetch() {
         emitUiEvent(
             DiaryEditUiEvent.CheckAccessLocationPermissionBeforeWeatherInfoFetch
         )
     }
 
     /**
-     * 天気情報の取得を実行する。
+     * 位置情報権限の有無を確認し、許可されている場合に天気情報の取得を実行する。
+     * 権限がない場合は、ユーザーに権限が必要である旨をダイアログで表示する（イベント発行）。
      * @param isGranted 位置情報権限が許可されているか
      * @param date 天気情報を取得する日付
      */
-    private suspend fun executeFetchWeatherInfo(
+    private suspend fun executeWeatherInfoFetchWithPermissionCheck(
         isGranted: Boolean,
         date: LocalDate
     ) {
@@ -1401,13 +1395,13 @@ class DiaryEditViewModel @Inject internal constructor(
     }
     //endregion
 
-    //region Back Navigation
+    //region Navigation
     /**
-     * 戻るナビゲーションの処理を行う。変更がある場合は確認ダイアログを表示する。
+     * 前の画面へ遷移する処理を開始する。変更がある場合は確認ダイアログを表示する（イベント発行）。
      * @param diary 現在の編集中の日記データ
      * @param originalDiary 元の日記データ
      */
-    private suspend fun handleBackNavigation(
+    private suspend fun startPreviousScreenNavigationProcess(
         diary: Diary,
         originalDiary: Diary
     ) {
@@ -1416,23 +1410,33 @@ class DiaryEditViewModel @Inject internal constructor(
             originalDiary
         ).value
         if (shouldRequest) {
-            updatePendingPreviousNavigationParameter(originalDiary.date)
+            cachePendingPreviousNavigationParameter(originalDiary.date)
             emitUiEvent(
                 DiaryEditUiEvent.ShowExitWithoutDiarySaveDialog
             )
         } else {
-            requestNavigatePreviousScreen(originalDiary.date)
+            navigatePreviousScreen(originalDiary.date)
         }
     }
 
     /**
      * 前の画面へ遷移する。
-     * 日記画像のキャッシュファイルをクリアした後、画面遷移イベントを発行する。
+     * 日記画像のキャッシュファイルをクリアした後、画面遷移する（イベント発行）。
      * @param originalDiaryDate 遷移元に返す日付
      */
-    private suspend fun requestNavigatePreviousScreen(originalDiaryDate: LocalDate) {
+    private suspend fun navigatePreviousScreen(originalDiaryDate: LocalDate) {
         clearDiaryImageCacheFile()
         emitUiEvent(DiaryEditUiEvent.NavigatePreviousScreenWithResult(originalDiaryDate))
+    }
+
+    /**
+     * 前の画面へ遷移する。
+     * 初回の日記読み込み失敗時に呼び出す。
+     */
+    private suspend fun navigatePreviousScreenOnInitialDiaryLoadFailed() {
+        emitUiEvent(
+            DiaryEditUiEvent.NavigatePreviousScreenOnInitialDiaryLoadFailed
+        )
     }
     //endregion
 
@@ -1722,7 +1726,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param date 読み込み対象の日付
      * @param previousDate 以前選択されていた日付
      */
-    private fun updatePendingDiaryLoadParameters(date: LocalDate, previousDate: LocalDate?) {
+    private fun cachePendingDiaryLoadParameters(date: LocalDate, previousDate: LocalDate?) {
         pendingDiaryLoadParameters = DiaryLoadParameters(date, previousDate)
     }
 
@@ -1750,7 +1754,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param originalDiary 保存前の元の日記データ
      * @param isNewDiary 新規日記の場合はtrue
      */
-    private fun updatePendingDiaryUpdateParameters(
+    private fun cachePendingDiaryUpdateParameters(
         diary: Diary,
         diaryItemTitleSelectionHistoryList: List<DiaryItemTitleSelectionHistory>,
         originalDiary: Diary,
@@ -1791,7 +1795,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param id 削除対象の日記ID
      * @param date 削除対象の日記の日付
      */
-    private fun updatePendingDiaryDeleteParameters(id: DiaryId, date: LocalDate) {
+    private fun cachePendingDiaryDeleteParameters(id: DiaryId, date: LocalDate) {
         pendingDiaryDeleteParameters = DiaryDeleteParameters(id, date)
     }
 
@@ -1817,7 +1821,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param originalDate 元の日付
      * @param isNewDiary 新規日記の場合はtrue
      */
-    private fun updatePendingDiaryDateUpdateParameters(
+    private fun cachePendingDiaryDateUpdateParameters(
         originalDate: LocalDate,
         isNewDiary: Boolean
     ) {
@@ -1845,7 +1849,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * 保留中の前画面遷移パラメータを更新する。
      * @param originalDiaryDate 元の日記の日付
      */
-    private fun updatePendingPreviousNavigationParameter(originalDiaryDate: LocalDate) {
+    private fun cachePendingPreviousNavigationParameter(originalDiaryDate: LocalDate) {
         pendingPreviousNavigationParameters = PreviousNavigationParameters(originalDiaryDate)
     }
 
@@ -1868,7 +1872,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * 保留中の天気情報取得パラメータを更新する。
      * @param date 取得対象の日付
      */
-    private fun updatePendingWeatherInfoFetchParameters(date: LocalDate) {
+    private fun cachePendingWeatherInfoFetchParameters(date: LocalDate) {
         pendingWeatherInfoFetchParameters = WeatherInfoFetchParameters(date)
     }
 
@@ -1889,7 +1893,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * 保留中の日記項目削除パラメータを更新する。
      * @param itemNumber 削除する項目の番号
      */
-    private fun updatePendingDiaryItemDeleteParameters(itemNumber: DiaryItemNumber) {
+    private fun cachePendingDiaryItemDeleteParameters(itemNumber: DiaryItemNumber) {
         pendingDiaryItemDeleteParameters = DiaryItemDeleteParameters(itemNumber)
     }
 
@@ -1912,7 +1916,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * 保留中の日記画像更新パラメータを更新する。
      * @param diaryId 対象の日記ID
      */
-    private fun updatePendingDiaryImageUpdateParameters(diaryId: DiaryId) {
+    private fun cachePendingDiaryImageUpdateParameters(diaryId: DiaryId) {
         pendingDiaryImageUpdateParameters = DiaryImageUpdateParameters(diaryId)
     }
 
@@ -2044,7 +2048,7 @@ class DiaryEditViewModel @Inject internal constructor(
                 }
             }
             clearDiaryImageCacheFile()
-            requestNavigatePreviousScreen(originalDiary.date)
+            navigatePreviousScreen(originalDiary.date)
             isTesting = false
         }
     }
