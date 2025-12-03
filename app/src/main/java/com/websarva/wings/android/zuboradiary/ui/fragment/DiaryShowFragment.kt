@@ -6,16 +6,17 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
@@ -79,7 +80,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     /** 日記読み込み失敗ダイアログからの結果を監視する。 */
     private fun observeDiaryLoadFailureDialogResult() {
         observeDialogResult<Unit>(
-            DiaryLoadFailureDialogFragment.RESULT_KEY
+            RESULT_KEY_DIARY_LOAD_FAILURE
         ) { result ->
             when (result) {
                 is DialogResult.Positive,
@@ -94,7 +95,7 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     /** 日記削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryDeleteDialogResult() {
         observeDialogResult<Unit>(
-            DiaryDeleteDialogFragment.RESULT_KEY
+            RESULT_KEY_DIARY_DELETE_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -142,12 +143,6 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     override fun navigatePreviousFragment() {
         navigatePreviousFragmentOnce(FragmentResult.None)
     }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            DiaryShowFragmentDirections.actionDiaryShowFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
-    }
     //endregion
 
     //region View Setup
@@ -183,22 +178,36 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     }
 
     /**
-     * 日記読み込み失敗ダイアログ([DiaryLoadFailureDialogFragment])へ遷移する。
+     * 日記読み込み失敗ダイアログ([ConfirmationDialogFragment])へ遷移する。
      * @param date 読み込みに失敗した日記の日付
      */
     private fun navigateDiaryLoadFailureDialog(date: LocalDate) {
-        val directions =
-            DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryLoadFailureDialog(date)
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_DIARY_LOAD_FAILURE,
+            titleRes = R.string.dialog_diary_load_failure_title,
+            messageText = getString(
+                R.string.dialog_diary_load_failure_message,
+                date.formatDateString(requireContext())
+            )
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     /**
-     * 日記削除確認ダイアログ([DiaryDeleteDialogFragment])へ遷移する。
+     * 日記削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。
      * @param date 削除対象の日記の日付
      */
     private fun navigateDiaryDeleteDialog(date: LocalDate) {
-        val directions =
-            DiaryShowFragmentDirections.actionDiaryShowFragmentToDiaryDeleteDialog(date)
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_DIARY_DELETE_CONFIRMATION,
+            titleRes = R.string.dialog_diary_delete_title,
+            messageText = getString(
+                R.string.dialog_diary_delete_message,
+                date.formatDateString(requireContext())
+            )
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
     //endregion
@@ -206,5 +215,11 @@ class DiaryShowFragment : BaseFragment<FragmentDiaryShowBinding, DiaryShowUiEven
     internal companion object {
         /** このフラグメントから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
+
+        /** 日記読込失敗ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DIARY_LOAD_FAILURE = "diary_load_failure_result"
+
+        /** 日記削除の確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DIARY_DELETE_CONFIRMATION = "diary_delete_confirmation_result"
     }
 }

@@ -80,12 +80,12 @@
 
     <!-- region Dialog - Diary Delete Dialog -->
     <string name="dialog_diary_delete_title">警告</string>
-    <string name="dialog_diary_delete_message">の日記を削除してもよろしいでしょうか。</string>
+    <string name="dialog_diary_delete_message">%sの日記を削除してもよろしいでしょうか。</string>
     <!-- endregion -->
 
     <!-- region Dialog - Diary Load Failure Dialog -->
     <string name="dialog_diary_load_failure_title">警告</string>
-    <string name="dialog_diary_load_failure_message">の日記の読込に失敗しました。</string>
+    <string name="dialog_diary_load_failure_message">%sの日記の読込に失敗しました。</string>
     <!-- endregion -->
 
     <!-- region View - Image Progress View -->
@@ -198,15 +198,11 @@
     <string name="layout_settings_item_title_tools_value">設定項目</string>
     <!-- endregion -->
 
-    <!-- region Fragment - Settings Fragment -->
-    <string name="fragment_settings_permission_name_notification">通知</string>
-    <string name="fragment_settings_permission_name_location">位置情報利用</string>
-    <!-- endregion -->
-
     <!-- region Dialog - Permission Dialog -->
     <string name="dialog_permission_title">権限が必要です</string>
-    <string name="dialog_permission_first_message">この機能を正常に動作させるためには</string>
-    <string name="dialog_permission_third_message">権限が必要です。権限を有効にしてください。</string>
+    <string name="dialog_permission_message">この機能を正常に動作させるためには%s権限が必要です。権限を有効にしてください。</string>
+    <string name="dialog_permission_name_notification">通知</string>
+    <string name="dialog_permission_name_location">位置情報利用</string>
     <!-- endregion -->
 
     <!-- region Dialog - All Diaries Delete Dialog -->
@@ -315,12 +311,12 @@
 
     <!-- region Dialog - Diary Load Dialog -->
     <string name="dialog_diary_load_title">確認</string>
-    <string name="dialog_diary_load_message">の日記は既に保存されています。保存された日記を読み込みますか。</string>
+    <string name="dialog_diary_load_message">%sの日記は既に保存されています。保存された日記を読み込みますか。</string>
     <!-- endregion -->
 
     <!-- region Dialog - Diary Update Dialog -->
     <string name="dialog_diary_update_title">警告</string>
-    <string name="dialog_diary_update_message">の日記は既に保存されています。保存された日記を上書きしますか。</string>
+    <string name="dialog_diary_update_message">%sの日記は既に保存されています。保存された日記を上書きしますか。</string>
     <!-- endregion -->
 
     <!-- region Dialog - Exit Without Diary Save Dialog -->
@@ -330,13 +326,12 @@
 
     <!-- region Dialog - Weather Info Fetch Dialog -->
     <string name="dialog_weather_info_fetch_title">確認</string>
-    <string name="dialog_weather_info_fetch_message">の天気情報を取得しますか。</string>
+    <string name="dialog_weather_info_fetch_message">%sの天気情報を取得しますか。</string>
     <!-- endregion -->
 
     <!-- region Dialog - Diary Item Delete Dialog -->
     <string name="dialog_diary_item_delete_title">警告</string>
-    <string name="dialog_diary_item_delete_first_message">項目</string>
-    <string name="dialog_diary_item_delete_second_message">を削除してもよろしいでしょうか。</string>
+    <string name="dialog_diary_item_delete_message">項目%sを削除してもよろしいでしょうか。</string>
     <!-- endregion -->
 
     <!-- region Dialog - Diary Attached Image Delete Dialog -->
@@ -373,10 +368,9 @@
     <string name="dialog_diary_item_title_edit_new_item_title_input_field_error_message_empty">1文字以上の文字を入力してください</string>
     <!-- endregion -->
 
-    <!-- region Dialog -Diary Item Title Delete Dialog -->
-    <string name="dialog_diary_item_title_delete_title">警告</string>
-    <string name="dialog_diary_item_title_delete_first_message">”</string>
-    <string name="dialog_diary_item_title_delete_second_message">”を削除しますか。</string>
+    <!-- region Dialog -Diary Item Title History Delete Dialog -->
+    <string name="dialog_diary_item_title_history_delete_title">警告</string>
+    <string name="dialog_diary_item_title_history_delete_message">”%s”を削除しますか。</string>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->

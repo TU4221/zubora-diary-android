@@ -42,42 +42,7 @@
                     app:argType="java.time.LocalDate" />
             </action>
 
-            <action
-                android:id="@+id/action_diary_list_fragment_to_start_year_month_picker_dialog"
-                app:destination="@id/navigation_start_year_month_picker_dialog"/>
-
-            <action
-                android:id="@+id/action_diary_list_fragment_to_diary_delete_dialog"
-                app:destination="@id/navigation_diary_delete_dialog_for_diary_list_fragment"/>
-
-            <action
-                android:id="@+id/action_diary_list_fragment_to_app_message_dialog"
-                app:destination="@id/navigation_app_message_dialog">
-                <argument
-                    android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage" />
-            </action>
-
         </fragment>
-
-        <dialog
-            android:id="@+id/navigation_start_year_month_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment">
-            <argument
-                android:name="max_year"
-                app:argType="java.time.Year" />
-            <argument
-                android:name="min_year"
-                app:argType="java.time.Year" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_diary_delete_dialog_for_diary_list_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment">
-            <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
-        </dialog>
 
         <fragment
             android:id="@+id/navigation_word_search_fragment"
@@ -93,14 +58,6 @@
                 <argument
                     android:name="diary_date"
                     app:argType="java.time.LocalDate" />
-            </action>
-
-            <action
-                android:id="@+id/action_word_search_fragment_to_app_message_dialog"
-                app:destination="@id/navigation_app_message_dialog">
-                <argument
-                    android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage" />
             </action>
 
         </fragment>
@@ -129,14 +86,6 @@
                     app:argType="java.time.LocalDate" />
             </action>
 
-            <action
-                android:id="@+id/action_calendar_fragment_to_app_message_dialog"
-                app:destination="@id/navigation_app_message_dialog">
-                <argument
-                    android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage" />
-            </action>
-
         </fragment>
 
     </navigation>
@@ -151,87 +100,10 @@
             tools:layout="@layout/fragment_settings" >
 
             <action
-                android:id="@+id/action_navigation_settings_fragment_to_theme_color_picker_dialog"
-                app:destination="@id/navigation_theme_color_picker_dialog"/>
-
-            <action
-                android:id="@+id/action_navigation_settings_fragment_to_calendar_start_day_picker_dialog"
-                app:destination="@id/navigation_calendar_start_day_picker_dialog"/>
-
-            <action
-                android:id="@+id/action_navigation_settings_fragment_to_reminder_notification_time_picker_dialog"
-                app:destination="@id/navigation_reminder_notification_time_picker_dialog"/>
-
-            <action
-                android:id="@+id/action_settings_fragment_to_permission_rationale_dialog"
-                app:destination="@id/navigation_permission_rationale_dialog"/>
-
-            <action
-                android:id="@+id/action_settings_fragment_to_all_diaries_delete_dialog"
-                app:destination="@id/navigation_all_diaries_delete_dialog"/>
-
-            <action
-                android:id="@+id/action_settings_fragment_to_all_settings_initialization_dialog"
-                app:destination="@id/navigation_all_settings_initialization_dialog"/>
-
-            <action
-                android:id="@+id/action_settings_fragment_to_all_data_delete_dialog"
-                app:destination="@id/navigation_all_data_delete_dialog"/>
-
-            <action
-                android:id="@+id/action_settings_fragment_to_app_message_dialog"
-                app:destination="@id/navigation_app_message_dialog">
-                <argument
-                    android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage" />
-            </action>
-
-            <action
                 android:id="@+id/action_navigation_settings_fragment_to_open_source_software_licenses_dialog"
                 app:destination="@id/navigation_open_source_software_licenses_dialog"/>
 
         </fragment>
-
-        <dialog
-            android:id="@+id/navigation_theme_color_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment">
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_calendar_start_day_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.CalendarStartDayPickerDialogFragment">
-            <argument
-                android:name="initial_value"
-                app:argType="java.time.DayOfWeek" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_reminder_notification_time_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.ReminderNotificationTimePickerDialogFragment">
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_permission_rationale_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.PermissionRationaleDialogFragment">
-            <argument
-                android:name="request_permission_type"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.permission.RequestPermissionType" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_all_diaries_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDiariesDeleteDialogFragment">
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_all_settings_initialization_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllSettingsInitializationDialogFragment">
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_all_data_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDataDeleteDialogFragment">
-        </dialog>
 
         <dialog
             android:id="@+id/navigation_open_source_software_licenses_dialog"
@@ -267,39 +139,7 @@
                     app:argType="java.time.LocalDate" />
             </action>
 
-            <action
-                android:id="@+id/action_diary_show_fragment_to_diary_load_failure_dialog"
-                app:destination="@id/navigation_diary_load_failure_dialog_for_diary_show_fragment"/>
-
-            <action
-                android:id="@+id/action_diary_show_fragment_to_diary_delete_dialog"
-                app:destination="@id/navigation_diary_delete_dialog_for_diary_show_fragment"/>
-
-            <action
-                android:id="@+id/action_diary_show_fragment_to_app_message_dialog"
-                app:destination="@id/navigation_app_message_dialog">
-                <argument
-                    android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage" />
-            </action>
-
         </fragment>
-
-        <dialog
-            android:id="@+id/navigation_diary_load_failure_dialog_for_diary_show_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment">
-            <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_diary_delete_dialog_for_diary_show_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment">
-            <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
-        </dialog>
 
     </navigation>
 
@@ -350,117 +190,7 @@
                     app:argType="java.time.LocalDate" />
             </action>
 
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_load_dialog"
-                app:destination="@id/navigation_diary_load_dialog"/>
-
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_load_failure_dialog"
-                app:destination="@id/navigation_diary_load_failure_dialog_for_diary_edit_fragment"/>
-
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_update_dialog"
-                app:destination="@id/navigation_diary_update_dialog"/>
-
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_delete_dialog"
-                app:destination="@id/navigation_diary_delete_dialog_for_diary_edit_fragment"/>
-
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_date_picker_dialog"
-                app:destination="@id/navigation_date_picker_dialog"/>
-
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_weather_info_fetch_dialog"
-                app:destination="@id/navigation_weather_info_fetch_dialog"/>
-
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_item_delete_dialog"
-                app:destination="@id/navigation_diary_item_delete_dialog"/>
-
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_image_delete_dialog"
-                app:destination="@id/navigation_diary_image_delete_dialog"/>
-
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_exit_without_diary_save_dialog"
-                app:destination="@id/navigation_exit_without_diary_save_dialog"/>
-
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_app_message_dialog"
-                app:destination="@id/navigation_app_message_dialog">
-                <argument
-                    android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage" />
-            </action>
-
         </fragment>
-
-        <dialog
-            android:id="@+id/navigation_diary_load_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadDialogFragment">
-            <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_diary_load_failure_dialog_for_diary_edit_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment">
-            <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_diary_update_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryUpdateDialogFragment">
-            <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_diary_delete_dialog_for_diary_edit_fragment"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment">
-            <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_date_picker_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.DatePickerDialogFragment">
-            <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_weather_info_fetch_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.WeatherInfoFetchDialogFragment">
-            <argument
-                android:name="date"
-                app:argType="java.time.LocalDate" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_diary_item_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemDeleteDialogFragment">
-            <argument
-                android:name="itemNumber"
-                app:argType="integer" />
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_diary_image_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryImageDeleteDialogFragment">
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_exit_without_diary_save_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ExitWithoutDiarySaveDialogFragment">
-        </dialog>
 
         <dialog
             android:id="@+id/navigation_diary_item_title_edit_dialog"
@@ -470,32 +200,27 @@
                 android:name="diary_item_title"
                 app:argType="com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi" />
 
-            <action
-                android:id="@+id/action_diary_item_title_edit_dialog_to_diary_item_title_selection_history_delete_dialog"
-                app:destination="@id/navigation_diary_item_title_selection_history_delete_dialog"/>
-
-            <action
-                android:id="@+id/action_diary_item_title_edit_dialog_to_app_message_dialog"
-                app:destination="@id/navigation_app_message_dialog">
-                <argument
-                    android:name="app_message"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage" />
-            </action>
-
-        </dialog>
-
-        <dialog
-            android:id="@+id/navigation_diary_item_title_selection_history_delete_dialog"
-            android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemTitleSelectionHistoryDeleteDialogFragment">
-            <argument
-                android:name="itemTitle"
-                app:argType="string" />
         </dialog>
 
     </navigation>
 
+
     <action
-        android:id="@+id/action_activity_to_app_message_dialog"
+        android:id="@+id/action_global_to_confirmation_dialog"
+        app:destination="@id/navigation_confirmation_dialog_fragment" />
+
+    <dialog
+        android:id="@+id/navigation_confirmation_dialog_fragment"
+        android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment"
+        android:label="ConfirmationDialogFragment" >
+        <argument
+            android:name="dialog_args"
+            app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs" />
+    </dialog>
+
+
+    <action
+        android:id="@+id/action_global_to_app_message_dialog"
         app:destination="@id/navigation_app_message_dialog">
         <argument
             android:name="app_message"
@@ -508,6 +233,45 @@
         <argument
             android:name="app_message"
             app:argType="com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage" />
+    </dialog>
+
+
+    <action
+        android:id="@+id/action_global_to_date_picker_dialog"
+        app:destination="@id/navigation_date_picker_dialog" />
+
+    <dialog
+        android:id="@+id/navigation_date_picker_dialog"
+        android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.DatePickerDialogFragment">
+        <argument
+            android:name="date_picker_args"
+            app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DatePickerArgs" />
+    </dialog>
+
+
+    <action
+        android:id="@+id/action_global_to_time_picker_dialog"
+        app:destination="@id/navigation_time_picker_dialog" />
+
+    <dialog
+        android:id="@+id/navigation_time_picker_dialog"
+        android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.TimePickerDialogFragment">
+        <argument
+            android:name="time_picker_args"
+            app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.TimePickerArgs" />
+    </dialog>
+
+
+    <action
+        android:id="@+id/action_global_to_list_pickers_dialog"
+        app:destination="@id/navigation_list_pickers_dialog" />
+
+    <dialog
+        android:id="@+id/navigation_list_pickers_dialog"
+        android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogFragment">
+        <argument
+            android:name="list_pickers_args"
+            app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersArgs" />
     </dialog>
 
 </navigation>

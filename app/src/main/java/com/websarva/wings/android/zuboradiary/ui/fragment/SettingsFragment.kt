@@ -13,27 +13,29 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.activityViewModels
+import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDataDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllDiariesDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AllSettingsInitializationDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.CalendarStartDayPickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.PermissionRationaleDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.OpenSourceSoftwareLicensesDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.ReminderNotificationTimePickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.TimePickerDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ThemeColorPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickerConfig
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersArgs
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersResult
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.permission.RequestPermissionType
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.TimePickerArgs
+import com.websarva.wings.android.zuboradiary.ui.utils.asCalendarStartDayOfWeekString
+import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.ui.utils.isPostNotificationsGranted
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.SettingsViewModel
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import java.time.DayOfWeek
+import java.time.LocalTime
 import kotlin.getValue
 
 /**
@@ -87,6 +90,16 @@ class SettingsFragment :
             val isAllGranted = isAccessFineLocationGranted && isAccessCoarseLocationGranted
             onAccessLocationPermissionResult(isAllGranted)
         }
+
+    /** テーマカラー選択ダイアログで使用するピッカーリスト。 */
+    private val themeColorPickerList = ThemeColorUi.entries
+
+    /** カレンダー開始曜日選択ダイアログで使用するピッカーリスト。 */
+    private val dayOfWeekPickerList =
+        DayOfWeek.entries.sortedBy { dayOfWeek ->
+            // MEMO:DayOfWeekはMonday～Sundayの値が1～7となる。Sundayを先頭に表示させたいため、下記コード記述。
+            if (dayOfWeek == DayOfWeek.SUNDAY) 0 else dayOfWeek.value
+        }
     //endregion
 
     //region Fragment Lifecycle
@@ -122,7 +135,10 @@ class SettingsFragment :
         observeThemeColorPickerDialogResult()
         observeCalendarStartDayPickerDialogResult()
         observeReminderNotificationTimePickerDialogResult()
-        observePermissionDialogResult()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            observePostNotificationsPermissionDialogResult()
+        }
+        observeAccessLocationPermissionDialogResult()
         observeAllDiariesDeleteDialogResult()
         observeAllSettingsInitializationDialogResult()
         observeAllDataDeleteDialogResult()
@@ -130,13 +146,15 @@ class SettingsFragment :
 
     /** テーマカラー選択ダイアログからの結果を監視する。 */
     private fun observeThemeColorPickerDialogResult() {
-        observeDialogResult(
-            ThemeColorPickerDialogFragment.RESULT_KEY
+        observeDialogResult<ListPickersResult>(
+            RESULT_KEY_THEME_COLOR_SETTING
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
+                    val selectedIndex = result.data.firstPickerValue
+                    val selectedThemeColor = themeColorPickerList[selectedIndex]
                     mainViewModel
-                        .onThemeColorSettingDialogPositiveResultReceived(result.data)
+                        .onThemeColorSettingDialogPositiveResultReceived(selectedThemeColor)
                 }
                 DialogResult.Negative,
                 DialogResult.Cancel -> { /* 処理なし */ }
@@ -146,14 +164,16 @@ class SettingsFragment :
 
     /** カレンダー開始曜日選択ダイアログからの結果を監視する。 */
     private fun observeCalendarStartDayPickerDialogResult() {
-        observeDialogResult(
-            CalendarStartDayPickerDialogFragment.RESULT_KEY
+        observeDialogResult<ListPickersResult>(
+            RESULT_KEY_CALENDAR_START_DAY_SETTING
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
+                    val selectedIndex = result.data.firstPickerValue
+                    val selectedDayOfWeek = dayOfWeekPickerList[selectedIndex]
                     mainViewModel
                         .onCalendarStartDayOfWeekSettingDialogPositiveResultReceived(
-                            result.data
+                            selectedDayOfWeek
                         )
                 }
                 DialogResult.Negative,
@@ -165,7 +185,7 @@ class SettingsFragment :
     /** リマインダー通知時間選択ダイアログからの結果を監視する。 */
     private fun observeReminderNotificationTimePickerDialogResult() {
         observeDialogResult(
-            ReminderNotificationTimePickerDialogFragment.RESULT_KEY
+            RESULT_KEY_POST_REMINDER_NOTIFICATION_TIME_SELECTION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -180,28 +200,29 @@ class SettingsFragment :
         }
     }
 
-    // TODO:Negative時の処理(スイッチViewクリア)を設定したいが、現時点のダイアログの構成では判断できない。
-    //      権限毎に専用Dialogを作成するか、共通ダイログでResultKey、TiTle、Messageをダイログに渡す構成(クリーン)に変更するか検討
-    /** 権限要求の理由説明ダイアログからの結果を監視する。 */
-    private fun observePermissionDialogResult() {
-        observeDialogResult<RequestPermissionType>(
-            PermissionRationaleDialogFragment.RESULT_KEY
+    /** 通知権限要求の理由説明ダイアログからの結果を監視する。 */
+    @RequiresApi(api = 33)
+    private fun observePostNotificationsPermissionDialogResult() {
+        observeDialogResult<Unit>(
+            RESULT_KEY_POST_NOTIFICATIONS_PERMISSION_RATIONALE
         ) { result ->
             when (result) {
-                is DialogResult.Positive -> {
-                    when (result.data) {
-                        RequestPermissionType.POST_NOTIFICATIONS -> {
-                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                requestPostNotificationsPermission()
-                            }
-                        }
-                        RequestPermissionType.ACCESS_LOCATION -> {
-                            requestAccessLocationPermission()
-                        }
-                    }
-                }
+                is DialogResult.Positive -> requestPostNotificationsPermission()
                 DialogResult.Negative,
-                DialogResult.Cancel -> { /*処理なし*/ }
+                DialogResult.Cancel -> mainViewModel.onPostNotificationsPermissionDenied()
+            }
+        }
+    }
+
+    /** 位置情報権限要求の理由説明ダイアログからの結果を監視する。 */
+    private fun observeAccessLocationPermissionDialogResult() {
+        observeDialogResult<Unit>(
+            RESULT_KEY_ACCESS_LOCATION_PERMISSION_RATIONALE
+        ) { result ->
+            when (result) {
+                is DialogResult.Positive -> requestAccessLocationPermission()
+                DialogResult.Negative,
+                DialogResult.Cancel -> mainViewModel.onAccessLocationPermissionDenied()
             }
         }
     }
@@ -209,7 +230,7 @@ class SettingsFragment :
     /** 全日記削除確認ダイアログからの結果を監視する。 */
     private fun observeAllDiariesDeleteDialogResult() {
         observeDialogResult<Unit>(
-            AllDiariesDeleteDialogFragment.RESULT_KEY
+            RESULT_KEY_ALL_DIARIES_DELETE_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive<Unit> -> {
@@ -224,7 +245,7 @@ class SettingsFragment :
     /** 全設定初期化確認ダイアログからの結果を監視する。 */
     private fun observeAllSettingsInitializationDialogResult() {
         observeDialogResult<Unit>(
-            AllSettingsInitializationDialogFragment.RESULT_KEY
+            RESULT_KEY_ALL_SETTINGS_INITIALIZATION_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive<Unit> -> {
@@ -239,7 +260,7 @@ class SettingsFragment :
     /** 全データ削除確認ダイアログからの結果を監視する。 */
     private fun observeAllDataDeleteDialogResult() {
         observeDialogResult<Unit>(
-            AllDataDeleteDialogFragment.RESULT_KEY
+            RESULT_KEY_ALL_DATA_DELETE_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -351,12 +372,6 @@ class SettingsFragment :
     //region CommonUiEventHandler Overrides
     override fun navigatePreviousFragment() {
         mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            SettingsFragmentDirections.actionSettingsFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 
@@ -475,74 +490,135 @@ class SettingsFragment :
 
     //region Navigation Helpers
     /**
-     * テーマカラー選択ダイアログ ([ThemeColorPickerDialogFragment])へ遷移する。
+     * テーマカラー選択ダイアログ ([ListPickersDialogFragment])へ遷移する。
      */
     private fun navigateThemeColorPickerDialog() {
+        val themeColorStringPickerList = themeColorPickerList.map { themeColor ->
+            themeColor.asString(requireContext())
+        }
+        val currentThemeColorString = themeColor.asString(requireContext())
+
+        val args = ListPickersArgs(
+            resultKey = RESULT_KEY_THEME_COLOR_SETTING,
+            pickerConfigs = listOf(
+                ListPickerConfig(
+                    items = themeColorStringPickerList,
+                    initialIndex = themeColorStringPickerList.indexOf(currentThemeColorString)
+                )
+            )
+        )
         val directions =
-            SettingsFragmentDirections.actionNavigationSettingsFragmentToThemeColorPickerDialog()
+            MobileNavigationDirections.actionGlobalToListPickersDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     /**
-     * カレンダー開始曜日選択ダイアログ([CalendarStartDayPickerDialogFragment])へ遷移する。
+     * カレンダー開始曜日選択ダイアログ([ListPickersDialogFragment])へ遷移する。
      * @param dayOfWeek 現在設定されている週の開始曜日
      */
     private fun navigateCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
-        val directions =
-            SettingsFragmentDirections.actionNavigationSettingsFragmentToCalendarStartDayPickerDialog(
-                dayOfWeek
+        val dayOfWeekStringPickerList =
+            dayOfWeekPickerList.map { dayOfWeek ->
+                dayOfWeek.asCalendarStartDayOfWeekString(requireContext())
+            }
+        val currentDayOfWeekString = dayOfWeek.asCalendarStartDayOfWeekString(requireContext())
+
+        val args = ListPickersArgs(
+            resultKey = RESULT_KEY_CALENDAR_START_DAY_SETTING,
+            pickerConfigs = listOf(
+                ListPickerConfig(
+                    items = dayOfWeekStringPickerList,
+                    initialIndex = dayOfWeekStringPickerList.indexOf(currentDayOfWeekString)
+                )
             )
+        )
+        val directions =
+            MobileNavigationDirections.actionGlobalToListPickersDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** リマインダー通知時間選択ダイアログ([ReminderNotificationTimePickerDialogFragment])へ遷移する。 */
+    /** リマインダー通知時間選択ダイアログ([TimePickerDialogFragment])へ遷移する。 */
     private fun navigateReminderNotificationTimePickerDialog() {
+        val args = TimePickerArgs(
+            resultKey = RESULT_KEY_POST_REMINDER_NOTIFICATION_TIME_SELECTION,
+            initialTime = LocalTime.now()
+        )
         val directions =
-            SettingsFragmentDirections.actionNavigationSettingsFragmentToReminderNotificationTimePickerDialog()
+            MobileNavigationDirections.actionGlobalToTimePickerDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 通知権限要求の理由説明ダイアログ([PermissionRationaleDialogFragment])へ遷移する。 */
+    /** 通知権限要求の理由説明ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
     private fun navigatePostNotificationsPermissionRationaleDialog() {
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_POST_NOTIFICATIONS_PERMISSION_RATIONALE,
+            titleRes = R.string.dialog_permission_title,
+            messageText = getString(
+                R.string.dialog_permission_message,
+                getString(R.string.dialog_permission_name_notification)
+            )
+        )
         val directions =
-            SettingsFragmentDirections
-                .actionSettingsFragmentToPermissionRationaleDialog(RequestPermissionType.POST_NOTIFICATIONS)
+            MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 位置情報権限要求の理由説明ダイアログ([PermissionRationaleDialogFragment])へ遷移する。 */
+    /** 位置情報権限要求の理由説明ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
     private fun navigateAccessLocationPermissionRationaleDialog() {
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_ACCESS_LOCATION_PERMISSION_RATIONALE,
+            titleRes = R.string.dialog_permission_title,
+            messageText = getString(
+                R.string.dialog_permission_message,
+                getString(R.string.dialog_permission_name_location)
+            )
+        )
         val directions =
-            SettingsFragmentDirections
-                .actionSettingsFragmentToPermissionRationaleDialog(RequestPermissionType.ACCESS_LOCATION)
+            MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 全日記削除確認ダイアログ([AllDiariesDeleteDialogFragment])へ遷移する。 */
+    /** 全日記削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
     private fun navigateAllDiariesDeleteDialog() {
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_ALL_DIARIES_DELETE_CONFIRMATION,
+            titleRes = R.string.dialog_all_diaries_delete_title,
+            messageRes = R.string.dialog_all_diaries_delete_message
+        )
         val directions =
-            SettingsFragmentDirections.actionSettingsFragmentToAllDiariesDeleteDialog()
+            MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 全設定初期化確認ダイアログ([AllSettingsInitializationDialogFragment])へ遷移する。 */
+    /** 全設定初期化確認ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
     private fun navigateAllSettingsInitializationDialog() {
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_ALL_SETTINGS_INITIALIZATION_CONFIRMATION,
+            titleRes = R.string.dialog_all_settings_initialization_title,
+            messageRes = R.string.dialog_all_settings_initialization_message
+        )
         val directions =
-            SettingsFragmentDirections.actionSettingsFragmentToAllSettingsInitializationDialog()
+            MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 全データ削除確認ダイアログ([AllDataDeleteDialogFragment])へ遷移する。 */
+    /** 全データ削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
     private fun navigateAllDataDeleteDialog() {
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_ALL_DATA_DELETE_CONFIRMATION,
+            titleRes = R.string.dialog_all_data_delete_title,
+            messageRes = R.string.dialog_all_data_delete_message
+        )
         val directions =
-            SettingsFragmentDirections.actionSettingsFragmentToAllDataDeleteDialog()
+            MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     /** OSSライセンスダイアログ([OpenSourceSoftwareLicensesDialogFragment])へ遷移する。 */
     private fun navigateOpenSourceSoftwareLicensesDialog() {
         val directions =
-            SettingsFragmentDirections.actionNavigationSettingsFragmentToOpenSourceSoftwareLicensesDialog()
+            SettingsFragmentDirections
+                .actionNavigationSettingsFragmentToOpenSourceSoftwareLicensesDialog()
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
@@ -664,4 +740,36 @@ class SettingsFragment :
             .onEnsureWeatherInfoFetchSettingMatchesPermission(isAccessLocationGranted)
     }
     //endregion
+
+    internal companion object {
+        /** テーマカラー選択の結果を受け取るためのキー。 */
+        private const val RESULT_KEY_THEME_COLOR_SETTING = "theme_color_setting_result"
+
+        /** カレンダー開始曜日選択の結果を受け取るためのキー。 */
+        private const val RESULT_KEY_CALENDAR_START_DAY_SETTING = "calendar_start_day_setting_result"
+
+        /** リマインダー通知時刻選択の結果を受け取るためのキー。 */
+        private const val RESULT_KEY_POST_REMINDER_NOTIFICATION_TIME_SELECTION =
+            "post_reminder_notification_time_selection_result"
+
+        /** 全日記削除の確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_ALL_DIARIES_DELETE_CONFIRMATION =
+            "all_diaries_delete_confirmation_result"
+
+        /** 全設定初期化の確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_ALL_SETTINGS_INITIALIZATION_CONFIRMATION =
+            "all_settings_initialization_confirmation_result"
+
+        /** 全データ削除の確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_ALL_DATA_DELETE_CONFIRMATION =
+            "all_data_delete_confirmation_result"
+
+        /** 通知権限要求の理由説明ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_POST_NOTIFICATIONS_PERMISSION_RATIONALE =
+            "post_notifications_permission_rationale_result"
+
+        /** 位置情報権限要求の理由説明ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_ACCESS_LOCATION_PERMISSION_RATIONALE =
+            "access_location_permission_rationale_result"
+    }
 }

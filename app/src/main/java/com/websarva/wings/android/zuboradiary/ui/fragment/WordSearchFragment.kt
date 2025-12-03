@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.WordSearchResultDiaryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
@@ -146,12 +145,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     //region CommonUiEventHandler Overrides
     override fun navigatePreviousFragment() {
         navigatePreviousFragmentOnce(FragmentResult.None)
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            WordSearchFragmentDirections.actionWordSearchFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 

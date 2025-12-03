@@ -14,23 +14,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
+import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.DatePickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemDeleteDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryLoadFailureDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryImageDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.DiaryItemTitleEditDialog
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryUpdateDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ExitWithoutDiarySaveDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.WeatherInfoFetchDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
@@ -40,7 +32,11 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DatePickerArgs
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -176,7 +172,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     /** 既存日記読込ダイアログからの結果を監視する。 */
     private fun observeDiaryLoadDialogResult() {
         observeDialogResult<Unit>(
-            DiaryLoadDialogFragment.RESULT_KEY
+            RESULT_KEY_DIARY_LOAD_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -193,7 +189,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     /** 日記読込失敗確認ダイアログからの結果を監視する。 */
     private fun observeDiaryLoadFailureDialogResult() {
         observeDialogResult<Unit>(
-            DiaryLoadFailureDialogFragment.RESULT_KEY
+            RESULT_KEY_DIARY_LOAD_FAILURE
         ) { result ->
             when (result) {
                 is DialogResult.Positive<Unit>,
@@ -208,7 +204,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     /** 既存日記上書きダイアログからの結果を監視する。 */
     private fun observeDiaryUpdateDialogResult() {
         observeDialogResult<Unit>(
-            DiaryUpdateDialogFragment.RESULT_KEY
+            RESULT_KEY_DIARY_UPDATE_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -225,7 +221,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     /** 日記削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryDeleteDialogResult() {
         observeDialogResult<Unit>(
-            DiaryDeleteDialogFragment.RESULT_KEY
+            RESULT_KEY_DIARY_DELETE_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -242,7 +238,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     /** 日付選択ダイアログからの結果を監視する。 */
     private fun observeDatePickerDialogResult() {
         observeDialogResult(
-            DatePickerDialogFragment.RESULT_KEY
+            RESULT_KEY_DATE_SELECTION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -259,7 +255,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     /** 天気情報読込ダイアログからの結果を監視する。 */
     private fun observeUpWeatherInfoFetchDialogResult() {
         observeDialogResult<Unit>(
-            WeatherInfoFetchDialogFragment.RESULT_KEY
+            RESULT_KEY_WEATHER_INFO_FETCH
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -276,7 +272,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     /** 項目削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryItemDeleteDialogResult() {
         observeDialogResult<Unit>(
-            DiaryItemDeleteDialogFragment.RESULT_KEY
+            RESULT_KEY_DIARY_ITEM_DELETE_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -293,7 +289,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     /** 添付画像削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryImageDeleteDialogResult() {
         observeDialogResult<Unit>(
-            DiaryImageDeleteDialogFragment.RESULT_KEY
+            RESULT_KEY_DIARY_IMAGE_DELETE_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive<Unit> -> {
@@ -308,7 +304,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     /** 未保存終了確認ダイアログからの結果を監視する。 */
     private fun observeExitWithoutDiarySaveDialogResult() {
         observeDialogResult<Unit>(
-            ExitWithoutDiarySaveDialogFragment.RESULT_KEY
+            RESULT_KEY_EXIT_WITHOUT_SAVE_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -465,12 +461,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //region CommonUiEventHandler Overrides
     override fun navigatePreviousFragment() {
         navigatePreviousFragmentOnce(FragmentResult.None)
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 
@@ -972,42 +962,70 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     }
 
     /**
-     * 既存日記読込ダイアログ([DiaryLoadDialogFragment])へ遷移する。
+     * 既存日記読込確認ダイアログ([ConfirmationDialogFragment])へ遷移する。
      * @param date 読み込む日記の日付
      */
     private fun navigateDiaryLoadDialog(date: LocalDate) {
-        val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadDialog(date)
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_DIARY_LOAD_CONFIRMATION,
+            titleRes = R.string.dialog_diary_load_title,
+            messageText = getString(
+                R.string.dialog_diary_load_message,
+                date.formatDateString(requireContext())
+            )
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     /**
-     * 日記読込失敗ダイアログ([DiaryLoadFailureDialogFragment])へ遷移する。
+     * 日記読込失敗ダイアログ([ConfirmationDialogFragment])へ遷移する。
      * @param date 読み込みに失敗した日記の日付
      */
     private fun navigateDiaryLoadFailureDialog(date: LocalDate) {
-        val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryLoadFailureDialog(date)
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_DIARY_LOAD_FAILURE,
+            titleRes = R.string.dialog_diary_load_failure_title,
+            messageText = getString(
+                R.string.dialog_diary_load_failure_message,
+                date.formatDateString(requireContext())
+            )
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     /**
-     * 既存日記上書きダイアログ([DiaryUpdateDialogFragment])へ遷移する。
+     * 既存日記上書きダイアログ([ConfirmationDialogFragment])へ遷移する。
      * @param date 上書きする日記の日付
      */
     private fun navigateDiaryUpdateDialog(date: LocalDate) {
-        val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryUpdateDialog(date)
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_DIARY_UPDATE_CONFIRMATION,
+            titleRes = R.string.dialog_diary_update_title,
+            messageText = getString(
+                R.string.dialog_diary_update_message,
+                date.formatDateString(requireContext())
+            )
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     /**
-     * 日記削除確認ダイアログ([DiaryDeleteDialogFragment])へ遷移する。
+     * 日記削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。
      * @param date 削除する日記の日付
      */
     private fun navigateDiaryDeleteDialog(date: LocalDate) {
-        val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryDeleteDialog(date)
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_DIARY_DELETE_CONFIRMATION,
+            titleRes = R.string.dialog_diary_delete_title,
+            messageText = getString(
+                R.string.dialog_diary_delete_message,
+                date.formatDateString(requireContext())
+            )
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
@@ -1016,44 +1034,67 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
      * @param date 初期選択されている日付
      */
     private fun navigateDatePickerDialog(date: LocalDate) {
-        val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDatePickerDialog(date)
+        val args = DatePickerArgs(
+            resultKey = RESULT_KEY_DATE_SELECTION,
+            initialDate = date
+        )
+        val directions = MobileNavigationDirections.actionGlobalToDatePickerDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     /**
-     * 天気情報読込ダイアログ([WeatherInfoFetchDialogFragment])へ遷移する。
+     * 天気情報読込ダイアログ([ConfirmationDialogFragment])へ遷移する。
      * @param date 天気情報を取得する日付
      */
     private fun navigateWeatherInfoFetchDialog(date: LocalDate) {
-        val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToWeatherInfoFetchDialog(date)
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_WEATHER_INFO_FETCH,
+            titleRes = R.string.dialog_weather_info_fetch_title,
+            messageText = getString(
+                R.string.dialog_weather_info_fetch_message,
+                date.formatDateString(requireContext())
+            )
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     /**
-     * 項目削除確認ダイアログ([DiaryItemDeleteDialogFragment])へ遷移する。
+     * 項目削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。
      * @param itemNumber 削除する項目の番号
      */
     private fun navigateDiaryItemDeleteDialog(itemNumber: Int) {
-        val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemDeleteDialog(itemNumber)
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_DIARY_ITEM_DELETE_CONFIRMATION,
+            titleRes = R.string.dialog_diary_item_delete_title,
+            messageText = getString(
+                R.string.dialog_diary_item_delete_message,
+                itemNumber.toString()
+            )
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 添付画像削除確認ダイアログ([DiaryImageDeleteDialogFragment])へ遷移する。 */
+    /** 添付画像削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
     private fun navigateDiaryImageDeleteDialog() {
-        val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryImageDeleteDialog()
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_DIARY_IMAGE_DELETE_CONFIRMATION,
+            titleRes = R.string.dialog_diary_attached_image_delete_title,
+            messageRes = R.string.dialog_diary_attached_image_delete_message
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 日記を保存せずに終了することを確認するダイアログ([ExitWithoutDiarySaveDialogFragment])へ遷移する。 */
+    /** 日記を保存せずに終了することを確認するダイアログ([ConfirmationDialogFragment])へ遷移する。 */
     private fun navigateExitWithoutDiarySaveDialog() {
-        val directions =
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToExitWithoutDiarySaveDialog()
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_EXIT_WITHOUT_SAVE_CONFIRMATION,
+            titleRes = R.string.dialog_exit_without_diary_save_title,
+            messageRes = R.string.dialog_exit_without_diary_save_message
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
@@ -1090,5 +1131,32 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     internal companion object {
         /** このフラグメントから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
+
+        /** 既存日記読込の確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DIARY_LOAD_CONFIRMATION = "diary_load_confirmation_result"
+
+        /** 日記読込失敗ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DIARY_LOAD_FAILURE = "diary_load_failure_result"
+
+        /** 既存日記上書きの確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DIARY_UPDATE_CONFIRMATION = "diary_update_confirmation_result"
+
+        /** 日記削除の確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DIARY_DELETE_CONFIRMATION = "diary_delete_confirmation_result"
+
+        /** 日付選択ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DATE_SELECTION = "date_selection_result"
+
+        /** 天気情報取得ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_WEATHER_INFO_FETCH = "weather_info_fetch_result"
+
+        /** 日記項目削除の確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DIARY_ITEM_DELETE_CONFIRMATION = "diary_item_delete_confirmation_result"
+
+        /** 添付画像削除の確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DIARY_IMAGE_DELETE_CONFIRMATION = "diary_image_delete_confirmation_result"
+
+        /** 保存せずに終了するかの確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_EXIT_WITHOUT_SAVE_CONFIRMATION = "exit_without_save_confirmation_result"
     }
 }

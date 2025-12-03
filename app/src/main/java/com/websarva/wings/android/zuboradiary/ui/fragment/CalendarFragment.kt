@@ -13,7 +13,6 @@ import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentCalendarBinding
 import com.websarva.wings.android.zuboradiary.databinding.LayoutCalendarDayBinding
@@ -211,12 +210,6 @@ class CalendarFragment :
     //region CommonUiEventHandler Overrides
     override fun navigatePreviousFragment() {
         mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            CalendarFragmentDirections.actionCalendarFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 

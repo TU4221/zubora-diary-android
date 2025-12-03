@@ -7,28 +7,34 @@ import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.StandardDiaryListAdapter
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryListDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.DiaryListSetupHelper
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.SwipeBackgroundButtonInteractionHelper
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.StartYearMonthPickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickerConfig
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersArgs
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersResult
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
+import java.time.Month
 import java.time.Year
 
 /**
@@ -65,6 +71,12 @@ class DiaryListFragment :
 
     /** RecyclerViewのスワイプ操作と背景ボタンのインタラクションを処理するヘルパークラス。 */
     private var swipeBackgroundButtonInteractionHelper: SwipeBackgroundButtonInteractionHelper? = null
+
+    /** 開始年月選択ダイアログで使用する年ピッカーリスト。 */
+    private var yearPickerList = listOf(Year.of(LocalDate.now().year))
+
+    /** 開始年月選択ダイアログで使用する月ピッカーリスト。 */
+    private val monthPickerList = Month.entries.toList()
     //endregion
 
     //region Fragment Lifecycle
@@ -121,12 +133,19 @@ class DiaryListFragment :
 
     /** 開始年月の選択ダイアログからの結果を監視する。 */
     private fun observeDatePickerDialogResult() {
-        observeDialogResult(
-            StartYearMonthPickerDialogFragment.RESULT_KEY
+        observeDialogResult<ListPickersResult>(
+            RESULT_KEY_START_YEAR_MONTH_PICKER
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
-                    mainViewModel.onDatePickerDialogPositiveResultReceived(result.data)
+                    val selectedYearIndex = result.data.firstPickerValue
+                    val selectedMonthIndex =
+                        result.data.secondPickerValue
+                            ?: throw IllegalStateException("月ピッカーの選択値が`null`")
+                    val selectedYear = yearPickerList[selectedYearIndex]
+                    val selectedMonth = monthPickerList[selectedMonthIndex]
+                    val selectedYearMonth = Year.of(selectedYear.value).atMonth(selectedMonth)
+                    mainViewModel.onDatePickerDialogPositiveResultReceived(selectedYearMonth)
                 }
                 DialogResult.Negative,
                 DialogResult.Cancel -> { /*処理なし*/ }
@@ -137,7 +156,7 @@ class DiaryListFragment :
     /** 日記削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryDeleteDialogResult() {
         observeDialogResult<Unit>(
-            DiaryListDeleteDialogFragment.RESULT_KEY
+            RESULT_KEY_DIARY_DELETE_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -229,12 +248,6 @@ class DiaryListFragment :
     //region CommonUiEventHandler Overrides
     override fun navigatePreviousFragment() {
         navigatePreviousFragmentOnce(FragmentResult.None)
-    }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            DiaryListFragmentDirections.actionDiaryListFragmentToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 
@@ -332,23 +345,51 @@ class DiaryListFragment :
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 開始年月選択ダイアログ([StartYearMonthPickerDialogFragment])へ遷移する。 */
+    /** 開始年月選択ダイアログ([ListPickersDialogFragment])へ遷移する。 */
     private fun navigateStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
-        Log.d("20250714", "navigateStartYearMonthPickerDialog()")
-        val directions = 
-            DiaryListFragmentDirections.actionDiaryListFragmentToStartYearMonthPickerDialog(
-                newestYear,
-                oldestYear
+        yearPickerList =
+            (oldestYear.value..newestYear.value).map {
+                Year.of(it)
+            }
+
+        val args = ListPickersArgs(
+            resultKey = RESULT_KEY_START_YEAR_MONTH_PICKER,
+            pickerConfigs = listOf(
+                ListPickerConfig(
+                    items = yearPickerList.map { it.toString() },
+                    initialIndex = yearPickerList.size - 1
+                ),
+                ListPickerConfig(
+                    items = monthPickerList.map { it.value.toString() },
+                    initialIndex = monthPickerList.size - 1
+                )
             )
+        )
+        val directions =
+            MobileNavigationDirections.actionGlobalToListPickersDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
-    /** 日記削除確認ダイアログ([DiaryListDeleteDialogFragment])へ遷移する。 */
+    /** 日記削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
     private fun navigateDiaryDeleteDialog(date: LocalDate) {
-        Log.d("20250714", "navigateDiaryDeleteDialog")
-        val directions = 
-            DiaryListFragmentDirections.actionDiaryListFragmentToDiaryDeleteDialog(date)
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_DIARY_DELETE_CONFIRMATION,
+            titleRes = R.string.dialog_diary_delete_title,
+            messageText = getString(
+                R.string.dialog_diary_delete_message,
+                date.formatDateString(requireContext())
+            )
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
     //endregion
+
+    internal companion object {
+        /** 開始年月選択ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_START_YEAR_MONTH_PICKER = "start_year_month_picker_result"
+
+        /** 日記削除の確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DIARY_DELETE_CONFIRMATION = "diary_delete_confirmation_result"
+    }
 }

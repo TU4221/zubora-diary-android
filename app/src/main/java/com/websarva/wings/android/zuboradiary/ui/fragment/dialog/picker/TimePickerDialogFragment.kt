@@ -4,26 +4,38 @@ import android.app.Dialog
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.DialogFragment
+import androidx.navigation.fragment.navArgs
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.google.android.material.timepicker.MaterialTimePicker.INPUT_MODE_CLOCK
 import com.google.android.material.timepicker.TimeFormat
 import com.websarva.wings.android.zuboradiary.ui.utils.timePickerDialogThemeResId
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.TimePickerArgs
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalTime
+import kotlin.getValue
 
 /**
- * [MaterialTimePicker]を使用した時刻選択ダイアログの基底クラス。
+ * アプリ内で共通して使用される、[MaterialTimePicker]を使用した時刻選択ダイアログ。
+ * 最初に表示する日付は [TimePickerArgs] を通じて外部から注入される。
  *
  * 以下の責務を持つ:
  * - [MaterialTimePicker]のセットアップと表示
  * - テーマカラーに応じたダイアログスタイルの適用
  * - 24時間形式、クロック入力モードの指定
- * - Positive/Negativeボタンクリック、およびキャンセル時のコールバック処理
+ * - Positive/Negativeボタンクリック、およびキャンセル時の処理
  */
 @AndroidEntryPoint
-abstract class BaseTimePickerDialogFragment : DialogFragment() {
+class TimePickerDialogFragment : DialogFragment() {
+
+    /** ナビゲーション引数。 */
+    private val navArgs: TimePickerDialogFragmentArgs by navArgs()
+
+    /** [navArgs]から取り出した、ダイアログの表示内容を定義する引数。 */
+    private val timePickerArgs: TimePickerArgs get() = navArgs.timePickerArgs
 
     /** [MainActivity]から取得する現在のテーマカラー。 */
     private val themeColor
@@ -50,29 +62,22 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
      * @return 設定済みのMaterialTimePickerインスタンス
      */
     private fun createTimePickerDialog(dummyDialog: Dialog): MaterialTimePicker {
-        val builder = MaterialTimePicker.Builder()
-
         val themeResId = themeColor.timePickerDialogThemeResId
-        builder.setTheme(themeResId)
+        val initialTime = timePickerArgs.initialTime
 
-        builder
-            .setTimeFormat(TimeFormat.CLOCK_24H)
-            .setInputMode(INPUT_MODE_CLOCK)
-
-        setupInitializationTime(builder)
-
-        val timePicker = builder.build()
+        val timePicker =
+            MaterialTimePicker.Builder()
+                .setTheme(themeResId)
+                .setTimeFormat(TimeFormat.CLOCK_24H)
+                .setInputMode(INPUT_MODE_CLOCK)
+                .setHour(initialTime.hour)
+                .setMinute(initialTime.minute)
+                .build()
 
         setupOnClickListener(timePicker, dummyDialog)
 
         return timePicker
     }
-
-    /**
-     * TimePickerに表示する初期時刻を設定する。[createTimePickerDialog] で呼び出される。
-     * @param builder 初期時刻を設定する対象のビルダー
-     */
-    protected abstract fun setupInitializationTime(builder: MaterialTimePicker.Builder)
 
     /**
      * TimePickerの各種ボタンクリック、およびキャンセル時のリスナーを設定する。
@@ -86,37 +91,21 @@ abstract class BaseTimePickerDialogFragment : DialogFragment() {
             // 選択日付型変換(Int -> LocalTime)
             val selectedHour = timePicker.hour
             val selectedMinute = timePicker.minute
-            val localTime = LocalTime.of(selectedHour, selectedMinute)
-            handleOnPositiveButtonClick(localTime)
+            val selectedTime = LocalTime.of(selectedHour, selectedMinute)
+            setResult(timePickerArgs.resultKey, DialogResult.Positive(selectedTime))
             dummyDialog.dismiss()
         }
 
         timePicker.addOnNegativeButtonClickListener {
             Log.d(logTag, "onClick()_NegativeButton")
-            handleOnNegativeButtonClick()
+            setResult(timePickerArgs.resultKey, DialogResult.Negative)
             dummyDialog.dismiss()
         }
 
         timePicker.addOnCancelListener {
             Log.d(logTag, "onCancel()")
-            handleOnCancel()
+            setResult(timePickerArgs.resultKey, DialogResult.Cancel)
             dummyDialog.dismiss()
         }
     }
-
-    /**
-     * Positiveボタンがクリックされた際の処理を定義する。
-     * @param selectedTime ユーザーが選択した時刻
-     */
-    protected abstract fun handleOnPositiveButtonClick(selectedTime: LocalTime)
-
-    /**
-     * Negativeボタンがクリックされた際の処理を定義する。
-     */
-    protected abstract fun handleOnNegativeButtonClick()
-
-    /**
-     * ダイアログがキャンセルされた際の処理を定義する。
-     */
-    protected abstract fun handleOnCancel()
 }

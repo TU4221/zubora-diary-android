@@ -7,18 +7,19 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEditBinding
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.DiaryItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.SwipeSimpleInteractionHelper
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.DiaryItemTitleSelectionHistoryDeleteDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import dagger.hilt.android.AndroidEntryPoint
@@ -93,7 +94,7 @@ class DiaryItemTitleEditDialog :
     /** 履歴項目削除確認ダイアログからの結果を監視する。 */
     private fun observeDiaryItemTitleDeleteDialogResult() {
         observeDialogResult<Unit>(
-            DiaryItemTitleSelectionHistoryDeleteDialogFragment.RESULT_KEY
+            RESULT_KEY_TITLE_SELECTION_HISTORY_DELETE_CONFIRMATION
         ) { result ->
             when (result) {
                 is DialogResult.Positive -> {
@@ -150,14 +151,6 @@ class DiaryItemTitleEditDialog :
     override fun navigatePreviousFragment() {
         navigatePreviousFragment(FragmentResult.None)
     }
-
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions =
-            DiaryItemTitleEditDialogDirections.actionDiaryItemTitleEditDialogToAppMessageDialog(
-                appMessage
-            )
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
-    }
     //endregion
 
     //region View Setup
@@ -201,13 +194,19 @@ class DiaryItemTitleEditDialog :
     }
 
     /**
-     * 履歴項目削除確認ダイアログ([DiaryItemTitleSelectionHistoryDeleteDialogFragment])へ遷移する。
+     * タイトル選択履歴削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。
      * @param itemTitle 削除対象の項目タイトル
      */
     private fun navigateDiaryItemTitleSelectionHistoryDeleteDialog(itemTitle: String) {
-        val directions =
-            DiaryItemTitleEditDialogDirections
-                .actionDiaryItemTitleEditDialogToDiaryItemTitleSelectionHistoryDeleteDialog(itemTitle)
+        val args = ConfirmationDialogArgs(
+            resultKey = RESULT_KEY_TITLE_SELECTION_HISTORY_DELETE_CONFIRMATION,
+            titleRes = R.string.dialog_diary_item_title_history_delete_title,
+            messageText = getString(
+                R.string.dialog_diary_item_title_history_delete_message,
+                itemTitle
+            )
+        )
+        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
         navigateFragmentOnce(NavigationCommand.To(directions))
     }
     //endregion
@@ -215,5 +214,9 @@ class DiaryItemTitleEditDialog :
     internal companion object {
         /** このダイアログから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryItemTitleEditDialog::class.java.name
+
+        /** タイトル選択履歴削除の確認ダイアログの結果を受け取るためのキー。 */
+        private const val RESULT_KEY_TITLE_SELECTION_HISTORY_DELETE_CONFIRMATION =
+            "title_selection_history_delete_confirmation_result"
     }
 }

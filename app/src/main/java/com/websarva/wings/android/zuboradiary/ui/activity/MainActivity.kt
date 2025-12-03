@@ -303,7 +303,8 @@ class MainActivity : LoggingActivity() {
      * @param appMessage 表示するメッセージ
      */
     private fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val action = MobileNavigationDirections.actionActivityToAppMessageDialog(appMessage)
+        val action = MobileNavigationDirections.actionGlobalToAppMessageDialog(appMessage)
+        // TODO:navController.navigate()を直接使用するのではなく遷移管理処理を通す
         navController.navigate(action)
     }
 

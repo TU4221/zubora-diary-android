@@ -13,6 +13,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
+import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHandler
@@ -357,6 +358,14 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
                 destinationId,
                 mainViewModel
             )
+    }
+    //endregion
+
+    //region CommonUiEventHandler Overrides
+    // 他メソッドのOverrideは本クラスの継承先で行うこと。
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val directions = MobileNavigationDirections.actionGlobalToAppMessageDialog(appMessage)
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 

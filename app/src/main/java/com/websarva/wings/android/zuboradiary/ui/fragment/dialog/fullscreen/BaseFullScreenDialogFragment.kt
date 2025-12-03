@@ -6,6 +6,7 @@ import androidx.annotation.CallSuper
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
+import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.MainUiEventHandler
@@ -146,6 +147,14 @@ abstract class BaseFullScreenDialogFragment<T: ViewBinding, E: UiEvent>
                 destinationId,
                 mainViewModel
             )
+    }
+    //endregion
+
+    //region CommonUiEventHandler Overrides
+    // 他メソッドのOverrideは本クラスの継承先で行うこと。
+    override fun navigateAppMessageDialog(appMessage: AppMessage) {
+        val directions = MobileNavigationDirections.actionGlobalToAppMessageDialog(appMessage)
+        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
     //endregion
 

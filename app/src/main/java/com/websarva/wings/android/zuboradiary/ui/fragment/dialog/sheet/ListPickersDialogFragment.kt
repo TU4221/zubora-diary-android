@@ -9,23 +9,36 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.NumberPicker
 import androidx.appcompat.view.ContextThemeWrapper
+import androidx.navigation.fragment.navArgs
 import com.websarva.wings.android.zuboradiary.databinding.DialogNumberPickersBinding
 import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceVariantColorInt
 import com.websarva.wings.android.zuboradiary.ui.utils.numberPickerBottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersArgs
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersResult
+import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import kotlin.getValue
 
 /**
- * 複数の[NumberPicker]を持つボトムシートダイアログの基底クラス。
+ * アプリ内で共通して使用される、
+ * 汎用的な複数のドラムロールピッカー([NumberPicker])を動的に表示するボトムシートダイアログ。
+ * 表示する内容は [ListPickersArgs] を通じて外部から注入される。
  *
  * 以下の責務を持つ:
  * - [BaseBottomSheetDialogFragment]の機能の継承
- * - 複数の[NumberPicker]を持つ共通レイアウトの提供
+ * - [NumberPicker]の初期化処理
  * - テーマカラーに応じた[NumberPicker]のテーマ適用とテキストカラー設定
  * - 決定/キャンセルボタンのクリックイベント処理
- * - [NumberPicker]の初期化処理の移譲
  */
-abstract class BaseNumberPickersBottomSheetDialogFragment
+class ListPickersDialogFragment
     : BaseBottomSheetDialogFragment<DialogNumberPickersBinding>() {
+
+    /** ナビゲーション引数。 */
+    private val navArgs: ListPickersDialogFragmentArgs by navArgs()
+
+    /** [navArgs]から取り出した、ダイアログの表示内容を定義する引数。 */
+    private val listPickersArgs: ListPickersArgs get() = navArgs.listPickersArgs
 
     /** 追加処理として、ボタンのリスナー設定とNumberPickerの初期化を行う。 */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -34,17 +47,19 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
         with(binding) {
             buttonDecision.setOnClickListener {
                 Log.d(logTag, "onClick()_PositiveButton")
-                handleOnPositiveButtonClick(
-                    numberPickerFirst.value,
-                    numberPickerSecond.value,
-                    numberPickerThird.value
-                )
+                val result =
+                    ListPickersResult(
+                        numberPickerFirst.value,
+                        numberPickerSecond.value,
+                        numberPickerThird.value
+                    )
+                setResult(listPickersArgs.resultKey, DialogResult.Positive(result))
                 navigatePreviousFragment()
             }
 
             buttonCancel.setOnClickListener {
                 Log.d(logTag, "onClick()_NegativeButton")
-                handleOnNegativeButtonClick()
+                setResult(listPickersArgs.resultKey, DialogResult.Negative)
                 navigatePreviousFragment()
             }
         }
@@ -80,6 +95,10 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
         super.clearViewBindings()
     }
 
+    override fun handleOnCancel() {
+        setResult(listPickersArgs.resultKey, DialogResult.Cancel)
+    }
+
     /**
      * NumberPickerのテキストカラーをテーマに合わせて設定する。
      * @param binding カラーを設定するNumberPickerを含むViewBinding
@@ -97,24 +116,30 @@ abstract class BaseNumberPickersBottomSheetDialogFragment
     }
 
     /**
-     * 決定ボタンがクリックされた際の処理を定義する。
-     * @param firstPickerValue 1つ目のNumberPickerで選択された値
-     * @param secondPickerValue 2つ目のNumberPickerで選択された値
-     * @param thirdPickerValue 3つ目のNumberPickerで選択された値
-     */
-    protected abstract fun handleOnPositiveButtonClick(
-        firstPickerValue: Int,
-        secondPickerValue: Int,
-        thirdPickerValue: Int
-    )
-
-    /**
-     * キャンセルボタンがクリックされた際の処理を定義する。
-     */
-    protected abstract fun handleOnNegativeButtonClick()
-
-    /**
      * 各NumberPickerの初期設定（最小値、最大値、初期値など）を行う。
      */
-    protected abstract fun setupNumberPickers()
+    private fun setupNumberPickers() {
+        val pickers =
+            listOf(
+                binding.numberPickerFirst,
+                binding.numberPickerSecond,
+                binding.numberPickerThird
+            )
+
+        pickers.forEachIndexed { index, picker ->
+            val config = listPickersArgs.pickerConfigs.getOrNull(index)
+            if (config != null) {
+                picker.apply {
+                    visibility = View.VISIBLE
+                    minValue = 0
+                    maxValue = config.items.size - 1
+                    displayedValues = config.items.toTypedArray()
+                    value = config.initialIndex
+                    wrapSelectorWheel = false
+                }
+            } else {
+                picker.visibility = View.GONE
+            }
+        }
+    }
 }

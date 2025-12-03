@@ -131,8 +131,9 @@ class FragmentHelper {
                     when (event) {
                         is CommonUiEvent.NavigatePreviousScreen ->
                             handler.navigatePreviousFragment()
-                        is CommonUiEvent.ShowAppMessageDialog ->
+                        is CommonUiEvent.ShowAppMessageDialog -> {
                             handler.navigateAppMessageDialog(event.message)
+                        }
                     }
                 }
         }
@@ -205,6 +206,8 @@ class FragmentHelper {
     //endregion
 
     //region Navigation Helpers
+    // TODO:Dialogへの遷移をグローバルアクションに変更したことによる仕様見直し
+
     /**
      * 画面遷移を一度だけ試みる。
      * @param navController 画面遷移を管理するNavController
