@@ -16,6 +16,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemCommen
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * 指定された検索ワードに一致する日記のリストを読み込み、表示用のデータに整形して返すユースケース。
@@ -25,7 +26,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class LoadWordSearchResultListUseCase(
+internal class LoadWordSearchResultListUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) {
 

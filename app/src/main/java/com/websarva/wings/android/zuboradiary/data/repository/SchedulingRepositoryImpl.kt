@@ -4,17 +4,17 @@ import com.websarva.wings.android.zuboradiary.data.mapper.scheduling.SchedulingR
 import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
 import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
 import java.time.LocalTime
+import javax.inject.Inject
 
-internal class SchedulingRepositoryImpl(
-    private val notificationSchedulingDataSource: NotificationSchedulingDataSource,
-    private val schedulingRepositoryExceptionMapper: SchedulingRepositoryExceptionMapper
+internal class SchedulingRepositoryImpl @Inject constructor(
+    private val notificationSchedulingDataSource: NotificationSchedulingDataSource
 ) : SchedulingRepository {
 
     override suspend fun registerReminderNotification(settingTime: LocalTime) {
         try {
             notificationSchedulingDataSource.registerReminderNotificationWorker(settingTime)
         } catch (e: Exception) {
-            throw schedulingRepositoryExceptionMapper.toDomainException(e)
+            throw SchedulingRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -22,7 +22,7 @@ internal class SchedulingRepositoryImpl(
         try {
             notificationSchedulingDataSource.cancelReminderNotificationWorker()
         } catch (e: Exception) {
-            throw schedulingRepositoryExceptionMapper.toDomainException(e)
+            throw SchedulingRepositoryExceptionMapper.toDomainException(e)
         }
     }
 }

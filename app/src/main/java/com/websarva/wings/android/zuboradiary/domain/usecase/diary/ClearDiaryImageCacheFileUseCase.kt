@@ -8,13 +8,14 @@ import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageCacheFileClearException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * キャッシュストレージの日記画像ファイルをクリアするユースケース。
  *
  * @property fileRepository ファイル関連の操作を行うリポジトリ。
  */
-internal class ClearDiaryImageCacheFileUseCase(
+internal class ClearDiaryImageCacheFileUseCase @Inject constructor(
     private val fileRepository: FileRepository
 ) {
 

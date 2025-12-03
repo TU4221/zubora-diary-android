@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 /**
  * テーマカラー設定を読み込むユースケース。
@@ -23,7 +24,7 @@ import kotlinx.coroutines.flow.map
  *
  * @property settingsRepository 設定関連の操作を行うリポジトリ。
  */
-internal class LoadThemeColorSettingUseCase(
+internal class LoadThemeColorSettingUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository
 ) {
 

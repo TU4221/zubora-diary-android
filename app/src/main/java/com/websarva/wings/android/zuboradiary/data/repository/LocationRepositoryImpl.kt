@@ -5,17 +5,17 @@ import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepos
 import com.websarva.wings.android.zuboradiary.data.mapper.location.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.location.SimpleLocation
 import com.websarva.wings.android.zuboradiary.domain.repository.LocationRepository
+import javax.inject.Inject
 
-internal class LocationRepositoryImpl (
-    private val fusedLocationDataSource: FusedLocationDataSource,
-    private val locationRepositoryExceptionMapper: LocationRepositoryExceptionMapper
+internal class LocationRepositoryImpl @Inject constructor(
+    private val fusedLocationDataSource: FusedLocationDataSource
 ) : LocationRepository {
 
     override suspend fun fetchCurrentLocation(): SimpleLocation {
         return try {
             fusedLocationDataSource.fetchCurrentLocation().toDomainModel()
         } catch (e: Exception) {
-            throw locationRepositoryExceptionMapper.toDomainException(e)
+            throw LocationRepositoryExceptionMapper.toDomainException(e)
         }
     }
 }

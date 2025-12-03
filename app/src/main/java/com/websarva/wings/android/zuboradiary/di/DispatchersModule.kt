@@ -1,14 +1,19 @@
-package com.websarva.wings.android.zuboradiary.di.domain
+package com.websarva.wings.android.zuboradiary.di
 
-import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputTextUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import javax.inject.Qualifier
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class DispatchersIO
 
 /**
- * テキスト関連のユースケースの依存性を提供するHiltモジュール。
+ * [CoroutineDispatcher]関連の依存性を提供するHiltモジュール。
  *
  * このモジュールは、[SingletonComponent] にインストールされ、
  * アプリケーション全体で共有されるシングルトンインスタンスを提供する。
@@ -17,9 +22,8 @@ import javax.inject.Singleton
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal object TextUseCaseModule {
-
-    @Singleton
+internal object DispatchersModule {
     @Provides
-    fun provideValidateInputTextUseCase(): ValidateInputTextUseCase = ValidateInputTextUseCase()
+    @DispatchersIO
+    fun provideIoDispatcher(): CoroutineDispatcher = Dispatchers.IO
 }

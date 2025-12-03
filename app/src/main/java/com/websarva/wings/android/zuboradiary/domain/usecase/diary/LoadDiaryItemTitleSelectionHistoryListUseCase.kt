@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
 /**
  * 日記項目のタイトル選択履歴リストを読み込むユースケース。
@@ -19,7 +20,7 @@ import kotlinx.coroutines.flow.map
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class LoadDiaryItemTitleSelectionHistoryListUseCase(
+internal class LoadDiaryItemTitleSelectionHistoryListUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) {
 

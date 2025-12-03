@@ -13,6 +13,7 @@ import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataSto
 import com.websarva.wings.android.zuboradiary.data.preferences.exception.DataStoreInsufficientStorageException
 import com.websarva.wings.android.zuboradiary.data.utils.isInsufficientStorage
 import com.websarva.wings.android.zuboradiary.di.ApplicationScope
+import com.websarva.wings.android.zuboradiary.di.DispatchersIO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +43,7 @@ import javax.inject.Inject
 internal class UserPreferencesDataSource @Inject constructor(
     private val preferencesDataStore: DataStore<Preferences>,
     @ApplicationScope appScope: CoroutineScope,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @param:DispatchersIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     private val themeColorPreferenceKey = intPreferencesKey("theme_color")

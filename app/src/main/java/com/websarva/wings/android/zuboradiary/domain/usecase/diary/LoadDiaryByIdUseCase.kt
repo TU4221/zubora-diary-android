@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryLoadByIdException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * 特定のIDの日記データを読み込むユースケース。
@@ -18,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class LoadDiaryByIdUseCase(
+internal class LoadDiaryByIdUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) {
 

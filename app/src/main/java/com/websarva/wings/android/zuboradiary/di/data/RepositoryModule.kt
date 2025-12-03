@@ -1,19 +1,8 @@
 package com.websarva.wings.android.zuboradiary.di.data
 
-import com.websarva.wings.android.zuboradiary.data.database.DiaryDataSource
-import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
-import com.websarva.wings.android.zuboradiary.data.location.FusedLocationDataSource
-import com.websarva.wings.android.zuboradiary.data.mapper.diary.DiaryRepositoryExceptionMapper
-import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExceptionMapper
-import com.websarva.wings.android.zuboradiary.data.mapper.location.LocationRepositoryExceptionMapper
-import com.websarva.wings.android.zuboradiary.data.mapper.scheduling.SchedulingRepositoryExceptionMapper
-import com.websarva.wings.android.zuboradiary.data.mapper.settings.SettingsRepositoryExceptionMapper
-import com.websarva.wings.android.zuboradiary.data.mapper.weather.WeatherInfoRepositoryExceptionMapper
-import com.websarva.wings.android.zuboradiary.data.network.WeatherApiDataSource
 import com.websarva.wings.android.zuboradiary.domain.repository.DiaryRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
 import com.websarva.wings.android.zuboradiary.data.repository.DiaryRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.repository.FileRepositoryImpl
 import com.websarva.wings.android.zuboradiary.data.repository.LocationRepositoryImpl
@@ -21,11 +10,10 @@ import com.websarva.wings.android.zuboradiary.data.repository.SchedulingReposito
 import com.websarva.wings.android.zuboradiary.data.repository.SettingsRepositoryImpl
 import com.websarva.wings.android.zuboradiary.domain.repository.SchedulingRepository
 import com.websarva.wings.android.zuboradiary.data.repository.WeatherInfoRepositoryImpl
-import com.websarva.wings.android.zuboradiary.data.worker.NotificationSchedulingDataSource
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
 import com.websarva.wings.android.zuboradiary.domain.repository.LocationRepository
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
@@ -36,59 +24,57 @@ import javax.inject.Singleton
  * このモジュールは、[SingletonComponent] にインストールされ、
  * アプリケーション全体で共有されるシングルトンインスタンスを提供する。
  *
- * 各インスタンスは、対応する `@Provides` アノテーションが付与されたメソッドによって生成される。
+ * 各インターフェースは、対応する実装クラスと `@Binds` アノテーションによって紐付けられる。
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal object RepositoryModule {
+internal abstract class RepositoryModule {
 
+    // Hiltが内部的に参照するため、IDE上の未使用警告は無視
+    @Suppress("unused")
     @Singleton
-    @Provides
-    fun provideDiaryRepositoryImpl(
-        diaryDataSource: DiaryDataSource
-    ): DiaryRepositoryImpl =
-        DiaryRepositoryImpl(diaryDataSource, DiaryRepositoryExceptionMapper)
+    @Binds
+    abstract fun bindDiaryRepository(
+        impl: DiaryRepositoryImpl
+    ): DiaryRepository
 
+    // Hiltが内部的に参照するため、IDE上の未使用警告は無視
+    @Suppress("unused")
     @Singleton
-    @Provides
-    fun provideDiaryRepository(
-        diaryRepositoryImpl: DiaryRepositoryImpl
-    ): DiaryRepository = diaryRepositoryImpl
+    @Binds
+    abstract fun bindLocationRepository(
+        impl: LocationRepositoryImpl
+    ): LocationRepository
 
+    // Hiltが内部的に参照するため、IDE上の未使用警告は無視
+    @Suppress("unused")
     @Singleton
-    @Provides
-    fun provideLocationRepository(
-        fusedLocationDataSource: FusedLocationDataSource
-    ): LocationRepository =
-        LocationRepositoryImpl(fusedLocationDataSource, LocationRepositoryExceptionMapper)
+    @Binds
+    abstract fun bindFileRepository(
+        impl: FileRepositoryImpl
+    ): FileRepository
 
+    // Hiltが内部的に参照するため、IDE上の未使用警告は無視
+    @Suppress("unused")
     @Singleton
-    @Provides
-    fun provideFileRepository(
-        imageFileDataSource: ImageFileDataSource
-    ): FileRepository = FileRepositoryImpl(imageFileDataSource, FileRepositoryExceptionMapper)
+    @Binds
+    abstract fun bindSchedulingRepository(
+        impl: SchedulingRepositoryImpl
+    ): SchedulingRepository
 
+    // Hiltが内部的に参照するため、IDE上の未使用警告は無視
+    @Suppress("unused")
     @Singleton
-    @Provides
-    fun provideSchedulingRepository(
-        workManager: NotificationSchedulingDataSource
-    ): SchedulingRepository =
-        SchedulingRepositoryImpl(
-            workManager,
-            SchedulingRepositoryExceptionMapper
-            )
+    @Binds
+    abstract fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ): SettingsRepository
 
+    // Hiltが内部的に参照するため、IDE上の未使用警告は無視
+    @Suppress("unused")
     @Singleton
-    @Provides
-    fun provideSettingsRepository(
-        userPreferencesDataSource: UserPreferencesDataSource
-    ): SettingsRepository =
-        SettingsRepositoryImpl(userPreferencesDataSource, SettingsRepositoryExceptionMapper)
-
-    @Singleton
-    @Provides
-    fun provideWeatherApiRepository(
-        weatherApiDataSource: WeatherApiDataSource
-    ): WeatherInfoRepository =
-        WeatherInfoRepositoryImpl(weatherApiDataSource, WeatherInfoRepositoryExceptionMapper)
+    @Binds
+    abstract fun bindWeatherApiRepository(
+        impl: WeatherInfoRepositoryImpl
+    ): WeatherInfoRepository
 }

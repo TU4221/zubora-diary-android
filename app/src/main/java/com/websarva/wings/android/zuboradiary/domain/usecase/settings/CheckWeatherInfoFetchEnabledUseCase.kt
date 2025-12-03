@@ -7,13 +7,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * 天気情報取得設定が有効かどうかを確認するユースケース。
  *
  * @property loadWeatherInfoFetchSettingUseCase 天気情報取得設定を読み込むユースケース。
  */
-internal class CheckWeatherInfoFetchEnabledUseCase(
+internal class CheckWeatherInfoFetchEnabledUseCase @Inject constructor(
     private val loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase
 ) {
 

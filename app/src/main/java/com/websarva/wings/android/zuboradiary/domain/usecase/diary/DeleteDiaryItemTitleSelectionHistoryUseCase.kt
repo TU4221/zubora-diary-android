@@ -9,13 +9,14 @@ import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * 日記項目のタイトル選択履歴から特定の履歴を削除するユースケース。
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class DeleteDiaryItemTitleSelectionHistoryUseCase(
+internal class DeleteDiaryItemTitleSelectionHistoryUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) {
 

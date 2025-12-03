@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.Diar
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.WordSearchResultCountException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * ワード検索結果リストのフッターを更新するユースケース。
@@ -17,7 +18,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  *
  * @property countWordSearchResultsUseCase 検索ワードに一致する日記の総数を取得するためのユースケース。
  */
-internal class UpdateWordSearchResultListFooterUseCase(
+internal class UpdateWordSearchResultListFooterUseCase @Inject constructor(
     private val countWordSearchResultsUseCase: CountWordSearchResultsUseCase
 ) {
 

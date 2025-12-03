@@ -13,8 +13,8 @@ import javax.inject.Singleton
 /**
  * アプリケーション全体で使用するコルーチンスコープを識別するためのカスタム修飾子アノテーション。
  */
-@Retention(AnnotationRetention.BINARY)
 @Qualifier
+@Retention(AnnotationRetention.BINARY)
 annotation class ApplicationScope
 
 /**

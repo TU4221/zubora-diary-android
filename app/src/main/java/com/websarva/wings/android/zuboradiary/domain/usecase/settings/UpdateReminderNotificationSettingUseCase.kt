@@ -17,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 /**
  * リマインダー通知設定を更新するユースケース。
@@ -28,7 +29,7 @@ import kotlinx.coroutines.withContext
  * @property schedulingRepository スケジューリング関連の操作を行うリポジトリ。
  * @property loadReminderNotificationSettingUseCase リマインダー通知設定を読み込むユースケース。
  */
-internal class UpdateReminderNotificationSettingUseCase(
+internal class UpdateReminderNotificationSettingUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val schedulingRepository: SchedulingRepository,
     private val loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase

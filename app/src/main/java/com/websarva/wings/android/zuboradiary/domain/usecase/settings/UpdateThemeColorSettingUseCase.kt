@@ -9,13 +9,14 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * テーマカラー設定を更新するユースケース。
  *
  * @property settingsRepository 設定関連の操作を行うリポジトリ。
  */
-internal class UpdateThemeColorSettingUseCase(
+internal class UpdateThemeColorSettingUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository
 ) {
 

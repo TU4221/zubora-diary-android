@@ -8,13 +8,14 @@ import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * 指定された検索ワードに一致する日記の総数を取得するユースケース。
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class CountWordSearchResultsUseCase(
+internal class CountWordSearchResultsUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) {
 

@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllDataDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * アプリケーションの全データを削除するユースケース。
@@ -22,7 +23,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  * @property fileRepository ファイル関連へのアクセスを提供するリポジトリ。
  * @property initializeAllSettingsUseCase 全ての設定を初期化するユースケース。
  */
-internal class DeleteAllDataUseCase(
+internal class DeleteAllDataUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val fileRepository: FileRepository,
     private val initializeAllSettingsUseCase: InitializeAllSettingsUseCase

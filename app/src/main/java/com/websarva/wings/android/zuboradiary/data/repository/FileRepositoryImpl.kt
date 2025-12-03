@@ -5,10 +5,10 @@ import com.websarva.wings.android.zuboradiary.data.mapper.file.FileRepositoryExc
 import com.websarva.wings.android.zuboradiary.data.mapper.file.toImageFileNameDataModel
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.repository.FileRepository
+import javax.inject.Inject
 
-internal class FileRepositoryImpl(
-    private val imageFileDataSource: ImageFileDataSource,
-    private val fileRepositoryExceptionMapper: FileRepositoryExceptionMapper
+internal class FileRepositoryImpl @Inject constructor(
+    private val imageFileDataSource: ImageFileDataSource
 ) : FileRepository {
 
     override fun buildImageFileAbsolutePathFromCache(fileName: DiaryImageFileName): String {
@@ -23,7 +23,7 @@ internal class FileRepositoryImpl(
         return try {
             imageFileDataSource.existsImageFileInCache(fileName.toImageFileNameDataModel())
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -31,7 +31,7 @@ internal class FileRepositoryImpl(
         return try {
             imageFileDataSource.existsImageFileInPermanent(fileName.toImageFileNameDataModel())
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -39,7 +39,7 @@ internal class FileRepositoryImpl(
         return try {
             imageFileDataSource.existsImageFileInBackup(fileName.toImageFileNameDataModel())
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -52,7 +52,7 @@ internal class FileRepositoryImpl(
                 imageFileDataSource.cacheImageFile(uriString, fileBaseName)
             DiaryImageFileName(savedImageFileName)
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -60,7 +60,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.moveImageFileToPermanent(fileName.toImageFileNameDataModel())
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -68,7 +68,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.moveImageFileToBackup(fileName.toImageFileNameDataModel())
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -76,7 +76,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.restoreImageFileFromPermanent(fileName.toImageFileNameDataModel())
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -84,7 +84,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.restoreImageFileFromBackup(fileName.toImageFileNameDataModel())
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -92,7 +92,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.deleteImageFileInPermanent(fileName.toImageFileNameDataModel())
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -100,7 +100,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.deleteAllFilesInCache()
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -108,7 +108,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.deleteAllFilesInBackup()
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -116,7 +116,7 @@ internal class FileRepositoryImpl(
         try {
             imageFileDataSource.deleteAllFiles()
         } catch (e: Exception) {
-            throw fileRepositoryExceptionMapper.toDomainException(e)
+            throw FileRepositoryExceptionMapper.toDomainException(e)
         }
     }
 }

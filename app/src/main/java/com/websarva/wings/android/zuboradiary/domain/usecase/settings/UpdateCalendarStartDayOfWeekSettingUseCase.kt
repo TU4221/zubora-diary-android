@@ -9,13 +9,14 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * カレンダーの週の開始曜日設定を更新するユースケース。
  *
  * @property settingsRepository 設定関連の操作を行うリポジトリ。
  */
-internal class UpdateCalendarStartDayOfWeekSettingUseCase(
+internal class UpdateCalendarStartDayOfWeekSettingUseCase @Inject constructor(
     private val settingsRepository: SettingsRepository
 ) {
 

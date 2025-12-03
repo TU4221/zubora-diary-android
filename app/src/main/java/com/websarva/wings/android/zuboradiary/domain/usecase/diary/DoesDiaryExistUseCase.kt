@@ -8,13 +8,14 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * 指定された日付の日記が既に存在するかどうかを確認するユースケース。
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class DoesDiaryExistUseCase(
+internal class DoesDiaryExistUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) {
 

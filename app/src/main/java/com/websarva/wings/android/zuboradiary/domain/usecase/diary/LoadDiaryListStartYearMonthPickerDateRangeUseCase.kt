@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.ResourceNotFoundE
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryListStartYearMonthPickerDateRangeLoadException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * 日記リストの先頭年月を選択するピッカーに表示するための日付範囲を読み込むユースケース。
@@ -18,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase(
+internal class LoadDiaryListStartYearMonthPickerDateRangeUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) {
 

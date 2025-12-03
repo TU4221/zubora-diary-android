@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.Diar
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * 既存の日記リストを再読み込みし、フッターを更新するユースケース。
@@ -20,7 +21,7 @@ import java.time.LocalDate
  * @property loadDiaryListUseCase 日記リストを読み込むためのユースケース。
  * @property updateDiaryListFooterUseCase 日記リストのフッターを更新するためのユースケース。
  */
-internal class RefreshDiaryListUseCase(
+internal class RefreshDiaryListUseCase @Inject constructor(
     private val loadDiaryListUseCase: LoadDiaryListUseCase,
     private val updateDiaryListFooterUseCase: UpdateDiaryListFooterUseCase
 ) {

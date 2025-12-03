@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNoti
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * アプリケーションの全ての設定項目を初期値にリセットするユースケース。
@@ -32,7 +33,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  * @property updateWeatherInfoFetchSettingUseCase 天気情報取得設定を更新するユースケース。
  *
  */
-internal class InitializeAllSettingsUseCase(
+internal class InitializeAllSettingsUseCase @Inject constructor(
     private val updateThemeColorSettingUseCase: UpdateThemeColorSettingUseCase,
     private val updateCalendarStartDayOfWeekSettingUseCase: UpdateCalendarStartDayOfWeekSettingUseCase,
     private val updateReminderNotificationSettingUseCase: UpdateReminderNotificationSettingUseCase,

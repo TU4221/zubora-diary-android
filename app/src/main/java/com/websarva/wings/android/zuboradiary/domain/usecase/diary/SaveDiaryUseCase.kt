@@ -19,6 +19,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * 日記データと関連情報を保存するユースケース。
@@ -30,7 +31,7 @@ import java.time.LocalDate
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  * @property fileRepository ファイル関連へのアクセスを提供するリポジトリ。
  */
-internal class SaveDiaryUseCase(
+internal class SaveDiaryUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val fileRepository: FileRepository,
 ) {

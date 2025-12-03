@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * 日記の読み込み確認ダイアログを表示する必要があるかどうかを判断するユースケース。
@@ -19,7 +20,7 @@ import java.time.LocalDate
  *
  * @property doesDiaryExistUseCase 指定された日付の日記が存在するかどうかを確認するユースケース。
  */
-internal class ShouldRequestDiaryLoadConfirmationUseCase(
+internal class ShouldRequestDiaryLoadConfirmationUseCase @Inject constructor(
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase
 ) {
 

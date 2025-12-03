@@ -1,13 +1,22 @@
 package com.websarva.wings.android.zuboradiary.di.data
 
+import android.content.ContentResolver
 import android.content.Context
-import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import java.io.File
+import javax.inject.Qualifier
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class CacheDir
+
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class FilesDir
 
 /**
  * ファイル操作関連の依存性を提供するHiltモジュール。
@@ -21,14 +30,20 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 internal object FileModule {
 
-    @Singleton
     @Provides
-    fun provideImageFileDataSource(
-        @ApplicationContext context: Context
-    ):  ImageFileDataSource =
-        ImageFileDataSource(
-            context.contentResolver,
-            context.cacheDir,
-            context.filesDir
-        )
+    fun provideContentResolver(@ApplicationContext context: Context): ContentResolver {
+        return context.contentResolver
+    }
+
+    @Provides
+    @CacheDir
+    fun provideCacheDir(@ApplicationContext context: Context): File {
+        return context.cacheDir
+    }
+
+    @Provides
+    @FilesDir
+    fun provideFilesDir(@ApplicationContext context: Context): File {
+        return context.filesDir
+    }
 }

@@ -4,6 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * 日記を保存せずに終了する際の確認ダイアログを表示する必要があるかどうかを判断するユースケース。
@@ -12,7 +13,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  *
  * 日記編集画面から離脱する際に、未保存の変更がある場合にユーザーに警告するための判定に使用される。
  */
-internal class ShouldRequestExitWithoutDiarySaveConfirmationUseCase {
+internal class ShouldRequestExitWithoutDiarySaveConfirmationUseCase @Inject constructor() {
 
     private val logMsg = "日記未保存終了確認要否判定_"
 

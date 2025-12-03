@@ -13,12 +13,14 @@ import com.websarva.wings.android.zuboradiary.data.location.exception.LocationPr
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationUnavailableException
 import com.websarva.wings.android.zuboradiary.data.location.exception.PermissionDeniedException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.di.DispatchersIO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
+import javax.inject.Inject
 
 /**
  * Fused Location Provider APIを利用して位置情報を取得するデータソースクラス。
@@ -29,9 +31,9 @@ import kotlinx.coroutines.withTimeout
  * @property fusedLocationProviderClient デバイスの位置情報を取得するために使用される。
  * @property dispatcher 位置情報の取得を実行するスレッドプール。
  */
-internal class FusedLocationDataSource(
+internal class FusedLocationDataSource @Inject constructor(
     private val fusedLocationProviderClient: FusedLocationProviderClient,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @param:DispatchersIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
     // MEMO:fusedLocationProviderClient.lastLocation()を記述する時、Permission確認コードが必須となるが、

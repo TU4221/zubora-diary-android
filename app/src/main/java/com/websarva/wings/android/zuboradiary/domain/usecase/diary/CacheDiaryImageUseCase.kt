@@ -12,13 +12,14 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import javax.inject.Inject
 
 /**
  * 日記画像ファイルをキャッシュストレージへキャッシュするユースケース。
  *
  * @property fileRepository ファイル関連の操作を行うリポジトリ。
  */
-internal class CacheDiaryImageUseCase(
+internal class CacheDiaryImageUseCase @Inject constructor(
     private val fileRepository: FileRepository
 ) {
 

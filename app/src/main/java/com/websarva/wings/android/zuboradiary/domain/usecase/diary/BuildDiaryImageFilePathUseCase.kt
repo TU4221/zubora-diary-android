@@ -9,13 +9,14 @@ import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryImageFilePathBuildingException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * 日記画像ファイルの絶対パスを取得するユースケース。
  *
  * @property fileRepository ファイル関連の操作を行うリポジトリ。
  */
-internal class BuildDiaryImageFilePathUseCase(
+internal class BuildDiaryImageFilePathUseCase @Inject constructor(
     private val fileRepository: FileRepository
 ) {
     private val logMsg = "日記画像ファイルパス取得_"

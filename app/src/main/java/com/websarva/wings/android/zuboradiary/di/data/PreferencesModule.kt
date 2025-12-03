@@ -5,14 +5,11 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
-import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
-import com.websarva.wings.android.zuboradiary.di.ApplicationScope
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineScope
 import javax.inject.Singleton
 
 /**
@@ -37,11 +34,4 @@ internal object PreferencesModule {
         PreferenceDataStoreFactory.create {
             context.dataStoreFile("UserPreferences.preferences_pb")
         }
-
-    @Singleton
-    @Provides
-    fun provideUserPreferences(
-        preferencesDataStore: DataStore<Preferences>,
-        @ApplicationScope appScope: CoroutineScope
-    ): UserPreferencesDataSource = UserPreferencesDataSource(preferencesDataStore, appScope)
 }

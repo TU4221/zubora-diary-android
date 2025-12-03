@@ -4,6 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * 天気情報の取得確認ダイアログを表示する必要があるかどうかを判断するユースケース。
@@ -16,7 +17,7 @@ import java.time.LocalDate
  *
  * @property shouldFetchWeatherInfoUseCase 天気情報を新たに取得する必要があるかどうかを判断するユースケース。
  */
-internal class ShouldRequestWeatherInfoConfirmationUseCase(
+internal class ShouldRequestWeatherInfoConfirmationUseCase @Inject constructor(
     val shouldFetchWeatherInfoUseCase: ShouldFetchWeatherInfoUseCase
 ) {
 

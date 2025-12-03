@@ -13,10 +13,10 @@ import com.websarva.wings.android.zuboradiary.domain.repository.SettingsReposito
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-internal class SettingsRepositoryImpl(
-    private val userPreferencesDataSource: UserPreferencesDataSource,
-    private val settingsRepositoryExceptionMapper: SettingsRepositoryExceptionMapper
+internal class SettingsRepositoryImpl @Inject constructor(
+    private val userPreferencesDataSource: UserPreferencesDataSource
 ) : SettingsRepository {
 
     override fun loadThemeColorSetting(): Flow<ThemeColorSetting?> {
@@ -25,7 +25,7 @@ internal class SettingsRepositoryImpl(
                 preference?.toDomainModel()
             }.catch { cause ->
                 throw if (cause is Exception) {
-                    settingsRepositoryExceptionMapper.toDomainException(cause)
+                    SettingsRepositoryExceptionMapper.toDomainException(cause)
                 } else {
                     cause
                 }
@@ -38,7 +38,7 @@ internal class SettingsRepositoryImpl(
                 preference?.toDomainModel()
             }.catch { cause ->
                 throw if (cause is Exception) {
-                    settingsRepositoryExceptionMapper.toDomainException(cause)
+                    SettingsRepositoryExceptionMapper.toDomainException(cause)
                 } else {
                     cause
                 }
@@ -51,7 +51,7 @@ internal class SettingsRepositoryImpl(
                 preference?.toDomainModel()
             }.catch { cause ->
                 throw if (cause is Exception) {
-                    settingsRepositoryExceptionMapper.toDomainException(cause)
+                    SettingsRepositoryExceptionMapper.toDomainException(cause)
                 } else {
                     cause
                 }
@@ -64,7 +64,7 @@ internal class SettingsRepositoryImpl(
                 preference?.toDomainModel()
             }.catch { cause ->
                 throw if (cause is Exception) {
-                    settingsRepositoryExceptionMapper.toDomainException(cause)
+                    SettingsRepositoryExceptionMapper.toDomainException(cause)
                 } else {
                     cause
                 }
@@ -77,7 +77,7 @@ internal class SettingsRepositoryImpl(
                 preference?.toDomainModel()
             }.catch { cause ->
                 throw if (cause is Exception) {
-                    settingsRepositoryExceptionMapper.toDomainException(cause)
+                    SettingsRepositoryExceptionMapper.toDomainException(cause)
                 } else {
                     cause
                 }
@@ -89,7 +89,7 @@ internal class SettingsRepositoryImpl(
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateThemeColorPreference(preference)
         } catch (e: Exception) {
-            throw settingsRepositoryExceptionMapper.toDomainException(e)
+            throw SettingsRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -98,7 +98,7 @@ internal class SettingsRepositoryImpl(
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateCalendarStartDayOfWeekPreference(preference)
         } catch (e: Exception) {
-            throw settingsRepositoryExceptionMapper.toDomainException(e)
+            throw SettingsRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -107,7 +107,7 @@ internal class SettingsRepositoryImpl(
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateReminderNotificationPreference(preference)
         } catch (e: Exception) {
-            throw settingsRepositoryExceptionMapper.toDomainException(e)
+            throw SettingsRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -116,7 +116,7 @@ internal class SettingsRepositoryImpl(
             val preference = setting.toDataModel()
             userPreferencesDataSource.updatePasscodeLockPreference(preference)
         } catch (e: Exception) {
-            throw settingsRepositoryExceptionMapper.toDomainException(e)
+            throw SettingsRepositoryExceptionMapper.toDomainException(e)
         }
     }
 
@@ -125,7 +125,7 @@ internal class SettingsRepositoryImpl(
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateWeatherInfoFetchPreference(preference)
         } catch (e: Exception) {
-            throw settingsRepositoryExceptionMapper.toDomainException(e)
+            throw SettingsRepositoryExceptionMapper.toDomainException(e)
         }
     }
 }

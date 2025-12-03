@@ -4,6 +4,7 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * 天気情報を新たに取得する必要があるかどうかを判断するユースケース。
@@ -11,7 +12,7 @@ import java.time.LocalDate
  * 日記新規作成時、又は入力された日付が、入力前の日付と異なる場合に天気情報を取得する必要があると判断する。
  * 日記編集画面で日付が変更された際に、新しい日付の天気情報を取得するかどうかの判定に使用される。
  */
-internal class ShouldFetchWeatherInfoUseCase {
+internal class ShouldFetchWeatherInfoUseCase @Inject constructor() {
 
     private val logMsg = "天気情報取得要否判定_"
 

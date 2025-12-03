@@ -7,10 +7,10 @@ import com.websarva.wings.android.zuboradiary.domain.model.location.SimpleLocati
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Weather
 import com.websarva.wings.android.zuboradiary.domain.repository.WeatherInfoRepository
 import java.time.LocalDate
+import javax.inject.Inject
 
-internal class WeatherInfoRepositoryImpl (
-    private val weatherApiDataSource: WeatherApiDataSource,
-    private val weatherInfoRepositoryExceptionMapper: WeatherInfoRepositoryExceptionMapper
+internal class WeatherInfoRepositoryImpl @Inject constructor(
+    private val weatherApiDataSource: WeatherApiDataSource
 ) : WeatherInfoRepository {
 
     override fun canFetchWeatherInfo(date: LocalDate): Boolean {
@@ -23,7 +23,7 @@ internal class WeatherInfoRepositoryImpl (
                 .fetchWeatherInfo(date, location.latitude, location.longitude)
                 .toDomainModel()
         } catch (e: Exception) {
-            throw weatherInfoRepositoryExceptionMapper.toDomainException(e)
+            throw WeatherInfoRepositoryExceptionMapper.toDomainException(e)
         }
     }
 }

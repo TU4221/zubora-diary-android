@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * 指定された条件に基づいて日記リストを読み込むユースケース。
@@ -21,7 +22,7 @@ import java.time.LocalDate
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class LoadDiaryListUseCase(
+internal class LoadDiaryListUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) {
 

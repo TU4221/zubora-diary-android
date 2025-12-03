@@ -15,12 +15,13 @@ import com.websarva.wings.android.zuboradiary.data.database.exception.RecordNotF
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordReadException
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordUpdateException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.di.DispatchersIO
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.withContext
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * データベース操作のデータソースクラス。
@@ -34,11 +35,11 @@ import java.time.LocalDate
  * @property diaryItemTitleSelectionHistoryDao 日記項目タイトル選択履歴データアクセスオブジェクト。
  * @property dispatcher データベース操作を実行するスレッドプール。
  */
-internal class DiaryDataSource(
+internal class DiaryDataSource @Inject constructor(
     private val diaryDatabase: DiaryDatabase,
     private val diaryDao: DiaryDao,
     private val diaryItemTitleSelectionHistoryDao: DiaryItemTitleSelectionHistoryDao,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @param:DispatchersIO private val dispatcher: CoroutineDispatcher
 ) {
 
     //region Diary

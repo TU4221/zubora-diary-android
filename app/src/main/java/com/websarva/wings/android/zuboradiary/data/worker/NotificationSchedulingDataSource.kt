@@ -7,12 +7,13 @@ import androidx.work.WorkManager
 import com.websarva.wings.android.zuboradiary.data.worker.exception.WorkerCancellationException
 import com.websarva.wings.android.zuboradiary.data.worker.exception.WorkerEnqueueException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.di.DispatchersIO
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.time.LocalTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * [WorkManager] を使用して通知のスケジュール登録とキャンセルを行うデータソースクラス。
@@ -22,9 +23,9 @@ import java.util.concurrent.TimeUnit
  * @property workManager WorkManagerのインスタンス。
  * @property dispatcher WorkManagerの操作を実行するスレッドプール。
  */
-internal class NotificationSchedulingDataSource(
+internal class NotificationSchedulingDataSource @Inject constructor(
     private val workManager: WorkManager,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @param:DispatchersIO private val dispatcher: CoroutineDispatcher
 ) {
 
     private val reminderNotificationWorkTag = "ReminderNotification"

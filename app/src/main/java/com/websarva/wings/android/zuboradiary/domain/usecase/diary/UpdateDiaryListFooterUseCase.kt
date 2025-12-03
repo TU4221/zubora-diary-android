@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * 日記リストのフッターを更新するユースケース。
@@ -20,7 +21,7 @@ import java.time.LocalDate
  *
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  */
-internal class UpdateDiaryListFooterUseCase(
+internal class UpdateDiaryListFooterUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository
 ) {
 

@@ -10,6 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Wor
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryDayListItem
 import com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary.DiaryYearMonthList
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * 既存のワード検索結果リストに追加の検索結果データを読み込み、結合してフッターを更新するユースケース。
@@ -19,7 +20,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  * @property loadWordSearchResultListUseCase ワード検索結果リストを読み込むためのユースケース。
  * @property updateWordSearchResultListFooterUseCase ワード検索結果リストのフッターを更新するためのユースケース。
  */
-internal class LoadAdditionWordSearchResultListUseCase(
+internal class LoadAdditionWordSearchResultListUseCase @Inject constructor(
     private val loadWordSearchResultListUseCase: LoadWordSearchResultListUseCase,
     private val updateWordSearchResultListFooterUseCase: UpdateWordSearchResultListFooterUseCase
 ) {

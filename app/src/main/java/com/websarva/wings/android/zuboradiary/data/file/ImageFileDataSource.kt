@@ -15,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.data.file.exception.FileWriteExcep
 import com.websarva.wings.android.zuboradiary.data.file.exception.FileNotFoundException
 import com.websarva.wings.android.zuboradiary.data.utils.isInsufficientStorage
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
@@ -24,6 +23,10 @@ import java.io.InputStream
 import androidx.core.net.toUri
 import com.websarva.wings.android.zuboradiary.data.file.exception.InvalidFileOperationParameterException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.di.DispatchersIO
+import com.websarva.wings.android.zuboradiary.di.data.CacheDir
+import com.websarva.wings.android.zuboradiary.di.data.FilesDir
+import javax.inject.Inject
 
 /**
  * 画像ファイルの永続化およびキャッシュ処理を担当するデータソース。
@@ -37,11 +40,11 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  * @property permanentDir アプリケーションの永続ファイル用ディレクトリ。
  * @property dispatcher ファイル操作を実行するスレッドプール。
  */
-class ImageFileDataSource(
+class ImageFileDataSource @Inject constructor(
     private val contentResolver: ContentResolver,
-    private val cacheDir: File,
-    private val permanentDir: File,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @param:CacheDir private val cacheDir: File,
+    @param:FilesDir private val permanentDir: File,
+    @param:DispatchersIO private val dispatcher: CoroutineDispatcher
 ) {
 
     private val imageFileExtension = Bitmap.CompressFormat.JPEG

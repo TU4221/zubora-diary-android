@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.DomainException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.AllDiariesDeleteException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * 全ての日記データ (項目タイトル選択履歴除く) と、それに関連する永続的なURI権限を削除するユースケース。
@@ -19,7 +20,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  * @property diaryRepository 日記関連の操作を行うリポジトリ。
  * @property fileRepository ファイル関連へのアクセスを提供するリポジトリ。
  */
-internal class DeleteAllDiariesUseCase(
+internal class DeleteAllDiariesUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val fileRepository: FileRepository
 ) {

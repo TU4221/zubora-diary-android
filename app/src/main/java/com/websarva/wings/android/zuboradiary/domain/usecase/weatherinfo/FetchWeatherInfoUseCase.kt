@@ -13,6 +13,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.PermissionExcepti
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import java.time.LocalDate
+import javax.inject.Inject
 
 /**
  * 指定された日付の天気情報を取得するユースケース。
@@ -22,7 +23,7 @@ import java.time.LocalDate
  * @property weatherInfoRepository 天気情報関連の操作を行うリポジトリ。
  * @property locationRepository 位置情報関連の操作を行うリポジトリ。
  */
-internal class FetchWeatherInfoUseCase(
+internal class FetchWeatherInfoUseCase @Inject constructor(
     private val weatherInfoRepository: WeatherInfoRepository,
     private val locationRepository: LocationRepository
 ) {

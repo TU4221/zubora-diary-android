@@ -9,8 +9,8 @@ import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOper
 import com.websarva.wings.android.zuboradiary.data.network.exception.InvalidNetworkRequestParameterException
 import com.websarva.wings.android.zuboradiary.data.network.exception.ResponseParsingException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.di.DispatchersIO
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import java.net.ConnectException
@@ -18,6 +18,7 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
+import javax.inject.Inject
 import javax.net.ssl.SSLException
 
 /**
@@ -29,9 +30,9 @@ import javax.net.ssl.SSLException
  * @property weatherApiService Retrofitサービスインターフェースのインスタンス。
  * @property dispatcher 天気情報の取得を実行するスレッドプール。
  */
-internal class WeatherApiDataSource(
+internal class WeatherApiDataSource @Inject constructor(
     private val weatherApiService: WeatherApiService,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.IO
+    @param:DispatchersIO private val dispatcher: CoroutineDispatcher
 ) {
 
     // MEMO:@Suppress("unused")が不要と警告が発生したので削除したが、"unused"警告が再発する。

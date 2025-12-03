@@ -4,13 +4,14 @@ import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.common.InputTextValidation
+import javax.inject.Inject
 
 /**
  * 入力されたテキストの有効性を検証するユースケース。
  *
  * テキストが空でないか、先頭が空白文字でないかをチェックする。
  */
-internal class ValidateInputTextUseCase {
+internal class ValidateInputTextUseCase @Inject constructor() {
 
     private val logMsg = "インプットテキスト有効確認_"
 

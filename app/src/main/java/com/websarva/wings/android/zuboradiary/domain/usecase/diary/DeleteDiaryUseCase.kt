@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryDeleteException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import javax.inject.Inject
 
 /**
  * 特定の日付の日記を削除するユースケース。
@@ -20,7 +21,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
  * @property diaryRepository 日記データへのアクセスを提供するリポジトリ。
  * @property fileRepository ファイル関連へのアクセスを提供するリポジトリ。
  */
-internal class DeleteDiaryUseCase(
+internal class DeleteDiaryUseCase @Inject constructor(
     private val diaryRepository: DiaryRepository,
     private val fileRepository: FileRepository
 ) {
