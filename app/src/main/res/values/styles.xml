@@ -354,26 +354,34 @@
     <!-- region Material Time Picker Dialog -->
     <style name="MaterialTimePickerThemeColorWhite" parent="ThemeOverlay.Material3.MaterialTimePicker">
         <item name="android:theme">@style/ThemeColorWhite</item>
+
+        <!-- HACK:下記属性は"android:theme"では反映されない為、下記で反映 -->
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_white_surfaceContainerHigh</item>
     </style>
 
     <style name="MaterialTimePickerThemeColorBlack" parent="ThemeOverlay.Material3.MaterialTimePicker">
         <item name="android:theme">@style/ThemeColorBlack</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_black_surfaceContainerHigh</item>
     </style>
 
     <style name="MaterialTimePickerThemeColorRed" parent="ThemeOverlay.Material3.MaterialTimePicker">
         <item name="android:theme">@style/ThemeColorRed</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_red_surfaceContainerHigh</item>
     </style>
 
     <style name="MaterialTimePickerThemeColorBlue" parent="ThemeOverlay.Material3.MaterialTimePicker">
         <item name="android:theme">@style/ThemeColorBlue</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_blue_surfaceContainerHigh</item>
     </style>
 
     <style name="MaterialTimePickerThemeColorGreen" parent="ThemeOverlay.Material3.MaterialTimePicker">
         <item name="android:theme">@style/ThemeColorGreen</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_green_surfaceContainerHigh</item>
     </style>
 
     <style name="MaterialTimePickerThemeColorYellow" parent="ThemeOverlay.Material3.MaterialTimePicker">
         <item name="android:theme">@style/ThemeColorYellow</item>
+        <item name="colorSurfaceContainerHigh">@color/md_theme_color_yellow_surfaceContainerHigh</item>
     </style>
     <!-- endregion -->
 
