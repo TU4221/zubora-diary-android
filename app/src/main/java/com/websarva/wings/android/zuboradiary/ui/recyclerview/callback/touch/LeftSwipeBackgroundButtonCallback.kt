@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import java.lang.IllegalArgumentException
 
 /**
  * RecyclerViewのアイテムに対する左スワイプで、
@@ -65,7 +66,8 @@ internal open class LeftSwipeBackgroundButtonCallback(
 
     /** スワイプが完了した際に、描画オフセットを計算する。 */
     override fun onSwipedHook(viewHolder: RecyclerView.ViewHolder) {
-        val recyclerView = viewHolder.itemView.parent as? RecyclerView ?: return
+        val recyclerView =
+            viewHolder.itemView.parent as? RecyclerView ?: throw IllegalArgumentException()
         if (viewHolder !is BackgroundButtonViewHolder) return
 
         swipingOffset =

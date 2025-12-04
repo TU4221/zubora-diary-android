@@ -375,7 +375,7 @@ class DiaryEditViewModel @Inject internal constructor(
 
         val itemNumber = DiaryItemNumber(itemNumberInt)
         val itemTitle =
-            currentUiState.editingDiary.itemTitles[itemNumberInt] ?: throw IllegalStateException()
+            checkNotNull(currentUiState.editingDiary.itemTitles[itemNumberInt])
         launchWithUnexpectedErrorHandler {
             showDiaryItemTitleEditDialog(itemNumber, itemTitle)
         }
@@ -453,7 +453,7 @@ class DiaryEditViewModel @Inject internal constructor(
     fun onAttachedImageClick() {
         if (!isReadyForOperation) return
 
-        val diaryId = currentUiState.editingDiary.id.let { DiaryId(it) }
+        val diaryId = DiaryId(currentUiState.editingDiary.id)
         launchWithUnexpectedErrorHandler {
             showImageSelectionGallery(diaryId)
         }
@@ -706,12 +706,13 @@ class DiaryEditViewModel @Inject internal constructor(
     internal fun onAccessLocationPermissionChecked(
         isGranted: Boolean
     ) {
-        val parameters = pendingWeatherInfoFetchParameters
+        val parameters = checkNotNull(pendingWeatherInfoFetchParameters)
         clearPendingWeatherInfoFetchParameters()
         launchWithUnexpectedErrorHandler {
-            parameters?.let {
-                executeWeatherInfoFetchWithPermissionCheck(isGranted, it.date)
-            } ?: throw IllegalStateException()
+            executeWeatherInfoFetchWithPermissionCheck(
+                isGranted,
+                parameters.date
+            )
         }
     }
     //endregion
@@ -814,7 +815,7 @@ class DiaryEditViewModel @Inject internal constructor(
             id,
             date,
             { id, _ ->
-                id ?: throw IllegalArgumentException()
+                requireNotNull(id)
                 loadDiaryByIdUseCase(id)
             },
             { exception ->
@@ -1534,14 +1535,13 @@ class DiaryEditViewModel @Inject internal constructor(
      */
     private fun updateItemTitle(selection: DiaryItemTitleSelectionUi) {
         val itemNumberInt = selection.itemNumber
+        val id = requireNotNull(selection.id)
         val title = selection.title
-        val updateHistory = selection.let {
-            DiaryItemTitleSelectionHistoryUi(
-                it.id ?: throw IllegalStateException(),
-                it.title,
-                LocalDateTime.now()
-            )
-        }
+        val updateHistory = DiaryItemTitleSelectionHistoryUi(
+            id,
+            title,
+            LocalDateTime.now()
+        )
         updateUiState {
             it.copy(
                 editingDiary =

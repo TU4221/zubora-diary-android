@@ -101,9 +101,9 @@ class FragmentHelper {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
             mainViewModel.uiEvent
                 .collect { value: ConsumableEvent<E> ->
-                    val event = value.getContentIfNotHandled()
-                    Log.d(logTag, "UiEvent_Collect(): $event")
-                    event ?: return@collect
+                    val event = value.getContentIfNotHandled().also {
+                        Log.d(logTag, "UiEvent_Collect(): $it")
+                    } ?: return@collect
 
                     handler.onMainUiEventReceived(event)
                 }
@@ -124,9 +124,9 @@ class FragmentHelper {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
             mainViewModel.commonUiEvent
                 .collect { value: ConsumableEvent<CommonUiEvent> ->
-                    val event = value.getContentIfNotHandled()
-                    Log.d(logTag, "Common_UiEvent_Collect(): $event")
-                    event ?: return@collect
+                    val event = value.getContentIfNotHandled().also {
+                        Log.d(logTag, "Common_UiEvent_Collect(): $it")
+                    } ?: return@collect
 
                     when (event) {
                         is CommonUiEvent.NavigatePreviousScreen ->
@@ -153,9 +153,9 @@ class FragmentHelper {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
             mainActivityViewModel.activityCallbackUiEvent
                 .collect { value: ConsumableEvent<ActivityCallbackUiEvent> ->
-                    val event = value.getContentIfNotHandled()
-                    Log.d(logTag, "ActivityUiEvent_Collect(): $event")
-                    event ?: return@collect
+                    val event = value.getContentIfNotHandled().also {
+                        Log.d(logTag, "ActivityUiEvent_Collect(): $it")
+                    } ?: return@collect
 
                     handler.onActivityCallbackUiEventReceived(event)
                 }

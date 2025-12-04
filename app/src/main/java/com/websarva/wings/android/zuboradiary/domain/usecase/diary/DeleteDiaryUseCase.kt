@@ -64,6 +64,8 @@ internal class DeleteDiaryUseCase @Inject constructor(
         }
 
         // 日記添付画像ファイル削除
+        // MEMO:削除対象の日記が無かった場合は失敗とならず、読み出しデータが‘null‘の状態で処理が続行される為、
+        //      セーフコール演算子で下記対応。
         deleteDiary?.imageFileName?.let {
             try {
                 fileRepository.deleteImageFileInPermanent(it)

@@ -160,8 +160,7 @@ internal class UserPreferencesDataSource @Inject constructor(
     private fun createCalendarStartDayOfWeekPreference(
         preferences: Preferences
     ): CalendarStartDayOfWeekPreference? {
-        val dayOfWeekNumber =
-            preferences[calendarStartDayOfWeekPreferenceKey]
+        val dayOfWeekNumber = preferences[calendarStartDayOfWeekPreferenceKey]
         return dayOfWeekNumber?.let { CalendarStartDayOfWeekPreference(it) }
     }
 

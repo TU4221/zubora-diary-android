@@ -12,9 +12,10 @@ import com.websarva.wings.android.zuboradiary.ui.theme.ThemeColorChanger
  * @param themeColor テーマに応じてナビゲーションバーのアイコンカラーなどを設定するために使用する。
  */
 internal fun DialogFragment.enableEdgeToEdge(themeColor: ThemeColorUi) {
-    val window = dialog?.window ?: return
-    setupEdgeToEdge(window)
-    setupStatusBarAndNavigationBarIconColor(window, themeColor)
+    dialog?.window?.let {
+        setupEdgeToEdge(it)
+        setupStatusBarAndNavigationBarIconColor(it, themeColor)
+    }
 }
 
 /**

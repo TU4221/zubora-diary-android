@@ -598,13 +598,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                     includeItem4.motionLayoutDiaryEditItem,
                     includeItem5.motionLayoutDiaryEditItem,
                 )
-            }.also { motionLayoutDiaryEditItems ->
-                val arraySize = motionLayoutDiaryEditItems.size
+            }.also { layouts ->
                 itemMotionLayoutListeners =
-                    Array(arraySize) { init ->
+                    layouts.mapIndexed { index, layout ->
                         ItemMotionLayoutListener(
-                            arraySize,
-                            init + 1,
+                            layouts.size,
+                            index + 1,
                             { mainViewModel.onDiaryItemInvisibleStateTransitionCompleted(it) },
                             { mainViewModel.onDiaryItemVisibleStateTransitionCompleted(it) },
                             { selectItemMotionLayout(it) },
@@ -615,9 +614,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                                 binding.includeItem1.motionLayoutDiaryEditItem.height
                             }
                         ).also {
-                            motionLayoutDiaryEditItems[init].setTransitionListener(it)
+                            layout.setTransitionListener(it)
                         }
-                    }
+                    }.toTypedArray()
             }
 
     }
@@ -774,14 +773,12 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
      * @param numVisibleItems 表示すべき日記項目の総数。
      */
     private fun renderItemLayouts(numVisibleItems: Int) {
-        itemMotionLayouts?.let {
-            for (i in it.indices) {
-                val itemNumber = i + 1
-                if (itemNumber <= numVisibleItems) {
-                    transitionDiaryItemToVisible(itemNumber, true)
-                } else {
-                    transitionDiaryItemToInvisible(itemNumber, true)
-                }
+        checkNotNull(itemMotionLayouts).forEachIndexed { index, _ ->
+            val itemNumber = index + 1
+            if (itemNumber <= numVisibleItems) {
+                transitionDiaryItemToVisible(itemNumber, true)
+            } else {
+                transitionDiaryItemToInvisible(itemNumber, true)
             }
         }
     }
@@ -854,7 +851,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
      */
     private fun selectItemMotionLayout(itemNumber: Int): MotionLayout? {
         val arrayNumber = itemNumber - 1
-        return itemMotionLayouts?.let {
+        return checkNotNull(itemMotionLayouts).let {
             if (arrayNumber in it.indices) {
                 it[arrayNumber]
             } else {
@@ -871,7 +868,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
      */
     private fun selectItemMotionLayoutListener(itemNumber: Int): ItemMotionLayoutListener? {
         val arrayNumber = itemNumber - 1
-        return itemMotionLayoutListeners?.let {
+        return checkNotNull(itemMotionLayoutListeners).let {
             if (arrayNumber in it.indices) {
                 it[arrayNumber]
             } else {
@@ -886,11 +883,9 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
      * @return 表示状態のMotionLayoutの数。
      */
     private fun countVisibleItems(): Int {
-        return itemMotionLayouts?.let {
-            it.count { motionLayout ->
-                motionLayout.currentState == R.id.motion_scene_edit_diary_item_visible_state
-            }
-        } ?: 0
+        return checkNotNull(itemMotionLayouts).count { motionLayout ->
+            motionLayout.currentState == R.id.motion_scene_edit_diary_item_visible_state
+        }
     }
 
     /**
@@ -899,7 +894,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
      * @return 検証を通過した場合は`true`、それ以外は`false`。
      */
     private fun validateVisibleItemStatesContinuity(): Boolean {
-        val layouts = itemMotionLayouts ?: return false
+        val layouts = checkNotNull(itemMotionLayouts)
         if (layouts.isEmpty()) return false
 
         // 最初の項目が「表示」状態でなければならない

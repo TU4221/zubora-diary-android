@@ -140,8 +140,7 @@ class DiaryListFragment :
                 is DialogResult.Positive -> {
                     val selectedYearIndex = result.data.firstPickerValue
                     val selectedMonthIndex =
-                        result.data.secondPickerValue
-                            ?: throw IllegalStateException("月ピッカーの選択値が`null`")
+                        checkNotNull(result.data.secondPickerValue) {"月ピッカーの選択値が`null`"}
                     val selectedYear = yearPickerList[selectedYearIndex]
                     val selectedMonth = monthPickerList[selectedMonthIndex]
                     val selectedYearMonth = Year.of(selectedYear.value).atMonth(selectedMonth)
@@ -272,11 +271,11 @@ class DiaryListFragment :
             themeColor,
             { mainViewModel.onDiaryListItemClick(it) },
             { mainViewModel.onDiaryListItemDeleteButtonClick(it) }
-        ).also { adapter ->
+        ).also {
             diaryListSetupHelper = 
                 DiaryListSetupHelper(
                     diaryRecyclerView,
-                    adapter
+                    it
                 ) { 
                     mainViewModel.onDiaryListEndScrolled()
                 }.apply { setup() }
@@ -284,7 +283,7 @@ class DiaryListFragment :
             swipeBackgroundButtonInteractionHelper = 
                 SwipeBackgroundButtonInteractionHelper(
                     diaryRecyclerView,
-                    adapter
+                    it
                 ).apply { setup() }
         }
     }

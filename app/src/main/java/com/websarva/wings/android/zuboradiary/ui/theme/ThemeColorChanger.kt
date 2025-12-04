@@ -246,8 +246,7 @@ internal open class ThemeColorChanger {
      * @param color 適用する色。
      */
     private fun applyAppToolbarNavigationIconColor(toolbar: MaterialToolbar, color: Int) {
-        val navigationIcon = toolbar.navigationIcon ?: return
-        navigationIcon.setTint(color)
+        toolbar.navigationIcon?.setTint(color)
     }
 
     /**
@@ -271,14 +270,14 @@ internal open class ThemeColorChanger {
      * @param color 適用する色。
      */
     private fun applyAppToolbarMenuIconColor(toolbar: MaterialToolbar, color: Int) {
-        val menu = toolbar.menu ?: return
+        toolbar.menu?.let {
+            val numMenuIcons = it.size
+            if (numMenuIcons <= 0) return
 
-        val numMenuIcons = menu.size
-        if (numMenuIcons <= 0) return
-
-        for (i in 0 until numMenuIcons) {
-            val icon = menu[i].icon
-            icon?.setTint(color)
+            for (i in 0 until numMenuIcons) {
+                val icon = it[i].icon
+                icon?.setTint(color)
+            }
         }
     }
     // endregion

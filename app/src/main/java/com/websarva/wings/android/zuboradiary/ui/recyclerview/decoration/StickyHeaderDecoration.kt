@@ -5,6 +5,7 @@ import android.view.View
 import androidx.core.graphics.withTranslation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import java.lang.IllegalArgumentException
 
 /**
  * RecyclerViewにスティッキーヘッダー効果を設定するための[RecyclerView.ItemDecoration]。
@@ -30,7 +31,8 @@ internal class StickyHeaderDecoration(
         // MEMO:画面遷移時、MotionLayoutによりRecyclerViewの高さが変わる時がある為、
         //      RecyclerViewから取得しようとすると安定して値を取得することができない(最後尾のアイテムポジションを取得する)。
         //      その為、LinearLayoutManagerから取得するようにする。
-        val layoutManager = parent.layoutManager as? LinearLayoutManager ?: return
+        val layoutManager =
+            parent.layoutManager as? LinearLayoutManager ?: throw IllegalArgumentException()
         val topChildPosition = layoutManager.findFirstVisibleItemPosition()
         if (topChildPosition == RecyclerView.NO_POSITION) return
 

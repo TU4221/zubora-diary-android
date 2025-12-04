@@ -2,6 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.recyclerview.callback.touch
 
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
+import java.lang.IllegalArgumentException
 
 /**
  * RecyclerViewのアイテムに対するシンプルな左スワイプ機能を実装するための[ItemTouchHelper.Callback]。
@@ -24,7 +25,8 @@ internal open class SimpleLeftSwipeCallback(
 
     /** [BaseLeftSwipeCallback]の実装。フォアグラウンドビューのX方向の移動量を、スワイプされた距離`dX`に設定する。 */
     override fun drawViewHolder(viewHolder: RecyclerView.ViewHolder, dX: Float) {
-        val leftSwipeViewHolder = viewHolder as? SwipeableViewHolder ?: return
+        val leftSwipeViewHolder =
+            viewHolder as? SwipeableViewHolder ?: throw IllegalArgumentException()
         leftSwipeViewHolder.foregroundView.translationX = dX
     }
 }

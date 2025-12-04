@@ -261,7 +261,8 @@ internal abstract class BaseLeftSwipeCallback(
     private fun animateCloseSwipedViewHolder(position: Int, viewHolder: RecyclerView.ViewHolder) {
         Log.d(logTag, "animateCloseSwipedViewHolder()_position:$position")
 
-        val leftSwipeViewHolder = viewHolder as? SwipeableViewHolder ?: return
+        val leftSwipeViewHolder =
+            viewHolder as? SwipeableViewHolder ?: throw IllegalArgumentException()
         leftSwipeViewHolder.foregroundView.animate()
             .setDuration(300)
             .setInterpolator(FastOutSlowInInterpolator())

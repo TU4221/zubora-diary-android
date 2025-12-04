@@ -154,11 +154,11 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         val diaryRecyclerView = binding.recyclerWordSearchResultList
         wordSearchResultDiaryListAdapter = WordSearchResultDiaryListAdapter(
             themeColor
-        ) { mainViewModel.onWordSearchResultListItemClick(it) }.also { adapter ->
+        ) { mainViewModel.onWordSearchResultListItemClick(it) }.also {
             diaryListSetupHelper =
                 DiaryListSetupHelper(
                     diaryRecyclerView,
-                    adapter
+                    it
                 ) {
                     mainViewModel.onWordSearchResultListEndScrolled()
                 }.apply { setup() }
@@ -204,8 +204,13 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
 
     /** 検索ワード入力欄にフォーカスを当て、キーボードを表示する。 */
     private fun showKeyboard() {
-        val textSearchWord = binding.textInputEditTextSearchWord.apply { requestFocus() }
-        keyboardManager.showKeyboard(textSearchWord)
+        binding.textInputEditTextSearchWord
+            .apply {
+                requestFocus()
+            }.also {
+                keyboardManager.showKeyboard(it)
+            }
+
     }
     //endregion
 

@@ -22,7 +22,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
  * @param result 送信する結果オブジェクト。
  */
 internal fun <T> DialogFragment.setResult(resultKey: String, result: DialogResult<T>) {
-    val navBackStackEntry = checkNotNull(findNavController().previousBackStackEntry) // TODO: ?.let{} より checkNotNullが適しているところはcheckNotNullに修正
+    val navBackStackEntry = checkNotNull(findNavController().previousBackStackEntry)
     val savedStateHandle = navBackStackEntry.savedStateHandle
     savedStateHandle[resultKey] = result
 }

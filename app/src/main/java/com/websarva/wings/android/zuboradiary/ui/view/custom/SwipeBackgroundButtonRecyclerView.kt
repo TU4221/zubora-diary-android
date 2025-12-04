@@ -76,9 +76,10 @@ internal class SwipeBackgroundButtonRecyclerView @JvmOverloads constructor(
      */
     override fun performClick(): Boolean {
         super.performClick()
-        return currentMotionEvent?.let {
-            onPerformClickListener?.onPerformClick(this, it) ?: true
-        } ?: throw IllegalStateException()
+        return onPerformClickListener?.onPerformClick(
+            this,
+            checkNotNull(currentMotionEvent)
+        ) ?: true
     }
 
     /**

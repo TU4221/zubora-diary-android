@@ -69,11 +69,12 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     private fun setupTitle() {
         if (handle.contains(SAVED_STATE_UI_KEY)) return
 
-        val diaryItemTitleSelection =
+        checkNotNull(
             handle.get<DiaryItemTitleSelectionUi>(ARGUMENT_DIARY_ITEM_TITLE_KEY)
-                ?: throw IllegalArgumentException()
-        updateItemNumber(diaryItemTitleSelection.itemNumber)
-        updateTitle(diaryItemTitleSelection.title)
+        ).let {
+            updateItemNumber(it.itemNumber)
+            updateTitle(it.title)
+        }
     }
 
     /** UI状態の監視を開始する。 */

@@ -269,7 +269,7 @@ class SettingsViewModel @Inject internal constructor(
     fun onCalendarStartDayOfWeekSettingItemClick() {
         if (!canExecuteOperation()) return
 
-        val dayOfWeek = currentUiState.calendarStartDayOfWeek ?: return
+        val dayOfWeek = checkNotNull(currentUiState.calendarStartDayOfWeek)
         launchWithUnexpectedErrorHandler {
             showCalendarStartDayOfWeekPickerDialog(dayOfWeek)
         }

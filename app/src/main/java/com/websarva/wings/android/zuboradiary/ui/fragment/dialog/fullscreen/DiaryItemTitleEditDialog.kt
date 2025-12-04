@@ -163,7 +163,7 @@ class DiaryItemTitleEditDialog :
             ) {
                 mainViewModel.onDiaryItemTitleSelectionHistoryListItemClick(it)
             }.also { listAdapter ->
-                with(recyclerView) {
+                recyclerView.apply {
                     adapter = listAdapter
                     layoutManager = LinearLayoutManager(context)
                     addItemDecoration(

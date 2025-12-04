@@ -15,11 +15,11 @@ class ConfirmationDialogFragment : BaseAlertDialogFragment() {
     private val dialogArgs: ConfirmationDialogArgs get() = navArgs.dialogArgs
 
     override fun createTitle(): String {
-        return dialogArgs.titleText ?: getString(dialogArgs.titleRes!!)
+        return dialogArgs.titleText ?: getString(checkNotNull(dialogArgs.titleRes))
     }
 
     override fun createMessage(): String {
-        return dialogArgs.messageText ?: getString(dialogArgs.messageRes!!)
+        return dialogArgs.messageText ?: getString(checkNotNull(dialogArgs.messageRes))
     }
 
     override fun handleOnPositiveButtonClick() {

@@ -6,6 +6,7 @@ import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.DiaryListB
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.decoration.SpacingItemDecoration
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.decoration.StickyHeaderDecoration
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemUi
+import java.lang.IllegalArgumentException
 
 /**
  * 日記リスト用のRecyclerViewのセットアップするヘルパークラス。
@@ -72,10 +73,12 @@ internal class DiaryListSetupHelper(
          */
         override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
             if (dy <= 0) return
-            val layoutManager = recyclerView.layoutManager as? LinearLayoutManager ?: return
+            val layoutManager =
+                recyclerView.layoutManager as? LinearLayoutManager ?: throw IllegalArgumentException()
             val totalItemCount = layoutManager.itemCount
             val lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition()
-            val adapter = recyclerView.adapter as? DiaryListBaseAdapter<*, *> ?: return
+            val adapter =
+                recyclerView.adapter as? DiaryListBaseAdapter<*, *> ?: throw IllegalArgumentException()
             val lastItem = adapter.currentList.getOrNull(totalItemCount - 1)
 
             // 最後のアイテムが「日記なしメッセージ」の場合は、追加読み込みをしない

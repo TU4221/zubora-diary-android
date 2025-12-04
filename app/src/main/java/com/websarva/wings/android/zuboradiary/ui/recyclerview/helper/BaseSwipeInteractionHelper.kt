@@ -47,9 +47,11 @@ internal abstract class BaseSwipeInteractionHelper<
      */
     fun setup() {
         // ItemTouchHelperのセットアップ
-        simpleCallback = createLeftSwipeSimpleCallback()
-        itemTouchHelper = simpleCallback?.let { ItemTouchHelper(it) }
-        itemTouchHelper?.attachToRecyclerView(recyclerView)
+        simpleCallback = createLeftSwipeSimpleCallback().also {
+            itemTouchHelper = ItemTouchHelper(it).apply {
+                attachToRecyclerView(recyclerView)
+            }
+        }
 
         // AdapterDataObserverのセットアップ
         adapterDataObserver = RecyclerViewAdapterDataObserver {

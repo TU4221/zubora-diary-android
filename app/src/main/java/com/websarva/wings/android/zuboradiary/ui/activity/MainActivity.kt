@@ -256,7 +256,7 @@ class MainActivity : LoggingActivity() {
      * @param themeColor 適用するテーマカラー
      */
     private fun switchThemeColor(themeColor: ThemeColorUi) {
-        themeColorChanger.run {
+        with(themeColorChanger) {
             applyStatusBarIconColor(window, themeColor)
             applyNavigationBarIconColor(window, themeColor)
             applyAppBackgroundColor(binding.root, themeColor)
@@ -271,7 +271,7 @@ class MainActivity : LoggingActivity() {
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
         val bottomNavigationView = binding.bottomNavigation
         setupWithNavController(bottomNavigationView, navController)
-        bottomNavigationView.run {
+        bottomNavigationView.apply {
             // MEMO:setupWithNavController()で設定したOnItemSelectedListenerを下記で上書き
             setOnItemSelectedListener { menuItem: MenuItem ->
                 Log.i(logTag, "ボトムナビゲーション_セレクト")

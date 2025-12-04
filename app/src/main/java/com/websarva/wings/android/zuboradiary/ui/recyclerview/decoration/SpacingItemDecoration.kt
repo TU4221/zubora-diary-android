@@ -5,6 +5,7 @@ import android.graphics.Rect
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
+import java.lang.IllegalArgumentException
 
 /**
  * RecyclerViewの特定のアイテム間に、垂直方向の間隔を設定するための[RecyclerView.ItemDecoration]。
@@ -32,7 +33,7 @@ internal class SpacingItemDecoration(
         val position = parent.getChildAdapterPosition(view)
         if (position == RecyclerView.NO_POSITION) return
 
-        val provider = parent.adapter as? SpacingItemProvider ?: return
+        val provider = parent.adapter as? SpacingItemProvider ?: throw IllegalArgumentException()
 
         if (provider.isSpacingItem(position)) {
             outRect.bottom = itemSpacing

@@ -71,7 +71,7 @@ internal class KeyboardManager(
         listener: KeyboardStateListener
     ) {
         val viewLifecycleOwner = fragment.viewLifecycleOwner
-        val rootView = fragment.view ?: return
+        val rootView = requireNotNull(fragment.view)
 
         viewLifecycleOwner.lifecycle.addObserver(object : DefaultLifecycleObserver {
             // このObserverは、viewLifecycleOwnerが破棄されるまでメモリ上に存在する
