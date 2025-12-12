@@ -12,8 +12,9 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.event.MainActivityUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.message.CommonAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.message.MainActivityAppMessage
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.MainActivityNavDestination
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.MainActivityUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseViewModel
@@ -45,7 +46,11 @@ import javax.inject.Inject
 class MainActivityViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
-) : BaseViewModel<MainActivityUiState, MainActivityUiEvent>(
+) : BaseViewModel<
+        MainActivityUiState,
+        MainActivityUiEvent,
+        NavigationEvent.To<MainActivityNavDestination>
+>(
     handle.get<MainActivityUiState>(SAVED_STATE_UI_KEY)?.let {
         MainActivityUiState.fromSavedState(it)
     } ?: MainActivityUiState()
@@ -98,12 +103,12 @@ class MainActivityViewModel @Inject internal constructor(
                     is UseCaseResult.Failure -> {
                         when (it.exception) {
                             is ThemeColorSettingLoadException.LoadFailure -> {
-                                emitMainActivityAppMessageEvent(
+                                showAppMessageDialog(
                                     MainActivityAppMessage.SettingsLoadFailure
                                 )
                             }
                             is ThemeColorSettingLoadException.Unknown -> {
-                                emitUnexpectedAppMessage(it.exception)
+                                showUnexpectedAppMessageDialog(it.exception)
                             }
                         }
                     }
@@ -164,16 +169,6 @@ class MainActivityViewModel @Inject internal constructor(
     internal fun onBottomNavigationItemReselect() {
         viewModelScope.launch {
             emitActivityCallbackUiEvent(ActivityCallbackUiEvent.ProcessOnBottomNavigationItemReselect)
-        }
-    }
-
-    /**
-     * BottomNavigationViewを持つFragmentから戻るナビゲーションが発生した時に呼び出される事を想定。
-     * スタート地点のタブFragmentへ遷移するイベントを発行する。
-     */
-    internal fun onNavigateBackFromBottomNavigationTab() {
-        viewModelScope.launch {
-            emitUiEvent(MainActivityUiEvent.NavigateStartTabScreen)
         }
     }
     //endregion
@@ -346,30 +341,20 @@ class MainActivityViewModel @Inject internal constructor(
     //endregion
 
     //region UI Event Emission
-    override suspend fun emitUnexpectedAppMessage(e: Exception) {
-        emitCommonAppMessageEvent(
-            CommonAppMessage.Unexpected(e)
-        )
+    override suspend fun showUnexpectedAppMessageDialog(e: Exception) {
+        showAppMessageDialog(MainActivityAppMessage.Unexpected(e))
     }
 
     /**
-     * MainActivity固有のアプリケーションメッセージ([MainActivityAppMessage])をUIに通知するイベントを発行する。
-     * @param appMessage 表示する共通メッセージ。
+     * アプリケーションメッセージダイアログを表示する（イベント発行）。
+     * @param appMessage 表示するメッセージ。
      */
-    private suspend fun emitMainActivityAppMessageEvent(appMessage: MainActivityAppMessage) {
-        emitUiEvent(
-            MainActivityUiEvent.ShowMainActivityAppMessageDialog(appMessage)
-        )
-    }
-
-
-    /**
-     * アプリケーション共通のメッセージ([CommonAppMessage])をUIに通知するイベントを発行する。
-     * @param appMessage 表示する共通メッセージ。
-     */
-    private suspend fun emitCommonAppMessageEvent(appMessage: CommonAppMessage) {
-        emitUiEvent(
-            MainActivityUiEvent.ShowCommonAppMessageDialog(appMessage)
+    private suspend fun showAppMessageDialog(appMessage: MainActivityAppMessage) {
+        emitNavigationEvent(
+            NavigationEvent.To(
+                MainActivityNavDestination.AppMessageDialog(appMessage),
+                NavigationEvent.Policy.Retry
+            )
         )
     }
 

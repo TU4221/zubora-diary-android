@@ -24,6 +24,9 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.WordSearchNavDestination
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.WordSearchUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
@@ -54,7 +57,12 @@ class WordSearchViewModel @Inject internal constructor(
     private val loadNewWordSearchResultListUseCase: LoadNewWordSearchResultListUseCase,
     private val loadAdditionWordSearchResultListUseCase: LoadAdditionWordSearchResultListUseCase,
     private val refreshWordSearchResultListUseCase: RefreshWordSearchResultListUseCase
-) : BaseFragmentViewModel<WordSearchUiState, WordSearchUiEvent, WordSearchAppMessage>(
+) : BaseFragmentViewModel<
+        WordSearchUiState,
+        WordSearchUiEvent,
+        WordSearchNavDestination,
+        DummyNavBackDestination
+>(
     handle.get<WordSearchUiState>(SAVED_STATE_UI_KEY)?.let {
         WordSearchUiState.fromSavedState(it)
     } ?: WordSearchUiState()
@@ -142,10 +150,13 @@ class WordSearchViewModel @Inject internal constructor(
 
     //region UI Event Handlers
     /**
-     * UIが準備完了した時に、`Fragment`から呼び出される事を想定。
-     * 必要に応じて検索結果リストのリフレッシュを行う。
+     * UIが準備完了した時に呼び出される事を想定。
+     *
+     * 必要に応じて検索結果リストのリフレッシュを行う処理を追加。
      */
-    internal fun onUiReady() {
+    override fun onUiReady() {
+        super.onUiReady()
+
         if (!needsRefreshWordSearchResultList) return
         updateNeedsRefreshWordSearchResultList(false)
         if (!isReadyForOperation) return
@@ -163,10 +174,13 @@ class WordSearchViewModel @Inject internal constructor(
     }
 
     /**
-     * UIが非表示になる時に、`Fragment`から呼び出される事を想定。
-     * 次回表示時にリストをリフレッシュするためのフラグを立てる。
+     * UIが非表示になる時に呼び出される事を想定。
+     * 
+     * 次回表示時にリストをリフレッシュするためのフラグを立てる処理を追加。
      */
-    internal fun onUiGone() {
+    override fun onUiGone() {
+        super.onUiGone()
+        
         updateNeedsRefreshWordSearchResultList(true)
     }
 
@@ -266,12 +280,12 @@ class WordSearchViewModel @Inject internal constructor(
             { exception ->
                 when (exception) {
                     is WordSearchResultListNewLoadException.LoadFailure -> {
-                        emitAppMessageEvent(
+                        showAppMessageDialog(
                             WordSearchAppMessage.SearchResultListLoadFailure
                         )
                     }
                     is WordSearchResultListNewLoadException.Unknown -> {
-                        emitUnexpectedAppMessage(exception)
+                        showUnexpectedAppMessageDialog(exception)
                     }
                 }
             }
@@ -297,12 +311,12 @@ class WordSearchViewModel @Inject internal constructor(
             { exception ->
                 when (exception) {
                     is WordSearchResultListAdditionLoadException.LoadFailure -> {
-                        emitAppMessageEvent(
+                        showAppMessageDialog(
                             WordSearchAppMessage.SearchResultListLoadFailure
                         )
                     }
                     is WordSearchResultListAdditionLoadException.Unknown -> {
-                        emitUnexpectedAppMessage(exception)
+                        showUnexpectedAppMessageDialog(exception)
                     }
                 }
             }
@@ -328,12 +342,12 @@ class WordSearchViewModel @Inject internal constructor(
             { exception ->
                 when (exception) {
                     is WordSearchResultListRefreshException.RefreshFailure -> {
-                        emitAppMessageEvent(
+                        showAppMessageDialog(
                             WordSearchAppMessage.SearchResultListLoadFailure
                         )
                     }
                     is WordSearchResultListRefreshException.Unknown -> {
-                        emitUnexpectedAppMessage(exception)
+                        showUnexpectedAppMessageDialog(exception)
                     }
                 }
             }
@@ -375,12 +389,12 @@ class WordSearchViewModel @Inject internal constructor(
                     updateToIdleState()
                     when (result.exception) {
                         is WordSearchResultCountException.CountFailure -> {
-                            emitAppMessageEvent(
+                            showAppMessageDialog(
                                 WordSearchAppMessage.SearchResultListLoadFailure
                             )
                         }
                         is WordSearchResultCountException.Unknown -> {
-                            emitUnexpectedAppMessage(result.exception)
+                            showUnexpectedAppMessageDialog(result.exception)
                         }
                     }
                     return
@@ -425,7 +439,12 @@ class WordSearchViewModel @Inject internal constructor(
      * 前の画面へ遷移する（イベント発行）。
      */
     private suspend fun navigatePreviousScreen() {
-        emitNavigatePreviousFragmentEvent()
+        emitNavigationEvent(
+            NavigationEvent.Back(
+                NavigationEvent.Policy.Single,
+                null
+            )
+        )
     }
 
     /**
@@ -435,9 +454,29 @@ class WordSearchViewModel @Inject internal constructor(
      * @param date 表示対象の日記の日付。
      */
     private suspend fun navigateDiaryShowScreen(id: String, date: LocalDate) {
-        emitUiEvent(
-            WordSearchUiEvent.NavigateDiaryShowScreen(id, date)
+        emitNavigationEvent(
+            NavigationEvent.To(
+                WordSearchNavDestination.DiaryShowScreen(id, date),
+                NavigationEvent.Policy.Single
+            )
         )
+    }
+
+    /**
+     * アプリケーションメッセージダイアログを表示する（イベント発行）。
+     * @param appMessage 表示するメッセージ。
+     */
+    private suspend fun showAppMessageDialog(appMessage: WordSearchAppMessage) {
+        emitNavigationEvent(
+            NavigationEvent.To(
+                WordSearchNavDestination.AppMessageDialog(appMessage),
+                NavigationEvent.Policy.Retry
+            )
+        )
+    }
+
+    override suspend fun showUnexpectedAppMessageDialog(e: Exception) {
+        showAppMessageDialog(WordSearchAppMessage.Unexpected(e))
     }
     //endregion
 

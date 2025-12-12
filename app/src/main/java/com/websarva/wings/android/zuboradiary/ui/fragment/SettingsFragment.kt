@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavDirections
 import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
@@ -20,10 +21,6 @@ import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentSettingsBinding
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.OpenSourceSoftwareLicensesDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.TimePickerDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -32,8 +29,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDi
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickerConfig
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersArgs
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersResult
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.TimePickerArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.SettingsNavDestination
 import com.websarva.wings.android.zuboradiary.ui.utils.asCalendarStartDayOfWeekString
 import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
@@ -58,8 +56,12 @@ import kotlin.getValue
  * - 各種権限（通知、位置情報）の要求と状態反映
  */
 @AndroidEntryPoint
-class SettingsFragment :
-    BaseFragment<FragmentSettingsBinding, SettingsUiEvent>(),
+class SettingsFragment : BaseFragment<
+        FragmentSettingsBinding,
+        SettingsUiEvent,
+        SettingsNavDestination,
+        DummyNavBackDestination
+>(),
     RequiresBottomNavigation,
     ActivityCallbackUiEventHandler {
         
@@ -70,6 +72,8 @@ class SettingsFragment :
     override val mainViewModel: SettingsViewModel by activityViewModels()
 
     override val destinationId = R.id.navigation_settings_fragment
+
+    override val resultKey: String? get() = null
 
     /** 通知権限のリクエスト結果を処理するランチャー。 */
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
@@ -276,33 +280,6 @@ class SettingsFragment :
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: SettingsUiEvent) {
         when (event) {
-            is SettingsUiEvent.ShowThemeColorPickerDialog -> {
-                navigateThemeColorPickerDialog()
-            }
-            is SettingsUiEvent.ShowCalendarStartDayPickerDialog -> {
-                navigateCalendarStartDayPickerDialog(event.dayOfWeek)
-            }
-            is SettingsUiEvent.ShowReminderNotificationTimePickerDialog -> {
-                navigateReminderNotificationTimePickerDialog()
-            }
-            is SettingsUiEvent.ShowAllDiariesDeleteDialog -> {
-                navigateAllDiariesDeleteDialog()
-            }
-            is SettingsUiEvent.ShowAllSettingsInitializationDialog -> {
-                navigateAllSettingsInitializationDialog()
-            }
-            is SettingsUiEvent.ShowAllDataDeleteDialog -> {
-                navigateAllDataDeleteDialog()
-            }
-            is SettingsUiEvent.ShowOSSLicensesDialog -> {
-                navigateOpenSourceSoftwareLicensesDialog()
-            }
-            is SettingsUiEvent.ShowNotificationPermissionRationaleDialog -> {
-                navigatePostNotificationsPermissionRationaleDialog()
-            }
-            is SettingsUiEvent.ShowLocationPermissionRationaleDialog -> {
-                navigateAccessLocationPermissionRationaleDialog()
-            }
             is SettingsUiEvent.ShowApplicationDetailsSettingsScreen -> {
                 showApplicationDetailsSettings()
             }
@@ -366,12 +343,6 @@ class SettingsFragment :
             mainActivityViewModel,
             this
         )
-    }
-    //endregion
-
-    //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment() {
-        mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
     }
     //endregion
 
@@ -489,10 +460,48 @@ class SettingsFragment :
     //endregion
 
     //region Navigation Helpers
-    /**
-     * テーマカラー選択ダイアログ ([ListPickersDialogFragment])へ遷移する。
-     */
-    private fun navigateThemeColorPickerDialog() {
+    override fun toNavDirections(destination: SettingsNavDestination): NavDirections {
+        return when (destination) {
+            is SettingsNavDestination.AppMessageDialog -> {
+                navigationEventHelper.createAppMessageDialogNavDirections(destination.message)
+            }
+            is SettingsNavDestination.ThemeColorPickerDialog -> {
+                createThemeColorPickerDialogNavDirections()
+            }
+            is SettingsNavDestination.CalendarStartDayPickerDialog -> {
+                createCalendarStartDayPickerDialogNavDirections(destination.dayOfWeek)
+            }
+            is SettingsNavDestination.ReminderNotificationTimePickerDialog -> {
+                createReminderNotificationTimePickerDialogNavDirections()
+            }
+            is SettingsNavDestination.AllDiariesDeleteDialog -> {
+                createAllDiariesDeleteDialogNavDirections()
+            }
+            is SettingsNavDestination.AllSettingsInitializationDialog -> {
+                createAllSettingsInitializationDialogNavDirections()
+            }
+            is SettingsNavDestination.AllDataDeleteDialog -> {
+                createAllDataDeleteDialogNavDirections()
+            }
+            is SettingsNavDestination.OSSLicensesDialog -> {
+                createOpenSourceSoftwareLicensesDialogNavDirections()
+            }
+            is SettingsNavDestination.NotificationPermissionRationaleDialog -> {
+                createPostNotificationsPermissionRationaleDialogNavDirections()
+            }
+            is SettingsNavDestination.LocationPermissionRationaleDialog -> {
+                createAccessLocationPermissionRationaleDialogNavDirections()
+            }
+        }
+    }
+
+    override fun toNavDestinationId(destination: DummyNavBackDestination): Int {
+        // 処理なし
+        throw IllegalStateException("NavDestinationIdへの変換は不要の為、未対応。")
+    }
+
+    /** テーマカラー選択ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createThemeColorPickerDialogNavDirections(): NavDirections {
         val themeColorStringPickerList = themeColorPickerList.map { themeColor ->
             themeColor.asString(requireContext())
         }
@@ -507,16 +516,15 @@ class SettingsFragment :
                 )
             )
         )
-        val directions =
-            MobileNavigationDirections.actionGlobalToListPickersDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToListPickersDialog(args)
     }
 
     /**
-     * カレンダー開始曜日選択ダイアログ([ListPickersDialogFragment])へ遷移する。
+     * カレンダー開始曜日選択ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。
+     * 
      * @param dayOfWeek 現在設定されている週の開始曜日
      */
-    private fun navigateCalendarStartDayPickerDialog(dayOfWeek: DayOfWeek) {
+    private fun createCalendarStartDayPickerDialogNavDirections(dayOfWeek: DayOfWeek): NavDirections {
         val dayOfWeekStringPickerList =
             dayOfWeekPickerList.map { dayOfWeek ->
                 dayOfWeek.asCalendarStartDayOfWeekString(requireContext())
@@ -532,24 +540,20 @@ class SettingsFragment :
                 )
             )
         )
-        val directions =
-            MobileNavigationDirections.actionGlobalToListPickersDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToListPickersDialog(args)
     }
 
-    /** リマインダー通知時間選択ダイアログ([TimePickerDialogFragment])へ遷移する。 */
-    private fun navigateReminderNotificationTimePickerDialog() {
+    /** リマインダー通知時間選択ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createReminderNotificationTimePickerDialogNavDirections(): NavDirections {
         val args = TimePickerArgs(
             resultKey = RESULT_KEY_POST_REMINDER_NOTIFICATION_TIME_SELECTION,
             initialTime = LocalTime.now()
         )
-        val directions =
-            MobileNavigationDirections.actionGlobalToTimePickerDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToTimePickerDialog(args)
     }
 
-    /** 通知権限要求の理由説明ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
-    private fun navigatePostNotificationsPermissionRationaleDialog() {
+    /** 通知権限要求の理由説明ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createPostNotificationsPermissionRationaleDialogNavDirections(): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_POST_NOTIFICATIONS_PERMISSION_RATIONALE,
             titleRes = R.string.dialog_permission_title,
@@ -558,13 +562,11 @@ class SettingsFragment :
                 getString(R.string.dialog_permission_name_notification)
             )
         )
-        val directions =
-            MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
-    /** 位置情報権限要求の理由説明ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
-    private fun navigateAccessLocationPermissionRationaleDialog() {
+    /** 位置情報権限要求の理由説明ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createAccessLocationPermissionRationaleDialogNavDirections(): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_ACCESS_LOCATION_PERMISSION_RATIONALE,
             titleRes = R.string.dialog_permission_title,
@@ -573,53 +575,43 @@ class SettingsFragment :
                 getString(R.string.dialog_permission_name_location)
             )
         )
-        val directions =
-            MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
-    /** 全日記削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
-    private fun navigateAllDiariesDeleteDialog() {
+    /** 全日記削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createAllDiariesDeleteDialogNavDirections(): NavDirections{
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_ALL_DIARIES_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_all_diaries_delete_title,
             messageRes = R.string.dialog_all_diaries_delete_message
         )
-        val directions =
-            MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
-    /** 全設定初期化確認ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
-    private fun navigateAllSettingsInitializationDialog() {
+    /** 全設定初期化確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createAllSettingsInitializationDialogNavDirections(): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_ALL_SETTINGS_INITIALIZATION_CONFIRMATION,
             titleRes = R.string.dialog_all_settings_initialization_title,
             messageRes = R.string.dialog_all_settings_initialization_message
         )
-        val directions =
-            MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
-    /** 全データ削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
-    private fun navigateAllDataDeleteDialog() {
+    /** 全データ削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createAllDataDeleteDialogNavDirections(): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_ALL_DATA_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_all_data_delete_title,
             messageRes = R.string.dialog_all_data_delete_message
         )
-        val directions =
-            MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
-    /** OSSライセンスダイアログ([OpenSourceSoftwareLicensesDialogFragment])へ遷移する。 */
-    private fun navigateOpenSourceSoftwareLicensesDialog() {
-        val directions =
-            SettingsFragmentDirections
-                .actionNavigationSettingsFragmentToOpenSourceSoftwareLicensesDialog()
-        navigateFragmentOnce(NavigationCommand.To(directions))
+    /** OSSライセンスダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createOpenSourceSoftwareLicensesDialogNavDirections(): NavDirections {
+        return SettingsFragmentDirections
+            .actionNavigationSettingsFragmentToOpenSourceSoftwareLicensesDialog()
     }
 
     /** アプリケーション詳細設定画面へ遷移する。 */
@@ -647,7 +639,7 @@ class SettingsFragment :
                 requireActivity(), Manifest.permission.POST_NOTIFICATIONS
             ) -> {
                 Log.d(logTag, "${logPrefix}: Rationale表示が必要。")
-                navigatePostNotificationsPermissionRationaleDialog()
+                mainViewModel.onPostNotificationsPermissionRationaleRequired()
             }
 
             else -> {
@@ -702,7 +694,7 @@ class SettingsFragment :
                 requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION
             ) -> {
                 Log.d(logTag, "${logPrefix}: Rationale表示が必要。")
-                navigateAccessLocationPermissionRationaleDialog()
+                mainViewModel.onAccessLocationPermissionRationaleRequired()
             }
 
             else -> {

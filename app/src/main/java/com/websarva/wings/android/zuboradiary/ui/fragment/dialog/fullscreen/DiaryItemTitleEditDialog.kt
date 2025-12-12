@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavDirections
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
@@ -12,14 +13,12 @@ import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.DiaryItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.SwipeSimpleInteractionHelper
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryItemTitleEditNavDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import dagger.hilt.android.AndroidEntryPoint
@@ -36,8 +35,12 @@ import kotlinx.coroutines.flow.mapNotNull
  * - 選択、または編集したタイトルを呼び出し元に返す
  */
 @AndroidEntryPoint
-class DiaryItemTitleEditDialog :
-    BaseFullScreenDialogFragment<DialogDiaryItemTitleEditBinding, DiaryItemTitleEditUiEvent>() {
+class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<
+        DialogDiaryItemTitleEditBinding,
+        DiaryItemTitleEditUiEvent,
+        DiaryItemTitleEditNavDestination,
+        DummyNavBackDestination
+>() {
 
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -47,6 +50,8 @@ class DiaryItemTitleEditDialog :
     override val mainViewModel: DiaryItemTitleEditViewModel by viewModels()
 
     override val destinationId = R.id.navigation_diary_item_title_edit_dialog
+
+    override val resultKey: String get() = RESULT_KEY
 
     /** 項目タイトル選択履歴を表示するためのRecyclerViewアダプター。 */
     private var selectionHistoryListAdapter: DiaryItemTitleSelectionHistoryListAdapter? = null
@@ -114,18 +119,8 @@ class DiaryItemTitleEditDialog :
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: DiaryItemTitleEditUiEvent) {
         when (event) {
-            DiaryItemTitleEditUiEvent.CloseSwipedSelectionHistory -> {
+            DiaryItemTitleEditUiEvent.CloseSwipedTitleSelectionHistory -> {
                 swipeSimpleInteractionHelper?.closeSwipedItem()
-            }
-
-            is DiaryItemTitleEditUiEvent.CompleteEdit -> {
-                completeItemTitleEdit(
-                    event.diaryItemTitleSelection
-                )
-            }
-
-            is DiaryItemTitleEditUiEvent.ShowSelectionHistoryDeleteDialog -> {
-                navigateDiaryItemTitleSelectionHistoryDeleteDialog(event.itemTitle)
             }
         }
     }
@@ -144,12 +139,6 @@ class DiaryItemTitleEditDialog :
             }.mapNotNull { (it.titleSelectionHistoriesLoadState as? LoadState.Success)?.data }
                 .collect { selectionHistoryListAdapter?.submitList(it.itemList) }
         }
-    }
-    //endregion
-
-    //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment() {
-        navigatePreviousFragment(FragmentResult.None)
     }
     //endregion
 
@@ -183,21 +172,27 @@ class DiaryItemTitleEditDialog :
     //endregion
 
     //region Navigation Helpers
-    /**
-     * 編集/選択したタイトルを結果として設定し、ダイアログを閉じる。
-     * @param diaryItemTitleSelection 呼び出し元に返すタイトル選択情報
-     */
-    private fun completeItemTitleEdit(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
-        navigatePreviousFragment(
-            FragmentResult.Some(RESULT_KEY, diaryItemTitleSelection)
-        )
+    override fun toNavDirections(destination: DiaryItemTitleEditNavDestination): NavDirections {
+        return when (destination) {
+            is DiaryItemTitleEditNavDestination.AppMessageDialog -> {
+                navigationEventHelper.createAppMessageDialogNavDirections(destination.message)
+            }
+            is DiaryItemTitleEditNavDestination.SelectionHistoryDeleteDialog -> {
+                createTitleSelectionHistoryDeleteDialogNavDirections(destination.itemTitle)
+            }
+        }
+    }
+
+    override fun toNavDestinationId(destination: DummyNavBackDestination): Int {
+        // 処理なし
+        throw IllegalStateException("NavDestinationIdへの変換は不要の為、未対応。")
     }
 
     /**
-     * タイトル選択履歴削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。
+     * タイトル選択履歴削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。。
      * @param itemTitle 削除対象の項目タイトル
      */
-    private fun navigateDiaryItemTitleSelectionHistoryDeleteDialog(itemTitle: String) {
+    private fun createTitleSelectionHistoryDeleteDialogNavDirections(itemTitle: String): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_TITLE_SELECTION_HISTORY_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_item_title_history_delete_title,
@@ -206,8 +201,7 @@ class DiaryItemTitleEditDialog :
                 itemTitle
             )
         )
-        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
     //endregion
 

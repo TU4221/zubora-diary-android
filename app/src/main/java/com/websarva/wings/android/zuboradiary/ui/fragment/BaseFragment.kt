@@ -8,30 +8,37 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.findNavController
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.transition.platform.MaterialFadeThrough
 import com.google.android.material.transition.platform.MaterialSharedAxis
-import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
-import com.websarva.wings.android.zuboradiary.ui.fragment.common.CommonUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.FragmentHelper
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.MainUiEventHandler
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.FragmentNavigationEventHandler
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.AppNavBackDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.AppNavDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.FragmentNavigationEventHelper
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 
 /**
  * このアプリケーションにおける全てのフラグメントの基底クラス。
@@ -40,16 +47,23 @@ import kotlinx.coroutines.flow.map
  * - [ViewBinding]のライフサイクル管理
  * - ViewModelとの基本的な連携
  * - Material Designに基づいた画面遷移アニメーションの設定
- * - UI状態(State)とUIイベント(Event)の監視
- * - Fragment Result APIを用いた画面間のデータ受け渡し
+ * - UI状態([UiState])、UIイベント([UiEvent])、ナビゲーションイベント([NavigationEvent])との監視
+ * - [FragmentNavigationEventHelper]を介したナビゲーションイベントの実行と保留・再実行機能の提供
+ * - フラグメント、ダイアログからの結果受け取り機能のセットアップ
  * - Navigation Componentを利用した画面遷移のヘルパー
  * - バックプレス処理の共通化
  *
  * @param T ViewBindingの型
  * @param E このフラグメントが処理するUiEventの型
+ * @param ND このフラグメントが処理するNavigationEventの前方遷移の型
+ * @param NBD このフラグメントが処理するNavigationEventの後方遷移の型
  */
-abstract class BaseFragment<T: ViewBinding, E : UiEvent>
-    : LoggingFragment(), MainUiEventHandler<E>, CommonUiEventHandler {
+abstract class BaseFragment<
+        T: ViewBinding,
+        E : UiEvent,
+        ND : AppNavDestination,
+        NBD : AppNavBackDestination
+> : LoggingFragment(), MainUiEventHandler<E>, FragmentNavigationEventHandler<ND, NBD> {
 
     //region Properties
     /** [ViewBinding]のインスタンス。onDestroyViewでnullに設定される。 */
@@ -58,7 +72,7 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     protected val binding get() = checkNotNull(_binding)
 
     /** このフラグメントに対応するViewModel。 */
-    protected abstract val mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>
+    protected abstract val mainViewModel: BaseFragmentViewModel<out UiState, E, ND, NBD>
 
     /** アプリケーションの[MainActivity]と共有されるViewModel。 */
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -66,9 +80,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
     @Suppress("unused", "RedundantSuppression")
     protected val mainActivityViewModel: MainActivityViewModel by activityViewModels()
-
-    /** Navigation Componentにおけるこのフラグメントのdestination ID。 */
-    protected abstract val destinationId: Int
 
     /** このフラグメントがナビゲーショングラフの開始地点であるかを示す。 */
     private val isNavigationStartFragment: Boolean
@@ -86,6 +97,9 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
 
     /** フラグメントの共通処理をまとめたヘルパークラス。 */
     protected val fragmentHelper = FragmentHelper()
+
+    /** ナビゲーションイベント（[NavigationEvent]）の処理をまとめたヘルパークラス。 */
+    protected val navigationEventHelper = FragmentNavigationEventHelper()
     //endregion
 
     //region Fragment Lifecycle
@@ -102,32 +116,39 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
         return binding.root
     }
 
-    /** 追加処理として、Fragment Result APIの監視、UIの監視、バックプレス処理の登録を行う。 */
+    /**
+     * 追加処理として、フラグメント、ダイアログからの結果の監視、UIの監視、ナビゲーションイベントの監視、
+     * およびバックプレス処理の登録を行う。
+     * また、[MainActivityViewModel]、[BaseFragmentViewModel]へ通知する。
+     * */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        mainViewModel.onUiReady()
         mainActivityViewModel.onFragmentViewReady(this is RequiresBottomNavigation)
 
         setupFragmentResultObservers()
         setupUiObservers()
+        setupNavigationEvent()
         if (!isNavigationStartFragment) registerOnBackPressedCallback()
     }
 
+    /** 追加処理として、[MainActivityViewModel]へ通知する。 */
     override fun onResume() {
         super.onResume()
         mainActivityViewModel.onFragmentViewResumed()
     }
 
-    /** 追加処理として、非表示になる時の画面遷移アニメーションを設定する */
+    /** 追加処理として、非表示になる時の画面遷移アニメーションを設定、[MainActivityViewModel]へ通知する。 */
     override fun onPause() {
         mainActivityViewModel.onFragmentViewPause()
         setupInvisibleFragmentTransitionEffect()
         super.onPause()
     }
 
-    /** 追加処理として、[ViewBinding]を解放する。 */
+    /** 追加処理として、[ViewBinding]を解放、[BaseFragmentViewModel]へ通知する。 */
     override fun onDestroyView() {
         clearViewBindings()
-
+        mainViewModel.onUiGone()
         super.onDestroyView()
     }
     //endregion
@@ -303,7 +324,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     private fun setupUiObservers() {
         setupUiStateObservers()
         setupUiEventObservers()
-        observePendingNavigation()
     }
 
     /** ViewModelのUI状態(State)の監視を設定する。 */
@@ -327,7 +347,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     @CallSuper
     protected open fun setupUiEventObservers() {
         observeMainUiEvent()
-        observeCommonUiEvent()
     }
 
     /** このフラグメント固有のUIイベントを監視する。 */
@@ -339,33 +358,52 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
                 this
             )
     }
-
-    /** 全てのフラグメントで共通のUIイベントを監視する。 */
-    private fun observeCommonUiEvent() {
-        fragmentHelper
-            .observeCommonUiEvent(
-                this,
-                mainViewModel,
-                this
-            )
-    }
-
-    /** 保留中の画面遷移コマンドを監視し、実行する。 */
-    private fun observePendingNavigation() {
-        fragmentHelper
-            .observePendingNavigation(
-                findNavController(),
-                destinationId,
-                mainViewModel
-            )
-    }
     //endregion
 
-    //region CommonUiEventHandler Overrides
-    // 他メソッドのOverrideは本クラスの継承先で行うこと。
-    override fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val directions = MobileNavigationDirections.actionGlobalToAppMessageDialog(appMessage)
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
+    //region Navigation Event Setup
+    /** ナビゲーションイベント関連の設定を行う。 */
+    private fun setupNavigationEvent() {
+        observeNavigationEvent()
+        setupNavigationEnabledNotifier()
+    }
+
+    /**
+     * このフラグメント固有のViewModelが発行するナビゲーションイベント([NavigationEvent])を監視する。
+     * 新規イベントを受け取ると、[FragmentNavigationEventHelper]にナビゲーション処理の実行を委譲する。
+     */
+    private fun observeNavigationEvent() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.navigationEvent
+                .collect { value: ConsumableEvent<NavigationEvent<ND, NBD>> ->
+                    val event = value.getContentIfNotHandled().also {
+                        Log.d(logTag, "NavigationEvent_Collect(): $it")
+                    } ?: return@collect
+
+                    navigationEventHelper.executeFragmentNavigation(
+                        viewLifecycleOwner.lifecycle,
+                        findNavController(),
+                        event,
+                        this@BaseFragment,
+                        mainViewModel
+                    )
+                }
+        }
+    }
+
+    /**
+     * ナビゲーション操作が可能になったことを通知する仕組みを設定する。
+     *
+     * このフラグメント（[NavBackStackEntry]）が [Lifecycle.State.RESUMED] 状態になるたび、
+     * ViewModelへ「ナビゲーション有効」であることを通知する。
+     */
+    fun setupNavigationEnabledNotifier() {
+        val backStackEntry = findNavController().getBackStackEntry(destinationId)
+        backStackEntry.lifecycleScope.launch {
+            backStackEntry.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                mainActivityViewModel.onNavigationEnabled()
+                mainViewModel.onNavigationEnabled()
+            }
+        }
     }
     //endregion
 
@@ -373,62 +411,6 @@ abstract class BaseFragment<T: ViewBinding, E : UiEvent>
     /** バックプレス時のコールバックを登録する。 */
     private fun registerOnBackPressedCallback() {
         fragmentHelper.registerOnBackPressedCallback(this, mainViewModel)
-    }
-    //endregion
-
-    //region Navigation Helpers
-    /**
-     * 画面遷移を一度だけ実行する。
-     * @param command 画面遷移情報を持つコマンド
-     */
-    protected fun navigateFragmentOnce(command: NavigationCommand) {
-        fragmentHelper
-            .navigateFragmentOnce(
-                findNavController(),
-                destinationId,
-                command
-            )
-    }
-
-    /**
-     * 画面遷移を試み、失敗した場合は再試行する。
-     * @param command 画面遷移情報を持つコマンド
-     */
-    protected fun navigateFragmentWithRetry(command: NavigationCommand) {
-        fragmentHelper
-            .navigateFragmentWithRetry(
-                findNavController(),
-                destinationId,
-                mainViewModel,
-                command
-            )
-    }
-
-    /**
-     * 前の画面に一度だけ戻る。
-     * @param result 渡す結果データ
-     */
-    protected fun navigatePreviousFragmentOnce(result: FragmentResult<*>) {
-        fragmentHelper
-            .navigatePreviousFragmentOnce(
-                findNavController(),
-                destinationId,
-                result
-            )
-    }
-
-    /**
-     * 前の画面に戻ることを試み、失敗した場合は再試行する。
-     * @param result 渡す結果データ
-     */
-    protected fun navigatePreviousFragmentWithRetry(result: FragmentResult<*>) {
-        fragmentHelper
-            .navigatePreviousFragmentWithRetry(
-                findNavController(),
-                destinationId,
-                result,
-                mainViewModel
-            )
     }
     //endregion
 

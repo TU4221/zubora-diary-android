@@ -13,6 +13,7 @@ import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
@@ -20,21 +21,20 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
 import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.DatePickerDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.DiaryItemTitleEditDialog
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.DatePickerArgs
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryEditNavBackDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryEditNavDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import dagger.hilt.android.AndroidEntryPoint
@@ -53,7 +53,12 @@ import kotlin.collections.map
  * - 編集内容の保存、または保存せずに終了する際の確認処理
  */
 @AndroidEntryPoint
-class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEvent>() {
+class DiaryEditFragment : BaseFragment<
+        FragmentDiaryEditBinding,
+        DiaryEditUiEvent,
+        DiaryEditNavDestination,
+        DiaryEditNavBackDestination
+>() {
 
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -63,6 +68,8 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     override val mainViewModel: DiaryEditViewModel by viewModels()
 
     override val destinationId = R.id.navigation_diary_edit_fragment
+
+    override val resultKey: String get() = RESULT_KEY
 
     /** 日記項目レイアウトのトランジションアニメーション時間(ms)。 */
     private val motionLayoutTransitionTime = 500 /*ms*/
@@ -322,50 +329,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: DiaryEditUiEvent) {
         when (event) {
-            is DiaryEditUiEvent.NavigateDiaryShowScreen -> {
-                navigateDiaryShowFragment(event.id, event.date)
-            }
-            is DiaryEditUiEvent.NavigatePreviousScreenWithResult -> {
-                navigatePreviousFragmentOnce(
-                    FragmentResult.Some(RESULT_KEY, event.originalDiaryDate)
-                )
-            }
-            is DiaryEditUiEvent.NavigatePreviousScreenOnDiaryDelete -> {
-                navigatePreviousFragmentOnDiaryDelete(event.date)
-            }
-            is DiaryEditUiEvent.NavigatePreviousScreenOnInitialDiaryLoadFailed -> {
-                navigatePreviousFragmentWithRetry(FragmentResult.None)
-            }
-            is DiaryEditUiEvent.ShowDiaryItemTitleEditDialog -> {
-                navigateDiaryItemTitleEditDialog(event.diaryItemTitleSelection)
-            }
-            is DiaryEditUiEvent.ShowDiaryLoadDialog -> {
-                navigateDiaryLoadDialog(event.date)
-            }
-            is DiaryEditUiEvent.ShowDiaryLoadFailureDialog -> {
-                navigateDiaryLoadFailureDialog(event.date)
-            }
-            is DiaryEditUiEvent.ShowDiaryUpdateDialog -> {
-                navigateDiaryUpdateDialog(event.date)
-            }
-            is DiaryEditUiEvent.ShowDiaryDeleteDialog -> {
-                navigateDiaryDeleteDialog(event.date)
-            }
-            is DiaryEditUiEvent.ShowDatePickerDialog -> {
-                navigateDatePickerDialog(event.date)
-            }
-            is DiaryEditUiEvent.ShowWeatherInfoFetchDialog -> {
-                navigateWeatherInfoFetchDialog(event.date)
-            }
-            is DiaryEditUiEvent.ShowDiaryItemDeleteDialog -> {
-                navigateDiaryItemDeleteDialog(event.itemNumber)
-            }
-            DiaryEditUiEvent.ShowDiaryImageDeleteDialog -> {
-                navigateDiaryImageDeleteDialog()
-            }
-            is DiaryEditUiEvent.ShowExitWithoutDiarySaveDialog -> {
-                navigateExitWithoutDiarySaveDialog()
-            }
             is DiaryEditUiEvent.ShowImageSelectionGallery -> {
                 openDocumentResultLauncher.launch(arrayOf("image/*"))
             }
@@ -455,12 +418,6 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 renderItemLayouts(it)
             }
         }
-    }
-    //endregion
-
-    //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment() {
-        navigatePreviousFragmentOnce(FragmentResult.None)
     }
     //endregion
 
@@ -919,12 +876,68 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     //region Navigation Helpers
+    override fun toNavDirections(destination: DiaryEditNavDestination): NavDirections {
+        return when (destination) {
+            is DiaryEditNavDestination.AppMessageDialog -> {
+                navigationEventHelper.createAppMessageDialogNavDirections(destination.message)
+            }
+            is DiaryEditNavDestination.DiaryShowScreen -> {
+                createDiaryShowFragmentNavDirections(destination.id, destination.date)
+            }
+            is DiaryEditNavDestination.DiaryItemTitleEditDialog -> {
+                createDiaryItemTitleEditDialogNavDirections(destination.diaryItemTitleSelection)
+            }
+            is DiaryEditNavDestination.DiaryLoadDialog -> {
+                createDiaryLoadDialogNavDirections(destination.date)
+            }
+            is DiaryEditNavDestination.DiaryLoadFailureDialog -> {
+                createDiaryLoadFailureDialogNavDirections(destination.date)
+            }
+            is DiaryEditNavDestination.DiaryUpdateDialog -> {
+                createDiaryUpdateDialogNavDirections(destination.date)
+            }
+            is DiaryEditNavDestination.DiaryDeleteDialog -> {
+                createDiaryDeleteDialogNavDirections(destination.date)
+            }
+            is DiaryEditNavDestination.DatePickerDialog -> {
+                createDatePickerDialogNavDirections(destination.date)
+            }
+            is DiaryEditNavDestination.WeatherInfoFetchDialog -> {
+                createWeatherInfoFetchDialogNavDirections(destination.date)
+            }
+            is DiaryEditNavDestination.DiaryItemDeleteDialog -> {
+                createDiaryItemDeleteDialogNavDirections(destination.itemNumber)
+            }
+            DiaryEditNavDestination.DiaryImageDeleteDialog -> {
+                createDiaryImageDeleteDialogNavDirections()
+            }
+            is DiaryEditNavDestination.ExitWithoutDiarySaveDialog -> {
+                createExitWithoutDiarySaveDialogNavDirections()
+            }
+        }
+    }
+
+    override fun toNavDestinationId(destination: DiaryEditNavBackDestination): Int {
+        return when (destination) {
+            DiaryEditNavBackDestination.SelectedTabScreen -> {
+                try {
+                    findNavController()
+                        .getBackStackEntry(R.id.navigation_calendar_fragment)
+                    R.id.navigation_calendar_fragment
+                } catch (_: IllegalArgumentException) {
+                    R.id.navigation_diary_list_fragment
+                }
+            }
+        }
+    }
+
     /**
-     * 日記表示画面([DiaryShowFragment])へ遷移する。
+     * 日記表示画面へ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
      * @param id 表示する日記のID
      * @param date 表示する日記の日付
      */
-    private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
+    private fun createDiaryShowFragmentNavDirections(id: String, date: LocalDate): NavDirections {
         // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
         val containsDiaryShowFragment =
             try {
@@ -934,33 +947,34 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 false
             }
 
-        val directions = if (containsDiaryShowFragment) {
+        return if (containsDiaryShowFragment) {
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryShow(id, date)
         } else {
             DiaryEditFragmentDirections
                 .actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryEdit(id, date)
         }
-        navigateFragmentWithRetry(NavigationCommand.To(directions))
     }
 
     /**
-     * 日記項目タイトル編集ダイアログ([DiaryItemTitleEditDialog])へ遷移する。
+     * 日記項目タイトル編集ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
      * @param diaryItemTitleSelection 編集対象の日記項目タイトル情報
      */
-    private fun navigateDiaryItemTitleEditDialog(diaryItemTitleSelection: DiaryItemTitleSelectionUi) {
-        val directions =
-            DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemTitleEditDialog(
+    private fun createDiaryItemTitleEditDialogNavDirections(
+        diaryItemTitleSelection: DiaryItemTitleSelectionUi
+    ): NavDirections {
+        return DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemTitleEditDialog(
                 diaryItemTitleSelection
             )
-        navigateFragmentOnce(NavigationCommand.To(directions))
     }
 
     /**
-     * 既存日記読込確認ダイアログ([ConfirmationDialogFragment])へ遷移する。
+     * 既存日記読込確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
      * @param date 読み込む日記の日付
      */
-    private fun navigateDiaryLoadDialog(date: LocalDate) {
+    private fun createDiaryLoadDialogNavDirections(date: LocalDate): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_DIARY_LOAD_CONFIRMATION,
             titleRes = R.string.dialog_diary_load_title,
@@ -969,15 +983,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 date.formatDateString(requireContext())
             )
         )
-        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return  MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
     /**
-     * 日記読込失敗ダイアログ([ConfirmationDialogFragment])へ遷移する。
+     * 日記読込失敗ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
      * @param date 読み込みに失敗した日記の日付
      */
-    private fun navigateDiaryLoadFailureDialog(date: LocalDate) {
+    private fun createDiaryLoadFailureDialogNavDirections(date: LocalDate): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_DIARY_LOAD_FAILURE,
             titleRes = R.string.dialog_diary_load_failure_title,
@@ -986,15 +1000,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 date.formatDateString(requireContext())
             )
         )
-        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
     /**
-     * 既存日記上書きダイアログ([ConfirmationDialogFragment])へ遷移する。
+     * 既存日記上書きダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
      * @param date 上書きする日記の日付
      */
-    private fun navigateDiaryUpdateDialog(date: LocalDate) {
+    private fun createDiaryUpdateDialogNavDirections(date: LocalDate): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_DIARY_UPDATE_CONFIRMATION,
             titleRes = R.string.dialog_diary_update_title,
@@ -1003,15 +1017,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 date.formatDateString(requireContext())
             )
         )
-        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
     /**
-     * 日記削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。
+     * 日記削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
      * @param date 削除する日記の日付
      */
-    private fun navigateDiaryDeleteDialog(date: LocalDate) {
+    private fun createDiaryDeleteDialogNavDirections(date: LocalDate): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_DIARY_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_delete_title,
@@ -1020,28 +1034,28 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 date.formatDateString(requireContext())
             )
         )
-        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
     /**
-     * 日付選択ダイアログ([DatePickerDialogFragment])へ遷移する。
+     * 日付選択ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
      * @param date 初期選択されている日付
      */
-    private fun navigateDatePickerDialog(date: LocalDate) {
+    private fun createDatePickerDialogNavDirections(date: LocalDate): NavDirections {
         val args = DatePickerArgs(
             resultKey = RESULT_KEY_DATE_SELECTION,
             initialDate = date
         )
-        val directions = MobileNavigationDirections.actionGlobalToDatePickerDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToDatePickerDialog(args)
     }
 
     /**
-     * 天気情報読込ダイアログ([ConfirmationDialogFragment])へ遷移する。
+     * 天気情報読込ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
      * @param date 天気情報を取得する日付
      */
-    private fun navigateWeatherInfoFetchDialog(date: LocalDate) {
+    private fun createWeatherInfoFetchDialogNavDirections(date: LocalDate): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_WEATHER_INFO_FETCH,
             titleRes = R.string.dialog_weather_info_fetch_title,
@@ -1050,15 +1064,15 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 date.formatDateString(requireContext())
             )
         )
-        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
     /**
-     * 項目削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。
+     * 項目削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
      * @param itemNumber 削除する項目の番号
      */
-    private fun navigateDiaryItemDeleteDialog(itemNumber: Int) {
+    private fun createDiaryItemDeleteDialogNavDirections(itemNumber: Int): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_DIARY_ITEM_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_item_delete_title,
@@ -1067,51 +1081,27 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
                 itemNumber.toString()
             )
         )
-        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
-    /** 添付画像削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
-    private fun navigateDiaryImageDeleteDialog() {
+    /** 添付画像削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createDiaryImageDeleteDialogNavDirections(): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_DIARY_IMAGE_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_attached_image_delete_title,
             messageRes = R.string.dialog_diary_attached_image_delete_message
         )
-        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
 
-    /** 日記を保存せずに終了することを確認するダイアログ([ConfirmationDialogFragment])へ遷移する。 */
-    private fun navigateExitWithoutDiarySaveDialog() {
+    /** 日記を保存せずに終了することを確認するダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createExitWithoutDiarySaveDialogNavDirections(): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_EXIT_WITHOUT_SAVE_CONFIRMATION,
             titleRes = R.string.dialog_exit_without_diary_save_title,
             messageRes = R.string.dialog_exit_without_diary_save_message
         )
-        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
-    }
-
-    /**
-     * 前の画面へ戻る（日記削除時専用）。
-     * @param date 削除された日記の日付
-     */
-    private fun navigatePreviousFragmentOnDiaryDelete(date: LocalDate) {
-        val destinationId =
-            try {
-                findNavController().getBackStackEntry(R.id.navigation_calendar_fragment)
-                R.id.navigation_calendar_fragment
-            } catch (_: IllegalArgumentException) {
-                R.id.navigation_diary_list_fragment
-            }
-        navigateFragmentWithRetry(
-            NavigationCommand.PopTo(
-                destinationId,
-                false,
-                FragmentResult.Some(RESULT_KEY, date)
-            )
-        )
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
     //endregion
 
@@ -1124,6 +1114,7 @@ class DiaryEditFragment : BaseFragment<FragmentDiaryEditBinding, DiaryEditUiEven
     //endregion
 
     internal companion object {
+
         /** このフラグメントから遷移元へ結果を返すためのキー。 */
         val RESULT_KEY = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
 

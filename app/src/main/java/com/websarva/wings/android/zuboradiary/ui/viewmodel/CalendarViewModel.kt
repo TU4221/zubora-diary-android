@@ -16,6 +16,9 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.CalendarNavDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.CalendarUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
@@ -50,7 +53,12 @@ class CalendarViewModel @Inject internal constructor(
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
-) : BaseFragmentViewModel<CalendarUiState, CalendarUiEvent, CalendarAppMessage>(
+) : BaseFragmentViewModel<
+        CalendarUiState,
+        CalendarUiEvent,
+        CalendarNavDestination,
+        DummyNavBackDestination
+>(
     handle.get<CalendarUiState>(SAVED_STATE_UI_KEY)?.let {
         CalendarUiState.fromSavedState(it)
     } ?:CalendarUiState()
@@ -105,10 +113,10 @@ class CalendarViewModel @Inject internal constructor(
                     is UseCaseResult.Failure -> {
                         when (it.exception) {
                             is CalendarStartDayOfWeekSettingLoadException.LoadFailure -> {
-                                emitAppMessageEvent(CalendarAppMessage.SettingsLoadFailure)
+                                showAppMessageDialog(CalendarAppMessage.SettingsLoadFailure)
                             }
                             is CalendarStartDayOfWeekSettingLoadException.Unknown -> {
-                                emitUnexpectedAppMessage(it.exception)
+                                showUnexpectedAppMessageDialog(it.exception)
                             }
                         }
                     }
@@ -329,10 +337,10 @@ class CalendarViewModel @Inject internal constructor(
             is UseCaseResult.Failure -> {
                 when (result.exception) {
                     is DiaryExistenceCheckException.CheckFailure -> {
-                        emitAppMessageEvent(CalendarAppMessage.DiaryInfoLoadFailure)
+                        showAppMessageDialog(CalendarAppMessage.DiaryInfoLoadFailure)
                     }
                     is DiaryExistenceCheckException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
                 return false
@@ -360,7 +368,12 @@ class CalendarViewModel @Inject internal constructor(
      * 前の画面へ遷移する（イベント発行）。
      */
     private suspend fun navigatePreviousScreen() {
-        emitNavigatePreviousFragmentEvent()
+        emitNavigationEvent(
+            NavigationEvent.Back(
+                NavigationEvent.Policy.Single,
+                null
+            )
+        )
     }
 
     /**
@@ -370,9 +383,29 @@ class CalendarViewModel @Inject internal constructor(
      * @param date 編集対象の日記の日付。
      */
     private suspend fun navigateDiaryEditScreen(id: String?, date: LocalDate) {
-        emitUiEvent(
-            CalendarUiEvent.NavigateDiaryEditScreen(id, date)
+        emitNavigationEvent(
+            NavigationEvent.To(
+                CalendarNavDestination.DiaryEditScreen(id, date),
+                NavigationEvent.Policy.Single
+            )
         )
+    }
+
+    /**
+     * アプリケーションメッセージダイアログを表示する（イベント発行）。
+     * @param appMessage 表示するメッセージ。
+     */
+    private suspend fun showAppMessageDialog(appMessage: CalendarAppMessage) {
+        emitNavigationEvent(
+            NavigationEvent.To(
+                CalendarNavDestination.AppMessageDialog(appMessage),
+                NavigationEvent.Policy.Retry
+            )
+        )
+    }
+
+    override suspend fun showUnexpectedAppMessageDialog(e: Exception) {
+        showAppMessageDialog(CalendarAppMessage.Unexpected(e))
     }
     //endregion
 

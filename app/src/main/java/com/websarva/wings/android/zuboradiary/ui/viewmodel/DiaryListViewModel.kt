@@ -31,6 +31,9 @@ import com.websarva.wings.android.zuboradiary.ui.mapper.toDomainModel
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryListNavDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryListUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -67,7 +70,12 @@ class DiaryListViewModel @Inject internal constructor(
     private val deleteDiaryUseCase: DeleteDiaryUseCase,
     private val loadDiaryListStartYearMonthPickerDateRangeUseCase: LoadDiaryListStartYearMonthPickerDateRangeUseCase,
     private val buildDiaryImageFilePathUseCase: BuildDiaryImageFilePathUseCase
-) : BaseFragmentViewModel<DiaryListUiState, DiaryListUiEvent, DiaryListAppMessage>(
+) : BaseFragmentViewModel<
+        DiaryListUiState,
+        DiaryListUiEvent,
+        DiaryListNavDestination,
+        DummyNavBackDestination
+>(
     handle.get<DiaryListUiState>(SAVED_STATE_UI_KEY)?.let {
         DiaryListUiState.fromSavedState(it)
     } ?: DiaryListUiState()
@@ -144,11 +152,14 @@ class DiaryListViewModel @Inject internal constructor(
     //endregion
 
     //region UI Event Handlers - Observation
-    /** 
-     * UIが準備完了した時に、`Fragment`から呼び出される事を想定。
-     * 必要に応じてリストのリフレッシュを行う。
+    /**
+     * UIが準備完了した時に呼び出される事を想定。
+     *
+     * 必要に応じてリストのリフレッシュを行う処理を追加。
      * */
-    internal fun onUiReady() {
+    override fun onUiReady() {
+        super.onUiReady()
+
         if (!needsRefreshDiaryList) return
         updateNeedsRefreshDiaryList(false)
         if (!isReadyForOperation) return
@@ -162,11 +173,14 @@ class DiaryListViewModel @Inject internal constructor(
             }
     }
 
-    /** 
-     * UIが非表示になる時に、`Fragment`から呼び出される事を想定。
-     * 次回表示時にリストをリフレッシュするためのフラグを立てる。 
+    /**
+     * UIが非表示になる時に呼び出される事を想定。
+     * 
+     * 次回表示時にリストをリフレッシュするためのフラグを立てる処理を追加。 
      * */
-    internal fun onUiGone() {
+    override fun onUiGone() {
+        super.onUiGone()
+        
         updateNeedsRefreshDiaryList(true)
     }
     //endregion
@@ -328,10 +342,10 @@ class DiaryListViewModel @Inject internal constructor(
             { exception ->
                 when (exception) {
                     is DiaryListNewLoadException.LoadFailure -> {
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
+                        showAppMessageDialog(DiaryListAppMessage.DiaryListLoadFailure)
                     }
                     is DiaryListNewLoadException.Unknown -> {
-                        emitUnexpectedAppMessage(exception)
+                        showUnexpectedAppMessageDialog(exception)
                     }
                 }
             }
@@ -361,10 +375,10 @@ class DiaryListViewModel @Inject internal constructor(
             { exception ->
                 when (exception) {
                     is DiaryListAdditionLoadException.LoadFailure -> {
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
+                        showAppMessageDialog(DiaryListAppMessage.DiaryListLoadFailure)
                     }
                     is DiaryListAdditionLoadException.Unknown -> {
-                        emitUnexpectedAppMessage(exception)
+                        showUnexpectedAppMessageDialog(exception)
                     }
                 }
             }
@@ -389,10 +403,10 @@ class DiaryListViewModel @Inject internal constructor(
             { exception ->
                 when (exception) {
                     is DiaryListRefreshException.RefreshFailure -> {
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryListLoadFailure)
+                        showAppMessageDialog(DiaryListAppMessage.DiaryListLoadFailure)
                     }
                     is DiaryListRefreshException.Unknown -> {
-                        emitUnexpectedAppMessage(exception)
+                        showUnexpectedAppMessageDialog(exception)
                     }
                 }
             }
@@ -475,8 +489,12 @@ class DiaryListViewModel @Inject internal constructor(
         val oldestDiaryDate = dateRange.oldestDiaryDate
         val newestYear = Year.of(newestDiaryDate.year)
         val oldestYear = Year.of(oldestDiaryDate.year)
-        emitUiEvent(
-            DiaryListUiEvent.ShowStartYearMonthPickerDialog(newestYear, oldestYear)
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryListNavDestination
+                    .StartYearMonthPickerDialog(newestYear, oldestYear),
+                NavigationEvent.Policy.Single
+            )
         )
     }
 
@@ -491,10 +509,10 @@ class DiaryListViewModel @Inject internal constructor(
             is UseCaseResult.Failure -> {
                 when (val exception = result.exception) {
                     is DiaryListStartYearMonthPickerDateRangeLoadException.DiaryInfoLoadFailure -> {
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryInfoLoadFailure)
+                        showAppMessageDialog(DiaryListAppMessage.DiaryInfoLoadFailure)
                     }
                     is DiaryListStartYearMonthPickerDateRangeLoadException.Unknown -> {
-                        emitUnexpectedAppMessage(exception)
+                        showUnexpectedAppMessageDialog(exception)
                     }
                 }
                 result.exception.fallbackDateRange
@@ -526,8 +544,11 @@ class DiaryListViewModel @Inject internal constructor(
             currentList,
             sortConditionDate
         )
-        emitUiEvent(
-            DiaryListUiEvent.ShowDiaryDeleteDialog(date)
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryListNavDestination.DiaryDeleteDialog(date),
+                NavigationEvent.Policy.Single
+            )
         )
     }
 
@@ -556,13 +577,13 @@ class DiaryListViewModel @Inject internal constructor(
                 updateToIdleState()
                 when (result.exception) {
                     is DiaryDeleteException.DiaryDataDeleteFailure -> {
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryDeleteFailure)
+                        showAppMessageDialog(DiaryListAppMessage.DiaryDeleteFailure)
                     }
                     is DiaryDeleteException.ImageFileDeleteFailure -> {
-                        emitAppMessageEvent(DiaryListAppMessage.DiaryImageDeleteFailure)
+                        showAppMessageDialog(DiaryListAppMessage.DiaryImageDeleteFailure)
                     }
                     is DiaryDeleteException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -575,14 +596,24 @@ class DiaryListViewModel @Inject internal constructor(
      * 前の画面へ遷移する（イベント発行）。
      */
     private suspend fun navigatePreviousScreen() {
-        emitNavigatePreviousFragmentEvent()
+        emitNavigationEvent(
+            NavigationEvent.Back(
+                NavigationEvent.Policy.Single,
+                null
+            )
+        )
     }
 
     /**
      * ワード検索画面へ遷移する（イベント発行）。
      */
     private suspend fun navigateWordSearchScreen() {
-        emitUiEvent(DiaryListUiEvent.NavigateWordSearchScreen)
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryListNavDestination.WordSearchScreen,
+                NavigationEvent.Policy.Single
+            )
+        )
     }
 
     /**
@@ -592,7 +623,12 @@ class DiaryListViewModel @Inject internal constructor(
      * @param date 表示対象の日記の日付。
      */
     private suspend fun navigateDiaryShowScreen(id: String, date: LocalDate) {
-        emitUiEvent(DiaryListUiEvent.NavigateDiaryShowScreen(id, date))
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryListNavDestination.DiaryShowScreen(id, date),
+                NavigationEvent.Policy.Single
+            )
+        )
     }
 
     /**
@@ -600,7 +636,29 @@ class DiaryListViewModel @Inject internal constructor(
      */
     private suspend fun navigateNewDiaryEditScreen() {
         val today = LocalDate.now()
-        emitUiEvent(DiaryListUiEvent.NavigateDiaryEditScreen(date = today))
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryListNavDestination.DiaryEditScreen(date = today),
+                NavigationEvent.Policy.Single
+            )
+        )
+    }
+
+    /**
+     * アプリケーションメッセージダイアログを表示する（イベント発行）。
+     * @param appMessage 表示するメッセージ。
+     */
+    private suspend fun showAppMessageDialog(appMessage: DiaryListAppMessage) {
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryListNavDestination.AppMessageDialog(appMessage),
+                NavigationEvent.Policy.Retry
+            )
+        )
+    }
+
+    override suspend fun showUnexpectedAppMessageDialog(e: Exception) {
+        showAppMessageDialog(DiaryListAppMessage.Unexpected(e))
     }
     //endregion
 

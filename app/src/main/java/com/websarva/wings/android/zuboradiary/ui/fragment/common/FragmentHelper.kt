@@ -8,23 +8,16 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
-import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.event.CommonUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
-import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.theme.withTheme
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
@@ -33,7 +26,7 @@ import kotlinx.coroutines.launch
  *
  * 以下の責務を持つ:
  * - テーマカラーを適用したView Inflaterの生成
- * - Fragment Result APIの監視セットアップ
+ * - フラグメント、ダイアログからの結果受け取り機能のセットアップ
  * - ViewModelからの各種UIイベントの監視セットアップ
  * - Navigation Componentを用いた画面遷移の実行とリトライ処理
  * - バックプレス処理の移譲
@@ -95,7 +88,7 @@ class FragmentHelper {
      */
     fun <E: UiEvent> observeMainUiEvent(
         fragment: Fragment,
-        mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
+        mainViewModel: BaseFragmentViewModel<*, E, *, *>,
         handler: MainUiEventHandler<E>
     ) {
         launchAndRepeatOnViewLifeCycleStarted(fragment) {
@@ -106,35 +99,6 @@ class FragmentHelper {
                     } ?: return@collect
 
                     handler.onMainUiEventReceived(event)
-                }
-        }
-    }
-
-    /**
-     * ViewModelからの共通UIイベントを監視する。
-     * @param fragment ライフサイクルスコープのオーナーとなるFragment
-     * @param mainViewModel イベントを供給するViewModel
-     * @param handler イベントを処理するハンドラ
-     */
-    fun <E: UiEvent> observeCommonUiEvent(
-        fragment: Fragment,
-        mainViewModel: BaseFragmentViewModel<out UiState, E, out AppMessage>,
-        handler: CommonUiEventHandler
-    ) {
-        launchAndRepeatOnViewLifeCycleStarted(fragment) {
-            mainViewModel.commonUiEvent
-                .collect { value: ConsumableEvent<CommonUiEvent> ->
-                    val event = value.getContentIfNotHandled().also {
-                        Log.d(logTag, "Common_UiEvent_Collect(): $it")
-                    } ?: return@collect
-
-                    when (event) {
-                        is CommonUiEvent.NavigatePreviousScreen ->
-                            handler.navigatePreviousFragment()
-                        is CommonUiEvent.ShowAppMessageDialog -> {
-                            handler.navigateAppMessageDialog(event.message)
-                        }
-                    }
                 }
         }
     }
@@ -160,210 +124,6 @@ class FragmentHelper {
                     handler.onActivityCallbackUiEventReceived(event)
                 }
         }
-    }
-
-    /**
-     * 保留中の画面遷移コマンドを監視し、実行する。
-     * @param navController 画面遷移を管理するNavController
-     * @param navDestinationId 現在のフラグメントのDestination ID
-     * @param mainViewModel 保留コマンドを保持するViewModel
-     */
-    fun observePendingNavigation(
-        navController: NavController,
-        navDestinationId: Int,
-        mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>
-    ) {
-        val navBackStackEntry = navController.getBackStackEntry(navDestinationId)
-        navBackStackEntry.lifecycleScope.launch {
-            navBackStackEntry.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mainViewModel.pendingNavigationCommandList
-                    .collectLatest { value ->
-                        if (value.isEmpty()) return@collectLatest
-
-                        val firstPendingCommand = value.first()
-                        if (!firstPendingCommand.canRetry()) {
-                            Log.e(logTag, "保留ナビゲーションコマンド最大リトライ回数到達")
-                            if (BuildConfig.DEBUG) throw IllegalStateException()
-                            mainViewModel
-                                .onPendingFragmentNavigationRetryLimitReached(firstPendingCommand)
-                        }
-
-                        val isNavigationSuccessful =
-                            navigateFragmentOnce(
-                                navController,
-                                navDestinationId,
-                                firstPendingCommand.command
-                            )
-                        if (isNavigationSuccessful) {
-                            mainViewModel.onPendingFragmentNavigationComplete(firstPendingCommand)
-                        } else {
-                            mainViewModel.onPendingFragmentNavigationFailure(firstPendingCommand)
-                        }
-                    }
-            }
-        }
-    }
-    //endregion
-
-    //region Navigation Helpers
-    // TODO:Dialogへの遷移をグローバルアクションに変更したことによる仕様見直し
-
-    /**
-     * 画面遷移を一度だけ試みる。
-     * @param navController 画面遷移を管理するNavController
-     * @param fragmentDestinationId 現在のフラグメントのDestination ID
-     * @param command 実行するナビゲーションコマンド
-     * @return 画面遷移が試みられた場合はtrue、そうでなければfalse
-     */
-    fun navigateFragmentOnce(
-        navController: NavController,
-        fragmentDestinationId: Int,
-        command: NavigationCommand,
-    ): Boolean {
-        Log.d(logTag, "リトライなし画面遷移開始")
-        return executeFragmentNavigation(
-            navController,
-            fragmentDestinationId,
-            command
-        )
-    }
-
-    /**
-     * 画面遷移を試み、失敗した場合はViewModelに通知してリトライを可能にする。
-     * @param navController 画面遷移を管理するNavController
-     * @param fragmentDestinationId 現在のフラグメントのDestination ID
-     * @param mainViewModel 失敗時にコマンドを保持するViewModel
-     * @param command 実行するナビゲーションコマンド
-     */
-    fun navigateFragmentWithRetry(
-        navController: NavController,
-        fragmentDestinationId: Int,
-        mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>,
-        command: NavigationCommand,
-    ) {
-        Log.d(logTag, "リトライあり画面遷移開始")
-        executeFragmentNavigation(
-            navController,
-            fragmentDestinationId,
-            command
-        ) {
-            mainViewModel.onFragmentNavigationFailure(command)
-        }
-    }
-
-    /**
-     * 画面遷移コマンドを実際に実行する内部関数。
-     * @param navController 画面遷移を管理するNavController
-     * @param fragmentDestinationId 現在のフラグメントのDestination ID
-     * @param command 実行するナビゲーションコマンド
-     * @param onCannotNavigate 画面遷移が不可能な場合に実行されるコールバック
-     * @return 画面遷移が試みられた場合はtrue、そうでなければfalse
-     */
-    private fun executeFragmentNavigation(
-        navController: NavController,
-        fragmentDestinationId: Int,
-        command: NavigationCommand,
-        onCannotNavigate: () -> Unit = {}
-    ): Boolean {
-        if (!canNavigateFragment(navController, fragmentDestinationId)) {
-            Log.d(logTag, "画面遷移不可_$command")
-            onCannotNavigate()
-            return false
-        }
-
-        Log.d(logTag, "画面遷移ナビゲーション起動_$command")
-        when (command) {
-            is NavigationCommand.To -> {
-                navController.navigate(command.directions)
-            }
-            is NavigationCommand.Up<*> -> {
-                val result = command.result
-                if (result is FragmentResult.Some<*>) {
-                    val previousBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-                    previousBackStackEntry.savedStateHandle[result.key] = result
-                }
-                navController.navigateUp()
-            }
-            is NavigationCommand.Pop<*> -> {
-                val result = command.result
-                if (result is FragmentResult.Some<*>) {
-                    val previousBackStackEntry = checkNotNull(navController.previousBackStackEntry)
-                    previousBackStackEntry.savedStateHandle[result.key] = result
-                }
-                navController.popBackStack()
-            }
-            is NavigationCommand.PopTo<*> -> {
-                val result = command.result
-                if (result is FragmentResult.Some<*>) {
-                    val previousBackStackEntry = navController.getBackStackEntry(command.destinationId)
-                    previousBackStackEntry.savedStateHandle[result.key] = result
-                }
-                navController.popBackStack(command.destinationId, command.inclusive)
-            }
-        }
-        return true
-    }
-
-    /**
-     * 現在の画面から指定されたコマンドで遷移可能か判定する。
-     * @param navController 画面遷移を管理するNavController
-     * @param fragmentDestinationId 現在いるべきフラグメントのDestination ID
-     * @return 遷移可能な場合はtrue
-     */
-    private fun canNavigateFragment(
-        navController: NavController,
-        fragmentDestinationId: Int
-    ): Boolean {
-        val currentDestination = navController.currentDestination ?: return false
-        return fragmentDestinationId == currentDestination.id
-    }
-
-    /**
-     * 前の画面に一度だけ戻る。
-     * @param navController 画面遷移を管理するNavController
-     * @param fragmentDestinationId 現在のフラグメントのDestination ID
-     * @param result 遷移元に渡す結果データ
-     */
-    fun navigatePreviousFragmentOnce(
-        navController: NavController,
-        fragmentDestinationId: Int,
-        result: FragmentResult<*>
-    ) {
-        navigateFragmentOnce(
-            navController,
-            fragmentDestinationId,
-            createPreviousFragmentCommand(result)
-        )
-    }
-
-    /**
-     * 前の画面に戻る遷移を試み、失敗した場合はリトライする。
-     * @param navController 画面遷移を管理するNavController
-     * @param fragmentDestinationId 現在のフラグメントのDestination ID
-     * @param result 遷移元に渡す結果データ
-     * @param mainViewModel 失敗時にコマンドを保持するViewModel
-     */
-    fun navigatePreviousFragmentWithRetry(
-        navController: NavController,
-        fragmentDestinationId: Int,
-        result: FragmentResult<*>,
-        mainViewModel: BaseFragmentViewModel<out UiState, out UiEvent, out AppMessage>,
-    ) {
-        navigateFragmentWithRetry(
-            navController,
-            fragmentDestinationId,
-            mainViewModel,
-            createPreviousFragmentCommand(result)
-        )
-    }
-
-    /**
-     * 前の画面に戻るためのNavigationCommandを生成する。
-     * @param result 遷移元に渡す結果データ
-     * @return 生成されたNavigationCommand
-     */
-    private fun createPreviousFragmentCommand(result: FragmentResult<*>): NavigationCommand {
-         return NavigationCommand.Up(result)
     }
     //endregion
 

@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.NavDirections
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
@@ -21,9 +22,10 @@ import com.websarva.wings.android.zuboradiary.ui.theme.CalendarThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.CalendarNavDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -48,7 +50,7 @@ import kotlin.math.absoluteValue
  */
 @AndroidEntryPoint
 class CalendarFragment :
-    BaseFragment<FragmentCalendarBinding, CalendarUiEvent>(),
+    BaseFragment<FragmentCalendarBinding, CalendarUiEvent, CalendarNavDestination, DummyNavBackDestination>(),
     RequiresBottomNavigation,
     ActivityCallbackUiEventHandler {
 
@@ -60,6 +62,8 @@ class CalendarFragment :
     override val mainViewModel: CalendarViewModel by activityViewModels()
 
     override val destinationId = R.id.navigation_calendar_fragment
+
+    override val resultKey: String? get() = null
     //endregion
 
     //region Fragment Lifecycle
@@ -133,9 +137,6 @@ class CalendarFragment :
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: CalendarUiEvent) {
         when (event) {
-            is CalendarUiEvent.NavigateDiaryEditScreen -> {
-                navigateDiaryEditFragment(event.id, event.date)
-            }
             is CalendarUiEvent.ScrollCalendar -> {
                 scrollCalendar(event.date)
             }
@@ -204,12 +205,6 @@ class CalendarFragment :
             mainActivityViewModel,
             this
         )
-    }
-    //endregion
-
-    //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment() {
-        mainActivityViewModel.onNavigateBackFromBottomNavigationTab()
     }
     //endregion
 
@@ -609,16 +604,30 @@ class CalendarFragment :
     //endregion
 
     //region Navigation Helpers
+    override fun toNavDirections(destination: CalendarNavDestination): NavDirections {
+        return when (destination) {
+            is CalendarNavDestination.AppMessageDialog -> {
+                navigationEventHelper.createAppMessageDialogNavDirections(destination.message)
+            }
+            is CalendarNavDestination.DiaryEditScreen -> {
+                createDiaryEditFragmentNavDirections(destination.id, destination.date)
+            }
+        }
+    }
+
+    override fun toNavDestinationId(destination: DummyNavBackDestination): Int {
+        // 処理なし
+        throw IllegalStateException("NavDestinationIdへの変換は不要の為、未対応。")
+    }
+
     /**
-     * 日記編集画面([DiaryEditFragment])へ遷移する。
+     * 日記編集画面へ遷移する為の [NavDirections] オブジェクトを生成する。
      * @param id 編集する日記のID（新規作成の場合はnull）
      * @param date 対象の日付
      *  */
-    private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {
-        val directions =
-            CalendarFragmentDirections
+    private fun createDiaryEditFragmentNavDirections(id: String?, date: LocalDate): NavDirections {
+        return CalendarFragmentDirections
                 .actionNavigationCalendarFragmentToDiaryEditFragment(id, date)
-        navigateFragmentOnce(NavigationCommand.To(directions))
     }
     //endregion
 }

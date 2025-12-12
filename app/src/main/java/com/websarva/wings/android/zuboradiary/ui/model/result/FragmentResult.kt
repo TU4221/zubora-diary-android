@@ -15,10 +15,9 @@ sealed class FragmentResult<out T> : NavigationResult, Serializable {
 
     /**
      * 何らかのデータを持つ結果を表す。
-     * @param key Fragmentから返されるデータのキー。
      * @property data Fragmentから返される具体的なデータ。
      */
-    data class Some<out T>(val key: String, val data: T) : FragmentResult<T>()
+    data class Some<out T>(val data: T) : FragmentResult<T>()
 
     /** 結果データが存在しないことを示す。 */
     data object None : FragmentResult<Nothing>() {

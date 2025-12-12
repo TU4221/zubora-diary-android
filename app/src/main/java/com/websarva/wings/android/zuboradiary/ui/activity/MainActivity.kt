@@ -29,12 +29,16 @@ import kotlinx.coroutines.launch
 import androidx.core.view.size
 import androidx.core.view.get
 import androidx.navigation.NavController
+import androidx.navigation.NavDirections
 import androidx.viewbinding.ViewBinding
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.AppMessageDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.state.ui.MainActivityUiState
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.ActivityNavigationEventHandler
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.ActivityNavigationEventHelper
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.FragmentNavigationEventHelper
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.MainActivityNavDestination
 import com.websarva.wings.android.zuboradiary.ui.theme.withTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -50,9 +54,11 @@ import kotlinx.coroutines.flow.map
  * - アプリケーション全体のテーマカラーの適用と動的変更
  * - [NavHostFragment]と[BottomNavigationView]のセットアップ
  * - Fragmentのライフサイクルに応じたUIの状態管理
+ * - UI状態([MainActivityUiState])、UIイベント([MainActivityUiEvent])、ナビゲーションイベント([NavigationEvent])との監視
+ * - [FragmentNavigationEventHelper]を介したナビゲーションイベントの実行と保留・再実行機能の提供
  */
 @AndroidEntryPoint
-class MainActivity : LoggingActivity() {
+class MainActivity : LoggingActivity(), ActivityNavigationEventHandler<MainActivityNavDestination> {
 
     companion object {
         private const val SAVED_STATE_THEME_COLOR = "saved_state_theme_color"
@@ -74,6 +80,9 @@ class MainActivity : LoggingActivity() {
         private set
 
     private val themeColorChanger = ThemeColorChanger()
+
+    /** ナビゲーションイベント（[NavigationEvent]）の処理をまとめたヘルパークラス。 */
+    private val activityNavigationEventHelper = ActivityNavigationEventHelper()
 
     /** このActivityに対応するViewModel。 */
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -147,7 +156,9 @@ class MainActivity : LoggingActivity() {
             isMainActivityLayoutInflated = true
             observeUiEvent()
             observeUiState()
+            observeNavigationEvent()
             setupNavigation()
+            mainActivityViewModel.onUiReady()
         }
     }
 
@@ -168,18 +179,9 @@ class MainActivity : LoggingActivity() {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 mainActivityViewModel.uiEvent
                     .collectLatest { value: ConsumableEvent<MainActivityUiEvent> ->
-                        val event = value.getContentIfNotHandled() ?: return@collectLatest
-                        when (event) {
-                            MainActivityUiEvent.NavigateStartTabScreen -> {
-                                navigateBottomNavigationStartTabFragment()
-                            }
-                            is MainActivityUiEvent.ShowMainActivityAppMessageDialog -> {
-                                navigateAppMessageDialog(event.message)
-                            }
-                            is MainActivityUiEvent.ShowCommonAppMessageDialog -> {
-                                navigateAppMessageDialog(event.message)
-                            }
-                        }
+                        value.getContentIfNotHandled() ?: return@collectLatest
+
+                        // 処理イベントなし
                     }
             }
         }
@@ -286,32 +288,47 @@ class MainActivity : LoggingActivity() {
         }
     }
 
-    /** [BottomNavigationView]の開始タブに遷移する。 */
-    // MEMO:BottomNavigationView経由のFragment間でNavigateUpすると、意図しない遷移エフェクトになる。
-    //      これは遷移エフェクトの設定方法の都合によるものになる。
-    //      これを避け、ユーザーがタブを再選択した際と同じ挙動(正しいエフェクト)で開始Fragmentに戻すために、
-    //      このメソッドを使用する。
-    private fun navigateBottomNavigationStartTabFragment() {
-        with(binding.bottomNavigation) {
-            selectedItemId =
-                menu[0].itemId // 初期メニューアイテム(アプリ起動で最初に選択されているアイテム)
+    /**
+     * このアクティビティ固有のViewModelが発行するナビゲーションイベント([NavigationEvent])を監視する。
+     * 新規イベントを受け取ると、[FragmentNavigationEventHelper]にナビゲーション処理の実行を委譲する。
+     */
+    private fun observeNavigationEvent() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                mainActivityViewModel.navigationEvent
+                    .collect { value: ConsumableEvent<NavigationEvent.To<MainActivityNavDestination>> ->
+                        val event = value.getContentIfNotHandled().also {
+                            Log.d(logTag, "NavigationEvent_Collect(): $it")
+                        } ?: return@collect
+
+                        activityNavigationEventHelper
+                            .executeFragmentNavigation(
+                                lifecycle,
+                                navController,
+                                event,
+                                this@MainActivity,
+                                mainActivityViewModel
+                            )
+                    }
+            }
         }
     }
 
-    /**
-     * アプリケーションメッセージダイアログ([AppMessageDialogFragment])へ遷移する。
-     * @param appMessage 表示するメッセージ
-     */
-    private fun navigateAppMessageDialog(appMessage: AppMessage) {
-        val action = MobileNavigationDirections.actionGlobalToAppMessageDialog(appMessage)
-        // TODO:navController.navigate()を直接使用するのではなく遷移管理処理を通す
-        navController.navigate(action)
+    override fun toNavDirections(destination: MainActivityNavDestination): NavDirections {
+        return when (destination) {
+            is MainActivityNavDestination.AppMessageDialog -> {
+                activityNavigationEventHelper
+                    .createAppMessageDialogNavDirections(destination.message)
+            }
+        }
     }
 
-    /** 追加処理として、[ViewBinding]の解放を行う。 */
+    /** 追加処理として、[ViewBinding]の解放、[MainActivityViewModel]への通知を行う。 */
     override fun onDestroy() {
-        super.onDestroy()
         clearViewBindings()
+        mainActivityViewModel.onUiGone()
+
+        super.onDestroy()
     }
 
     /** [ViewBinding]とリスナーを解放する。 */

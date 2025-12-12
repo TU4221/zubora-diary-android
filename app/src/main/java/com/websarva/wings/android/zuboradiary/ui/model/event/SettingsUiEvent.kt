@@ -1,43 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
 import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
-import java.time.DayOfWeek
 
 /**
  * 設定画面([SettingsFragment])における、UIイベントを表すsealed class。
  */
 sealed class SettingsUiEvent : UiEvent {
 
-    /** テーマカラー選択ダイアログを表示することを示すイベント。 */
-    data object ShowThemeColorPickerDialog : SettingsUiEvent()
-
-    /**
-     * カレンダー開始曜日選択ダイアログを表示することを示すイベント。
-     * @property dayOfWeek 現在設定されている週の開始曜日。
-     */
-    data class ShowCalendarStartDayPickerDialog(val dayOfWeek: DayOfWeek) : SettingsUiEvent()
-
-    /** リマインダー通知時間選択ダイアログを表示することを示すイベント。 */
-    data object ShowReminderNotificationTimePickerDialog : SettingsUiEvent()
-
-    /** 全日記削除確認ダイアログを表示することを示すイベント。 */
-    data object ShowAllDiariesDeleteDialog : SettingsUiEvent()
-
-    /** 全設定初期化確認ダイアログを表示することを示すイベント。 */
-    data object ShowAllSettingsInitializationDialog : SettingsUiEvent()
-
-    /** 全データ削除確認ダイアログを表示することを示すイベント。 */
-    data object ShowAllDataDeleteDialog : SettingsUiEvent()
-
-    /** OSSライセンスダイアログを表示することを示すイベント。 */
-    data object ShowOSSLicensesDialog : SettingsUiEvent()
-
-    /** 通知権限要求の理由説明ダイアログを表示することを示すイベント。 */
-    data object ShowNotificationPermissionRationaleDialog : SettingsUiEvent()
-
-    /** 位置情報権限要求の理由説明ダイアログを表示することを示すイベント。 */
-    data object ShowLocationPermissionRationaleDialog : SettingsUiEvent()
-
+    // TODO:不要だが残しておく(最終的に削除)
     /** アプリケーションの詳細設定画面を表示することを示すイベント。 */
     data object ShowApplicationDetailsSettingsScreen : SettingsUiEvent()
 

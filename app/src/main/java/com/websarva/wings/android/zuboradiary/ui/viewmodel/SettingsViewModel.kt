@@ -40,6 +40,9 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentVi
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseUnknownException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.SettingsNavDestination
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.SettingsUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -77,7 +80,12 @@ class SettingsViewModel @Inject internal constructor(
     private val updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase,
     private val deleteAllDiariesUseCase: DeleteAllDiariesUseCase,
     private val deleteAllDataUseCase: DeleteAllDataUseCase,
-) : BaseFragmentViewModel<SettingsUiState, SettingsUiEvent, SettingsAppMessage>(
+) : BaseFragmentViewModel<
+        SettingsUiState,
+        SettingsUiEvent,
+        SettingsNavDestination,
+        DummyNavBackDestination
+>(
     SettingsUiState()
 ) {
 
@@ -219,9 +227,9 @@ class SettingsViewModel @Inject internal constructor(
 
         updateToSettingsLoadFailedState()
         if (exception is UseCaseUnknownException) {
-            emitUnexpectedAppMessage(exception)
+            showUnexpectedAppMessageDialog(exception)
         } else {
-            emitAppMessageEvent(SettingsAppMessage.SettingLoadFailure)
+            showAppMessageDialog(SettingsAppMessage.SettingLoadFailure)
         }
     }
 
@@ -388,7 +396,7 @@ class SettingsViewModel @Inject internal constructor(
         if (!isReadyForOperation) return
 
         launchWithUnexpectedErrorHandler {
-            showOssLicensesScreen()
+            showOssLicensesDialog()
         }
     }
     //endregion
@@ -492,6 +500,16 @@ class SettingsViewModel @Inject internal constructor(
     }
 
     /**
+     * 通知権限要求の理由説明が必要とされる時に呼び出される事を想定。
+     * 通知権限要求の理由説明ダイアログを表示する。
+     */
+    internal fun onPostNotificationsPermissionRationaleRequired() {
+        launchWithUnexpectedErrorHandler {
+            showNotificationPermissionRationaleDialog()
+        }
+    }
+
+    /**
      * OSの通知権限の状態をリマインダー設定に同期させるために呼び出される事を想定。
      * 権限がないのに設定がONになっている場合は、設定をOFFに更新する。
      * @param isGranted OSの通知権限が許可されている場合はtrue
@@ -528,6 +546,16 @@ class SettingsViewModel @Inject internal constructor(
     }
 
     /**
+     * 位置情報権限要求の理由説明が必要とされる時に呼び出される事を想定。
+     * 位置情報権限要求の理由説明ダイアログを表示する。
+     */
+    internal fun onAccessLocationPermissionRationaleRequired() {
+        launchWithUnexpectedErrorHandler {
+            showLocationPermissionRationaleDialog()
+        }
+    }
+
+    /**
      * OSの位置情報権限の状態を天気情報取得設定に同期させるために呼び出される事を想定。
      * 権限がないのに設定がONになっている場合は、設定をOFFに更新する。
      * @param isGranted OSの位置情報権限が許可されている場合はtrue
@@ -555,7 +583,7 @@ class SettingsViewModel @Inject internal constructor(
     private fun canExecuteOperation(): Boolean {
         if (currentUiState.hasSettingsLoadFailure) {
             launchWithUnexpectedErrorHandler {
-                emitAppMessageEvent(SettingsAppMessage.SettingsNotLoadedRetryRestart)
+                showAppMessageDialog(SettingsAppMessage.SettingsNotLoadedRetryRestart)
             }
             return false
         }
@@ -568,8 +596,11 @@ class SettingsViewModel @Inject internal constructor(
      * テーマカラーの選択ダイログを表示する（イベント発行）。
      */
     private suspend fun showThemeColorPickerDialog() {
-        emitUiEvent(
-            SettingsUiEvent.ShowThemeColorPickerDialog
+        emitNavigationEvent(
+            NavigationEvent.To(
+                SettingsNavDestination.ThemeColorPickerDialog,
+                NavigationEvent.Policy.Single
+            )
         )
     }
 
@@ -589,13 +620,13 @@ class SettingsViewModel @Inject internal constructor(
             is UseCaseResult.Failure -> {
                 when (result.exception) {
                     is ThemeColorSettingUpdateException.UpdateFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateFailure)
                     }
                     is ThemeColorSettingUpdateException.InsufficientStorage -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
                     }
                     is ThemeColorSettingUpdateException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -608,8 +639,11 @@ class SettingsViewModel @Inject internal constructor(
      * カレンダー開始曜日の選択ダイアログを表示する（イベント発行）。
      */
     private suspend fun showCalendarStartDayOfWeekPickerDialog(dayOfWeek: DayOfWeek) {
-        emitUiEvent(
-            SettingsUiEvent.ShowCalendarStartDayPickerDialog(dayOfWeek)
+        emitNavigationEvent(
+            NavigationEvent.To(
+                SettingsNavDestination.CalendarStartDayPickerDialog(dayOfWeek),
+                NavigationEvent.Policy.Single
+            )
         )
     }
 
@@ -629,13 +663,13 @@ class SettingsViewModel @Inject internal constructor(
             is UseCaseResult.Failure -> {
                 when (result.exception) {
                     is CalendarStartDayOfWeekSettingUpdateException.UpdateFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateFailure)
                     }
                     is CalendarStartDayOfWeekSettingUpdateException.InsufficientStorage -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
                     }
                     is CalendarStartDayOfWeekSettingUpdateException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -681,8 +715,11 @@ class SettingsViewModel @Inject internal constructor(
      * リマインダ通知時間選択ダイアログを表示する（イベント発行）。
      */
     private suspend fun showReminderNotificationTimePickerDialog() {
-        emitUiEvent(
-            SettingsUiEvent.ShowReminderNotificationTimePickerDialog
+        emitNavigationEvent(
+            NavigationEvent.To(
+                SettingsNavDestination.ReminderNotificationTimePickerDialog,
+                NavigationEvent.Policy.Retry
+            )
         )
     }
 
@@ -703,13 +740,13 @@ class SettingsViewModel @Inject internal constructor(
                 emitUiEvent(SettingsUiEvent.TurnReminderNotificationSettingSwitch(false))
                 when (result.exception) {
                     is ReminderNotificationSettingUpdateException.SettingUpdateFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateFailure)
                     }
                     is ReminderNotificationSettingUpdateException.InsufficientStorage -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
                     }
                     is ReminderNotificationSettingUpdateException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -730,13 +767,13 @@ class SettingsViewModel @Inject internal constructor(
                 emitUiEvent(SettingsUiEvent.TurnReminderNotificationSettingSwitch(true))
                 when (result.exception) {
                     is ReminderNotificationSettingUpdateException.SettingUpdateFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateFailure)
                     }
                     is ReminderNotificationSettingUpdateException.InsufficientStorage -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
                     }
                     is ReminderNotificationSettingUpdateException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -780,13 +817,13 @@ class SettingsViewModel @Inject internal constructor(
                 emitUiEvent(SettingsUiEvent.TurnPasscodeLockSettingSwitch(!value))
                 when (result.exception) {
                     is PassCodeSettingUpdateException.UpdateFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateFailure)
                     }
                     is PassCodeSettingUpdateException.InsufficientStorage -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
                     }
                     is PassCodeSettingUpdateException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -839,13 +876,13 @@ class SettingsViewModel @Inject internal constructor(
                 emitUiEvent(SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch(!isEnabled))
                 when (result.exception) {
                     is WeatherInfoFetchSettingUpdateException.UpdateFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateFailure)
                     }
                     is WeatherInfoFetchSettingUpdateException.InsufficientStorage -> {
-                        emitAppMessageEvent(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
+                        showAppMessageDialog(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
                     }
                     is WeatherInfoFetchSettingUpdateException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -858,8 +895,11 @@ class SettingsViewModel @Inject internal constructor(
      * 全ての日記の削除確認ダイアログを表示する（イベント発行）。
      */
     private suspend fun showAllDiariesDeleteDialog() {
-        emitUiEvent(
-            SettingsUiEvent.ShowAllDiariesDeleteDialog
+        emitNavigationEvent(
+            NavigationEvent.To(
+                SettingsNavDestination.AllDiariesDeleteDialog,
+                NavigationEvent.Policy.Single
+            )
         )
     }
 
@@ -875,13 +915,13 @@ class SettingsViewModel @Inject internal constructor(
                 Log.e(logTag, "全日記削除_失敗", result.exception)
                 when (result.exception) {
                     is AllDiariesDeleteException.DeleteFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllDiaryDeleteFailure)
+                        showAppMessageDialog(SettingsAppMessage.AllDiaryDeleteFailure)
                     }
                     is AllDiariesDeleteException.ImageFileDeleteFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllDiaryImagesDeleteFailure)
+                        showAppMessageDialog(SettingsAppMessage.AllDiaryImagesDeleteFailure)
                     }
                     is AllDiariesDeleteException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -892,8 +932,11 @@ class SettingsViewModel @Inject internal constructor(
      * 全ての設定の初期化確認ダイアログを表示する（イベント発行）。
      */
     private suspend fun showAllSettingsInitializationDialog() {
-        emitUiEvent(
-            SettingsUiEvent.ShowAllSettingsInitializationDialog
+        emitNavigationEvent(
+            NavigationEvent.To(
+                SettingsNavDestination.AllSettingsInitializationDialog,
+                NavigationEvent.Policy.Single
+            )
         )
     }
 
@@ -907,13 +950,13 @@ class SettingsViewModel @Inject internal constructor(
                 Log.e(logTag, "全設定初期化_失敗", result.exception)
                 when (result.exception) {
                     is AllSettingsInitializationException.InitializationFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)
+                        showAppMessageDialog(SettingsAppMessage.AllSettingsInitializationFailure)
                     }
                     is AllSettingsInitializationException.InsufficientStorage -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationInsufficientStorageFailure)
+                        showAppMessageDialog(SettingsAppMessage.AllSettingsInitializationInsufficientStorageFailure)
                     }
                     is AllSettingsInitializationException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -924,8 +967,11 @@ class SettingsViewModel @Inject internal constructor(
      * 全てのアプリケーションデータの削除確認ダイアログを表示する（イベント発行）。
      */
     private suspend fun showAllDataDeleteDialog() {
-        emitUiEvent(
-            SettingsUiEvent.ShowAllDataDeleteDialog
+        emitNavigationEvent(
+            NavigationEvent.To(
+                SettingsNavDestination.AllDataDeleteDialog,
+                NavigationEvent.Policy.Single
+            )
         )
     }
 
@@ -941,19 +987,19 @@ class SettingsViewModel @Inject internal constructor(
                 updateToIdleState()
                 when (result.exception) {
                     is AllDataDeleteException.DiariesDeleteFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllDataDeleteFailure)
+                        showAppMessageDialog(SettingsAppMessage.AllDataDeleteFailure)
                     }
                     is AllDataDeleteException.ImageFileDeleteFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllDiaryImagesDeleteFailure)
+                        showAppMessageDialog(SettingsAppMessage.AllDiaryImagesDeleteFailure)
                     }
                     is AllDataDeleteException.SettingsInitializationFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationFailure)
+                        showAppMessageDialog(SettingsAppMessage.AllSettingsInitializationFailure)
                     }
                     is AllDataDeleteException.SettingsInitializationInsufficientStorageFailure -> {
-                        emitAppMessageEvent(SettingsAppMessage.AllSettingsInitializationInsufficientStorageFailure)
+                        showAppMessageDialog(SettingsAppMessage.AllSettingsInitializationInsufficientStorageFailure)
                     }
                     is AllDataDeleteException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -966,16 +1012,65 @@ class SettingsViewModel @Inject internal constructor(
      * 前の画面へ遷移する（イベント発行）。
      */
     private suspend fun navigatePreviousScreen() {
-        emitNavigatePreviousFragmentEvent()
+        emitNavigationEvent(
+            NavigationEvent.Back(
+                NavigationEvent.Policy.Single,
+                null
+            )
+        )
+    }
+
+    /**
+     * 通知権限要求の理由説明ダイアログを表示する（イベント発行）。
+     */
+    private suspend fun showNotificationPermissionRationaleDialog() {
+        emitNavigationEvent(
+            NavigationEvent.To(
+                SettingsNavDestination.NotificationPermissionRationaleDialog,
+                NavigationEvent.Policy.Retry
+            )
+        )
+    }
+
+    /**
+     * 位置情報権限要求の理由説明ダイアログを表示する（イベント発行）。
+     */
+    private suspend fun showLocationPermissionRationaleDialog() {
+        emitNavigationEvent(
+            NavigationEvent.To(
+                SettingsNavDestination.LocationPermissionRationaleDialog,
+                NavigationEvent.Policy.Retry
+            )
+        )
     }
 
     /**
      * OSSライセンス表示ダイアログを表示する（イベント発行）。
      */
-    private suspend fun showOssLicensesScreen() {
-        emitUiEvent(
-            SettingsUiEvent.ShowOSSLicensesDialog
+    private suspend fun showOssLicensesDialog() {
+        emitNavigationEvent(
+            NavigationEvent.To(
+                SettingsNavDestination.OSSLicensesDialog,
+                NavigationEvent.Policy.Single
+            )
         )
+    }
+
+    /**
+     * アプリケーションメッセージダイアログを表示する（イベント発行）。
+     * @param appMessage 表示するメッセージ。
+     */
+    private suspend fun showAppMessageDialog(appMessage: SettingsAppMessage) {
+        emitNavigationEvent(
+            NavigationEvent.To(
+                SettingsNavDestination.AppMessageDialog(appMessage),
+                NavigationEvent.Policy.Retry
+            )
+        )
+    }
+
+    override suspend fun showUnexpectedAppMessageDialog(e: Exception) {
+        showAppMessageDialog(SettingsAppMessage.Unexpected(e))
     }
 
     // TODO:不要だが残しておく(最終的に削除)
@@ -984,8 +1079,7 @@ class SettingsViewModel @Inject internal constructor(
      */
     private suspend fun showApplicationDetailsSettings() {
         emitUiEvent(
-            SettingsUiEvent.ShowApplicationDetailsSettingsScreen
-        )
+            SettingsUiEvent.ShowApplicationDetailsSettingsScreen)
     }
     //endregion
 

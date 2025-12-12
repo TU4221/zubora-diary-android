@@ -21,6 +21,9 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentVi
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.common.InputTextValidation
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryItemTitleEditNavDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryItemTitleEditUiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -48,7 +51,12 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     private val loadDiaryItemTitleSelectionHistoryListUseCase: LoadDiaryItemTitleSelectionHistoryListUseCase,
     private val deleteDiaryItemTitleSelectionHistoryUseCase: DeleteDiaryItemTitleSelectionHistoryUseCase,
     private val validateInputTextUseCase: ValidateInputTextUseCase
-) : BaseFragmentViewModel<DiaryItemTitleEditUiState, DiaryItemTitleEditUiEvent, DiaryItemTitleEditAppMessage>(
+) : BaseFragmentViewModel<
+        DiaryItemTitleEditUiState,
+        DiaryItemTitleEditUiEvent,
+        DiaryItemTitleEditNavDestination,
+        DummyNavBackDestination
+>(
     handle.get<DiaryItemTitleEditUiState>(SAVED_STATE_UI_KEY)?.let {
         DiaryItemTitleEditUiState.fromSavedState(it)
     } ?: DiaryItemTitleEditUiState()
@@ -119,12 +127,12 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
             if (result is UseCaseResult.Failure) {
                 when (result.exception) {
                     is DiaryItemTitleSelectionHistoryLoadException.LoadFailure -> {
-                        emitAppMessageEvent(
+                        showAppMessageDialog(
                             DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadFailure
                         )
                     }
                     is DiaryItemTitleSelectionHistoryLoadException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -263,8 +271,11 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
             InputTextValidation.Valid -> {
                 val diaryItemTitleSelection =
                     DiaryItemTitleSelectionUi(itemNumberInt, itemId.value, itemTitle)
-                emitUiEvent(
-                    DiaryItemTitleEditUiEvent.CompleteEdit(diaryItemTitleSelection)
+                emitNavigationEvent(
+                    NavigationEvent.Back(
+                        NavigationEvent.Policy.Single,
+                                diaryItemTitleSelection
+                    )
                 )
             }
             InputTextValidation.Empty,
@@ -286,11 +297,12 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
             DiaryItemTitleSelectionHistoryId(historyId),
             DiaryItemTitle(historyTitle)
         )
-        emitUiEvent(
-            DiaryItemTitleEditUiEvent
-                .ShowSelectionHistoryDeleteDialog(
-                    historyTitle
-                )
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryItemTitleEditNavDestination
+                    .SelectionHistoryDeleteDialog(historyTitle),
+                NavigationEvent.Policy.Retry
+            )
         )
     }
 
@@ -315,29 +327,50 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
                 Log.e(logTag, "${logMsg}_失敗")
                 when (result.exception) {
                     is DiaryItemTitleSelectionHistoryDeleteException.DeleteFailure -> {
-                        emitAppMessageEvent(
+                        showAppMessageDialog(
                             DiaryItemTitleEditAppMessage.ItemTitleHistoryDeleteFailure
                         )
                     }
                     is DiaryItemTitleSelectionHistoryDeleteException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
         }
     }
 
-    // TODO;Event名をメソッド名と統一
     /** スワイプされた日記項目タイトル選択履歴を閉じる（イベント発行）。 */
     private suspend fun closeSwipedTitleSelectionHistory() {
         emitUiEvent(
-            DiaryItemTitleEditUiEvent.CloseSwipedSelectionHistory
+            DiaryItemTitleEditUiEvent.CloseSwipedTitleSelectionHistory
         )
     }
 
     /** 前の画面へ遷移する（イベント発行）。 */
     private suspend fun navigatePreviousScreen() {
-        emitNavigatePreviousFragmentEvent()
+        emitNavigationEvent(
+            NavigationEvent.Back(
+                NavigationEvent.Policy.Single,
+                null
+            )
+        )
+    }
+
+    /**
+     * アプリケーションメッセージダイアログを表示する（イベント発行）。
+     * @param appMessage 表示するメッセージ。
+     */
+    private suspend fun showAppMessageDialog(appMessage: DiaryItemTitleEditAppMessage) {
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryItemTitleEditNavDestination.AppMessageDialog(appMessage),
+                NavigationEvent.Policy.Retry
+            )
+        )
+    }
+
+    override suspend fun showUnexpectedAppMessageDialog(e: Exception) {
+        showAppMessageDialog(DiaryItemTitleEditAppMessage.Unexpected(e))
     }
     //endregion
 

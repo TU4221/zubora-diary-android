@@ -7,13 +7,6 @@ import java.time.LocalDate
  * カレンダー画面([CalendarFragment])における、UIイベントを表すsealed class。
  */
 sealed class CalendarUiEvent : UiEvent {
-    
-    /**
-     * 日記編集画面へ遷移することを示すイベント。
-     * @property id 編集対象の日記ID。新規作成の場合は`null`。
-     * @property date 対象の日記の日付。
-     */
-    data class NavigateDiaryEditScreen(val id: String?, val date: LocalDate) : CalendarUiEvent()
 
     /**
      * 指定された日付までカレンダーをスクロールさせることを示すイベント。

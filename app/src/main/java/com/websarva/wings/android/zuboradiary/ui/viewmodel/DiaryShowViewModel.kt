@@ -15,6 +15,9 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryShowNavDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.DiaryShowUiState
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
@@ -42,7 +45,12 @@ class DiaryShowViewModel @Inject internal constructor(
     private val diaryUiStateHelper: DiaryUiStateHelper,
     private val loadDiaryByIdUseCase: LoadDiaryByIdUseCase,
     private val deleteDiaryUseCase: DeleteDiaryUseCase
-) : BaseFragmentViewModel<DiaryShowUiState, DiaryShowUiEvent, DiaryShowAppMessage>(
+) : BaseFragmentViewModel<
+        DiaryShowUiState,
+        DiaryShowUiEvent,
+        DiaryShowNavDestination,
+        DummyNavBackDestination
+>(
     DiaryShowUiState()
 ) {
 
@@ -228,11 +236,16 @@ class DiaryShowViewModel @Inject internal constructor(
                 when (result.exception) {
                     is DiaryLoadByIdException.LoadFailure -> {
                         updateToDiaryLoadErrorState()
-                        emitUiEvent(DiaryShowUiEvent.ShowDiaryLoadFailureDialog(date))
+                        emitNavigationEvent(
+                            NavigationEvent.To(
+                                DiaryShowNavDestination.DiaryLoadFailureDialog(date),
+                                NavigationEvent.Policy.Retry
+                            )
+                        )
                     }
                     is DiaryLoadByIdException.Unknown -> {
                         updateToDiaryLoadErrorState()
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -248,8 +261,11 @@ class DiaryShowViewModel @Inject internal constructor(
      */
     private suspend fun showDiaryDeleteDialog(id: DiaryId, date: LocalDate) {
         cachePendingDiaryDeleteParameters(id, date)
-        emitUiEvent(
-            DiaryShowUiEvent.ShowDiaryDeleteDialog(date)
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryShowNavDestination.DiaryDeleteDialog(date),
+                NavigationEvent.Policy.Single
+            )
         )
     }
 
@@ -267,8 +283,11 @@ class DiaryShowViewModel @Inject internal constructor(
             is UseCaseResult.Success -> {
                 Log.i(logTag, "${logMsg}_完了")
                 updateToProgressInvisibleState()
-                emitUiEvent(
-                    DiaryShowUiEvent.NavigatePreviousScreenOnDiaryDeleted(date)
+                emitNavigationEvent(
+                    NavigationEvent.Back(
+                        NavigationEvent.Policy.Retry,
+                        date
+                    )
                 )
             }
             is UseCaseResult.Failure -> {
@@ -276,13 +295,13 @@ class DiaryShowViewModel @Inject internal constructor(
                 updateToProgressInvisibleState()
                 when (result.exception) {
                     is DiaryDeleteException.DiaryDataDeleteFailure -> {
-                        emitAppMessageEvent(DiaryShowAppMessage.DiaryDeleteFailure)
+                        showAppMessageDialog(DiaryShowAppMessage.DiaryDeleteFailure)
                     }
                     is DiaryDeleteException.ImageFileDeleteFailure -> {
-                        emitAppMessageEvent(DiaryShowAppMessage.DiaryImageDeleteFailure)
+                        showAppMessageDialog(DiaryShowAppMessage.DiaryImageDeleteFailure)
                     }
                     is DiaryDeleteException.Unknown -> {
-                        emitUnexpectedAppMessage(result.exception)
+                        showUnexpectedAppMessageDialog(result.exception)
                     }
                 }
             }
@@ -294,7 +313,12 @@ class DiaryShowViewModel @Inject internal constructor(
      * @param diaryDate 遷移元に返す日記の日付
      */
     private suspend fun navigatePreviousScreen(diaryDate: LocalDate) {
-        emitUiEvent(DiaryShowUiEvent.NavigatePreviousScreenWithResult(diaryDate))
+        emitNavigationEvent(
+            NavigationEvent.Back(
+                NavigationEvent.Policy.Single,
+                diaryDate
+            )
+        )
     }
 
     /**
@@ -302,7 +326,12 @@ class DiaryShowViewModel @Inject internal constructor(
      * 日記読み込み失敗時に呼び出す。
      */
     private suspend fun navigatePreviousScreenOnDiaryLoadFailed() {
-        emitUiEvent(DiaryShowUiEvent.NavigatePreviousScreenOnDiaryLoadFailed)
+        emitNavigationEvent(
+            NavigationEvent.Back(
+                NavigationEvent.Policy.Retry,
+                null
+            )
+        )
     }
 
     /**
@@ -312,9 +341,29 @@ class DiaryShowViewModel @Inject internal constructor(
      * @param date 編集対象の日記の日付。
      */
     private suspend fun navigateDiaryEditScreen(id: String, date: LocalDate) {
-        emitUiEvent(
-            DiaryShowUiEvent.NavigateDiaryEditScreen(id, date)
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryShowNavDestination.DiaryEditScreen(id, date),
+                NavigationEvent.Policy.Single
+            )
         )
+    }
+
+    /**
+     * アプリケーションメッセージダイアログを表示する（イベント発行）。
+     * @param appMessage 表示するメッセージ。
+     */
+    private suspend fun showAppMessageDialog(appMessage: DiaryShowAppMessage) {
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryShowNavDestination.AppMessageDialog(appMessage),
+                NavigationEvent.Policy.Retry
+            )
+        )
+    }
+
+    override suspend fun showUnexpectedAppMessageDialog(e: Exception) {
+        showAppMessageDialog(DiaryShowAppMessage.Unexpected(e))
     }
     //endregion
 

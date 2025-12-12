@@ -1,12 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.fragment
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavDirections
 import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryListBinding
@@ -15,8 +15,6 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.DiaryListSetupHelper
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogFragment
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.SwipeBackgroundButtonInteractionHelper
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
@@ -26,9 +24,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDi
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickerConfig
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersArgs
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersResult
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryListNavDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -49,8 +47,12 @@ import java.time.Year
  * - ワード検索画面への遷移
  */
 @AndroidEntryPoint
-class DiaryListFragment :
-    BaseFragment<FragmentDiaryListBinding, DiaryListUiEvent>(),
+class DiaryListFragment : BaseFragment<
+        FragmentDiaryListBinding,
+        DiaryListUiEvent,
+        DiaryListNavDestination,
+        DummyNavBackDestination
+>(),
     RequiresBottomNavigation,
     ActivityCallbackUiEventHandler {
 
@@ -62,6 +64,8 @@ class DiaryListFragment :
     override val mainViewModel: DiaryListViewModel by viewModels()
     
     override val destinationId = R.id.navigation_diary_list_fragment
+
+    override val resultKey: String? get() = null
 
     /** 日記リストを表示するためのRecyclerViewアダプター。 */
     private var diaryListAdapter: StandardDiaryListAdapter? = null
@@ -86,14 +90,6 @@ class DiaryListFragment :
 
         setupToolbar()
         setupDiaryList()
-
-        mainViewModel.onUiReady()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-
-        mainViewModel.onUiGone()
     }
     //endregion
     
@@ -172,23 +168,7 @@ class DiaryListFragment :
 
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: DiaryListUiEvent) {
-        when (event) {
-            is DiaryListUiEvent.NavigateDiaryShowScreen -> {
-                navigateDiaryShowFragment(event.id, event.date)
-            }
-            is DiaryListUiEvent.NavigateDiaryEditScreen -> {
-                navigateDiaryEditFragment(event.id, event.date)
-            }
-            is DiaryListUiEvent.NavigateWordSearchScreen -> {
-                navigateWordSearchFragment()
-            }
-            is DiaryListUiEvent.ShowStartYearMonthPickerDialog -> {
-                navigateStartYearMonthPickerDialog(event.maxYear, event.minYear)
-            }
-            is DiaryListUiEvent.ShowDiaryDeleteDialog -> {
-                navigateDiaryDeleteDialog(event.date)
-            }
-        }
+        // 処理なし
     }
 
     override fun onActivityCallbackUiEventReceived(event: ActivityCallbackUiEvent) {
@@ -241,12 +221,6 @@ class DiaryListFragment :
             mainActivityViewModel,
             this
         )
-    }
-    //endregion
-
-    //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment() {
-        navigatePreviousFragmentOnce(FragmentResult.None)
     }
     //endregion
 
@@ -309,43 +283,66 @@ class DiaryListFragment :
     //endregion
 
     //region Navigation Helpers
+    override fun toNavDirections(destination: DiaryListNavDestination): NavDirections {
+        return when (destination) {
+            is DiaryListNavDestination.AppMessageDialog -> {
+                navigationEventHelper.createAppMessageDialogNavDirections(destination.message)
+            }
+            is DiaryListNavDestination.DiaryShowScreen -> {
+                createDiaryShowFragmentNavDirections(destination.id, destination.date)
+            }
+            is DiaryListNavDestination.DiaryEditScreen -> {
+                createDiaryEditFragmentNavDirections(destination.id, destination.date)
+            }
+            is DiaryListNavDestination.WordSearchScreen -> {
+                createWordSearchFragmentNavDirections()
+            }
+            is DiaryListNavDestination.StartYearMonthPickerDialog -> {
+                createStartYearMonthPickerDialogNavDirections(destination.maxYear, destination.minYear)
+            }
+            is DiaryListNavDestination.DiaryDeleteDialog -> {
+                createDiaryDeleteDialogNavDirections(destination.date)
+            }
+        }
+    }
+
+    override fun toNavDestinationId(destination: DummyNavBackDestination): Int {
+        // 処理なし
+        throw IllegalStateException("NavDestinationIdへの変換は不要の為、未対応。")
+    }
+
     /**
-     * 日記編集画面([DiaryEditFragment])へ遷移する。
+     * 日記編集画面へ遷移する為の [NavDirections] オブジェクトを生成する。
+     * 
      * @param id 編集する日記のID（新規作成の場合はnull）
      * @param date 対象の日付
      *  */
-    private fun navigateDiaryEditFragment(id: String?, date: LocalDate) {
-        Log.d("20250714", "navigateDiaryEditFragment()")
-        val directions = 
-            DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryEditFragment(
-                id,
-                date
-            )
-        navigateFragmentOnce(NavigationCommand.To(directions))
+    private fun createDiaryEditFragmentNavDirections(id: String?, date: LocalDate): NavDirections {
+        return DiaryListFragmentDirections
+            .actionNavigationDiaryListFragmentToDiaryEditFragment(id, date)
     }
 
     /**
-     * 日記表示画面([DiaryShowFragment])へ遷移する。
+     * 日記表示画面へ遷移する為の [NavDirections] オブジェクトを生成する。
+     * 
      * @param id 編集する日記のID（新規作成の場合はnull）
      * @param date 対象の日付
      * */
-    private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
-        Log.d("20250714", "navigateDiaryShowFragment()")
-        val directions = 
-            DiaryListFragmentDirections.actionNavigationDiaryListFragmentToDiaryShowFragment(id, date)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+    private fun createDiaryShowFragmentNavDirections(id: String, date: LocalDate): NavDirections {
+        return DiaryListFragmentDirections
+            .actionNavigationDiaryListFragmentToDiaryShowFragment(id, date)
     }
 
-    /** ワード検索画面([WordSearchFragment])へ遷移する。 */
-    private fun navigateWordSearchFragment() {
-        Log.d("20250714", "navigateWordSearchFragment()")
-        val directions = 
-            DiaryListFragmentDirections.actionNavigationDiaryListFragmentToWordSearchFragment()
-        navigateFragmentOnce(NavigationCommand.To(directions))
+    /** ワード検索画面へ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createWordSearchFragmentNavDirections(): NavDirections {
+        return DiaryListFragmentDirections.actionNavigationDiaryListFragmentToWordSearchFragment()
     }
 
-    /** 開始年月選択ダイアログ([ListPickersDialogFragment])へ遷移する。 */
-    private fun navigateStartYearMonthPickerDialog(newestYear: Year, oldestYear: Year) {
+    /** 開始年月選択ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createStartYearMonthPickerDialogNavDirections(
+        newestYear: Year,
+        oldestYear: Year
+    ): NavDirections {
         yearPickerList =
             (oldestYear.value..newestYear.value).map {
                 Year.of(it)
@@ -364,13 +361,11 @@ class DiaryListFragment :
                 )
             )
         )
-        val directions =
-            MobileNavigationDirections.actionGlobalToListPickersDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToListPickersDialog(args)
     }
 
-    /** 日記削除確認ダイアログ([ConfirmationDialogFragment])へ遷移する。 */
-    private fun navigateDiaryDeleteDialog(date: LocalDate) {
+    /** 日記削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
+    private fun createDiaryDeleteDialogNavDirections(date: LocalDate): NavDirections {
         val args = ConfirmationDialogArgs(
             resultKey = RESULT_KEY_DIARY_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_delete_title,
@@ -379,8 +374,7 @@ class DiaryListFragment :
                 date.formatDateString(requireContext())
             )
         )
-        val directions = MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
-        navigateFragmentOnce(NavigationCommand.To(directions))
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
     }
     //endregion
 

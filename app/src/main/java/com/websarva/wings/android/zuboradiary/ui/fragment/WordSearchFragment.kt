@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
+import androidx.navigation.NavDirections
 import androidx.recyclerview.widget.RecyclerView
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.FragmentWordSearchBinding
@@ -14,8 +15,8 @@ import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.DiaryListSe
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.NavigationCommand
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
+import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.WordSearchNavDestination
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -32,7 +33,12 @@ import java.time.LocalDate
  * - 画面表示時のキーボード自動表示
  */
 @AndroidEntryPoint
-class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiEvent>() {
+class WordSearchFragment : BaseFragment<
+        FragmentWordSearchBinding,
+        WordSearchUiEvent,
+        WordSearchNavDestination,
+        DummyNavBackDestination
+>() {
 
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
@@ -42,6 +48,8 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     override val mainViewModel: WordSearchViewModel by viewModels()
 
     override val destinationId = R.id.navigation_word_search_fragment
+
+    override val resultKey: String? get() = null
 
     /** ワード検索結果の日記リストを表示するためのRecyclerViewアダプター。 */
     private var wordSearchResultDiaryListAdapter: WordSearchResultDiaryListAdapter? = null
@@ -64,14 +72,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
         setupWordSearchResultList()
         setupTopScrollFAB()
         setupKeyboardManager()
-
-        mainViewModel.onUiReady()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        
-        mainViewModel.onUiGone()
     }
     //endregion
 
@@ -113,9 +113,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: WordSearchUiEvent) {
         when (event) {
-            is WordSearchUiEvent.NavigateDiaryShowScreen -> {
-                navigateDiaryShowFragment(event.id, event.date)
-            }
             WordSearchUiEvent.ShowKeyboard -> {
                 showKeyboard()
             }
@@ -139,12 +136,6 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
                 updateWordSearchResultList(it)
             }
         }
-    }
-    //endregion
-
-    //region CommonUiEventHandler Overrides
-    override fun navigatePreviousFragment() {
-        navigatePreviousFragmentOnce(FragmentResult.None)
     }
     //endregion
 
@@ -215,16 +206,31 @@ class WordSearchFragment : BaseFragment<FragmentWordSearchBinding, WordSearchUiE
     //endregion
 
     //region Navigation Helpers
+    override fun toNavDirections(destination: WordSearchNavDestination): NavDirections {
+        return when (destination) {
+            is WordSearchNavDestination.AppMessageDialog -> {
+                navigationEventHelper.createAppMessageDialogNavDirections(destination.message)
+            }
+            is WordSearchNavDestination.DiaryShowScreen -> {
+                createDiaryShowFragmentNavDirection(destination.id, destination.date)
+            }
+        }
+    }
+
+    override fun toNavDestinationId(destination: DummyNavBackDestination): Int {
+        // 処理なし
+        throw IllegalStateException("NavDestinationIdへの変換は不要の為、未対応。")
+    }
+
     /**
-     * 日記表示画面([DiaryShowFragment])へ遷移する。
+     * 日記表示画面へ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
      * @param id 表示する日記のID
      * @param date 表示する日記の日付
      */
-    private fun navigateDiaryShowFragment(id: String, date: LocalDate) {
-        val directions =
-            WordSearchFragmentDirections
+    private fun createDiaryShowFragmentNavDirection(id: String, date: LocalDate): NavDirections {
+        return WordSearchFragmentDirections
                 .actionNavigationWordSearchFragmentToDiaryShowFragment(id, date)
-        navigateFragmentOnce(NavigationCommand.To(directions))
     }
     //endregion
 }
