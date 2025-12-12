@@ -265,8 +265,9 @@ class SettingsViewModel @Inject internal constructor(
     fun onThemeColorSettingItemClick() {
         if (!canExecuteOperation()) return
 
+        val themeColor = checkNotNull(currentUiState.themeColor).toDomainModel()
         launchWithUnexpectedErrorHandler {
-            showThemeColorPickerDialog()
+            showThemeColorPickerDialog(themeColor)
         }
     }
 
@@ -594,11 +595,12 @@ class SettingsViewModel @Inject internal constructor(
     //region Theme Color Setting Operation
     /**
      * テーマカラーの選択ダイログを表示する（イベント発行）。
+     * @param themeColor 現在設定されているテーマカラー
      */
-    private suspend fun showThemeColorPickerDialog() {
+    private suspend fun showThemeColorPickerDialog(themeColor: ThemeColor) {
         emitNavigationEvent(
             NavigationEvent.To(
-                SettingsNavDestination.ThemeColorPickerDialog,
+                SettingsNavDestination.ThemeColorPickerDialog(themeColor.toUiModel()),
                 NavigationEvent.Policy.Single
             )
         )
@@ -637,6 +639,7 @@ class SettingsViewModel @Inject internal constructor(
     //region Calendar Start Day Of Week Setting Operation
     /**
      * カレンダー開始曜日の選択ダイアログを表示する（イベント発行）。
+     * @param dayOfWeek 現在設定されている週の開始曜日
      */
     private suspend fun showCalendarStartDayOfWeekPickerDialog(dayOfWeek: DayOfWeek) {
         emitNavigationEvent(

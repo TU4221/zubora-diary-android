@@ -466,7 +466,7 @@ class SettingsFragment : BaseFragment<
                 navigationEventHelper.createAppMessageDialogNavDirections(destination.message)
             }
             is SettingsNavDestination.ThemeColorPickerDialog -> {
-                createThemeColorPickerDialogNavDirections()
+                createThemeColorPickerDialogNavDirections(destination.themeColor)
             }
             is SettingsNavDestination.CalendarStartDayPickerDialog -> {
                 createCalendarStartDayPickerDialogNavDirections(destination.dayOfWeek)
@@ -500,8 +500,12 @@ class SettingsFragment : BaseFragment<
         throw IllegalStateException("NavDestinationIdへの変換は不要の為、未対応。")
     }
 
-    /** テーマカラー選択ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
-    private fun createThemeColorPickerDialogNavDirections(): NavDirections {
+    /**
+     * テーマカラー選択ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。
+     *
+     * @param themeColor 現在設定されているテーマカラー
+     */
+    private fun createThemeColorPickerDialogNavDirections(themeColor: ThemeColorUi): NavDirections {
         val themeColorStringPickerList = themeColorPickerList.map { themeColor ->
             themeColor.asString(requireContext())
         }
@@ -614,6 +618,7 @@ class SettingsFragment : BaseFragment<
             .actionNavigationSettingsFragmentToOpenSourceSoftwareLicensesDialog()
     }
 
+    // TODO:不要だが残しておく(最終的に削除)
     /** アプリケーション詳細設定画面へ遷移する。 */
     private fun showApplicationDetailsSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)

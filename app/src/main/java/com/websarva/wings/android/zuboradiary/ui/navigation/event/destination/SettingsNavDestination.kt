@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.navigation.event.destination
 
 import com.websarva.wings.android.zuboradiary.ui.model.message.SettingsAppMessage
+import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import java.time.DayOfWeek
 
 /**
@@ -17,8 +18,11 @@ sealed interface SettingsNavDestination : AppNavDestination {
      */
     data class AppMessageDialog(val message: SettingsAppMessage) : SettingsNavDestination
 
-    /** テーマカラー選択ダイアログ。 */
-    data object ThemeColorPickerDialog : SettingsNavDestination
+    /**
+     * テーマカラー選択ダイアログ。
+     * @property themeColor 現在設定されているテーマカラー。
+     */
+    data class ThemeColorPickerDialog(val themeColor: ThemeColorUi) : SettingsNavDestination
 
     /**
      * カレンダー開始曜日選択ダイアログ。
