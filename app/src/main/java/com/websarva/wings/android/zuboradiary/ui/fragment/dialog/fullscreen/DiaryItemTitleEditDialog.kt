@@ -6,17 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavDirections
+import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.DialogDiaryItemTitleEditBinding
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel
-import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.DiaryItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.SwipeSimpleInteractionHelper
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryItemTitleEditDialogParameters
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryItemTitleEditNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -24,6 +25,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.mapNotNull
+import kotlin.getValue
 
 /**
  * 日記の項目タイトルを編集、または過去の履歴から選択するための全画面ダイアログ。
@@ -42,6 +44,13 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<
         DummyNavBackDestination
 >() {
 
+    /** 画面遷移時に渡された引数。 */
+    private val navArgs: DiaryItemTitleEditDialogArgs by navArgs()
+
+    /** 画面遷移時に渡された引数（[navArgs]）に含まれるパラメータオブジェクトを取得する。 */
+    private val navParameters: DiaryItemTitleEditDialogParameters
+        get() = navArgs.diaryItemTitleEditDialogParameters
+
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -51,7 +60,7 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<
 
     override val destinationId = R.id.navigation_diary_item_title_edit_dialog
 
-    override val resultKey: String get() = RESULT_KEY
+    override val resultKey: String get() = navParameters.resultKey
 
     /** 項目タイトル選択履歴を表示するためのRecyclerViewアダプター。 */
     private var selectionHistoryListAdapter: DiaryItemTitleSelectionHistoryListAdapter? = null
@@ -206,9 +215,6 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<
     //endregion
 
     internal companion object {
-        /** このダイアログから遷移元へ結果を返すためのキー。 */
-        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryItemTitleEditDialog::class.java.name
-
         /** タイトル選択履歴削除の確認ダイアログの結果を受け取るためのキー。 */
         private const val RESULT_KEY_TITLE_SELECTION_HISTORY_DELETE_CONFIRMATION =
             "title_selection_history_delete_confirmation_result"

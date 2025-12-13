@@ -15,6 +15,7 @@ import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.DiaryListSe
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.WordSearchNavDestination
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
@@ -229,8 +230,18 @@ class WordSearchFragment : BaseFragment<
      * @param date 表示する日記の日付
      */
     private fun createDiaryShowFragmentNavDirection(id: String, date: LocalDate): NavDirections {
+        val args = DiaryShowScreenParameters(
+            RESULT_KEY_DIARY,
+            id,
+            date
+        )
         return WordSearchFragmentDirections
-                .actionNavigationWordSearchFragmentToDiaryShowFragment(id, date)
+                .actionNavigationWordSearchFragmentToDiaryShowFragment(args)
     }
     //endregion
+
+    internal companion object {
+        /** 日記表示・編集画面からの遷移戻り時に、結果データを受け取るためのリクエストキー。 */
+        private const val RESULT_KEY_DIARY = "diary_result"
+    }
 }

@@ -21,6 +21,8 @@ import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemC
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickerConfig
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersArgs
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersResult
@@ -318,8 +320,13 @@ class DiaryListFragment : BaseFragment<
      * @param date 対象の日付
      *  */
     private fun createDiaryEditFragmentNavDirections(id: String?, date: LocalDate): NavDirections {
+        val args = DiaryEditScreenParameters(
+            RESULT_KEY_DIARY,
+            id,
+            date
+        )
         return DiaryListFragmentDirections
-            .actionNavigationDiaryListFragmentToDiaryEditFragment(id, date)
+                .actionNavigationDiaryListFragmentToDiaryEditFragment(args)
     }
 
     /**
@@ -329,8 +336,13 @@ class DiaryListFragment : BaseFragment<
      * @param date 対象の日付
      * */
     private fun createDiaryShowFragmentNavDirections(id: String, date: LocalDate): NavDirections {
+        val args = DiaryShowScreenParameters(
+            RESULT_KEY_DIARY,
+            id,
+            date
+        )
         return DiaryListFragmentDirections
-            .actionNavigationDiaryListFragmentToDiaryShowFragment(id, date)
+            .actionNavigationDiaryListFragmentToDiaryShowFragment(args)
     }
 
     /** ワード検索画面へ遷移する為の [NavDirections] オブジェクトを生成する。 */
@@ -379,6 +391,9 @@ class DiaryListFragment : BaseFragment<
     //endregion
 
     internal companion object {
+        /** 日記表示・編集画面からの遷移戻り時に、結果データを受け取るためのリクエストキー。 */
+        private const val RESULT_KEY_DIARY = "diary_result"
+
         /** 開始年月選択ダイアログの結果を受け取るためのキー。 */
         private const val RESULT_KEY_START_YEAR_MONTH_PICKER = "start_year_month_picker_result"
 

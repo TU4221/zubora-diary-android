@@ -7,12 +7,14 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavDirections
+import androidx.navigation.fragment.navArgs
 import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
-import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryShowNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -20,6 +22,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDate
+import kotlin.getValue
 
 /**
  * 日記の詳細情報を表示するフラグメント。
@@ -38,6 +41,13 @@ class DiaryShowFragment : BaseFragment<
         DummyNavBackDestination
 >() {
 
+    /** 画面遷移時に渡された引数。 */
+    private val navArgs: DiaryShowFragmentArgs by navArgs()
+
+    /** 画面遷移時に渡された引数（[navArgs]）に含まれるパラメータオブジェクトを取得する。 */
+    private val navParameters: DiaryShowScreenParameters
+        get() = navArgs.diaryShowScreenParameters
+
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -47,7 +57,7 @@ class DiaryShowFragment : BaseFragment<
 
     override val destinationId = R.id.navigation_diary_show_fragment
 
-    override val resultKey: String get() = RESULT_KEY
+    override val resultKey: String get() = navParameters.resultKey
     //endregion
 
     //region Fragment Lifecycle
@@ -170,10 +180,13 @@ class DiaryShowFragment : BaseFragment<
      * @param date 編集対象の日記の日付
      */
     private fun createDiaryEditFragmentNavDirections(id: String, date: LocalDate): NavDirections {
-        return DiaryShowFragmentDirections.actionNavigationDiaryShowFragmentToDiaryEditFragment(
-                id,
-                date
-            )
+        val args = DiaryEditScreenParameters(
+            navParameters.resultKey,
+            id,
+            date
+        )
+        return DiaryShowFragmentDirections
+            .actionNavigationDiaryShowFragmentToDiaryEditFragment(args)
     }
 
     /**
@@ -212,9 +225,6 @@ class DiaryShowFragment : BaseFragment<
     //endregion
 
     internal companion object {
-        /** このフラグメントから遷移元へ結果を返すためのキー。 */
-        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryShowFragment::class.java.name
-
         /** 日記読込失敗ダイアログの結果を受け取るためのキー。 */
         private const val RESULT_KEY_DIARY_LOAD_FAILURE = "diary_load_failure_result"
 

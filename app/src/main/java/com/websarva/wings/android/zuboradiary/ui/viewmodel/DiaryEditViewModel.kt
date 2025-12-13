@@ -45,6 +45,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragmentArgs
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionHistoryUi
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
@@ -159,9 +160,11 @@ class DiaryEditViewModel @Inject internal constructor(
     private fun initializeDiaryData() {
         // MEMO:下記条件はアプリ設定変更時のアプリ再起動時の不要初期化対策
         if (handle.contains(SAVED_STATE_UI_KEY)) return
-        val id = handle.get<String>(ARGUMENT_DIARY_ID_KEY)?.let { DiaryId(it) }
-        val date =
-            handle.get<LocalDate>(ARGUMENT_DIARY_DATE_KEY) ?: throw IllegalArgumentException()
+
+        val args = DiaryEditFragmentArgs.fromSavedStateHandle(handle)
+        val parameters = args.diaryEditScreenParameters
+        val id = parameters.diaryId?.let { DiaryId(it) }
+        val date = parameters.diaryDate
         launchWithUnexpectedErrorHandler {
             prepareDiaryEntry(
                 id,
@@ -2003,12 +2006,6 @@ class DiaryEditViewModel @Inject internal constructor(
     //endregion
 
     private companion object {
-        /** ナビゲーションコンポーネントで受け渡される日記IDのキー。 */
-        const val ARGUMENT_DIARY_ID_KEY = "diary_id"
-
-        /** ナビゲーションコンポーネントで受け渡される日記日付のキー。 */
-        const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
-
         /** SavedStateHandleにUI状態を保存するためのキー。 */
         const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }

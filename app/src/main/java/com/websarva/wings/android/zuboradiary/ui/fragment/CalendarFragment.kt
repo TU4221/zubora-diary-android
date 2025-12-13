@@ -24,6 +24,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomN
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.CalendarNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -101,32 +102,17 @@ class CalendarFragment :
 
     //region Fragment Result Observation Setup
     override fun setupFragmentResultObservers() {
-        observeDiaryShowFragmentResult()
-        observeDiaryEditFragmentResult()
+        observeDiaryFragmentResult()
     }
 
-    /** [DiaryShowFragment]からの結果を監視する。 */
-    private fun observeDiaryShowFragmentResult() {
+    /** 日記表示・編集画面からの結果を監視する。 */
+    private fun observeDiaryFragmentResult() {
         observeFragmentResult(
-            DiaryShowFragment.RESULT_KEY
+            RESULT_KEY_DIARY
         ) { result ->
             when (result) {
                 is FragmentResult.Some -> {
                     mainViewModel.onDiaryShowFragmentResultReceived(result.data)
-                }
-                is FragmentResult.None -> { /*処理なし*/ }
-            }
-        }
-    }
-
-    /** [DiaryEditFragment]からの結果を監視する。 */
-    private fun observeDiaryEditFragmentResult() {
-        observeFragmentResult(
-            DiaryEditFragment.RESULT_KEY
-        ) { result ->
-            when (result) {
-                is FragmentResult.Some -> {
-                    mainViewModel.onDiaryEditFragmentResultReceived(result.data)
                 }
                 is FragmentResult.None -> { /*処理なし*/ }
             }
@@ -626,8 +612,18 @@ class CalendarFragment :
      * @param date 対象の日付
      *  */
     private fun createDiaryEditFragmentNavDirections(id: String?, date: LocalDate): NavDirections {
+        val args = DiaryEditScreenParameters(
+            RESULT_KEY_DIARY,
+            id,
+            date
+        )
         return CalendarFragmentDirections
-                .actionNavigationCalendarFragmentToDiaryEditFragment(id, date)
+                .actionNavigationCalendarFragmentToDiaryEditFragment(args)
     }
     //endregion
+
+    internal companion object {
+        /** 日記表示・編集画面からの遷移戻り時に、結果データを受け取るためのリクエストキー。 */
+        private const val RESULT_KEY_DIARY = "diary_result"
+    }
 }

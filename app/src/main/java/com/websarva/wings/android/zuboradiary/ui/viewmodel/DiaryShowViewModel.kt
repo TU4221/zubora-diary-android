@@ -12,6 +12,7 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.Dia
 import com.websarva.wings.android.zuboradiary.ui.model.message.DiaryShowAppMessage
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowUiEvent
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragmentArgs
 import com.websarva.wings.android.zuboradiary.ui.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
@@ -82,8 +83,10 @@ class DiaryShowViewModel @Inject internal constructor(
 
     /** [SavedStateHandle]からIDと日付を取得し、日記データの初期化を開始する。 */
     private fun initializeDiaryData() {
-        val id = handle.get<String>(ARGUMENT_DIARY_ID_KEY)?.let { DiaryId(it) } ?: throw IllegalArgumentException()
-        val date = handle.get<LocalDate>(ARGUMENT_DIARY_DATE_KEY) ?: throw IllegalArgumentException()
+        val args = DiaryShowFragmentArgs.fromSavedStateHandle(handle)
+        val parameters = args.diaryShowScreenParameters
+        val id = DiaryId(checkNotNull(parameters.diaryId))
+        val date = parameters.diaryDate
         launchWithUnexpectedErrorHandler {
             loadDiary(id, date)
         }
@@ -474,12 +477,4 @@ class DiaryShowViewModel @Inject internal constructor(
         val date: LocalDate
     )
     //endregion
-
-    private companion object {
-        /** ナビゲーションコンポーネントで受け渡される日記IDのキー。 */
-        const val ARGUMENT_DIARY_ID_KEY = "diary_id"
-
-        /** ナビゲーションコンポーネントで受け渡される日記日付のキー。 */
-        const val ARGUMENT_DIARY_DATE_KEY = "diary_date"
-    }
 }

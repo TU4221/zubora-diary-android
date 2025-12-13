@@ -20,6 +20,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditU
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.common.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.common.InputTextValidation
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.DiaryItemTitleEditDialogArgs
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryItemTitleEditNavDestination
@@ -77,12 +78,11 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     private fun setupTitle() {
         if (handle.contains(SAVED_STATE_UI_KEY)) return
 
-        checkNotNull(
-            handle.get<DiaryItemTitleSelectionUi>(ARGUMENT_DIARY_ITEM_TITLE_KEY)
-        ).let {
-            updateItemNumber(it.itemNumber)
-            updateTitle(it.title)
-        }
+        val args = DiaryItemTitleEditDialogArgs.fromSavedStateHandle(handle)
+        val parameters = args.diaryItemTitleEditDialogParameters
+        val diaryItemTitleSelection = parameters.diaryItemTitleSelection
+        updateItemNumber(diaryItemTitleSelection.itemNumber)
+        updateTitle(diaryItemTitleSelection.title)
     }
 
     /** UI状態の監視を開始する。 */
@@ -457,9 +457,6 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
     //endregion
 
     private companion object {
-        /** ナビゲーションコンポーネントで受け渡される日記項目タイトル情報のキー。 */
-        const val ARGUMENT_DIARY_ITEM_TITLE_KEY = "diary_item_title"
-
         /** SavedStateHandleにUI状態を保存するためのキー。 */
         const val SAVED_STATE_UI_KEY = "saved_state_ui"
     }

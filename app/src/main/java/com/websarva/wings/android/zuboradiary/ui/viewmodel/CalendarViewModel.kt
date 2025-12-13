@@ -256,20 +256,11 @@ class CalendarViewModel @Inject internal constructor(
     }
 
     /**
-     * 日記表示画面から戻ってきた時に呼び出される事を想定。
+     * 日記表示・編集画面から戻ってきた時に呼び出される事を想定。
      * 選択された日付を更新する。
-     * @param date 日記表示画面の表示されていた日記の日付
+     * @param date 日記表示・編集画面の表示されていた日記の日付
      */
     internal fun onDiaryShowFragmentResultReceived(date: LocalDate) {
-        updateSelectedDate(date)
-    }
-
-    /**
-     * 日記編集画面から戻ってきた時に呼び出される事を想定。
-     * 選択された日付を更新する。
-     * @param date 日記編集画面の編集元日記の日付
-     */
-    internal fun onDiaryEditFragmentResultReceived(date: LocalDate) {
         updateSelectedDate(date)
     }
     //endregion

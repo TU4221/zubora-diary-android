@@ -23,23 +23,16 @@
                 android:id="@+id/action_navigation_diary_list_fragment_to_diary_show_fragment"
                 app:destination="@id/nested_navigation_diary_show">
                 <argument
-                    android:name="diary_id"
-                    app:argType="string" />
-                <argument
-                    android:name="diary_date"
-                    app:argType="java.time.LocalDate" />
+                    android:name="diary_show_screen_parameters"
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters" />
             </action>
 
             <action
                 android:id="@+id/action_navigation_diary_list_fragment_to_diary_edit_fragment"
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
-                    android:name="diary_id"
-                    app:argType="string"
-                    app:nullable="true" />
-                <argument
-                    android:name="diary_date"
-                    app:argType="java.time.LocalDate" />
+                    android:name="diary_edit_screen_parameters"
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters" />
             </action>
 
         </fragment>
@@ -53,11 +46,8 @@
                 android:id="@+id/action_navigation_word_search_fragment_to_diary_show_fragment"
                 app:destination="@id/nested_navigation_diary_show">
                 <argument
-                    android:name="diary_id"
-                    app:argType="string" />
-                <argument
-                    android:name="diary_date"
-                    app:argType="java.time.LocalDate" />
+                    android:name="diary_show_screen_parameters"
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters" />
             </action>
 
         </fragment>
@@ -78,12 +68,8 @@
                 android:id="@+id/action_navigation_calendar_fragment_to_diary_edit_fragment"
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
-                    android:name="diary_id"
-                    app:argType="string"
-                    app:nullable="true" />
-                <argument
-                    android:name="diary_date"
-                    app:argType="java.time.LocalDate" />
+                    android:name="diary_edit_screen_parameters"
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters" />
             </action>
 
         </fragment>
@@ -121,22 +107,15 @@
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment"
             tools:layout="@layout/fragment_diary_show" >
             <argument
-                android:name="diary_id"
-                app:argType="string" />
-            <argument
-                android:name="diary_date"
-                app:argType="java.time.LocalDate" />
+                android:name="diary_show_screen_parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters" />
 
             <action
                 android:id="@+id/action_navigation_diary_show_fragment_to_diary_edit_fragment"
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
-                    android:name="diary_id"
-                    app:argType="string"
-                    app:nullable="true" />
-                <argument
-                    android:name="diary_date"
-                    app:argType="java.time.LocalDate" />
+                    android:name="diary_edit_screen_parameters"
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters" />
             </action>
 
         </fragment>
@@ -153,41 +132,31 @@
             tools:layout="@layout/fragment_diary_edit"
             android:label="@string/title_settings" >
             <argument
-                android:name="diary_id"
-                app:argType="string"
-                app:nullable="true" />
-            <argument
-                android:name="diary_date"
-                app:argType="java.time.LocalDate" />
+                android:name="diary_edit_screen_parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters" />
 
             <action
                 android:id="@+id/action_diary_edit_fragment_to_diary_item_title_edit_dialog"
                 app:destination="@id/navigation_diary_item_title_edit_dialog"/>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pop_up_to_diary_show"
+                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pop_up_to_inclusive_diary_show"
                 app:destination="@id/nested_navigation_diary_show"
                 app:popUpTo="@id/navigation_diary_show_fragment"
                 app:popUpToInclusive="true">
                 <argument
-                    android:name="diary_id"
-                    app:argType="string" />
-                <argument
-                    android:name="diary_date"
-                    app:argType="java.time.LocalDate" />
+                    android:name="diary_show_screen_parameters"
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters" />
             </action>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pop_up_to_diary_edit"
+                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pop_up_to_inclusive_diary_edit"
                 app:destination="@id/nested_navigation_diary_show"
                 app:popUpTo="@id/navigation_diary_edit_fragment"
                 app:popUpToInclusive="true">
                 <argument
-                    android:name="diary_id"
-                    app:argType="string" />
-                <argument
-                    android:name="diary_date"
-                    app:argType="java.time.LocalDate" />
+                    android:name="diary_show_screen_parameters"
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters" />
             </action>
 
         </fragment>
@@ -197,8 +166,8 @@
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.DiaryItemTitleEditDialog"
             tools:layout="@layout/dialog_diary_item_title_edit" >
             <argument
-                android:name="diary_item_title"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi" />
+                android:name="diary_item_title_edit_dialog_parameters"
+                app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryItemTitleEditDialogParameters" />
 
         </dialog>
 

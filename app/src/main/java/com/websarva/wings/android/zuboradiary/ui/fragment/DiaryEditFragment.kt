@@ -15,14 +15,13 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBinding
-import com.websarva.wings.android.zuboradiary.ui.RESULT_KEY_PREFIX
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.DiaryItemTitleEditDialog
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -33,6 +32,9 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.DatePickerArgs
 import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryItemTitleEditDialogParameters
+import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryEditNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryEditNavDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -42,6 +44,7 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.time.LocalDate
 import kotlin.collections.map
+import kotlin.getValue
 
 /**
  * 日記の作成、編集を行うフラグメント。
@@ -60,6 +63,13 @@ class DiaryEditFragment : BaseFragment<
         DiaryEditNavBackDestination
 >() {
 
+    /** 画面遷移時に渡された引数。 */
+    private val navArgs: DiaryEditFragmentArgs by navArgs()
+
+    /** 画面遷移時に渡された引数（[navArgs]）に含まれるパラメータオブジェクトを取得する。 */
+    private val navParameters: DiaryEditScreenParameters
+        get() = navArgs.diaryEditScreenParameters
+
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -69,7 +79,7 @@ class DiaryEditFragment : BaseFragment<
 
     override val destinationId = R.id.navigation_diary_edit_fragment
 
-    override val resultKey: String get() = RESULT_KEY
+    override val resultKey: String get() = navParameters.resultKey
 
     /** 日記項目レイアウトのトランジションアニメーション時間(ms)。 */
     private val motionLayoutTransitionTime = 500 /*ms*/
@@ -165,7 +175,7 @@ class DiaryEditFragment : BaseFragment<
     /** 日記項目タイトル編集ダイアログからの結果を監視する。 */
     private fun observeDiaryItemTitleEditDialogResult() {
         observeFragmentResult(
-            DiaryItemTitleEditDialog.RESULT_KEY
+            RESULT_KEY_DIARY_ITEM_TITLE_EDIT
         ) { result ->
             when (result) {
                 is FragmentResult.Some -> {
@@ -947,12 +957,17 @@ class DiaryEditFragment : BaseFragment<
                 false
             }
 
+        val args = DiaryShowScreenParameters(
+            navParameters.resultKey,
+            id,
+            date
+        )
         return if (containsDiaryShowFragment) {
             DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryShow(id, date)
+                .actionDiaryEditFragmentToDiaryShowFragmentPopUpToInclusiveDiaryShow(args)
         } else {
             DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryShowFragmentPopUpToDiaryEdit(id, date)
+                .actionDiaryEditFragmentToDiaryShowFragmentPopUpToInclusiveDiaryEdit(args)
         }
     }
 
@@ -964,9 +979,12 @@ class DiaryEditFragment : BaseFragment<
     private fun createDiaryItemTitleEditDialogNavDirections(
         diaryItemTitleSelection: DiaryItemTitleSelectionUi
     ): NavDirections {
-        return DiaryEditFragmentDirections.actionDiaryEditFragmentToDiaryItemTitleEditDialog(
-                diaryItemTitleSelection
-            )
+        val args = DiaryItemTitleEditDialogParameters(
+            RESULT_KEY_DIARY_ITEM_TITLE_EDIT,
+            diaryItemTitleSelection
+        )
+        return DiaryEditFragmentDirections
+            .actionDiaryEditFragmentToDiaryItemTitleEditDialog(args)
     }
 
     /**
@@ -1114,9 +1132,8 @@ class DiaryEditFragment : BaseFragment<
     //endregion
 
     internal companion object {
-
-        /** このフラグメントから遷移元へ結果を返すためのキー。 */
-        val RESULT_KEY = RESULT_KEY_PREFIX + DiaryEditFragment::class.java.name
+        /** 日記項目タイトル編集画面から結果を受け取るためのキー。 */
+        private const val RESULT_KEY_DIARY_ITEM_TITLE_EDIT = "diary_item_title_edit_result"
 
         /** 既存日記読込の確認ダイアログの結果を受け取るためのキー。 */
         private const val RESULT_KEY_DIARY_LOAD_CONFIRMATION = "diary_load_confirmation_result"
