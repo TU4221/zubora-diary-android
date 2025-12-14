@@ -13,7 +13,7 @@ import kotlinx.parcelize.Parcelize
  * @property diaryItemTitleSelection 日記項目のタイトル編集対象データ。
  */
 @Parcelize
-data class DiaryItemTitleEditDialogParameters(
+data class DiaryItemTitleEditDialogParams(
     val resultKey: String,
     val diaryItemTitleSelection: DiaryItemTitleSelectionUi,
 ) : Parcelable

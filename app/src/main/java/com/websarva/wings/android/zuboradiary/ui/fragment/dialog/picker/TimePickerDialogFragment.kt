@@ -12,7 +12,6 @@ import com.websarva.wings.android.zuboradiary.ui.utils.timePickerDialogThemeResI
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.TimePickerArgs
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalTime
@@ -20,7 +19,7 @@ import kotlin.getValue
 
 /**
  * アプリ内で共通して使用される、[MaterialTimePicker]を使用した時刻選択ダイアログ。
- * 最初に表示する日付は [TimePickerArgs] を通じて外部から注入される。
+ * 最初に表示する日付は Navigation Component の引数を通じて外部から注入される。
  *
  * 以下の責務を持つ:
  * - [MaterialTimePicker]のセットアップと表示
@@ -31,11 +30,8 @@ import kotlin.getValue
 @AndroidEntryPoint
 class TimePickerDialogFragment : DialogFragment() {
 
-    /** ナビゲーション引数。 */
+    /** 画面遷移時に渡された引数。 */
     private val navArgs: TimePickerDialogFragmentArgs by navArgs()
-
-    /** [navArgs]から取り出した、ダイアログの表示内容を定義する引数。 */
-    private val timePickerArgs: TimePickerArgs get() = navArgs.timePickerArgs
 
     /** [MainActivity]から取得する現在のテーマカラー。 */
     private val themeColor
@@ -63,7 +59,7 @@ class TimePickerDialogFragment : DialogFragment() {
      */
     private fun createTimePickerDialog(dummyDialog: Dialog): MaterialTimePicker {
         val themeResId = themeColor.timePickerDialogThemeResId
-        val initialTime = timePickerArgs.initialTime
+        val initialTime = navArgs.params.initialTime
 
         val timePicker =
             MaterialTimePicker.Builder()
@@ -92,19 +88,19 @@ class TimePickerDialogFragment : DialogFragment() {
             val selectedHour = timePicker.hour
             val selectedMinute = timePicker.minute
             val selectedTime = LocalTime.of(selectedHour, selectedMinute)
-            setResult(timePickerArgs.resultKey, DialogResult.Positive(selectedTime))
+            setResult(navArgs.params.resultKey, DialogResult.Positive(selectedTime))
             dummyDialog.dismiss()
         }
 
         timePicker.addOnNegativeButtonClickListener {
             Log.d(logTag, "onClick()_NegativeButton")
-            setResult(timePickerArgs.resultKey, DialogResult.Negative)
+            setResult(navArgs.params.resultKey, DialogResult.Negative)
             dummyDialog.dismiss()
         }
 
         timePicker.addOnCancelListener {
             Log.d(logTag, "onCancel()")
-            setResult(timePickerArgs.resultKey, DialogResult.Cancel)
+            setResult(navArgs.params.resultKey, DialogResult.Cancel)
             dummyDialog.dismiss()
         }
     }

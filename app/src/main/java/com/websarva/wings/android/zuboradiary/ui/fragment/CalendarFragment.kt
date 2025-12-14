@@ -24,7 +24,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomN
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.CalendarNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
@@ -612,13 +612,13 @@ class CalendarFragment :
      * @param date 対象の日付
      *  */
     private fun createDiaryEditFragmentNavDirections(id: String?, date: LocalDate): NavDirections {
-        val args = DiaryEditScreenParameters(
+        val params = DiaryEditScreenParams(
             RESULT_KEY_DIARY,
             id,
             date
         )
         return CalendarFragmentDirections
-                .actionNavigationCalendarFragmentToDiaryEditFragment(args)
+                .actionNavigationCalendarFragmentToDiaryEditFragment(params)
     }
     //endregion
 

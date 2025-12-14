@@ -16,8 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditVie
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.DiaryItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.SwipeSimpleInteractionHelper
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryItemTitleEditDialogParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryItemTitleEditNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -47,10 +46,6 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<
     /** 画面遷移時に渡された引数。 */
     private val navArgs: DiaryItemTitleEditDialogArgs by navArgs()
 
-    /** 画面遷移時に渡された引数（[navArgs]）に含まれるパラメータオブジェクトを取得する。 */
-    private val navParameters: DiaryItemTitleEditDialogParameters
-        get() = navArgs.diaryItemTitleEditDialogParameters
-
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -60,7 +55,7 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<
 
     override val destinationId = R.id.navigation_diary_item_title_edit_dialog
 
-    override val resultKey: String get() = navParameters.resultKey
+    override val resultKey: String get() = navArgs.params.resultKey
 
     /** 項目タイトル選択履歴を表示するためのRecyclerViewアダプター。 */
     private var selectionHistoryListAdapter: DiaryItemTitleSelectionHistoryListAdapter? = null
@@ -202,7 +197,7 @@ class DiaryItemTitleEditDialog : BaseFullScreenDialogFragment<
      * @param itemTitle 削除対象の項目タイトル
      */
     private fun createTitleSelectionHistoryDeleteDialogNavDirections(itemTitle: String): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val args = ConfirmationDialogParams(
             resultKey = RESULT_KEY_TITLE_SELECTION_HISTORY_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_item_title_history_delete_title,
             messageText = getString(

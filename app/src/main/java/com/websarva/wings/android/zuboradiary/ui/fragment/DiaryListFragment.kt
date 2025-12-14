@@ -20,11 +20,11 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryListUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogParams
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParams
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickerConfig
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersDialogParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersResult
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryListNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
@@ -320,13 +320,13 @@ class DiaryListFragment : BaseFragment<
      * @param date 対象の日付
      *  */
     private fun createDiaryEditFragmentNavDirections(id: String?, date: LocalDate): NavDirections {
-        val args = DiaryEditScreenParameters(
+        val params = DiaryEditScreenParams(
             RESULT_KEY_DIARY,
             id,
             date
         )
         return DiaryListFragmentDirections
-                .actionNavigationDiaryListFragmentToDiaryEditFragment(args)
+                .actionNavigationDiaryListFragmentToDiaryEditFragment(params)
     }
 
     /**
@@ -336,13 +336,13 @@ class DiaryListFragment : BaseFragment<
      * @param date 対象の日付
      * */
     private fun createDiaryShowFragmentNavDirections(id: String, date: LocalDate): NavDirections {
-        val args = DiaryShowScreenParameters(
+        val params = DiaryShowScreenParams(
             RESULT_KEY_DIARY,
             id,
             date
         )
         return DiaryListFragmentDirections
-            .actionNavigationDiaryListFragmentToDiaryShowFragment(args)
+            .actionNavigationDiaryListFragmentToDiaryShowFragment(params)
     }
 
     /** ワード検索画面へ遷移する為の [NavDirections] オブジェクトを生成する。 */
@@ -360,7 +360,7 @@ class DiaryListFragment : BaseFragment<
                 Year.of(it)
             }
 
-        val args = ListPickersArgs(
+        val params = ListPickersDialogParams(
             resultKey = RESULT_KEY_START_YEAR_MONTH_PICKER,
             pickerConfigs = listOf(
                 ListPickerConfig(
@@ -373,12 +373,12 @@ class DiaryListFragment : BaseFragment<
                 )
             )
         )
-        return MobileNavigationDirections.actionGlobalToListPickersDialog(args)
+        return MobileNavigationDirections.actionGlobalToListPickersDialog(params)
     }
 
     /** 日記削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
     private fun createDiaryDeleteDialogNavDirections(date: LocalDate): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_DIARY_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_delete_title,
             messageText = getString(
@@ -386,7 +386,7 @@ class DiaryListFragment : BaseFragment<
                 date.formatDateString(requireContext())
             )
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
     //endregion
 

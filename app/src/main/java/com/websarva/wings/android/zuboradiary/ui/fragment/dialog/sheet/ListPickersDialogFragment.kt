@@ -15,7 +15,6 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceVariantColorIn
 import com.websarva.wings.android.zuboradiary.ui.utils.numberPickerBottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersArgs
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import kotlin.getValue
@@ -23,7 +22,7 @@ import kotlin.getValue
 /**
  * アプリ内で共通して使用される、
  * 汎用的な複数のドラムロールピッカー([NumberPicker])を動的に表示するボトムシートダイアログ。
- * 表示する内容は [ListPickersArgs] を通じて外部から注入される。
+ * 表示する内容は Navigation Component の引数を通じて外部から注入される。
  *
  * 以下の責務を持つ:
  * - [BaseBottomSheetDialogFragment]の機能の継承
@@ -34,11 +33,8 @@ import kotlin.getValue
 class ListPickersDialogFragment
     : BaseBottomSheetDialogFragment<DialogNumberPickersBinding>() {
 
-    /** ナビゲーション引数。 */
+    /** 画面遷移時に渡された引数。 */
     private val navArgs: ListPickersDialogFragmentArgs by navArgs()
-
-    /** [navArgs]から取り出した、ダイアログの表示内容を定義する引数。 */
-    private val listPickersArgs: ListPickersArgs get() = navArgs.listPickersArgs
 
     /** 追加処理として、ボタンのリスナー設定とNumberPickerの初期化を行う。 */
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -53,13 +49,13 @@ class ListPickersDialogFragment
                         numberPickerSecond.value,
                         numberPickerThird.value
                     )
-                setResult(listPickersArgs.resultKey, DialogResult.Positive(result))
+                setResult(navArgs.params.resultKey, DialogResult.Positive(result))
                 navigatePreviousFragment()
             }
 
             buttonCancel.setOnClickListener {
                 Log.d(logTag, "onClick()_NegativeButton")
-                setResult(listPickersArgs.resultKey, DialogResult.Negative)
+                setResult(navArgs.params.resultKey, DialogResult.Negative)
                 navigatePreviousFragment()
             }
         }
@@ -96,7 +92,7 @@ class ListPickersDialogFragment
     }
 
     override fun handleOnCancel() {
-        setResult(listPickersArgs.resultKey, DialogResult.Cancel)
+        setResult(navArgs.params.resultKey, DialogResult.Cancel)
     }
 
     /**
@@ -127,7 +123,7 @@ class ListPickersDialogFragment
             )
 
         pickers.forEachIndexed { index, picker ->
-            val config = listPickersArgs.pickerConfigs.getOrNull(index)
+            val config = navArgs.params.pickerConfigs.getOrNull(index)
             if (config != null) {
                 picker.apply {
                     visibility = View.VISIBLE

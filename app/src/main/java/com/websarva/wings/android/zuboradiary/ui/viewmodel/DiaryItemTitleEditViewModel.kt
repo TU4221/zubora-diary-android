@@ -79,8 +79,7 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         if (handle.contains(SAVED_STATE_UI_KEY)) return
 
         val args = DiaryItemTitleEditDialogArgs.fromSavedStateHandle(handle)
-        val parameters = args.diaryItemTitleEditDialogParameters
-        val diaryItemTitleSelection = parameters.diaryItemTitleSelection
+        val diaryItemTitleSelection = args.params.diaryItemTitleSelection
         updateItemNumber(diaryItemTitleSelection.itemNumber)
         updateTitle(diaryItemTitleSelection.title)
     }

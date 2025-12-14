@@ -2,11 +2,12 @@ package com.websarva.wings.android.zuboradiary.ui.navigation.params
 
 import android.os.Parcelable
 import androidx.annotation.StringRes
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment
 import kotlinx.parcelize.Parcelize
 
 /**
- * 汎用的な確認ダイアログ（[ConfirmationDialogFragment]）に渡すための引数モデル。
+ * 汎用的な確認ダイアログへの遷移時に渡すパラメータ。
+ *
+ * Navigation Componentの引数として使用されることを想定している。
  *
  * @property resultKey ダイアログの結果を返すためのユニークなキー。
  * @property titleText ダイアログのタイトルとして表示する文字列。`titleRes`よりも優先される。
@@ -15,7 +16,7 @@ import kotlinx.parcelize.Parcelize
  * @property messageRes ダイアログのメッセージとして表示する文字列リソースのID。
  */
 @Parcelize
-data class ConfirmationDialogArgs(
+data class ConfirmationDialogParams(
     val resultKey: String,
     val titleText: String? = null,
     @param:StringRes val titleRes: Int? = null,

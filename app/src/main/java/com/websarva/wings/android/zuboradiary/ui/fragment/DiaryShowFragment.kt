@@ -12,9 +12,8 @@ import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowUiEvent
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogParams
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryShowNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -44,10 +43,6 @@ class DiaryShowFragment : BaseFragment<
     /** 画面遷移時に渡された引数。 */
     private val navArgs: DiaryShowFragmentArgs by navArgs()
 
-    /** 画面遷移時に渡された引数（[navArgs]）に含まれるパラメータオブジェクトを取得する。 */
-    private val navParameters: DiaryShowScreenParameters
-        get() = navArgs.diaryShowScreenParameters
-
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -57,7 +52,7 @@ class DiaryShowFragment : BaseFragment<
 
     override val destinationId = R.id.navigation_diary_show_fragment
 
-    override val resultKey: String get() = navParameters.resultKey
+    override val resultKey: String get() = navArgs.params.resultKey
     //endregion
 
     //region Fragment Lifecycle
@@ -180,13 +175,13 @@ class DiaryShowFragment : BaseFragment<
      * @param date 編集対象の日記の日付
      */
     private fun createDiaryEditFragmentNavDirections(id: String, date: LocalDate): NavDirections {
-        val args = DiaryEditScreenParameters(
-            navParameters.resultKey,
+        val params = DiaryEditScreenParams(
+            navArgs.params.resultKey,
             id,
             date
         )
         return DiaryShowFragmentDirections
-            .actionNavigationDiaryShowFragmentToDiaryEditFragment(args)
+            .actionNavigationDiaryShowFragmentToDiaryEditFragment(params)
     }
 
     /**
@@ -195,7 +190,7 @@ class DiaryShowFragment : BaseFragment<
      * @param date 読み込みに失敗した日記の日付
      */
     private fun createDiaryLoadFailureDialogNavDirections(date: LocalDate): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_DIARY_LOAD_FAILURE,
             titleRes = R.string.dialog_diary_load_failure_title,
             messageText = getString(
@@ -203,7 +198,7 @@ class DiaryShowFragment : BaseFragment<
                 date.formatDateString(requireContext())
             )
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /**
@@ -212,7 +207,7 @@ class DiaryShowFragment : BaseFragment<
      * @param date 削除対象の日記の日付
      */
     private fun createDiaryDeleteDialogNavDirections(date: LocalDate): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_DIARY_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_delete_title,
             messageText = getString(
@@ -220,7 +215,7 @@ class DiaryShowFragment : BaseFragment<
                 date.formatDateString(requireContext())
             )
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
     //endregion
 

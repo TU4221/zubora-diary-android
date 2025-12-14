@@ -162,9 +162,8 @@ class DiaryEditViewModel @Inject internal constructor(
         if (handle.contains(SAVED_STATE_UI_KEY)) return
 
         val args = DiaryEditFragmentArgs.fromSavedStateHandle(handle)
-        val parameters = args.diaryEditScreenParameters
-        val id = parameters.diaryId?.let { DiaryId(it) }
-        val date = parameters.diaryDate
+        val id = args.params.diaryId?.let { DiaryId(it) }
+        val date = args.params.diaryDate
         launchWithUnexpectedErrorHandler {
             prepareDiaryEntry(
                 id,

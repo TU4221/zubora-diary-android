@@ -25,11 +25,11 @@ import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickerConfig
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersDialogParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersResult
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.TimePickerArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.TimePickerDialogParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.SettingsNavDestination
 import com.websarva.wings.android.zuboradiary.ui.utils.asCalendarStartDayOfWeekString
@@ -511,7 +511,7 @@ class SettingsFragment : BaseFragment<
         }
         val currentThemeColorString = themeColor.asString(requireContext())
 
-        val args = ListPickersArgs(
+        val params = ListPickersDialogParams(
             resultKey = RESULT_KEY_THEME_COLOR_SETTING,
             pickerConfigs = listOf(
                 ListPickerConfig(
@@ -520,7 +520,7 @@ class SettingsFragment : BaseFragment<
                 )
             )
         )
-        return MobileNavigationDirections.actionGlobalToListPickersDialog(args)
+        return MobileNavigationDirections.actionGlobalToListPickersDialog(params)
     }
 
     /**
@@ -535,7 +535,7 @@ class SettingsFragment : BaseFragment<
             }
         val currentDayOfWeekString = dayOfWeek.asCalendarStartDayOfWeekString(requireContext())
 
-        val args = ListPickersArgs(
+        val params = ListPickersDialogParams(
             resultKey = RESULT_KEY_CALENDAR_START_DAY_SETTING,
             pickerConfigs = listOf(
                 ListPickerConfig(
@@ -544,21 +544,21 @@ class SettingsFragment : BaseFragment<
                 )
             )
         )
-        return MobileNavigationDirections.actionGlobalToListPickersDialog(args)
+        return MobileNavigationDirections.actionGlobalToListPickersDialog(params)
     }
 
     /** リマインダー通知時間選択ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
     private fun createReminderNotificationTimePickerDialogNavDirections(): NavDirections {
-        val args = TimePickerArgs(
+        val params = TimePickerDialogParams(
             resultKey = RESULT_KEY_POST_REMINDER_NOTIFICATION_TIME_SELECTION,
             initialTime = LocalTime.now()
         )
-        return MobileNavigationDirections.actionGlobalToTimePickerDialog(args)
+        return MobileNavigationDirections.actionGlobalToTimePickerDialog(params)
     }
 
     /** 通知権限要求の理由説明ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
     private fun createPostNotificationsPermissionRationaleDialogNavDirections(): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_POST_NOTIFICATIONS_PERMISSION_RATIONALE,
             titleRes = R.string.dialog_permission_title,
             messageText = getString(
@@ -566,12 +566,12 @@ class SettingsFragment : BaseFragment<
                 getString(R.string.dialog_permission_name_notification)
             )
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /** 位置情報権限要求の理由説明ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
     private fun createAccessLocationPermissionRationaleDialogNavDirections(): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_ACCESS_LOCATION_PERMISSION_RATIONALE,
             titleRes = R.string.dialog_permission_title,
             messageText = getString(
@@ -579,37 +579,37 @@ class SettingsFragment : BaseFragment<
                 getString(R.string.dialog_permission_name_location)
             )
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /** 全日記削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
     private fun createAllDiariesDeleteDialogNavDirections(): NavDirections{
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_ALL_DIARIES_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_all_diaries_delete_title,
             messageRes = R.string.dialog_all_diaries_delete_message
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /** 全設定初期化確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
     private fun createAllSettingsInitializationDialogNavDirections(): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_ALL_SETTINGS_INITIALIZATION_CONFIRMATION,
             titleRes = R.string.dialog_all_settings_initialization_title,
             messageRes = R.string.dialog_all_settings_initialization_message
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /** 全データ削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
     private fun createAllDataDeleteDialogNavDirections(): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_ALL_DATA_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_all_data_delete_title,
             messageRes = R.string.dialog_all_data_delete_message
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /** OSSライセンスダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */

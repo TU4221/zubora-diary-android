@@ -14,7 +14,7 @@ import java.time.LocalDate
  * @property diaryDate 表示対象の日記の日付。
  */
 @Parcelize
-data class DiaryShowScreenParameters(
+data class DiaryShowScreenParams(
     val resultKey: String,
     val diaryId: String,
     val diaryDate: LocalDate,

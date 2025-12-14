@@ -30,11 +30,10 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DatePickerArgs
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryItemTitleEditDialogParameters
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DatePickerDialogParams
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogParams
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryItemTitleEditDialogParams
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryEditNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryEditNavDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -66,10 +65,6 @@ class DiaryEditFragment : BaseFragment<
     /** 画面遷移時に渡された引数。 */
     private val navArgs: DiaryEditFragmentArgs by navArgs()
 
-    /** 画面遷移時に渡された引数（[navArgs]）に含まれるパラメータオブジェクトを取得する。 */
-    private val navParameters: DiaryEditScreenParameters
-        get() = navArgs.diaryEditScreenParameters
-
     //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
@@ -79,7 +74,7 @@ class DiaryEditFragment : BaseFragment<
 
     override val destinationId = R.id.navigation_diary_edit_fragment
 
-    override val resultKey: String get() = navParameters.resultKey
+    override val resultKey: String get() = navArgs.params.resultKey
 
     /** 日記項目レイアウトのトランジションアニメーション時間(ms)。 */
     private val motionLayoutTransitionTime = 500 /*ms*/
@@ -964,17 +959,17 @@ class DiaryEditFragment : BaseFragment<
                 false
             }
 
-        val args = DiaryShowScreenParameters(
-            navParameters.resultKey,
+        val params = DiaryShowScreenParams(
+            navArgs.params.resultKey,
             id,
             date
         )
         return if (containsDiaryShowFragment) {
             DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryShowFragmentPopUpToInclusiveDiaryShow(args)
+                .actionDiaryEditFragmentToDiaryShowFragmentPopUpToInclusiveDiaryShow(params)
         } else {
             DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryShowFragmentPopUpToInclusiveDiaryEdit(args)
+                .actionDiaryEditFragmentToDiaryShowFragmentPopUpToInclusiveDiaryEdit(params)
         }
     }
 
@@ -986,12 +981,12 @@ class DiaryEditFragment : BaseFragment<
     private fun createDiaryItemTitleEditDialogNavDirections(
         diaryItemTitleSelection: DiaryItemTitleSelectionUi
     ): NavDirections {
-        val args = DiaryItemTitleEditDialogParameters(
+        val params = DiaryItemTitleEditDialogParams(
             RESULT_KEY_DIARY_ITEM_TITLE_EDIT,
             diaryItemTitleSelection
         )
         return DiaryEditFragmentDirections
-            .actionDiaryEditFragmentToDiaryItemTitleEditDialog(args)
+            .actionDiaryEditFragmentToDiaryItemTitleEditDialog(params)
     }
 
     /**
@@ -1000,7 +995,7 @@ class DiaryEditFragment : BaseFragment<
      * @param date 読み込む日記の日付
      */
     private fun createDiaryLoadDialogNavDirections(date: LocalDate): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_DIARY_LOAD_CONFIRMATION,
             titleRes = R.string.dialog_diary_load_title,
             messageText = getString(
@@ -1008,7 +1003,7 @@ class DiaryEditFragment : BaseFragment<
                 date.formatDateString(requireContext())
             )
         )
-        return  MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return  MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /**
@@ -1017,7 +1012,7 @@ class DiaryEditFragment : BaseFragment<
      * @param date 読み込みに失敗した日記の日付
      */
     private fun createDiaryLoadFailureDialogNavDirections(date: LocalDate): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_DIARY_LOAD_FAILURE,
             titleRes = R.string.dialog_diary_load_failure_title,
             messageText = getString(
@@ -1025,7 +1020,7 @@ class DiaryEditFragment : BaseFragment<
                 date.formatDateString(requireContext())
             )
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /**
@@ -1034,7 +1029,7 @@ class DiaryEditFragment : BaseFragment<
      * @param date 上書きする日記の日付
      */
     private fun createDiaryUpdateDialogNavDirections(date: LocalDate): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_DIARY_UPDATE_CONFIRMATION,
             titleRes = R.string.dialog_diary_update_title,
             messageText = getString(
@@ -1042,7 +1037,7 @@ class DiaryEditFragment : BaseFragment<
                 date.formatDateString(requireContext())
             )
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /**
@@ -1051,7 +1046,7 @@ class DiaryEditFragment : BaseFragment<
      * @param date 削除する日記の日付
      */
     private fun createDiaryDeleteDialogNavDirections(date: LocalDate): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_DIARY_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_delete_title,
             messageText = getString(
@@ -1059,7 +1054,7 @@ class DiaryEditFragment : BaseFragment<
                 date.formatDateString(requireContext())
             )
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /**
@@ -1068,11 +1063,11 @@ class DiaryEditFragment : BaseFragment<
      * @param date 初期選択されている日付
      */
     private fun createDatePickerDialogNavDirections(date: LocalDate): NavDirections {
-        val args = DatePickerArgs(
+        val params = DatePickerDialogParams(
             resultKey = RESULT_KEY_DATE_SELECTION,
             initialDate = date
         )
-        return MobileNavigationDirections.actionGlobalToDatePickerDialog(args)
+        return MobileNavigationDirections.actionGlobalToDatePickerDialog(params)
     }
 
     /**
@@ -1081,7 +1076,7 @@ class DiaryEditFragment : BaseFragment<
      * @param date 天気情報を取得する日付
      */
     private fun createWeatherInfoFetchDialogNavDirections(date: LocalDate): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_WEATHER_INFO_FETCH,
             titleRes = R.string.dialog_weather_info_fetch_title,
             messageText = getString(
@@ -1089,7 +1084,7 @@ class DiaryEditFragment : BaseFragment<
                 date.formatDateString(requireContext())
             )
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /**
@@ -1098,7 +1093,7 @@ class DiaryEditFragment : BaseFragment<
      * @param itemNumber 削除する項目の番号
      */
     private fun createDiaryItemDeleteDialogNavDirections(itemNumber: Int): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_DIARY_ITEM_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_item_delete_title,
             messageText = getString(
@@ -1106,27 +1101,27 @@ class DiaryEditFragment : BaseFragment<
                 itemNumber.toString()
             )
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /** 添付画像削除確認ダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
     private fun createDiaryImageDeleteDialogNavDirections(): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_DIARY_IMAGE_DELETE_CONFIRMATION,
             titleRes = R.string.dialog_diary_attached_image_delete_title,
             messageRes = R.string.dialog_diary_attached_image_delete_message
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
 
     /** 日記を保存せずに終了することを確認するダイアログへ遷移する為の [NavDirections] オブジェクトを生成する。 */
     private fun createExitWithoutDiarySaveDialogNavDirections(): NavDirections {
-        val args = ConfirmationDialogArgs(
+        val params = ConfirmationDialogParams(
             resultKey = RESULT_KEY_EXIT_WITHOUT_SAVE_CONFIRMATION,
             titleRes = R.string.dialog_exit_without_diary_save_title,
             messageRes = R.string.dialog_exit_without_diary_save_message
         )
-        return MobileNavigationDirections.actionGlobalToConfirmationDialog(args)
+        return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
     //endregion
 

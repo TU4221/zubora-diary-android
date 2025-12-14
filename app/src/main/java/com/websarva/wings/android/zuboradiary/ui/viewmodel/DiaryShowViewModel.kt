@@ -84,9 +84,8 @@ class DiaryShowViewModel @Inject internal constructor(
     /** [SavedStateHandle]からIDと日付を取得し、日記データの初期化を開始する。 */
     private fun initializeDiaryData() {
         val args = DiaryShowFragmentArgs.fromSavedStateHandle(handle)
-        val parameters = args.diaryShowScreenParameters
-        val id = DiaryId(checkNotNull(parameters.diaryId))
-        val date = parameters.diaryDate
+        val id = DiaryId(checkNotNull(args.params.diaryId))
+        val date = args.params.diaryDate
         launchWithUnexpectedErrorHandler {
             loadDiary(id, date)
         }

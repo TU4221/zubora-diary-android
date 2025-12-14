@@ -10,7 +10,6 @@ import com.websarva.wings.android.zuboradiary.ui.utils.datePickerDialogThemeResI
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.DatePickerArgs
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import java.time.Instant
 import java.time.LocalDate
@@ -20,7 +19,7 @@ import kotlin.getValue
 
 /**
  * アプリ内で共通して使用される、[MaterialDatePicker]を使用した日付選択ダイアログ。
- * 最初に表示する日付は [DatePickerArgs] を通じて外部から注入される。
+ * 最初に表示する日付は Navigation Component の引数を通じて外部から注入される。
  *
  * 以下の責務を持つ:
  * - [MaterialDatePicker]のセットアップと表示
@@ -30,11 +29,8 @@ import kotlin.getValue
  */
 class DatePickerDialogFragment : DialogFragment() {
 
-    /** ナビゲーション引数。 */
+    /** 画面遷移時に渡された引数。 */
     private val navArgs: DatePickerDialogFragmentArgs by navArgs()
-
-    /** [navArgs]から取り出した、ダイアログの表示内容を定義する引数。 */
-    private val datePickerArgs: DatePickerArgs get() = navArgs.datePickerArgs
 
     /** [MainActivity]から取得する現在のテーマカラー。 */
     private val themeColor
@@ -66,7 +62,7 @@ class DatePickerDialogFragment : DialogFragment() {
         val themeResId = themeColor.datePickerDialogThemeResId
         builder.setTheme(themeResId)
 
-        val initialDate = datePickerArgs.initialDate
+        val initialDate = navArgs.params.initialDate
         // MEMO：MaterialDatePickerはUTC基準の為UTC基準で変換
         val initialEpochMilli =
             initialDate
@@ -94,19 +90,19 @@ class DatePickerDialogFragment : DialogFragment() {
             // 選択日付型変換(EpochMilli -> LocalDate)
             val instant = Instant.ofEpochMilli(selection)
             val selectedDate = LocalDate.ofInstant(instant, ZoneId.systemDefault())
-            setResult(datePickerArgs.resultKey, DialogResult.Positive(selectedDate))
+            setResult(navArgs.params.resultKey, DialogResult.Positive(selectedDate))
             dummyDialog.dismiss()
         }
 
         datePicker.addOnNegativeButtonClickListener {
             Log.d(logTag, "onClick()_NegativeButton")
-            setResult(datePickerArgs.resultKey, DialogResult.Negative)
+            setResult(navArgs.params.resultKey, DialogResult.Negative)
             dummyDialog.dismiss()
         }
 
         datePicker.addOnCancelListener {
             Log.d(logTag, "onCancel()")
-            setResult(datePickerArgs.resultKey, DialogResult.Cancel)
+            setResult(navArgs.params.resultKey, DialogResult.Cancel)
             dummyDialog.dismiss()
         }
     }
