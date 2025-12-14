@@ -72,7 +72,7 @@ class FragmentNavigationEventHelper {
                         previousBackStackEntry.savedStateHandle[resultKey] =
                             FragmentResult.Some(event.resultData)
                     }
-                    navController.popBackStack(navDestinationId, event.inclusive)
+                    navController.popBackStack(navDestinationId, false)
                 }
             }
         }

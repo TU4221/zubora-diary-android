@@ -1071,7 +1071,7 @@ class DiaryEditViewModel @Inject internal constructor(
                     NavigationEvent.Back(
                         NavigationEvent.Policy.Retry,
                         date,
-                        DiaryEditNavBackDestination.SelectedTabScreen
+                        DiaryEditNavBackDestination.ExitDiaryFlow
                     )
                 )
             }

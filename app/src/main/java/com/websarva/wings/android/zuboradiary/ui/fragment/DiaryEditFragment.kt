@@ -929,14 +929,21 @@ class DiaryEditFragment : BaseFragment<
 
     override fun toNavDestinationId(destination: DiaryEditNavBackDestination): Int {
         return when (destination) {
-            DiaryEditNavBackDestination.SelectedTabScreen -> {
-                try {
-                    findNavController()
-                        .getBackStackEntry(R.id.navigation_calendar_fragment)
-                    R.id.navigation_calendar_fragment
-                } catch (_: IllegalArgumentException) {
-                    R.id.navigation_diary_list_fragment
-                }
+            DiaryEditNavBackDestination.ExitDiaryFlow -> {
+                val navController = findNavController()
+                val diaryFlowDestinationIds = listOf(
+                    R.id.nested_navigation_diary_show,
+                    R.id.navigation_diary_show_fragment,
+                    R.id.nested_navigation_diary_edit,
+                    R.id.navigation_diary_edit_fragment
+                )
+
+                val targetEntry =
+                    navController.currentBackStack.value.reversed().firstOrNull { entry ->
+                        entry.destination.id !in diaryFlowDestinationIds
+                                && entry.destination.id != navController.graph.id
+                    }
+                targetEntry?.destination?.id ?: R.id.navigation_diary_list_fragment
             }
         }
     }

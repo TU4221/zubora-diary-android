@@ -7,8 +7,6 @@ package com.websarva.wings.android.zuboradiary.ui.navigation.event.destination
  */
 sealed interface DiaryEditNavBackDestination : AppNavBackDestination {
 
-    /**
-     * ボトムナビゲーションの現在選択されているタブに割り当てられた画面。
-     */
-    data object SelectedTabScreen : DiaryEditNavBackDestination
+    /** 日記の表示・編集フローを終了し、呼び出し元の画面（一覧やカレンダーなど）へ戻る。 */
+    data object ExitDiaryFlow : DiaryEditNavBackDestination
 }

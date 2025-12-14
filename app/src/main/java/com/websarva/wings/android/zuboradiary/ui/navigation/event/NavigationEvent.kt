@@ -40,14 +40,12 @@ sealed class NavigationEvent<out ND: AppNavDestination, out NBD: AppNavBackDesti
      * @property policy 実行ポリシー。
      * @property resultData 前画面へ渡す結果データ。不要な場合はnull。
      * @property destination 戻り先の目的地。nullの場合は直前の画面へ戻る。
-     * @property inclusive 指定した [destination] をバックスタックから削除するかどうか。
      * @property id イベントID。デフォルトはランダム生成。
      */
     data class Back<NBD: AppNavBackDestination, T>(
         override val policy: Policy,
         val resultData: T? = null,
         val destination: NBD? = null,
-        val inclusive: Boolean = false,
         override val id: UUID = UUID.randomUUID()
     ): NavigationEvent<Nothing, NBD>(id, policy)
 
