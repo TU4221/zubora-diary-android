@@ -16,8 +16,8 @@ import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditVie
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.adapter.DiaryItemTitleSelectionHistoryListAdapter
 import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.SwipeSimpleInteractionHelper
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryItemTitleEditDialogParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryItemTitleEditDialogParameters
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryItemTitleEditNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult

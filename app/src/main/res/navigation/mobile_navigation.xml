@@ -23,7 +23,7 @@
                 app:destination="@id/nested_navigation_diary_show">
                 <argument
                     android:name="diary_show_screen_parameters"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters" />
             </action>
 
             <action
@@ -31,7 +31,7 @@
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
                     android:name="diary_edit_screen_parameters"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters" />
             </action>
 
         </fragment>
@@ -46,7 +46,7 @@
                 app:destination="@id/nested_navigation_diary_show">
                 <argument
                     android:name="diary_show_screen_parameters"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters" />
             </action>
 
         </fragment>
@@ -67,7 +67,7 @@
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
                     android:name="diary_edit_screen_parameters"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters" />
             </action>
 
         </fragment>
@@ -106,14 +106,14 @@
             tools:layout="@layout/fragment_diary_show" >
             <argument
                 android:name="diary_show_screen_parameters"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters" />
+                app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters" />
 
             <action
                 android:id="@+id/action_navigation_diary_show_fragment_to_diary_edit_fragment"
                 app:destination="@id/nested_navigation_diary_edit">
                 <argument
                     android:name="diary_edit_screen_parameters"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters" />
             </action>
 
         </fragment>
@@ -130,7 +130,7 @@
             tools:layout="@layout/fragment_diary_edit" >
             <argument
                 android:name="diary_edit_screen_parameters"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters" />
+                app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters" />
 
             <action
                 android:id="@+id/action_diary_edit_fragment_to_diary_item_title_edit_dialog"
@@ -143,7 +143,7 @@
                 app:popUpToInclusive="true">
                 <argument
                     android:name="diary_show_screen_parameters"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters" />
             </action>
 
             <action
@@ -153,7 +153,7 @@
                 app:popUpToInclusive="true">
                 <argument
                     android:name="diary_show_screen_parameters"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters" />
+                    app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters" />
             </action>
 
         </fragment>
@@ -164,7 +164,7 @@
             tools:layout="@layout/dialog_diary_item_title_edit" >
             <argument
                 android:name="diary_item_title_edit_dialog_parameters"
-                app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryItemTitleEditDialogParameters" />
+                app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryItemTitleEditDialogParameters" />
 
         </dialog>
 
@@ -180,7 +180,7 @@
         android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment" >
         <argument
             android:name="dialog_args"
-            app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs" />
+            app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs" />
     </dialog>
 
 
@@ -210,7 +210,7 @@
         android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.DatePickerDialogFragment">
         <argument
             android:name="date_picker_args"
-            app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DatePickerArgs" />
+            app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.DatePickerArgs" />
     </dialog>
 
 
@@ -223,7 +223,7 @@
         android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.TimePickerDialogFragment">
         <argument
             android:name="time_picker_args"
-            app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.TimePickerArgs" />
+            app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.TimePickerArgs" />
     </dialog>
 
 
@@ -236,7 +236,7 @@
         android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogFragment">
         <argument
             android:name="list_pickers_args"
-            app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersArgs" />
+            app:argType="com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersArgs" />
     </dialog>
 
 </navigation>

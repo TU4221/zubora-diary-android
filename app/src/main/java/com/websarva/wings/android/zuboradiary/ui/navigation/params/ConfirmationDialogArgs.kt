@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model.navigation
+package com.websarva.wings.android.zuboradiary.ui.navigation.params
 
 import android.os.Parcelable
 import androidx.annotation.StringRes

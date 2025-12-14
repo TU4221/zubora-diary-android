@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model.navigation
+package com.websarva.wings.android.zuboradiary.ui.navigation.params
 
 import android.os.Parcelable
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.picker.DatePickerDialogFragment

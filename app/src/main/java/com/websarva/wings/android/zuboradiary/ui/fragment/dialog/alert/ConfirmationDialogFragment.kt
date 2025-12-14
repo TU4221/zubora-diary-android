@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert
 
 import androidx.navigation.fragment.navArgs
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 
 /**

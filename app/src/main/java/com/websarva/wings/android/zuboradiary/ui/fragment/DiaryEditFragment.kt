@@ -30,11 +30,11 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.adapter.spinner.AppDropdownAdapter
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DatePickerArgs
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryItemTitleEditDialogParameters
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DatePickerArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryItemTitleEditDialogParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryEditNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryEditNavDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult

@@ -25,11 +25,11 @@ import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickerConfig
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersArgs
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersResult
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.TimePickerArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickerConfig
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.TimePickerArgs
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.SettingsNavDestination
 import com.websarva.wings.android.zuboradiary.ui.utils.asCalendarStartDayOfWeekString

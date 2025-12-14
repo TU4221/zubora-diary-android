@@ -15,8 +15,8 @@ import com.websarva.wings.android.zuboradiary.ui.utils.asOnSurfaceVariantColorIn
 import com.websarva.wings.android.zuboradiary.ui.utils.numberPickerBottomSheetDialogThemeResId
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersArgs
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.ListPickersResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersResult
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import kotlin.getValue
 

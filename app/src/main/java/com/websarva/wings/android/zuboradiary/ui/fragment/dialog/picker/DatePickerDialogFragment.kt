@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.datePickerDialogThemeResI
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DatePickerArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DatePickerArgs
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import java.time.Instant
 import java.time.LocalDate

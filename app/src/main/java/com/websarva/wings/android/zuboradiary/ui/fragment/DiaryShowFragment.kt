@@ -12,9 +12,9 @@ import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
 import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryShowBinding
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryShowUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogArgs
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryShowNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult

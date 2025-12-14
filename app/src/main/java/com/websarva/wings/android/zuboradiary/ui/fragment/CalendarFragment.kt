@@ -24,7 +24,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomN
 import com.websarva.wings.android.zuboradiary.ui.model.event.CalendarUiEvent
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbackUiEventHandler
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParameters
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.CalendarNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult

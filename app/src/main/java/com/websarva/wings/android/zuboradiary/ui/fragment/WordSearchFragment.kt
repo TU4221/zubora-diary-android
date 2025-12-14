@@ -15,7 +15,7 @@ import com.websarva.wings.android.zuboradiary.ui.recyclerview.helper.DiaryListSe
 import com.websarva.wings.android.zuboradiary.ui.model.event.WordSearchUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
-import com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryShowScreenParameters
+import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParameters
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.WordSearchNavDestination
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel
