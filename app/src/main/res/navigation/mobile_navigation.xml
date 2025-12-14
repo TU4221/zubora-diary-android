@@ -12,8 +12,7 @@
         <fragment
             android:id="@+id/navigation_diary_list_fragment"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment"
-            tools:layout="@layout/fragment_diary_list"
-            android:label="@string/title_list" >
+            tools:layout="@layout/fragment_diary_list" >
 
             <action
                 android:id="@+id/action_navigation_diary_list_fragment_to_word_search_fragment"
@@ -61,8 +60,7 @@
         <fragment
             android:id="@+id/navigation_calendar_fragment"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment"
-            tools:layout="@layout/fragment_calendar"
-            android:label="@string/title_calendar" >
+            tools:layout="@layout/fragment_calendar" >
 
             <action
                 android:id="@+id/action_navigation_calendar_fragment_to_diary_edit_fragment"
@@ -129,8 +127,7 @@
         <fragment
             android:id="@+id/navigation_diary_edit_fragment"
             android:name="com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment"
-            tools:layout="@layout/fragment_diary_edit"
-            android:label="@string/title_settings" >
+            tools:layout="@layout/fragment_diary_edit" >
             <argument
                 android:name="diary_edit_screen_parameters"
                 app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.DiaryEditScreenParameters" />
@@ -180,8 +177,7 @@
 
     <dialog
         android:id="@+id/navigation_confirmation_dialog_fragment"
-        android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment"
-        android:label="ConfirmationDialogFragment" >
+        android:name="com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert.ConfirmationDialogFragment" >
         <argument
             android:name="dialog_args"
             app:argType="com.websarva.wings.android.zuboradiary.ui.model.navigation.ConfirmationDialogArgs" />
