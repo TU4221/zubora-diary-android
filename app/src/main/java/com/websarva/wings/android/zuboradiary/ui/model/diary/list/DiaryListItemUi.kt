@@ -7,13 +7,13 @@ import java.time.YearMonth
 /**
  * 日記一覧画面のRecyclerViewに表示するアイテムを表すUIモデル。
  *
- * このsealed classは、ヘッダー、日記、メッセージ、プログレスインジケーターなど、
+ * ヘッダー、日記、メッセージ、プログレスインジケーターなど、
  * リストに表示される可能性のある全ての要素を表現する。
  *
  * @param T [DiaryListItemContainerUi]を継承する、日記リストアイテムの具体的なデータコンテナの型。
  */
 @Parcelize
-sealed class DiaryListItemUi<T: DiaryListItemContainerUi> : Parcelable {
+sealed interface DiaryListItemUi<T: DiaryListItemContainerUi> : Parcelable {
 
     /**
      * 年月を表すヘッダーアイテム。
@@ -21,7 +21,7 @@ sealed class DiaryListItemUi<T: DiaryListItemContainerUi> : Parcelable {
      */
     data class Header<T: DiaryListItemContainerUi>(
         val yearMonth: YearMonth
-    ) : DiaryListItemUi<T>()
+    ) : DiaryListItemUi<T>
 
     /**
      * 日記のコンテンツを持つアイテム。
@@ -29,11 +29,11 @@ sealed class DiaryListItemUi<T: DiaryListItemContainerUi> : Parcelable {
      */
     data class Diary<T: DiaryListItemContainerUi>(
         val containerUi: T
-    ) : DiaryListItemUi<T>()
+    ) : DiaryListItemUi<T>
 
     /** 日記が一件も存在しない場合に表示するメッセージアイテム。 */
-    class NoDiaryMessage<T: DiaryListItemContainerUi> : DiaryListItemUi<T>()
+    class NoDiaryMessage<T: DiaryListItemContainerUi> : DiaryListItemUi<T>
 
     /** 追加読み込み中に表示するプログレスインジケーターアイテム。 */
-    class ProgressIndicator<T: DiaryListItemContainerUi> : DiaryListItemUi<T>()
+    class ProgressIndicator<T: DiaryListItemContainerUi> : DiaryListItemUi<T>
 }

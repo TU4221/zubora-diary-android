@@ -8,16 +8,16 @@ import kotlinx.parcelize.Parcelize
 
 /**
  * 日記項目タイトル編集ダイアログ([DiaryItemTitleEditDialog])で表示される、
- * 固有のアプリケーションメッセージを表すsealed class。
+ * 固有のアプリケーションメッセージ。
  */
 @Parcelize
-sealed class DiaryItemTitleEditAppMessage : AppMessage {
+sealed interface DiaryItemTitleEditAppMessage : AppMessage {
 
     /**
      * 予期せぬエラーが発生したことを示すメッセージ。
      * @property exception 発生した例外。デバッグビルドの場合、メッセージに例外名が含まれる。
      */
-    class Unexpected(val exception: Exception) : DiaryItemTitleEditAppMessage() {
+    class Unexpected(val exception: Exception) : DiaryItemTitleEditAppMessage {
 
         @IgnoredOnParcel
         override val dialogTitleStringResId = R.string.dialog_app_message_title_unexpected_error
@@ -40,7 +40,7 @@ sealed class DiaryItemTitleEditAppMessage : AppMessage {
     }
 
     /** 項目タイトル履歴の読み込みに失敗したことを示すメッセージ。 */
-    data object ItemTitleHistoryLoadFailure : DiaryItemTitleEditAppMessage() {
+    data object ItemTitleHistoryLoadFailure : DiaryItemTitleEditAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
@@ -48,7 +48,7 @@ sealed class DiaryItemTitleEditAppMessage : AppMessage {
     }
 
     /** 項目タイトル履歴の削除に失敗したことを示すメッセージ。 */
-    data object ItemTitleHistoryDeleteFailure : DiaryItemTitleEditAppMessage() {
+    data object ItemTitleHistoryDeleteFailure : DiaryItemTitleEditAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel

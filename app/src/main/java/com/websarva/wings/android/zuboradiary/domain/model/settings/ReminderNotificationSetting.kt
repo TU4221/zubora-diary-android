@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.model.settings
 import java.time.LocalTime
 
 /**
- * リマインダー通知設定の状態を表す基底クララス。
+ * リマインダー通知設定の状態。
  *
  * このクラスは、リマインダー通知が有効か無効か、そして有効な場合はその通知時刻を保持する。
  *

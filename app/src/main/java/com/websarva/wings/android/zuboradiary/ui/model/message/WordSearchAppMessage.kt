@@ -7,16 +7,16 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
- * ワード検索画面([WordSearchFragment])で表示される、固有のアプリケーションメッセージを表すsealed class。
+ * ワード検索画面([WordSearchFragment])で表示される、固有のアプリケーションメッセージ。
  */
 @Parcelize
-sealed class WordSearchAppMessage : AppMessage {
+sealed interface WordSearchAppMessage : AppMessage {
 
     /**
      * 予期せぬエラーが発生したことを示すメッセージ。
      * @property exception 発生した例外。デバッグビルドの場合、メッセージに例外名が含まれる。
      */
-    class Unexpected(val exception: Exception) : WordSearchAppMessage() {
+    class Unexpected(val exception: Exception) : WordSearchAppMessage {
 
         @IgnoredOnParcel
         override val dialogTitleStringResId = R.string.dialog_app_message_title_unexpected_error
@@ -39,7 +39,7 @@ sealed class WordSearchAppMessage : AppMessage {
     }
 
     /** 検索結果リストの読み込みに失敗したことを示すメッセージ。 */
-    data object SearchResultListLoadFailure : WordSearchAppMessage() {
+    data object SearchResultListLoadFailure : WordSearchAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel

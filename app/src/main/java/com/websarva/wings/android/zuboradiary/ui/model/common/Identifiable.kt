@@ -7,7 +7,7 @@ import androidx.recyclerview.widget.ListAdapter
  *
  * [ListAdapter]などで、アイテムの差分計算や状態保持を効率的に行うために使用される。
  */
-internal interface Identifiable {
+interface Identifiable {
 
     /** アイテムを一意に識別するためのID。 */
     val id: Any

@@ -6,20 +6,20 @@ import kotlinx.parcelize.Parcelize
 /**
  * 入力テキストのバリデーション結果の状態を表すUI状態モデル。
  *
- * このsealed classは、テキスト検証の様々な結果を表現する。
+ * テキスト検証の様々な結果を表現する。
  */
 @Parcelize
-sealed class InputTextValidationState : Parcelable {
+sealed interface InputTextValidationState : Parcelable {
 
     /** 入力が有効であることを示す。 */
-    data object Valid : InputTextValidationState()
+    data object Valid : InputTextValidationState
 
     /** 入力が不正であることを示す（汎用的なエラー）。 */
-    data object Invalid : InputTextValidationState()
+    data object Invalid : InputTextValidationState
 
     /** 入力が空であることを示す。 */
-    data object InvalidEmpty : InputTextValidationState()
+    data object InvalidEmpty : InputTextValidationState
 
     /** 入力の開始文字が不正であることを示す。 */
-    data object InvalidInitialCharUnmatched : InputTextValidationState()
+    data object InvalidInitialCharUnmatched : InputTextValidationState
 }

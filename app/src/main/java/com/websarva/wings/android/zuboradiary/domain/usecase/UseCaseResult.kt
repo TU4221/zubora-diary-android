@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.usecase
 
 /**
- * ユースケースの実行結果を表す基底クラス。
+ * ユースケースの実行結果。
  *
  * 成功時には [Success] を、失敗時には [Failure] を返し、
  * それぞれ結果の値またはユースケース例外を保持する。
@@ -10,14 +10,14 @@ package com.websarva.wings.android.zuboradiary.domain.usecase
  * @param T 成功時の結果の型。
  * @param E 失敗時のドメイン例外の型。 [UseCaseException] のサブクラスである必要がある。
  */
-internal sealed class UseCaseResult<out T, out E : UseCaseException> {
+internal sealed interface UseCaseResult<out T, out E : UseCaseException> {
     /**
      * ユースケースの実行が成功したことを表す。
      *
      * @param value 成功した結果の値。
      * @param T 成功時の結果の型。
      */
-    data class Success<out T>(val value: T) : UseCaseResult<T, Nothing>()
+    data class Success<out T>(val value: T) : UseCaseResult<T, Nothing>
 
     /**
      * ユースケースの実行が失敗したことを表す。
@@ -25,5 +25,5 @@ internal sealed class UseCaseResult<out T, out E : UseCaseException> {
      * @param exception 発生したドメイン例外。
      * @param E 失敗時のドメイン例外の型。
      */
-    data class Failure<out E : UseCaseException>(val exception: E) : UseCaseResult<Nothing, E>()
+    data class Failure<out E : UseCaseException>(val exception: E) : UseCaseResult<Nothing, E>
 }

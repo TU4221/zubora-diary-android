@@ -7,16 +7,16 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
- * 日記一覧画面([DiaryListFragment])で表示される、固有のアプリケーションメッセージを表すsealed class。
+ * 日記一覧画面([DiaryListFragment])で表示される、固有のアプリケーションメッセージ。
  */
 @Parcelize
-sealed class DiaryListAppMessage : AppMessage {
+sealed interface DiaryListAppMessage : AppMessage {
 
     /**
      * 予期せぬエラーが発生したことを示すメッセージ。
      * @property exception 発生した例外。デバッグビルドの場合、メッセージに例外名が含まれる。
      */
-    class Unexpected(val exception: Exception) : DiaryListAppMessage() {
+    class Unexpected(val exception: Exception) : DiaryListAppMessage {
 
         @IgnoredOnParcel
         override val dialogTitleStringResId = R.string.dialog_app_message_title_unexpected_error
@@ -39,7 +39,7 @@ sealed class DiaryListAppMessage : AppMessage {
     }
 
     /** 日記リストの読み込みに失敗したことを示すメッセージ。 */
-    data object DiaryListLoadFailure : DiaryListAppMessage() {
+    data object DiaryListLoadFailure : DiaryListAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
@@ -47,7 +47,7 @@ sealed class DiaryListAppMessage : AppMessage {
     }
 
     /** 日記の削除に失敗したことを示すメッセージ。 */
-    data object DiaryDeleteFailure : DiaryListAppMessage() {
+    data object DiaryDeleteFailure : DiaryListAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
@@ -55,7 +55,7 @@ sealed class DiaryListAppMessage : AppMessage {
     }
 
     /** 添付画像の削除に失敗したことを示すメッセージ。 */
-    data object DiaryImageDeleteFailure : DiaryListAppMessage() {
+    data object DiaryImageDeleteFailure : DiaryListAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
@@ -63,7 +63,7 @@ sealed class DiaryListAppMessage : AppMessage {
     }
 
     /** 日記情報の読み込みに失敗したことを示すメッセージ。 */
-    data object DiaryInfoLoadFailure : DiaryListAppMessage() {
+    data object DiaryInfoLoadFailure : DiaryListAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel

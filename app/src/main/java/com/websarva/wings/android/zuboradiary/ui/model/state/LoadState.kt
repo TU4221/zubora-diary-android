@@ -9,30 +9,30 @@ import kotlinx.parcelize.Parcelize
  * @param T 読み込むデータの型。[Parcelable]を実装している事。
  */
 @Parcelize
-sealed class LoadState<out T : Parcelable> : Parcelable {
+sealed interface LoadState<out T : Parcelable> : Parcelable {
     /**
      * 初期状態、またはまだ読み込みが開始されていない状態。
      */
-    data object Idle : LoadState<Nothing>()
+    data object Idle : LoadState<Nothing>
 
     /**
      * データを読み込み中の状態。
      */
-    data object Loading : LoadState<Nothing>()
+    data object Loading : LoadState<Nothing>
 
     /**
      * データの読み込みが成功した状態。
      * @property data 読み込まれたデータ。
      */
-    data class Success<out T : Parcelable>(val data: T) : LoadState<T>()
+    data class Success<out T : Parcelable>(val data: T) : LoadState<T>
 
     /**
      * データが存在しなかった状態。
      */
-    data object Empty : LoadState<Nothing>()
+    data object Empty : LoadState<Nothing>
 
     /**
      * データの読み込みが失敗した状態。
      */
-    data object Error : LoadState<Nothing>()
+    data object Error : LoadState<Nothing>
 }

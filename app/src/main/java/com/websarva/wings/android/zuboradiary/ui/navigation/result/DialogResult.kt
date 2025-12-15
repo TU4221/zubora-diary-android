@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.ui.navigation.result
 import java.io.Serializable
 
 /**
- * ダイアログ操作による選択結果を表現するクラス。
+ * ダイアログ操作による選択結果。
  *
  * ユーザーの操作に応じて、肯定（[Positive]）、否定（[Negative]）、キャンセル（[Cancel]）のいずれかの状態を持つ。
  *
@@ -11,7 +11,7 @@ import java.io.Serializable
  */
 // HACK: Parcelableを実装するとジェネリクスTがParcelable制約を受けるため、
 //       Unit等も扱えるようSerializableを採用している。
-sealed class DialogResult<out T> : NavigationResult, Serializable {
+sealed interface DialogResult<out T> : NavigationResult, Serializable {
 
     /**
      * 肯定的な選択（「はい」、「OK」など）がなされた状態。
@@ -20,12 +20,12 @@ sealed class DialogResult<out T> : NavigationResult, Serializable {
      */
     data class Positive<out T>(
         val data: T
-    ) : DialogResult<T>()
+    ) : DialogResult<T>
 
     /**
      * 否定的な選択（「いいえ」、「キャンセル」ボタンなど）がなされた状態。
      */
-    data object Negative : DialogResult<Nothing>() {
+    data object Negative : DialogResult<Nothing> {
         // HACK: Serializable実装時にreadResolveの記述が推奨されるが、未使用のため警告を抑制
         @Suppress("unused")
         private fun readResolve(): Any = Negative
@@ -34,7 +34,7 @@ sealed class DialogResult<out T> : NavigationResult, Serializable {
     /**
      * 操作が中断（ダイアログ外タップ、戻るボタンなど）された状態。
      */
-    data object Cancel : DialogResult<Nothing>() {
+    data object Cancel : DialogResult<Nothing> {
         // HACK: Serializable実装時にreadResolveの記述が推奨されるが、未使用のため警告を抑制
         @Suppress("unused")
         private fun readResolve(): Any = Cancel

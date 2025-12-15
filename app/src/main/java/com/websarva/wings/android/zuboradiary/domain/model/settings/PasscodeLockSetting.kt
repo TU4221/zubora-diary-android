@@ -1,7 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.model.settings
 
 /**
- * パスコードロック設定の状態を表す基底クララス。
+ * パスコードロック設定の状態。
  *
  * このクラスは、パスコードロックが有効か無効か、そして有効な場合はそのパスコードを保持する。
  * パスコードは4桁の文字列数字である必要がある。

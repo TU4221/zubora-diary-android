@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.domain.model.diary.list.diary
 import java.time.YearMonth
 
 /**
- * 年月ごとの日記リストの各アイテムを表す基底クラス。
+ * 年月ごとの日記リストの各アイテム。
  *
  * このクラスは、年月単位でグループ化された日記リストの要素の共通の型を提供する。
  * 具体的なアイテムの種類（日記の年月ごとの集まり、日記なしメッセージ、プログレスインジケータ）に応じて、
@@ -11,7 +11,7 @@ import java.time.YearMonth
  *
  * @param T [DiaryDayListItem] を実装するアイテムの型。これは [Diary] サブクラス内の日記リストの型として使用される。
  */
-internal sealed class DiaryYearMonthListItem<T : DiaryDayListItem> {
+internal sealed interface DiaryYearMonthListItem<T : DiaryDayListItem> {
 
     /**
      * 特定の年月に属する日記のリストを表すアイテム。
@@ -23,19 +23,19 @@ internal sealed class DiaryYearMonthListItem<T : DiaryDayListItem> {
     data class Diary<T : DiaryDayListItem>(
         val yearMonth: YearMonth,
         val diaryDayList: DiaryDayList<T>
-    ) : DiaryYearMonthListItem<T>()
+    ) : DiaryYearMonthListItem<T>
 
     /**
      * 日記が存在しないことを示すメッセージアイテム。
      *
      * @param T [DiaryDayListItem] を実装するアイテムの型。
      */
-    class NoDiaryMessage<T : DiaryDayListItem> : DiaryYearMonthListItem<T>()
+    class NoDiaryMessage<T : DiaryDayListItem> : DiaryYearMonthListItem<T>
 
     /**
      * 続きの日記リスト読み込み中を示すプログレスインジケータアイテム。
      *
      * @param T [DiaryDayListItem] を実装するアイテムの型。
      */
-    class ProgressIndicator<T : DiaryDayListItem> : DiaryYearMonthListItem<T>()
+    class ProgressIndicator<T : DiaryDayListItem> : DiaryYearMonthListItem<T>
 }

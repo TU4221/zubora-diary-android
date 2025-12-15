@@ -3,9 +3,9 @@ package com.websarva.wings.android.zuboradiary.ui.model.event
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 
 /**
- * [MainActivity]における、UIイベントを表すsealed class。
+ * [MainActivity]における、UIイベント。
  */
-sealed class MainActivityUiEvent : UiEvent {
+sealed interface MainActivityUiEvent : UiEvent {
 
     // 必要時、記述する。
 }

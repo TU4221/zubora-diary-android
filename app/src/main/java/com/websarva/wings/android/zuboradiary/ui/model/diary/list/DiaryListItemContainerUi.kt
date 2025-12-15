@@ -9,17 +9,15 @@ import java.time.LocalDate
 /**
  * 日記一覧画面に表示するアイテムのコンテナを表すUIモデル。
  *
- * このsealed classは、通常の日記リスト項目([Standard])と、
- * ワード検索結果のリスト項目([WordSearchResult])の2種類を表現する。
- *
- * @property id アイテムの一意な識別子。
- * @property date アイテムの日付。
+ * 通常の日記リスト項目([Standard])と、ワード検索結果のリスト項目([WordSearchResult])の2種類を表現する。
  */
 @Parcelize
-sealed class DiaryListItemContainerUi(
-    override val id: String,
-    open val date: LocalDate
-) : Parcelable, Identifiable {
+sealed interface DiaryListItemContainerUi : Parcelable, Identifiable {
+
+    /**
+     * @property date アイテムの日付。
+     */
+    val date: LocalDate
 
     /**
      * 通常の日記リスト画面で表示される標準的なリスト項目。
@@ -36,7 +34,7 @@ sealed class DiaryListItemContainerUi(
         val title: String,
         val imageFileName: String?,
         val imageFilePath: FilePathUi?
-    ) : DiaryListItemContainerUi(id, date)
+    ) : DiaryListItemContainerUi
 
     /**
      * ワード検索結果画面で表示されるリスト項目。
@@ -61,5 +59,5 @@ sealed class DiaryListItemContainerUi(
         val itemTitle: String,
         val itemComment: String,
         val searchWord: String,
-    ) : DiaryListItemContainerUi(id, date)
+    ) : DiaryListItemContainerUi
 }

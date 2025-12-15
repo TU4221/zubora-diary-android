@@ -6,7 +6,7 @@ import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.Ap
 import java.util.UUID
 
 /**
- * 画面遷移イベントを表す基底クラス。
+ * 画面遷移イベント。
  *
  * イベントの一意性を保証する [id] と、処理方法を規定する [policy] を保持する。
  *
@@ -15,10 +15,13 @@ import java.util.UUID
  * @property id イベント識別用ID。
  * @property policy イベント実行時のポリシー。
  */
-sealed class NavigationEvent<out ND: AppNavDestination, out NBD: AppNavBackDestination>(
-    override val id: UUID,
-    open val policy: Policy
-) : Identifiable {
+sealed interface NavigationEvent<out ND: AppNavDestination, out NBD: AppNavBackDestination>
+    : Identifiable {
+
+    /**
+     * @property policy イベント実行時のポリシー。
+    */
+    val policy: Policy
 
     /**
      * 特定の目的地への前方遷移イベント。
@@ -31,7 +34,7 @@ sealed class NavigationEvent<out ND: AppNavDestination, out NBD: AppNavBackDesti
         val destination: ND,
         override val policy: Policy,
         override val id: UUID = UUID.randomUUID()
-    ): NavigationEvent<ND, Nothing>(id, policy)
+    ): NavigationEvent<ND, Nothing>
 
     /**
      * 前画面、または指定した目的地への戻り遷移イベント。
@@ -47,7 +50,7 @@ sealed class NavigationEvent<out ND: AppNavDestination, out NBD: AppNavBackDesti
         val resultData: T? = null,
         val destination: NBD? = null,
         override val id: UUID = UUID.randomUUID()
-    ): NavigationEvent<Nothing, NBD>(id, policy)
+    ): NavigationEvent<Nothing, NBD>
 
     /**
      * イベントの実行ポリシー定義。

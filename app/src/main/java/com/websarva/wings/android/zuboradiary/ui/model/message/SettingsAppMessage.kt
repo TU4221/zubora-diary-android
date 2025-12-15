@@ -7,16 +7,16 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
- * 設定画面([SettingsFragment])で表示される、固有のアプリケーションメッセージを表すsealed class。
+ * 設定画面([SettingsFragment])で表示される、固有のアプリケーションメッセージ。
  */
 @Parcelize
-sealed class SettingsAppMessage : AppMessage {
+sealed interface SettingsAppMessage : AppMessage {
 
     /**
      * 予期せぬエラーが発生したことを示すメッセージ。
      * @property exception 発生した例外。デバッグビルドの場合、メッセージに例外名が含まれる。
      */
-    class Unexpected(val exception: Exception) : SettingsAppMessage() {
+    class Unexpected(val exception: Exception) : SettingsAppMessage {
 
         @IgnoredOnParcel
         override val dialogTitleStringResId = R.string.dialog_app_message_title_unexpected_error
@@ -39,7 +39,7 @@ sealed class SettingsAppMessage : AppMessage {
     }
 
     /** 設定情報の読み込みに失敗したことを示すメッセージ。 */
-    data object SettingLoadFailure : SettingsAppMessage() {
+    data object SettingLoadFailure : SettingsAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
@@ -47,7 +47,7 @@ sealed class SettingsAppMessage : AppMessage {
     }
 
     /** 設定が読み込まれていないため、再起動を促すメッセージ。 */
-    data object SettingsNotLoadedRetryRestart : SettingsAppMessage() {
+    data object SettingsNotLoadedRetryRestart : SettingsAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_hint
         @IgnoredOnParcel
@@ -55,7 +55,7 @@ sealed class SettingsAppMessage : AppMessage {
     }
 
     /** 設定の更新に失敗したことを示すメッセージ。 */
-    data object SettingUpdateFailure : SettingsAppMessage() {
+    data object SettingUpdateFailure : SettingsAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
@@ -63,7 +63,7 @@ sealed class SettingsAppMessage : AppMessage {
     }
 
     /** ストレージ容量不足により設定の更新に失敗したことを示すメッセージ。 */
-    data object SettingUpdateInsufficientStorageFailure : SettingsAppMessage() {
+    data object SettingUpdateInsufficientStorageFailure : SettingsAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_storage_error
         @IgnoredOnParcel
@@ -71,7 +71,7 @@ sealed class SettingsAppMessage : AppMessage {
     }
 
     /** 全日記の削除に失敗したことを示すメッセージ。 */
-    data object AllDiaryDeleteFailure : SettingsAppMessage() {
+    data object AllDiaryDeleteFailure : SettingsAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
@@ -79,7 +79,7 @@ sealed class SettingsAppMessage : AppMessage {
     }
 
     /** 全ての添付画像の削除に失敗したことを示すメッセージ。 */
-    data object AllDiaryImagesDeleteFailure : SettingsAppMessage() {
+    data object AllDiaryImagesDeleteFailure : SettingsAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
@@ -87,7 +87,7 @@ sealed class SettingsAppMessage : AppMessage {
     }
 
     /** 全設定の初期化に失敗したことを示すメッセージ。 */
-    data object AllSettingsInitializationFailure : SettingsAppMessage() {
+    data object AllSettingsInitializationFailure : SettingsAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel
@@ -95,7 +95,7 @@ sealed class SettingsAppMessage : AppMessage {
     }
 
     /** ストレージ容量不足により全設定の初期化に失敗したことを示すメッセージ。 */
-    data object AllSettingsInitializationInsufficientStorageFailure : SettingsAppMessage() {
+    data object AllSettingsInitializationInsufficientStorageFailure : SettingsAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_storage_error
         @IgnoredOnParcel
@@ -103,7 +103,7 @@ sealed class SettingsAppMessage : AppMessage {
     }
 
     /** 全データの削除に失敗したことを示すメッセージ。 */
-    data object AllDataDeleteFailure : SettingsAppMessage() {
+    data object AllDataDeleteFailure : SettingsAppMessage {
         @IgnoredOnParcel
         override val dialogTitleStringResId: Int = R.string.dialog_app_message_title_access_error
         @IgnoredOnParcel

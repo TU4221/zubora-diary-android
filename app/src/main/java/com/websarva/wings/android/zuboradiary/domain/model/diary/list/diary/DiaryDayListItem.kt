@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.SearchWord
 import java.time.LocalDate
 
 /**
- * 日記リストの各日を表すアイテムの基底クラス。
+ * 日記リストの各日を表すアイテム。
  *
  * このクラスは、日記リスト内で日付を持つアイテムの共通の型を提供する。
  * 具体的なアイテムの種類（例: 通常の日記表示、検索結果表示）に応じて、
@@ -19,10 +19,13 @@ import java.time.LocalDate
  * @property id このリストアイテムが表す日記ID。
  * @property date このリストアイテムが表す日付。
  */
-internal sealed class DiaryDayListItem(
-    open val id: DiaryId,
-    open val date: LocalDate
-) {
+internal sealed interface DiaryDayListItem {
+
+    /** @property id このリストアイテムが表す日記ID。 */
+    val id: DiaryId
+
+    /** @property date このリストアイテムが表す日付。 */
+    val date: LocalDate
 
     /**
      * 標準的な日記リストアイテム。
@@ -38,7 +41,7 @@ internal sealed class DiaryDayListItem(
         override val date: LocalDate,
         val title: DiaryTitle,
         val imageFileName: DiaryImageFileName?
-    ) : DiaryDayListItem(id, date)
+    ) : DiaryDayListItem
 
     /**
      * 単語検索結果として表示される日記リストアイテム。
@@ -64,5 +67,5 @@ internal sealed class DiaryDayListItem(
         val itemTitle: DiaryItemTitle,
         val itemComment: DiaryItemComment,
         val searchWord: SearchWord,
-    ) : DiaryDayListItem(id, date)
+    ) : DiaryDayListItem
 }
