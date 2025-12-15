@@ -28,7 +28,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickerConfig
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersDialogParams
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersResult
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogResult
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.TimePickerDialogParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.SettingsNavDestination
@@ -150,7 +150,7 @@ class SettingsFragment : BaseFragment<
 
     /** テーマカラー選択ダイアログからの結果を監視する。 */
     private fun observeThemeColorPickerDialogResult() {
-        observeDialogResult<ListPickersResult>(
+        observeDialogResult<ListPickersDialogResult>(
             RESULT_KEY_THEME_COLOR_SETTING
         ) { result ->
             when (result) {
@@ -168,7 +168,7 @@ class SettingsFragment : BaseFragment<
 
     /** カレンダー開始曜日選択ダイアログからの結果を監視する。 */
     private fun observeCalendarStartDayPickerDialogResult() {
-        observeDialogResult<ListPickersResult>(
+        observeDialogResult<ListPickersDialogResult>(
             RESULT_KEY_CALENDAR_START_DAY_SETTING
         ) { result ->
             when (result) {

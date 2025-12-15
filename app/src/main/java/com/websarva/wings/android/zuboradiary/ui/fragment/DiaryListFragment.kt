@@ -25,7 +25,7 @@ import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScre
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickerConfig
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersDialogParams
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersResult
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogResult
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryListNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
@@ -131,7 +131,7 @@ class DiaryListFragment : BaseFragment<
 
     /** 開始年月の選択ダイアログからの結果を監視する。 */
     private fun observeDatePickerDialogResult() {
-        observeDialogResult<ListPickersResult>(
+        observeDialogResult<ListPickersDialogResult>(
             RESULT_KEY_START_YEAR_MONTH_PICKER
         ) { result ->
             when (result) {
