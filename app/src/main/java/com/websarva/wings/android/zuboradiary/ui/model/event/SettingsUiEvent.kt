@@ -1,9 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
-import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
-
 /**
- * 設定画面([SettingsFragment])における、UIイベント。
+ * 設定画面における、UIイベント。
  */
 sealed interface SettingsUiEvent : UiEvent {
 

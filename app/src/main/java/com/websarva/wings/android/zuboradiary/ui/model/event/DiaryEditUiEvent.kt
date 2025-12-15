@@ -1,9 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
-
 /**
- * 日記編集画面([DiaryEditFragment])における、UIイベント。
+ * 日記編集画面における、UIイベント。
  */
 sealed interface DiaryEditUiEvent : UiEvent {
 

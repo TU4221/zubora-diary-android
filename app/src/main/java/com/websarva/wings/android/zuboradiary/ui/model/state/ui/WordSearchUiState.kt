@@ -1,13 +1,12 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.ui.fragment.WordSearchFragment
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import kotlinx.parcelize.Parcelize
 
 /**
- * 単語検索画面([WordSearchFragment])のUI状態を表すデータクラス。
+ * ワード検索画面のUI状態を表すデータクラス。
  *
  * @property searchWord ユーザーによって入力された検索ワード。
  * @property numWordSearchResults 検索にヒットした結果の総数。

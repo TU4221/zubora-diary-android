@@ -1,12 +1,11 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import kotlinx.parcelize.Parcelize
 
 /**
- * [MainActivity]のUI状態を表すデータクラス。
+ * MainActivityのUI状態を表すデータクラス。
  *
  * @property themeColor 現在のテーマカラー。
  *

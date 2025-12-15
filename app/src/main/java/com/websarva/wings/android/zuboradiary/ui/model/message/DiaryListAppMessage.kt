@@ -2,12 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.model.message
 
 import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
- * 日記一覧画面([DiaryListFragment])で表示される、固有のアプリケーションメッセージ。
+ * 日記一覧画面で表示される、固有のアプリケーションメッセージ。
  */
 @Parcelize
 sealed interface DiaryListAppMessage : AppMessage {

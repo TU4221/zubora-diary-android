@@ -2,12 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.model.message
 
 import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.DiaryItemTitleEditDialog
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
- * 日記項目タイトル編集ダイアログ([DiaryItemTitleEditDialog])で表示される、
+ * 日記項目タイトル編集ダイアログで表示される、
  * 固有のアプリケーションメッセージ。
  */
 @Parcelize

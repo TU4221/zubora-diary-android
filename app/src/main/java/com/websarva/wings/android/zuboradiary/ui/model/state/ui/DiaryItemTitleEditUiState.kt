@@ -1,14 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.fullscreen.DiaryItemTitleEditDialog
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.list.DiaryItemTitleSelectionHistoryListUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.InputTextValidationState
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import kotlinx.parcelize.Parcelize
 
 /**
- * 日記項目タイトル編集ダイアログ([DiaryItemTitleEditDialog])のUI状態を表すデータクラス。
+ * 日記項目タイトル編集ダイアログのUI状態を表すデータクラス。
  *
  * @property itemNumber 編集対象の項目番号。
  * @property title 現在編集中のタイトル文字列。

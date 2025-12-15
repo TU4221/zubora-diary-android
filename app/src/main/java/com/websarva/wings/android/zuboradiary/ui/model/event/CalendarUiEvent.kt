@@ -1,10 +1,9 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
-import com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment
 import java.time.LocalDate
 
 /**
- * カレンダー画面([CalendarFragment])における、UIイベント。
+ * カレンダー画面における、UIイベント。
  */
 sealed interface CalendarUiEvent : UiEvent {
 

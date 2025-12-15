@@ -1,9 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment
-
 /**
- * 日記表示画面([DiaryShowFragment])における、UIイベント。
+ * 日記表示画面における、UIイベント。
  */
 sealed interface DiaryShowUiEvent : UiEvent {
 

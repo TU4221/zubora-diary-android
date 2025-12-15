@@ -2,12 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.model.message
 
 import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
- * カレンダー画面([CalendarFragment])で表示される、固有のアプリケーションメッセージ。
+ * カレンダー画面で表示される、固有のアプリケーションメッセージ。
  */
 @Parcelize
 sealed interface CalendarAppMessage : AppMessage {

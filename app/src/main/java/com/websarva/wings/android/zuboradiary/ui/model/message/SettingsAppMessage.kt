@@ -2,12 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.model.message
 
 import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.fragment.SettingsFragment
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
- * 設定画面([SettingsFragment])で表示される、固有のアプリケーションメッセージ。
+ * 設定画面で表示される、固有のアプリケーションメッセージ。
  */
 @Parcelize
 sealed interface SettingsAppMessage : AppMessage {

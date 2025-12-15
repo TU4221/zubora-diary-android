@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryEditFragment
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.ConditionUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
@@ -12,7 +11,7 @@ import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
 /**
- * 日記編集画面([DiaryEditFragment])のUI状態を表すデータクラス。
+ * 日記編集画面のUI状態を表すデータクラス。
  *
  * @property originalDiaryLoadState 編集開始時の元の日記データの読み込み状態。
  * @property editingDiary 現在編集中の日記データ。

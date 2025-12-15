@@ -2,12 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.model.message
 
 import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.fragment.WordSearchFragment
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
- * ワード検索画面([WordSearchFragment])で表示される、固有のアプリケーションメッセージ。
+ * ワード検索画面で表示される、固有のアプリケーションメッセージ。
  */
 @Parcelize
 sealed interface WordSearchAppMessage : AppMessage {

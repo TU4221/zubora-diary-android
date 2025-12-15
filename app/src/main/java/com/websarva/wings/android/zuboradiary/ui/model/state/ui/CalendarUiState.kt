@@ -1,7 +1,6 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.ui.fragment.CalendarFragment
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
@@ -10,7 +9,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 
 /**
- * カレンダー画面([CalendarFragment])のUI状態を表すデータクラス。
+ * カレンダー画面のUI状態を表すデータクラス。
  *
  * @property calendarStartDayOfWeek カレンダーの週の開始曜日。
  * @property selectedDate ユーザーによって選択されている日付。

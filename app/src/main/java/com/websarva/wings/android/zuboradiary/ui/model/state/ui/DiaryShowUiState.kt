@@ -1,14 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryShowFragment
 import com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import kotlinx.parcelize.Parcelize
 
 /**
- * 日記表示画面([DiaryShowFragment])のUI状態を表すデータクラス。
+ * 日記表示画面のUI状態を表すデータクラス。
  *
  * @property diaryLoadState 日記データの読み込み状態。
  * @property diaryImageFilePath 添付画像のファイルパス。

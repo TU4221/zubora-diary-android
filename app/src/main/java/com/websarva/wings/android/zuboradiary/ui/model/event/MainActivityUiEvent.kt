@@ -1,9 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
-import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
-
 /**
- * [MainActivity]における、UIイベント。
+ * MainActivityにおける、UIイベント。
  */
 sealed interface MainActivityUiEvent : UiEvent {
 

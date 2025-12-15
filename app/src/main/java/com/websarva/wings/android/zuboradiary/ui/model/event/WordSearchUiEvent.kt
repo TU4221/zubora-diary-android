@@ -1,9 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.model.event
 
-import com.websarva.wings.android.zuboradiary.ui.fragment.WordSearchFragment
-
 /**
- * 単語検索画面([WordSearchFragment])における、UIイベント。
+ * 単語検索画面における、UIイベント。
  */
 sealed interface WordSearchUiEvent : UiEvent {
 

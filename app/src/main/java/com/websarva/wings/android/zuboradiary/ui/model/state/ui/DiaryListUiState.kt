@@ -1,14 +1,13 @@
 package com.websarva.wings.android.zuboradiary.ui.model.state.ui
 
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.ui.fragment.DiaryListFragment
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.model.diary.list.DiaryListUi
 import kotlinx.parcelize.Parcelize
 import java.time.LocalDate
 
 /**
- * 日記一覧画面([DiaryListFragment])のUI状態を表すデータクラス。
+ * 日記一覧画面のUI状態を表すデータクラス。
  *
  * @property diaryList 表示する日記のリスト。
  * @property sortConditionDate 日記リストのソート条件日付。

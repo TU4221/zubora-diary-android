@@ -2,12 +2,11 @@ package com.websarva.wings.android.zuboradiary.ui.model.message
 
 import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.R
-import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 /**
- * [MainActivity]で表示される、固有のアプリケーションメッセージ。
+ * MainActivityで表示される、固有のアプリケーションメッセージ。
  */
 @Parcelize
 sealed interface MainActivityAppMessage : AppMessage {
