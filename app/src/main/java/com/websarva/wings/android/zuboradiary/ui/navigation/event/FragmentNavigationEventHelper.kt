@@ -10,7 +10,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.message.AppMessage
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.AppNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.AppNavDestination
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.FragmentResult
 
 /**
  * Fragmentにおける画面遷移処理を補助するヘルパークラス。

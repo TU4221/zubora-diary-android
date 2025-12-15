@@ -27,9 +27,9 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.AppNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.AppNavDestination
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.ui.UiState
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.FragmentNavigationEventHelper
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.NavigationEvent

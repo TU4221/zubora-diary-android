@@ -23,7 +23,7 @@ import com.websarva.wings.android.zuboradiary.ui.fragment.common.ActivityCallbac
 import com.websarva.wings.android.zuboradiary.ui.fragment.common.RequiresBottomNavigation
 import com.websarva.wings.android.zuboradiary.ui.theme.SettingsThemeColorChanger
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogParams
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickerConfig

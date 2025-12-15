@@ -27,7 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiE
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.CalendarNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.FragmentResult
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map

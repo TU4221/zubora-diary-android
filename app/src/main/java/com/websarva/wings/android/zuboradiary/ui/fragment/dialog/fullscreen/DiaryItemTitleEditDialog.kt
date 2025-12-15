@@ -19,7 +19,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryItemTitleEditU
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryItemTitleEditNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.state.LoadState
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged

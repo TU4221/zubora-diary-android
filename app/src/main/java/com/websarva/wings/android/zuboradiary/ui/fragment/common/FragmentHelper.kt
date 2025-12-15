@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.model.event.UiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.NavigationResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.NavigationResult
 import com.websarva.wings.android.zuboradiary.ui.model.settings.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.theme.withTheme
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.MainActivityViewModel

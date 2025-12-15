@@ -1,4 +1,4 @@
-package com.websarva.wings.android.zuboradiary.ui.model.result
+package com.websarva.wings.android.zuboradiary.ui.navigation.result
 
 /**
  * Fragment間のナビゲーションでやり取りされる結果を表すためのマーカーインターフェース。

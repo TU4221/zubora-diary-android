@@ -24,7 +24,7 @@ import com.websarva.wings.android.zuboradiary.databinding.FragmentDiaryEditBindi
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel
 import com.websarva.wings.android.zuboradiary.ui.keyboard.KeyboardManager
 import com.websarva.wings.android.zuboradiary.ui.model.event.DiaryEditUiEvent
-import com.websarva.wings.android.zuboradiary.ui.model.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.FragmentResult
 import com.websarva.wings.android.zuboradiary.ui.model.diary.item.DiaryItemTitleSelectionUi
 import com.websarva.wings.android.zuboradiary.ui.utils.asString
 import com.websarva.wings.android.zuboradiary.ui.utils.isAccessLocationGranted
@@ -36,7 +36,7 @@ import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryItemTitl
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryShowScreenParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryEditNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryEditNavDestination
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged

@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.alert
 
 import androidx.navigation.fragment.navArgs
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.DialogResult
 
 /**
  * アプリ内で共通して使用される、汎用的な確認ダイアログ。

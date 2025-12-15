@@ -12,7 +12,7 @@ import com.websarva.wings.android.zuboradiary.ui.utils.timePickerDialogThemeResI
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.ui.activity.MainActivity
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.setResult
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.DialogResult
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalTime
 import kotlin.getValue

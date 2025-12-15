@@ -16,7 +16,7 @@ import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationD
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.DiaryEditScreenParams
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryShowNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryShowViewModel
 import dagger.hilt.android.AndroidEntryPoint

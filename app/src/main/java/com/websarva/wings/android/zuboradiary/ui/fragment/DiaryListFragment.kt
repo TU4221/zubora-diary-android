@@ -28,7 +28,7 @@ import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersDi
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogResult
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DiaryListNavDestination
 import com.websarva.wings.android.zuboradiary.ui.navigation.event.destination.DummyNavBackDestination
-import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
+import com.websarva.wings.android.zuboradiary.ui.navigation.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.utils.formatDateString
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
