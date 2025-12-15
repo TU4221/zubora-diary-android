@@ -26,7 +26,7 @@ import com.websarva.wings.android.zuboradiary.ui.model.event.ActivityCallbackUiE
 import com.websarva.wings.android.zuboradiary.ui.model.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.model.event.SettingsUiEvent
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ConfirmationDialogParams
-import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickerConfig
+import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickerConfig
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.ListPickersDialogParams
 import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogResult
 import com.websarva.wings.android.zuboradiary.ui.navigation.params.TimePickerDialogParams

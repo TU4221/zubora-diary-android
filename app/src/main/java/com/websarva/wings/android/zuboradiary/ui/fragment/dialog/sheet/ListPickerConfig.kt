@@ -1,10 +1,10 @@
-package com.websarva.wings.android.zuboradiary.ui.navigation.params
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 /**
- * 個々のNumberPickerの設定を定義するモデル。
+ * 汎用的な複数選択ピッカーダイアログ（[ListPickersDialogFragment]）の個々のNumberPickerの設定データ。
  *
  * @property items 表示する文字列のリスト。
  * @property initialIndex 初期選択位置のインデックス。

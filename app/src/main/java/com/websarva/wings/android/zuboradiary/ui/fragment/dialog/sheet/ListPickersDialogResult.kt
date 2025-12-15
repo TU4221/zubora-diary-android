@@ -1,7 +1,6 @@
-package com.websarva.wings.android.zuboradiary.ui.navigation.params
+package com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet
 
 import android.os.Parcelable
-import com.websarva.wings.android.zuboradiary.ui.fragment.dialog.sheet.ListPickersDialogFragment
 import kotlinx.parcelize.Parcelize
 
 /**
@@ -12,7 +11,7 @@ import kotlinx.parcelize.Parcelize
  * @property thirdPickerValue 3番目のピッカーで選択された値。表示されていない場合はnull。
  */
 @Parcelize
-data class ListPickersResult(
+data class ListPickersDialogResult(
     val firstPickerValue: Int,
     val secondPickerValue: Int?,
     val thirdPickerValue: Int?
