@@ -10,7 +10,6 @@ import androidx.annotation.CallSuper
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraph
 import androidx.navigation.fragment.findNavController
@@ -33,6 +32,7 @@ import com.websarva.wings.android.zuboradiary.ui.common.navigation.event.Navigat
 import com.websarva.wings.android.zuboradiary.ui.common.viewmodel.BaseFragmentViewModel
 import com.websarva.wings.android.zuboradiary.ui.main.MainActivityViewModel
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -390,15 +390,24 @@ abstract class BaseFragment<
     /**
      * ナビゲーション操作が可能になったことを通知する仕組みを設定する。
      *
-     * このフラグメント（[NavBackStackEntry]）が [Lifecycle.State.RESUMED] 状態になるたび、
+     * このフラグメント（[NavBackStackEntry] & ViewLifeCycle）が
+     * [Lifecycle.State.RESUMED] 状態になるたび、
      * ViewModelへ「ナビゲーション有効」であることを通知する。
      */
     fun setupNavigationEnabledNotifier() {
         val backStackEntry = findNavController().getBackStackEntry(destinationId)
-        backStackEntry.lifecycleScope.launch {
-            backStackEntry.lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
-                mainActivityViewModel.onNavigationEnabled()
-                mainViewModel.onNavigationEnabled()
+        viewLifecycleOwner.lifecycleScope.launch {
+            combine(
+                viewLifecycleOwner.lifecycle.currentStateFlow,
+                backStackEntry.lifecycle.currentStateFlow
+            ) { viewState, entryState ->
+                viewState == Lifecycle.State.RESUMED && entryState == Lifecycle.State.RESUMED
+            }.distinctUntilChanged().collect { isResumed ->
+                if (isResumed) {
+                    Log.d(logTag, "Navigation有効（View & BackStackEntry ： RESUMED）")
+                    mainActivityViewModel.onNavigationEnabled()
+                    mainViewModel.onNavigationEnabled()
+                }
             }
         }
     }
