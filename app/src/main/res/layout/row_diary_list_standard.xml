@@ -50,7 +50,7 @@
                 android:maxLines="1"
                 android:ellipsize="end" />
 
-            <com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
+            <com.websarva.wings.android.zuboradiary.ui.common.view.ImageProgressView
                 android:id="@+id/image_progress_attached_image"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/row_diary_list_image_height"

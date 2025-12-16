@@ -5,13 +5,13 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.LoadState" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.common.state.LoadState" />
         <!-- MEMO:DataBinding時のnameの定義はcamelCaseにすること。
                   上手くビルド(クラス生成)がされない不具合が発生する。
                   https://qiita.com/nanoyatsu/items/afad39a63d42d6fa3ac8 -->
         <variable
             name="viewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.CalendarViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.calendar.CalendarViewModel" />
     </data>
 
     <FrameLayout

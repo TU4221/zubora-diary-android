@@ -4,10 +4,10 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.LoadState" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.common.state.LoadState" />
         <variable
             name="viewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.edit.itemtitle.DiaryItemTitleEditViewModel" />
     </data>
 
     <LinearLayout

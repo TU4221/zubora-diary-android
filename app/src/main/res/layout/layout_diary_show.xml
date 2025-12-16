@@ -5,10 +5,10 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.LoadState" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.common.FilePathUi" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.diary.common.model.WeatherUi" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.common.state.LoadState" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.diary.common.model.DiaryUi" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.common.model.FilePathUi" />
         <variable
             name="diaryLoadState"
             type="LoadState&lt;DiaryUi>" />
@@ -20,7 +20,7 @@
             type="int" />
         <variable
             name="diaryImageFilePath"
-            type="FilePathUi" />
+            type="com.websarva.wings.android.zuboradiary.ui.common.model.FilePathUi" />
     </data>
 
     <!-- MEMO:本レイアウトをincludeタグで参照する場合はincludeタグ使用先でスクロール機能を持たせること。 -->
@@ -178,7 +178,7 @@
 
         <!-- MEMO:本レイアウトはincludeタグ使用先でスクロール機能を用意してもらう前提のため、警告"partially hidden in layout"
                   を"tools:ignore="VisualLintBounds""で無視する。 -->
-        <com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
+        <com.websarva.wings.android.zuboradiary.ui.common.view.ImageProgressView
             android:id="@+id/image_progress_attached_image"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

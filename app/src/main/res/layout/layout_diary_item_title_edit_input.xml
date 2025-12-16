@@ -3,10 +3,10 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.InputTextValidationState" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.common.state.InputTextValidationState" />
         <variable
             name="viewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.edit.itemtitle.DiaryItemTitleEditViewModel" />
     </data>
 
     <LinearLayout
@@ -27,7 +27,7 @@
             app:errorEnabled="true"
             app:textValidationState="@{viewModel.uiState.titleValidationState}" >
 
-            <com.websarva.wings.android.zuboradiary.ui.view.custom.ImeActionHandlingTextInputEditText
+            <com.websarva.wings.android.zuboradiary.ui.common.view.ImeActionHandlingTextInputEditText
                 style="@style/AppImeDoneActionHandlingTextInputEditTextStyle"
                 android:id="@+id/text_input_edit_text_new_item_title"
                 android:layout_width="match_parent"

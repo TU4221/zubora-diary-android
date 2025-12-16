@@ -20,7 +20,7 @@ import coil3.memory.MemoryCache
 import coil3.request.crossfade
 import coil3.util.DebugLogger
 import com.websarva.wings.android.zuboradiary.data.file.ImageFileDataSource
-import com.websarva.wings.android.zuboradiary.ui.notification.ReminderNotificationManager
+import com.websarva.wings.android.zuboradiary.ui.reminder.ReminderNotificationManager
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.launch

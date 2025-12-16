@@ -6,7 +6,7 @@
     <data>
         <variable
             name="viewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryItemTitleEditViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.edit.itemtitle.DiaryItemTitleEditViewModel" />
     </data>
 
     <LinearLayout

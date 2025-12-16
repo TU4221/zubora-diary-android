@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.diary.common.model.DiaryUi" />
         <variable
             name="itemNumber"
             type="java.lang.String" />
@@ -66,7 +66,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/text_input_layout_title"/>
 
-        <com.websarva.wings.android.zuboradiary.ui.view.custom.PersistentClearIconTextInputLayout
+        <com.websarva.wings.android.zuboradiary.ui.common.view.PersistentClearIconTextInputLayout
             android:id="@+id/text_input_layout_title"
             style="@style/AppPersistentClearIconTextInputLayoutStyle"
             android:layout_width="0dp"
@@ -94,7 +94,7 @@
                 android:textAppearance="@style/AppTextInputEditTextTextAppearance"
                 android:textSize="@dimen/layout_diary_edit_item_text_size" />
 
-        </com.websarva.wings.android.zuboradiary.ui.view.custom.PersistentClearIconTextInputLayout>
+        </com.websarva.wings.android.zuboradiary.ui.common.view.PersistentClearIconTextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/text_input_layout_comment"
@@ -112,7 +112,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintBottom_toTopOf="@id/guideline">
 
-            <com.websarva.wings.android.zuboradiary.ui.view.custom.ScrollableMultiLineTextInputEditText
+            <com.websarva.wings.android.zuboradiary.ui.common.view.ScrollableMultiLineTextInputEditText
                 android:id="@+id/text_input_edit_text_comment"
                 style="@style/AppScrollableMultiLineTextInputEditTextStyle"
                 android:layout_width="match_parent"

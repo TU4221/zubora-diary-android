@@ -5,8 +5,8 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.state.LoadState" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.diary.DiaryUi" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.common.state.LoadState" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.diary.common.model.DiaryUi" />
         <variable
             name="itemNumber"
             type="java.lang.String" />

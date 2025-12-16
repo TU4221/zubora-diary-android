@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <variable
             name="viewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.WordSearchViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.search.WordSearchViewModel" />
 
     </data>
 
@@ -16,7 +16,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.websarva.wings.android.zuboradiary.ui.view.custom.ClearFocusBackgroundView
+        <com.websarva.wings.android.zuboradiary.ui.common.view.ClearFocusBackgroundView
             android:layout_width="match_parent"
             android:layout_height="match_parent"/>
 
@@ -57,7 +57,7 @@
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" >
 
-                            <com.websarva.wings.android.zuboradiary.ui.view.custom.ImeActionHandlingTextInputEditText
+                            <com.websarva.wings.android.zuboradiary.ui.common.view.ImeActionHandlingTextInputEditText
                                 style="@style/WordSearchTextInputEditTextStyle"
                                 android:id="@+id/text_input_edit_text_search_word"
                                 android:layout_width="match_parent"

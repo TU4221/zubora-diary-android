@@ -5,10 +5,10 @@
 
     <data>
         <import type="android.view.View" />
-        <import type="com.websarva.wings.android.zuboradiary.ui.model.diary.WeatherUi" />
+        <import type="com.websarva.wings.android.zuboradiary.ui.diary.common.model.WeatherUi" />
         <variable
             name="viewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryEditViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.edit.DiaryEditViewModel" />
     </data>
 
     <FrameLayout
@@ -55,7 +55,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
 
-                    <com.websarva.wings.android.zuboradiary.ui.view.custom.ClearFocusBackgroundView
+                    <com.websarva.wings.android.zuboradiary.ui.common.view.ClearFocusBackgroundView
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"/>
 
@@ -238,7 +238,7 @@
                                       この警告に対応すると項目1～5のタイトル、コメント入力欄のTextInputLayoutの
                                       hint属性も変更する必要がある為、警告を無視することにした。
                                       (項目1～5のタイトル、コメント入力欄はincludeタグで複製している為、警告は表示されない)-->
-                            <com.websarva.wings.android.zuboradiary.ui.view.custom.ImeActionHandlingTextInputEditText
+                            <com.websarva.wings.android.zuboradiary.ui.common.view.ImeActionHandlingTextInputEditText
                                 android:id="@+id/text_input_edit_text_title"
                                 style="@style/AppImeDoneActionHandlingTextInputEditTextStyle"
                                 android:layout_width="match_parent"
@@ -380,7 +380,7 @@
 
                         </LinearLayout>
 
-                        <com.websarva.wings.android.zuboradiary.ui.view.custom.ImageProgressView
+                        <com.websarva.wings.android.zuboradiary.ui.common.view.ImageProgressView
                             android:id="@+id/image_progress_attached_image"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"

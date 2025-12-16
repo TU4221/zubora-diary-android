@@ -7,7 +7,7 @@
         <import type="android.view.View" />
         <variable
             name="viewModel"
-            type="com.websarva.wings.android.zuboradiary.ui.viewmodel.DiaryListViewModel" />
+            type="com.websarva.wings.android.zuboradiary.ui.diary.list.DiaryListViewModel" />
     </data>
 
     <FrameLayout
@@ -57,7 +57,7 @@
 
                 <!-- MEMO:スクロールバーを表示させたいが、子RecyclerViewに反応してスクロールバーの長さが安定しない。
                           その為、"android:scrollbars="none"" とする。 -->
-                <com.websarva.wings.android.zuboradiary.ui.view.custom.SwipeBackgroundButtonRecyclerView
+                <com.websarva.wings.android.zuboradiary.ui.common.view.SwipeBackgroundButtonRecyclerView
                     style="@style/AppRecyclerViewStyle"
                     android:id="@+id/recycler_diary_list"
                     android:layout_width="match_parent"

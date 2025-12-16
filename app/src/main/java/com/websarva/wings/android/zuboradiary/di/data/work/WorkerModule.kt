@@ -3,7 +3,7 @@ package com.websarva.wings.android.zuboradiary.di.data.work
 import android.content.Context
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.WorkManager
-import com.websarva.wings.android.zuboradiary.ui.notification.ReminderNotificationManager
+import com.websarva.wings.android.zuboradiary.ui.reminder.ReminderNotificationManager
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
