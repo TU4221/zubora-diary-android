@@ -352,6 +352,9 @@ class WordSearchViewModel @Inject internal constructor(
 
     /**
      * 検索結果リストの読み込み処理を共通のロジックで実行する。
+     *
+     * 検索ワード（[searchWord]）が空の場合は処理されない。
+     *
      * @param updateToLoadingUiState 読み込み開始時のUI状態更新処理
      * @param currentResultList 現在の検索結果リスト
      * @param searchWord 検索ワード
@@ -368,13 +371,13 @@ class WordSearchViewModel @Inject internal constructor(
         ) -> UseCaseResult<DiaryYearMonthList<DiaryDayListItem.WordSearchResult>, E>,
         emitAppMessageOnFailure: suspend (E) -> Unit
     ) {
-        val searchWord = SearchWord(searchWord)
+        if (searchWord.isBlank()) return
 
         val logMsg = "ワード検索結果読込"
         Log.i(logTag, "${logMsg}_開始")
 
-
         updateToLoadingUiState()
+        val searchWord = SearchWord(searchWord)
         try {
             val updateNumWordSearchResults: Int
             when (val result  = countWordSearchResultsUseCase(searchWord)) {
