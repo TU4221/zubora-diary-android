@@ -9,9 +9,9 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitle
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistoryId
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DeleteDiaryItemTitleSelectionHistoryUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryItemTitleSelectionHistoryListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.list.LoadDiaryItemTitleSelectionHistoryListUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryDeleteException
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryItemTitleSelectionHistoryLoadException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.list.exception.DiaryItemTitleSelectionHistoryListLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.text.ValidateInputTextUseCase
 import com.websarva.wings.android.zuboradiary.ui.common.mapper.toUiModel
 import com.websarva.wings.android.zuboradiary.ui.diary.common.mapper.toUiModel
@@ -118,12 +118,12 @@ class DiaryItemTitleEditViewModel @Inject internal constructor(
         }.onEach { result ->
             if (result is UseCaseResult.Failure) {
                 when (result.exception) {
-                    is DiaryItemTitleSelectionHistoryLoadException.LoadFailure -> {
+                    is DiaryItemTitleSelectionHistoryListLoadException.LoadFailure -> {
                         showAppMessageDialog(
                             DiaryItemTitleEditAppMessage.ItemTitleHistoryLoadFailure
                         )
                     }
-                    is DiaryItemTitleSelectionHistoryLoadException.Unknown -> {
+                    is DiaryItemTitleSelectionHistoryListLoadException.Unknown -> {
                         showUnexpectedAppMessageDialog(result.exception)
                     }
                 }

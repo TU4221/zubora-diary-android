@@ -2,7 +2,7 @@ package com.websarva.wings.android.zuboradiary.ui.diary.common.viewmodel
 
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
-import com.websarva.wings.android.zuboradiary.domain.usecase.diary.BuildDiaryImageFilePathUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.image.BuildDiaryImageFilePathUseCase
 import com.websarva.wings.android.zuboradiary.ui.common.model.FilePathUi
 import com.websarva.wings.android.zuboradiary.ui.diary.common.model.WeatherUi
 import javax.inject.Inject
