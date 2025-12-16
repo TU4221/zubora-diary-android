@@ -113,12 +113,13 @@ class ZuboraDiaryApplication :
         // MEMO:メモリリーク対策として、引数の context は Activity の可能性があるため、
         //      必ず applicationContext に変換して使用する。
         //      これにより、画面(Activity)が破棄(画面回転等)された後も ImageLoader が Activity を掴み続けるのを防ぐ。
-        return ImageLoader.Builder(context.applicationContext)
+        val appContext = context.applicationContext
+        return ImageLoader.Builder(appContext)
             .memoryCache {
                 // メモリキャッシュ設定
                 MemoryCache.Builder()
                     // 利用可能なアプリメモリからメモリキャッシュへの使用料
-                    .maxSizePercent(context.applicationContext, 0.20)
+                    .maxSizePercent(appContext, 0.20)
                     .build()
             }
             // ローカルファイルの読み込みが主であるため、ディスクキャッシュを無効化
