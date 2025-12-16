@@ -101,24 +101,37 @@ class ZuboraDiaryApplication :
         }
     }
 
+    /**
+     * アプリケーション全体で共有される Coil の ImageLoader を生成・設定する。
+     *
+     * このメソッドは Coil が最初に画像を表示しようとしたタイミングで（遅延初期化で）呼び出さる。
+     *
+     * @param context 呼び出し元のコンテキスト
+     * @return 設定済みの [ImageLoader] インスタンス
+     */
     override fun newImageLoader(context: PlatformContext): ImageLoader {
-        return ImageLoader.Builder(context)
-            .memoryCache { // メモリキャッシュ設定
+        // MEMO:メモリリーク対策として、引数の context は Activity の可能性があるため、
+        //      必ず applicationContext に変換して使用する。
+        //      これにより、画面(Activity)が破棄(画面回転等)された後も ImageLoader が Activity を掴み続けるのを防ぐ。
+        return ImageLoader.Builder(context.applicationContext)
+            .memoryCache {
+                // メモリキャッシュ設定
                 MemoryCache.Builder()
-                    .maxSizePercent(context, 0.20) // 利用可能なアプリメモリからメモリキャッシュへの使用料
+                    // 利用可能なアプリメモリからメモリキャッシュへの使用料
+                    .maxSizePercent(context.applicationContext, 0.20)
                     .build()
             }
-            .diskCache(null) // ローカルファイルの読み込みの為、ディスクキャッシュを無効化
-
+            // ローカルファイルの読み込みが主であるため、ディスクキャッシュを無効化
+            .diskCache(null)
             // MEMO:画像切替時の表示不具合対策としてクロスフェードを無効化。
             //      有効の場合、アプリリソース画像とストレージ画像間の高速な切り替え時に、以下の問題が発生することがある。
             //      1. 画像が薄く表示される (アルファ値の問題の可能性)
             //      2. ImageView で指定した ScaleType が適用されない
-            .crossfade(false) // 画像表示時のクロスフェード有無
-
+            .crossfade(false)
             .apply {
+                // 開発時のみ詳細なログを出力してデバッグを容易にする
                 if (BuildConfig.DEBUG) {
-                    logger(DebugLogger()) // ロギング (開発中のみ)
+                    logger(DebugLogger())
                 }
             }
             .build()
