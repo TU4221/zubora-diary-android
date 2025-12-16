@@ -33,7 +33,7 @@
             android:layout_marginHorizontal="@dimen/screen_spacing_horizontal"
             android:minHeight="@dimen/row_diary_list_height"
             android:orientation="horizontal"
-            android:padding="8dp"
+            android:padding="@dimen/row_diary_list_content_spacing"
             app:applySystemInsetsToMarginLeft="@{true}"
             app:applySystemInsetsToMarginRight="@{true}">
 

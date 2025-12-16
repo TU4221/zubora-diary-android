@@ -35,8 +35,7 @@
     <!-- region row_diary_list -->
     <dimen name="row_diary_list_height">72dp</dimen>
     <dimen name="row_diary_list_image_height">64dp</dimen>
-
-    <dimen name="row_diary_list_word_search_result_content_spacing">8dp</dimen>
+    <dimen name="row_diary_list_content_spacing">8dp</dimen>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->
