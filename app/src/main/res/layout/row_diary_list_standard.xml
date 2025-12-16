@@ -12,12 +12,18 @@
 
         <!-- MEMO:親タグのFrameLayoutにpadding属性を設定するのではなく、子タグにmargin属性を設定する理由は、
                   スワイプ時にViewの端が途切れずに画面外に出てくような動きを表現するため。 -->
-        <include
-            layout="@layout/row_left_swipe_button_background"
-            android:id="@+id/include_background"
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginHorizontal="@dimen/screen_spacing_horizontal" />
+            app:applySystemInsetsToMarginLeft="@{true}"
+            app:applySystemInsetsToMarginRight="@{true}">
+            <include
+                layout="@layout/row_left_swipe_button_background"
+                android:id="@+id/include_background"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginHorizontal="@dimen/screen_spacing_horizontal" />
+        </FrameLayout>
 
         <LinearLayout
             style="@style/DiaryListItemLayoutStyle"
@@ -27,7 +33,9 @@
             android:layout_marginHorizontal="@dimen/screen_spacing_horizontal"
             android:minHeight="@dimen/row_diary_list_height"
             android:orientation="horizontal"
-            android:padding="8dp">
+            android:padding="8dp"
+            app:applySystemInsetsToMarginLeft="@{true}"
+            app:applySystemInsetsToMarginRight="@{true}">
 
             <include
                 layout="@layout/layout_diary_list_item_day"

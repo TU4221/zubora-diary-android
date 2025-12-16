@@ -1,85 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/DiaryListItemLayoutStyle"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:layout_marginHorizontal="@dimen/screen_spacing_horizontal"
-    android:minHeight="@dimen/row_diary_list_height"
-    android:orientation="horizontal"
-    android:baselineAligned="false">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <include
-        layout="@layout/layout_diary_list_item_day"
-        android:id="@+id/include_day"
-        android:layout_width="0dp"
+    <LinearLayout
+        style="@style/DiaryListItemLayoutStyle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="1"/>
+        android:layout_marginHorizontal="@dimen/screen_spacing_horizontal"
+        android:minHeight="@dimen/row_diary_list_height"
+        android:orientation="horizontal"
+        android:baselineAligned="false"
+        app:applySystemInsetsToMarginLeft="@{true}"
+        app:applySystemInsetsToMarginRight="@{true}">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="3">
-
-        <TextView
-            style="@style/DiaryListTextViewStyle"
-            android:id="@+id/text_title"
+        <include
+            layout="@layout/layout_diary_list_item_day"
+            android:id="@+id/include_day"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/row_diary_list_word_search_result_content_spacing"
-            android:textAppearance="@style/DiaryListTextAppearance"
-            android:textSize="20sp"
-            android:hint="@string/row_diary_list_word_search_result_title_hint"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_weight="1" />
 
-        <TextView
-            style="@style/DiaryListTextViewStyle"
-            android:id="@+id/text_item_number"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="@dimen/row_diary_list_word_search_result_content_spacing"
-            android:textAppearance="@style/DiaryListTextAppearance"
-            android:textSize="16sp"
-            android:hint="@string/row_diary_list_word_search_result_item_hint"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/text_title" />
-
-        <TextView
-            style="@style/DiaryListTextViewStyle"
-            android:id="@+id/text_item_title"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/row_diary_list_word_search_result_content_spacing"
-            android:layout_marginTop="@dimen/row_diary_list_word_search_result_content_spacing"
-            android:textAppearance="@style/DiaryListTextAppearance"
-            android:textSize="16sp"
-            android:hint="@string/row_diary_list_word_search_result_item_title_hint"
-            android:maxLines="1"
-            android:ellipsize="end"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/text_item_number"
-            app:layout_constraintTop_toBottomOf="@+id/text_title" />
+            android:layout_weight="3">
 
-        <TextView
-            style="@style/DiaryListTextViewStyle"
-            android:id="@+id/text_item_comment"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="@dimen/row_diary_list_word_search_result_content_spacing"
-            android:layout_marginVertical="@dimen/row_diary_list_word_search_result_content_spacing"
-            android:maxLines="4"
-            android:ellipsize="end"
-            android:textAppearance="@style/DiaryListTextAppearance"
-            android:textSize="14sp"
-            android:hint="@string/row_diary_list_word_search_result_item_comment_hint"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/text_item_number"
-            app:layout_constraintTop_toBottomOf="@+id/text_item_title" />
+            <TextView
+                style="@style/DiaryListTextViewStyle"
+                android:id="@+id/text_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/row_diary_list_word_search_result_content_spacing"
+                android:textAppearance="@style/DiaryListTextAppearance"
+                android:textSize="20sp"
+                android:hint="@string/row_diary_list_word_search_result_title_hint"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                style="@style/DiaryListTextViewStyle"
+                android:id="@+id/text_item_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/row_diary_list_word_search_result_content_spacing"
+                android:textAppearance="@style/DiaryListTextAppearance"
+                android:textSize="16sp"
+                android:hint="@string/row_diary_list_word_search_result_item_hint"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_title" />
 
-</LinearLayout>
+            <TextView
+                style="@style/DiaryListTextViewStyle"
+                android:id="@+id/text_item_title"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/row_diary_list_word_search_result_content_spacing"
+                android:layout_marginTop="@dimen/row_diary_list_word_search_result_content_spacing"
+                android:textAppearance="@style/DiaryListTextAppearance"
+                android:textSize="16sp"
+                android:hint="@string/row_diary_list_word_search_result_item_title_hint"
+                android:maxLines="1"
+                android:ellipsize="end"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/text_item_number"
+                app:layout_constraintTop_toBottomOf="@+id/text_title" />
+
+            <TextView
+                style="@style/DiaryListTextViewStyle"
+                android:id="@+id/text_item_comment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/row_diary_list_word_search_result_content_spacing"
+                android:layout_marginVertical="@dimen/row_diary_list_word_search_result_content_spacing"
+                android:maxLines="4"
+                android:ellipsize="end"
+                android:textAppearance="@style/DiaryListTextAppearance"
+                android:textSize="14sp"
+                android:hint="@string/row_diary_list_word_search_result_item_comment_hint"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/text_item_number"
+                app:layout_constraintTop_toBottomOf="@+id/text_item_title" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </LinearLayout>
+</layout>
