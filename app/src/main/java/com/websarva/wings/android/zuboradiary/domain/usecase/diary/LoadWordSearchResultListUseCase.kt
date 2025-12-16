@@ -147,7 +147,7 @@ internal class LoadWordSearchResultListUseCase @Inject constructor(
         item: RawWordSearchResultListItem,
         searchWord: SearchWord
     ): Map<String, Any> {
-        val regex = ".*$searchWord.*"
+        val regex = ".*${searchWord.value}.*"
         val itemTitles = arrayOf(
             item.item1Title,
             item.item2Title,
