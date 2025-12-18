@@ -565,7 +565,12 @@ class CalendarFragment :
     private fun updateCalendarDayDotVisibility(date: LocalDate, isVisible: Boolean) {
         val calendarMonthDayBinder = binding.calendar.dayBinder as CalendarMonthDayBinder
         calendarMonthDayBinder.updateDayDotVisibilityCache(date, isVisible)
-        binding.calendar.notifyDateChanged(date)
+        // TODO:CalendarViewのBind処理中に日記既存確認を開始し、
+        //      処理途中に結果（Event）を受け取りnotifyDateChanged()を呼び出すと、例外が発生。一時的措置としてpost()処理追加。
+        //      MonthScrollListenerで対応する日記既存確認を開始し、一日単位ではなく、月単位で既存確認をすることを検討。
+        binding.calendar.post {
+            binding.calendar.notifyDateChanged(date)
+        }
     }
 
     /**
