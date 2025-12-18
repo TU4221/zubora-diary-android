@@ -89,10 +89,13 @@ class MainActivity : LoggingActivity(), ActivityNavigationEventHandler<MainActiv
     private val mainActivityViewModel: MainActivityViewModel by viewModels()
 
     /** アプリケーションのナビゲーションを管理する[NavController]。 */
-    private val navController by lazy {
-        // MEMO:Activity#findNavController()でNavControllerを取得する場合、
-        //      アプリ設定(権限等)変更時でのアプリ再起動時にNavControllerの取得に失敗する為、
-        //      NavHostFragmentから取得する。
+    // MEMO:Activity#findNavController()でNavControllerを取得する場合、
+    //      アプリ設定(権限等)変更時でのアプリ再起動時にNavControllerの取得に失敗する為、
+    //      NavHostFragmentから取得する。
+    //      また、本プロパティはUIスレッド専用のため同期ロックは不要。
+    //      意図しないバックグラウンドアクセスが発生した際のロック競合(UIフリーズ)を回避するため、
+    //      明示的にNONEを指定する。
+    private val navController by lazy(LazyThreadSafetyMode.NONE) {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment_nav_host) as NavHostFragment
         navHostFragment.navController
