@@ -3,14 +3,14 @@ package com.websarva.wings.android.zuboradiary.domain.model.diary
 /**
  * 日記の項目のコメントを表すバリュークラス。
  *
- * @property value 項目のコメント。50文字以内でなければならない。
- * @throws IllegalArgumentException 文字列が50文字を超える場合。
+ * @property value 項目のコメント。150文字以内でなければならない。
+ * @throws IllegalArgumentException 文字列が150文字を超える場合。
  */
 @JvmInline
 internal value class DiaryItemComment(val value: String) {
     init {
-        require(value.length <= 50) {
-            "項目のコメントは50文字以内で入力してください。"
+        require(value.length <= 150) {
+            "項目のコメントは150文字以内で入力してください。"
         }
     }
 
