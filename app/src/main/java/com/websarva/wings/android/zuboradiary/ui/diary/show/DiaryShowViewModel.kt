@@ -81,7 +81,9 @@ class DiaryShowViewModel @Inject internal constructor(
         val args = DiaryShowFragmentArgs.fromSavedStateHandle(handle)
         val id = DiaryId(checkNotNull(args.params.diaryId))
         val date = args.params.diaryDate
-        launchWithUnexpectedErrorHandler {
+        launchWithUnexpectedErrorHandler(
+            onError = { handleDiaryLoadFailure(date) }
+        ) {
             loadDiary(id, date)
         }
     }
@@ -232,21 +234,31 @@ class DiaryShowViewModel @Inject internal constructor(
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 when (result.exception) {
                     is DiaryLoadByIdException.LoadFailure -> {
-                        updateToDiaryLoadErrorState()
-                        emitNavigationEvent(
-                            NavigationEvent.To(
-                                DiaryShowNavDestination.DiaryLoadFailureDialog(date),
-                                NavigationEvent.Policy.Retry
-                            )
-                        )
+                        handleDiaryLoadFailure(date)
                     }
                     is DiaryLoadByIdException.Unknown -> {
-                        updateToDiaryLoadErrorState()
                         showUnexpectedAppMessageDialog(result.exception)
+                        handleDiaryLoadFailure(date)
                     }
                 }
             }
         }
+    }
+
+    /**
+     * 日記の読み込みに失敗した際の共通処理を行う。
+     * UIをエラー状態に更新し、読み込み失敗ダイアログを表示する（イベント発行）。
+     *
+     * @param date 読み込もうとしていた日記の日付。ダイアログの表示に使用する。
+     */
+    private suspend fun handleDiaryLoadFailure(date: LocalDate) {
+        updateToDiaryLoadErrorState()
+        emitNavigationEvent(
+            NavigationEvent.To(
+                DiaryShowNavDestination.DiaryLoadFailureDialog(date),
+                NavigationEvent.Policy.Retry
+            )
+        )
     }
 
     /**
