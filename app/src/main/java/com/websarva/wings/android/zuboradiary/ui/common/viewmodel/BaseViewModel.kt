@@ -264,11 +264,13 @@ abstract class BaseViewModel<
      * また、UIが処理中のまま固まるのを防ぐため、[uiState]を指定された状態にロールバックする。
      *
      * @param rollbackState 予期せぬエラー発生時にロールバックするUI状態。デフォルトは処理開始前の状態。
+     * @param onError 例外発生時に追加で実行する処理ブロック。発生した例外が引数として渡される。
      * @param block 実行するメインの処理ブロック。
      * @return 起動したコルーチンの[Job]。
      */
     protected fun launchWithUnexpectedErrorHandler(
         rollbackState: US? = null,
+        onError: suspend (e: Exception) -> Unit = { },
         block: suspend CoroutineScope.() -> Unit
     ) : Job {
         return viewModelScope.launch {
@@ -276,7 +278,7 @@ abstract class BaseViewModel<
             try {
                 block()
             } catch (e: Exception) {
-                handleUnexpectedError(e, initialState)
+                handleUnexpectedError(e, initialState, onError)
             }
         }
     }
@@ -288,17 +290,19 @@ abstract class BaseViewModel<
      * [handleUnexpectedError]を呼び出して共通のエラー処理を行う。
      *
      * @param rollbackState 予期せぬエラー発生時にロールバックするUI状態。デフォルトは処理開始前の状態。
+     * @param onError 例外発生時に追加で実行する処理ブロック。発生した例外が引数として渡される。
      * @param block 実行する中断可能な処理ブロック。
      */
     protected suspend fun withUnexpectedErrorHandler(
         rollbackState: US? = null,
+        onError: suspend (e: Exception) -> Unit = { },
         block: suspend () -> Unit
     ) {
         val initialState = rollbackState ?: currentUiState
         try {
             block()
         } catch (e: Exception) {
-            handleUnexpectedError(e, initialState)
+            handleUnexpectedError(e, initialState, onError)
         }
     }
 
@@ -333,8 +337,13 @@ abstract class BaseViewModel<
      *
      * @param e 補足された例外。
      * @param rollbackState ロールバック先のUI状態。
+     * @param onError 例外発生時に追加で実行する処理ブロック。発生した例外が引数として渡される。
      */
-    private suspend fun handleUnexpectedError(e: Exception, rollbackState: US) {
+    private suspend fun handleUnexpectedError(
+        e: Exception,
+        rollbackState: US,
+        onError: suspend (e: Exception) -> Unit = { }
+    ) {
         // コルーチンのキャンセルはエラーではないため、再スローして処理を中断させる
         if (e is CancellationException) {
             throw e
@@ -342,6 +351,7 @@ abstract class BaseViewModel<
         Log.e(logTag, "予期せぬエラーが発生", e)
         updateUiState(rollbackState)
         showUnexpectedAppMessageDialog(e)
+        onError(e)
     }
     //endregion
 }
