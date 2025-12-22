@@ -38,6 +38,7 @@ import com.websarva.wings.android.zuboradiary.ui.common.navigation.event.Fragmen
 import com.websarva.wings.android.zuboradiary.ui.common.navigation.event.NavigationEvent
 import com.websarva.wings.android.zuboradiary.ui.common.theme.withTheme
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -147,9 +148,14 @@ class MainActivity : LoggingActivity(), ActivityNavigationEventHandler<MainActiv
         savedThemeColor?.let { themeColor = it }
     }
 
-    /** UIの初期設定を行う。テーマカラーの取得後、Viewのバインディング、UIイベント/ステートの監視、ナビゲーションのセットアップを順に行う。 */
+    /**
+     * UIの初期設定を行う。
+     * ViewModelの準備が出来たら、テーマカラーを取得し、Viewのバインディングを行う。
+     * その後、UIイベント/ステートの監視、ナビゲーションのセットアップを順に行う。
+     */
     private fun setupUi() {
         lifecycleScope.launch {
+            mainActivityViewModel.isReady.filter { it }.first()
             themeColor =
                 mainActivityViewModel.uiState.map { it.themeColor }.filterNotNull().first()
             setupMainActivityBinding()

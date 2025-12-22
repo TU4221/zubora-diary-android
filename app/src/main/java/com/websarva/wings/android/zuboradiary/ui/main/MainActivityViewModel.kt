@@ -22,6 +22,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -54,6 +56,13 @@ class MainActivityViewModel @Inject internal constructor(
 ) {
 
     //region Properties
+    /**
+     * ViewModelの初期化処理（テーマカラー設定の読み込みなど）が完了し、
+     * アプリケーションのUI表示準備が整ったことを示すStateFlow。Kotlin* * `MainActivity`は、この値が`true`になるまでスプラッシュスクリーンを表示し続ける。
+     */
+    private val _isReady = MutableStateFlow(false)
+    val isReady get() = _isReady.asStateFlow()
+
     /** BottomNavigationViewのタブが選択されたかどうかを示すStateFlow。 */
     private val _wasBottomNavigationTabSelected = MutableStateFlow(false)
     val wasSelectedTab get() = _wasBottomNavigationTabSelected.asStateFlow()
@@ -72,7 +81,21 @@ class MainActivityViewModel @Inject internal constructor(
 
     //region Initialization
     init {
+        prepareApplication()
         collectUiStates()
+    }
+
+    /**
+     * アプリケーションの起動に必要なデータの準備を実行する。
+     *
+     * 下記データの準備が完了したらアプリケーションの準備完了フラグ（[isReady]）を立てる。
+     * - テーマカラー設定
+     */
+    private fun prepareApplication() {
+        viewModelScope.launch {
+            uiState.map { it.themeColor }.filterNotNull().first()
+            _isReady.value = true
+        }
     }
 
     /** UI状態の監視を開始する。 */
