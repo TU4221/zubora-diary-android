@@ -13,7 +13,7 @@
     <!-- region layout_diary_edit -->
     <integer name="layout_diary_edit_item_title_max_length">20</integer>
     <integer name="layout_diary_edit_item_comment_max_length">150</integer>
-    <integer name="layout_diary_edit_item_comment_min_lines">5</integer>
+    <integer name="layout_diary_edit_item_comment_lines">5</integer>
     <!-- endregion -->
 
     <!-- ===================================================================================== -->

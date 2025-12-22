@@ -87,6 +87,10 @@
         <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
         <item name="android:textColor">@color/text_color_on_surface</item>
         <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
+
+        <item name="android:lines">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:inputType">text</item>
     </style>
     <style name="AppTextInputEditTextNoInputStyle" parent="AppTextInputEditTextStyle">
         <item name="android:focusable">false</item> <!-- MEMO:一回のタッチでクリック処理を起動 -->
@@ -107,7 +111,6 @@
     </style>
     <style name="AppImeDoneActionHandlingTextInputEditTextStyle" parent="AppImeActionHandlingTextInputEditTextStyle">
         <item name="android:imeOptions">actionDone</item>
-        <item name="android:inputType">text</item>
     </style>
     <style name="AppImeActionHandlingTextInputEditTextTextAppearance" parent="TextAppearance.AppCompat.Medium.Inverse">
         <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
@@ -121,18 +124,11 @@
 
     <!-- region Scrollable MultiLine Text Input Edit Text -->
     <style name="AppScrollableMultiLineTextInputEditTextStyle" parent="AppImeActionHandlingTextInputEditTextStyle">
-        <item name="android:textColor">@color/text_color_on_surface</item>
-        <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
-
         <item name="android:gravity">top</item>
         <item name="android:scrollbars">vertical</item>
+        <item name="android:inputType">textMultiLine</item>
     </style>
     <style name="AppScrollableMultiLineTextInputEditTextTextAppearance" parent="AppImeActionHandlingTextInputEditTextTextAppearance">
-        <!-- HACK:下記属性はTextAppearanceでは反映されない為、Styleに記述 -->
-        <!--
-        <item name="android:textColor">@color/text_color_on_surface</item>
-        <item name="android:textColorHint">@color/hint_text_color_on_surface</item>
-        -->
     </style>
     <!-- endregion -->
 
