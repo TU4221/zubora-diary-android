@@ -157,11 +157,13 @@ class DiaryEditViewModel @Inject internal constructor(
         val args = DiaryEditFragmentArgs.fromSavedStateHandle(handle)
         val id = args.params.diaryId?.let { DiaryId(it) }
         val date = args.params.diaryDate
-        launchWithUnexpectedErrorHandler {
-            prepareDiaryEntry(
-                id,
-                date
-            )
+        launchWithUnexpectedErrorHandler(
+            onError = {
+                updateToDiaryPreparationErrorState()
+                navigatePreviousScreen(date)
+            }
+        ) {
+            prepareDiaryEntry(id, date)
         }
     }
 
@@ -886,7 +888,7 @@ class DiaryEditViewModel @Inject internal constructor(
             is UseCaseResult.Failure -> {
                 Log.e(logTag, "${logMsg}_失敗", result.exception)
                 if (previousState.originalDiaryLoadState == LoadState.Idle) {
-                    updateToDiaryLoadErrorState()
+                    updateToDiaryPreparationErrorState()
 
                     // MEMO:連続するUIイベント（エラー表示と画面遷移）は、監視開始前に発行されると
                     //      取りこぼされる可能性がある。これを防ぐため、間に確認ダイアログを挟み、
@@ -1752,13 +1754,13 @@ class DiaryEditViewModel @Inject internal constructor(
         }
     }
 
-    /** UIを日記読み込み失敗の状態に更新する。 */
-    private fun updateToDiaryLoadErrorState() {
+    /** UIを日記編集準備失敗の状態に更新する。 */
+    private fun updateToDiaryPreparationErrorState() {
         updateUiState {
             it.copy(
                 originalDiaryLoadState = LoadState.Error,
                 isProcessing = false,
-                isInputDisabled = false
+                isInputDisabled = true
             )
         }
     }
