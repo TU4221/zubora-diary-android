@@ -390,18 +390,23 @@ abstract class BaseFragment<
     /**
      * ナビゲーション操作が可能になったことを通知する仕組みを設定する。
      *
-     * このフラグメント（[NavBackStackEntry] & ViewLifeCycle）が
+     * このフラグメントのライフサイクル（[NavBackStackEntry] & ViewLifeCycle）が
      * [Lifecycle.State.RESUMED] 状態になるたび、
      * ViewModelへ「ナビゲーション有効」であることを通知する。
      */
     fun setupNavigationEnabledNotifier() {
-        val backStackEntry = findNavController().getBackStackEntry(destinationId)
+        Log.d(logTag, "setupNavigationEnabledNotifier()")
         viewLifecycleOwner.lifecycleScope.launch {
             combine(
                 viewLifecycleOwner.lifecycle.currentStateFlow,
-                backStackEntry.lifecycle.currentStateFlow
-            ) { viewState, entryState ->
-                viewState == Lifecycle.State.RESUMED && entryState == Lifecycle.State.RESUMED
+                findNavController().currentBackStackEntryFlow
+            ) { viewState, entry ->
+                if (entry.destination.id == destinationId) {
+                    viewState == Lifecycle.State.RESUMED
+                            && entry.lifecycle.currentState == Lifecycle.State.RESUMED
+                } else {
+                    false
+                }
             }.distinctUntilChanged().collect { isResumed ->
                 if (isResumed) {
                     Log.d(logTag, "Navigation有効（View & BackStackEntry ： RESUMED）")
