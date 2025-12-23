@@ -438,11 +438,6 @@ class DiaryEditFragment : BaseFragment<
                         true
                     }
 
-                    R.id.diaryEditToolbarOptionTest -> {
-                        mainViewModel.test()
-                        true
-                    }
-
                     else -> false
                 }
             }
@@ -489,10 +484,6 @@ class DiaryEditFragment : BaseFragment<
         val menu = binding.materialToolbarTopAppBar.menu
         val deleteMenuItem = menu.findItem(R.id.diaryEditToolbarOptionDeleteDiary)
         deleteMenuItem.isEnabled = isDeleteEnabled
-
-        // TODO:テスト用の為、最終的に削除
-        val testMenuItem = menu.findItem(R.id.diaryEditToolbarOptionTest)
-        testMenuItem.isEnabled = !isDeleteEnabled
     }
 
     /**
