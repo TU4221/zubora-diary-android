@@ -26,6 +26,25 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     private val themeColor
         get() = (requireActivity() as MainActivity).themeColor
 
+    /** ダイアログのタイトル文字列。 */
+    protected abstract val title: String
+
+    /** ダイアログのメッセージ文字列。 */
+    protected abstract val message: String
+
+    /**
+     * Positiveボタンのテキスト。
+     */
+    protected open val positiveButtonText: String
+        get() = getString(R.string.dialog_alert_positive)
+
+    /**
+     * Negativeボタンのテキスト。
+     * null を返した場合、Negativeボタンは表示されない。
+     */
+    protected open val negativeButtonText: String?
+        get() = getString(R.string.dialog_alert_negative)
+
     /** 追加処理として、テーマカラーに基づいたMaterialAlertDialogBuilderを生成し、ダイアログのカスタマイズを行う。 */
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         Log.d(logTag, "onCreateDialog()")
@@ -46,20 +65,23 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
      */
     @CallSuper
     protected open fun customizeDialog(builder: MaterialAlertDialogBuilder) {
-        val title = createTitle()
         builder.setTitle(title)
-
-        val message = createMessage()
         builder.setMessage(message)
 
-        builder.setPositiveButton(R.string.dialog_base_alert_yes) { _: DialogInterface, _: Int ->
-            Log.d(logTag, "onClick()_PositiveButton")
-            handleOnPositiveButtonClick()
+        // Positiveボタンの設定 (nullならセットしない = 非表示)
+        positiveButtonText.let { text ->
+            builder.setPositiveButton(text) { _: DialogInterface, _: Int ->
+                Log.d(logTag, "onClick()_PositiveButton")
+                handleOnPositiveButtonClick()
+            }
         }
 
-        builder.setNegativeButton(R.string.dialog_base_alert_no) { _: DialogInterface, _: Int ->
-            Log.d(logTag, "onClick()_NegativeButton")
-            handleOnNegativeButtonClick()
+        // Negativeボタンの設定 (nullならセットしない = 非表示)
+        negativeButtonText?.let { text ->
+            builder.setNegativeButton(text) { _: DialogInterface, _: Int ->
+                Log.d(logTag, "onClick()_NegativeButton")
+                handleOnNegativeButtonClick()
+            }
         }
     }
 
@@ -72,30 +94,21 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
     }
 
     /**
-     * ダイアログのタイトル文字列を生成する。[onCreateDialog]から呼び出される。
+     * Positiveボタンがクリックされた際の処理。
+     * ボタンを表示する場合、必要に応じてオーバーライドする。
      */
-    protected abstract fun createTitle(): String
+    protected open fun handleOnPositiveButtonClick() {
+        // デフォルトでは何もしない
+    }
 
     /**
-     * ダイアログのメッセージ文字列を生成する。[onCreateDialog]から呼び出される。
+     * Negativeボタンがクリックされた際の処理。
+     * ボタンを表示する場合、必要に応じてオーバーライドする。
      */
-    protected abstract fun createMessage(): String
+    protected open fun handleOnNegativeButtonClick() {
+        // デフォルトでは何もしない
+    }
 
-    /**
-     * Positiveボタンがクリックされた際の処理を定義する。
-     */
-    protected abstract fun handleOnPositiveButtonClick()
-
-    /**
-     * Negativeボタンがクリックされた際の処理を定義する。
-     */
-    protected abstract fun handleOnNegativeButtonClick()
-
-    // ダイアログ枠外タッチ、popBackStack時に処理
-    // MEMO:ダイアログフラグメントのCANCEL・DISMISS 処理について、
-    //      このクラスのような、DialogFragmentにAlertDialogを作成する場合、
-    //      CANCEL・DISMISSの処理内容はDialogFragmentのonCancel/onDismissをオーバーライドする必要がある。
-    //      DialogFragment、AlertDialogのリスナセットメソッドを使用して処理内容を記述きても処理はされない。
     /** 追加処理として、キャンセル時の独自の処理を呼び出す。 */
     override fun onCancel(dialog: DialogInterface) {
         Log.d(logTag, "onCancel()")
@@ -105,6 +118,7 @@ abstract class BaseAlertDialogFragment : DialogFragment() {
 
     /**
      * ダイアログがキャンセルされた際の処理を定義する。[onCancel]から呼び出される。
+     * キャンセル動作はUI上のボタン有無に関わらず発生しうるため、abstractのまま(必須実装)とする。
      */
     protected abstract fun handleOnCancel()
 }

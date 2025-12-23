@@ -73,9 +73,9 @@
     <string name="enum_theme_color_yellow">イエロー</string>
     <!-- endregion -->
 
-    <!-- region Dialog - Base Alert Dialog -->
-    <string name="dialog_base_alert_yes">はい</string>
-    <string name="dialog_base_alert_no">いいえ</string>
+    <!-- region Dialog - Alert Dialog -->
+    <string name="dialog_alert_positive">はい</string>
+    <string name="dialog_alert_negative">いいえ</string>
     <!-- endregion -->
 
     <!-- region Dialog - Diary Delete Dialog -->
