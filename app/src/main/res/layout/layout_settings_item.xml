@@ -22,7 +22,7 @@
 
     </data>
 
-    <RelativeLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         style="@style/SettingsItemLayoutStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -39,13 +39,14 @@
         <TextView
             android:id="@+id/text_title"
             style="@style/SettingsItemTextViewStyle"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:layout_toStartOf="@+id/text_value"
             android:text="@{settingTitle}"
             android:textAppearance="@style/SettingsItemTextViewTextAppearance"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/text_value"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:drawableStartCompat="@{settingIcon}"
             tools:drawableStart="@drawable/ic_settings_24px"
             tools:ignore="DuplicateIncludedIds"
@@ -57,14 +58,15 @@
             style="@style/SettingsItemValueTextViewStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
             android:textAppearance="@style/SettingsItemValueTextViewTextAppearance"
             android:visibility="@{settingValueVisibility}"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:settingValueText="@{settingValue}"
             tools:ignore="DuplicateIncludedIds" />
 
-    </RelativeLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </layout>
 
