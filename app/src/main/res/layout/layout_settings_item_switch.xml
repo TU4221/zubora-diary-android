@@ -33,6 +33,7 @@
     </data>
 
     <RelativeLayout
+        style="@style/SettingsItemSwitchLayoutStyle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="@dimen/fragment_settings_section_layout_min_height"

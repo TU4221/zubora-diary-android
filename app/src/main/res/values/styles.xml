@@ -482,6 +482,16 @@
     <!-- ===================================================================================== -->
     <!-- region Screen - Settings -->
     <!-- ===================================================================================== -->
+    <style name="SettingsItemLayoutStyle">
+        <!-- 波紋エフェクト設定 -->
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="SettingsItemSwitchLayoutStyle">
+    </style>
+
     <style name="SettingsItemBaseTextViewStyle" parent="AppTextViewStyle">
         <item name="android:paddingStart">@dimen/screen_spacing_horizontal</item>
         <item name="android:paddingEnd">@dimen/fragment_settings_content_spacing_horizontal</item>
