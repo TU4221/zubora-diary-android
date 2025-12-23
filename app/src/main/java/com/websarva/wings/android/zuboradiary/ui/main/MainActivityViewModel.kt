@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.PrepareSampleDiariesUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingLoadException
 import com.websarva.wings.android.zuboradiary.ui.common.event.ActivityCallbackUiEvent
@@ -44,6 +45,7 @@ import javax.inject.Inject
 @HiltViewModel
 class MainActivityViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
+    private val prepareSampleDiariesUseCase: PrepareSampleDiariesUseCase,
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
 ) : BaseViewModel<
         MainActivityUiState,
@@ -89,10 +91,12 @@ class MainActivityViewModel @Inject internal constructor(
      * アプリケーションの起動に必要なデータの準備を実行する。
      *
      * 下記データの準備が完了したらアプリケーションの準備完了フラグ（[isReady]）を立てる。
+     * - サンプル日記
      * - テーマカラー設定
      */
     private fun prepareApplication() {
         viewModelScope.launch {
+            prepareSampleDiariesUseCase()
             uiState.map { it.themeColor }.filterNotNull().first()
             _isReady.value = true
         }

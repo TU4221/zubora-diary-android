@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLock
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
+import com.websarva.wings.android.zuboradiary.domain.model.settings.IsFirstLaunchSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.repository.SettingsRepository
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +19,19 @@ import javax.inject.Inject
 internal class SettingsRepositoryImpl @Inject constructor(
     private val userPreferencesDataSource: UserPreferencesDataSource
 ) : SettingsRepository {
+
+    override fun loadIsFirstLaunchSetting(): Flow<IsFirstLaunchSetting?> {
+        return userPreferencesDataSource.loadIsFirstLaunchPreference()
+            .map { preference ->
+                preference?.toDomainModel()
+            }.catch { cause ->
+                throw if (cause is Exception) {
+                    SettingsRepositoryExceptionMapper.toDomainException(cause)
+                } else {
+                    cause
+                }
+            }
+    }
 
     override fun loadThemeColorSetting(): Flow<ThemeColorSetting?> {
         return userPreferencesDataSource.loadThemeColorPreference()
@@ -82,6 +96,15 @@ internal class SettingsRepositoryImpl @Inject constructor(
                     cause
                 }
             }
+    }
+
+    override suspend fun updateIsFirstLaunchSetting(setting: IsFirstLaunchSetting) {
+        try {
+            val preference = setting.toDataModel()
+            userPreferencesDataSource.updateIsFirstLaunchPreference(preference)
+        } catch (e: Exception) {
+            throw SettingsRepositoryExceptionMapper.toDomainException(e)
+        }
     }
 
     override suspend fun updateThemeColorSetting(setting: ThemeColorSetting) {

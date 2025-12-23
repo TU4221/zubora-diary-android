@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSe
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
+import com.websarva.wings.android.zuboradiary.domain.model.settings.IsFirstLaunchSetting
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -17,6 +18,14 @@ import kotlinx.coroutines.flow.Flow
  * 各メソッドは、操作に失敗した場合にドメイン固有の例外 ([UseCaseException] のサブクラス) をスローします。
  */
 internal interface SettingsRepository {
+
+    /**
+     * アプリケーションの初回起動フラグを読み込む。
+     *
+     * @return 初回起動フラグ ([IsFirstLaunchSetting]) を放出するFlow。未設定の場合は`null`を放出する。
+     * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
+     */
+    fun loadIsFirstLaunchSetting(): Flow<IsFirstLaunchSetting?>
 
     /**
      * テーマカラー設定を読み込む。
@@ -57,6 +66,15 @@ internal interface SettingsRepository {
      * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
      */
     fun loadWeatherInfoFetchSetting(): Flow<WeatherInfoFetchSetting?>
+
+    /**
+     * アプリケーションの初回起動フラグを更新する。
+     *
+     * @param setting 更新する初回起動フラグ。
+     * @throws DataStorageException 初回起動フラグの更新に失敗した場合。
+     * @throws InsufficientStorageException ストレージ容量が不足している場合。
+     */
+    suspend fun updateIsFirstLaunchSetting(setting: IsFirstLaunchSetting)
 
     /**
      * テーマカラー設定を更新する。

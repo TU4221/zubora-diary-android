@@ -46,6 +46,8 @@ internal class UserPreferencesDataSource @Inject constructor(
     @param:DispatchersIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
+    private val isFirstLaunchPreferenceKey = booleanPreferencesKey("is_first_launch")
+
     private val themeColorPreferenceKey = intPreferencesKey("theme_color")
 
     private val calendarStartDayOfWeekPreferenceKey =
@@ -103,6 +105,36 @@ internal class UserPreferencesDataSource @Inject constructor(
                 SharingStarted.Eagerly,
                 null
             ).filterNotNull() // 初期値nullを除外
+
+    /**
+     * 初回起動フラグ ([IsFirstLaunchPreference]) をFlowとして読み込む。
+     *
+     * [userPreferencesResultFlow] から取得した [UserPreferencesLoadResult] をもとに設定オブジェクトを生成する。
+     *
+     * @return 初回起動に関する設定 ([IsFirstLaunchPreference]) を放出するFlow。
+     *         対応するデータが存在しない場合は`null`を放出する。
+     * @throws DataStoreReadException データストアへの読み込み(アクセス)に失敗した場合。([Flow] 内部で発生)
+     */
+    fun loadIsFirstLaunchPreference(): Flow<IsFirstLaunchPreference?> {
+        return userPreferencesResultFlow.map { result ->
+            when (result) {
+                is UserPreferencesLoadResult.Success ->
+                    createIsFirstLaunchPreference(result.preferences)
+                is UserPreferencesLoadResult.Failure -> throw result.cause
+            }
+        }
+    }
+
+    /**
+     * [Preferences] オブジェクトから [IsFirstLaunchPreference] を生成する。
+     *
+     * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
+     * @return 生成された [IsFirstLaunchPreference]。対応するデータが存在しない場合は`null`。
+     */
+    private fun createIsFirstLaunchPreference(preferences: Preferences): IsFirstLaunchPreference? {
+        val isFirstLaunch = preferences[isFirstLaunchPreferenceKey]
+        return isFirstLaunch?.let { IsFirstLaunchPreference(it) }
+    }
 
     /**
      * テーマカラー設定 ([ThemeColorPreference]) をFlowとして読み込む。
@@ -265,6 +297,21 @@ internal class UserPreferencesDataSource @Inject constructor(
     ): WeatherInfoFetchPreference? {
         val isEnabled = preferences[isEnabledWeatherInfoFetchPreferenceKey]
         return isEnabled?.let { WeatherInfoFetchPreference(it) }
+    }
+
+    /**
+     * 初回起動フラグ ([IsFirstLaunchPreference]) を更新する。
+     *
+     * @param value 更新するテーマカラー設定。
+     * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
+     * @throws DataStoreInsufficientStorageException ストレージの空き容量が不足した場合。
+     */
+    suspend fun updateIsFirstLaunchPreference(value: IsFirstLaunchPreference) {
+        withContext(dispatcher) {
+            executeDataStoreEditOperation { preferences ->
+                preferences[isFirstLaunchPreferenceKey] = value.isFirstLaunch
+            }
+        }
     }
 
     /**
