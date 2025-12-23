@@ -1578,10 +1578,16 @@ class DiaryEditViewModel @Inject internal constructor(
 
     /**
      * 日記項目のタイトルを更新する。
+     *
+     * 対象日記項目が編集無効（追加されてない）状態の場合は更新されずに処理が終了する。
+     *
      * @param itemNumber 対象の項目番号
      * @param title 新しいタイトル
      */
     private fun updateItemTitle(itemNumber: DiaryItemNumber, title: String) {
+        // MEMO:日記項目削除でnullを代入してもEditTextViewが空文字としてリスナ通知されるため、下記ガード節で対応
+        if (currentUiState.editingDiary.itemTitles[itemNumber.value] == null) return
+
         updateUiState {
             it.copy(
                 editingDiary =
@@ -1598,6 +1604,9 @@ class DiaryEditViewModel @Inject internal constructor(
      */
     private fun updateItemTitle(selection: DiaryItemTitleSelectionUi) {
         val itemNumberInt = selection.itemNumber
+        if (currentUiState.editingDiary.itemTitles[itemNumberInt] == null)
+            throw IllegalArgumentException("対象日記項目無効状態")
+
         val id = requireNotNull(selection.id)
         val title = selection.title
         val updateHistory = DiaryItemTitleSelectionHistoryUi(
@@ -1626,6 +1635,9 @@ class DiaryEditViewModel @Inject internal constructor(
         itemNumber: DiaryItemNumber,
         comment: String
     ) {
+        // MEMO:日記項目削除でnullを代入してもEditTextViewが空文字としてリスナ通知されるため、下記ガード節で対応
+        if (currentUiState.editingDiary.itemComments[itemNumber.value] == null) return
+
         updateUiState {
             it.copy(
                 editingDiary = it.editingDiary.copy(
