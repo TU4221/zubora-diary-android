@@ -318,31 +318,106 @@
         <!-- HACK:theme属性で指定しているstyleに"colorSurfaceContainerHigh"は含まれているが、反映されないので下記コードを記述して対応。
                   Material記事に記載されているapp:backgroundTintを設定しても反映されなかった。 -->
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_white_surfaceContainerHigh</item>
+
+        <!-- HACK:theme属性で指定しているstyleでは年選択の現在年の背景色は反映されないので下記コードを記述して対応。-->
+        <item name="materialCalendarStyle">@style/MaterialCalendarStyleThemeColorWhite</item>
+    </style>
+    <style name="MaterialCalendarStyleThemeColorWhite" parent="Widget.Material3.MaterialCalendar">
+        <item name="yearStyle">@style/MaterialCalendarYearStyleThemeColorWhite</item>
+        <!-- MEMO:yearTodayStyle属性（Widget.Material3.MaterialCalendar.Year.Today）では年選択の現在年の背景色は変更できなかった。 -->
+        <item name="yearSelectedStyle">@style/MaterialCalendarYearSelectedStyleThemeColorWhite</item>
+    </style>
+    <style name="MaterialCalendarYearStyleThemeColorWhite" parent="Widget.Material3.MaterialCalendar.Year">
+        <item name="itemTextColor">@color/md_theme_color_white_onSurfaceVariant</item>
+    </style>
+    <style name="MaterialCalendarYearSelectedStyleThemeColorWhite" parent="Widget.Material3.MaterialCalendar.Year.Selected">
+        <item name="itemFillColor">@color/md_theme_color_white_primaryContainer</item>
+        <item name="itemTextColor">@color/md_theme_color_white_onPrimaryContainer</item>
     </style>
 
     <style name="MaterialCalendarThemeColorBlack" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="android:theme">@style/ThemeColorBlack</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_black_surfaceContainerHigh</item>
+        <item name="materialCalendarStyle">@style/MaterialCalendarStyleThemeColorBlack</item>
+    </style>
+    <style name="MaterialCalendarStyleThemeColorBlack" parent="Widget.Material3.MaterialCalendar">
+        <item name="yearStyle">@style/MaterialCalendarYearStyleThemeColorBlack</item>
+        <item name="yearSelectedStyle">@style/MaterialCalendarYearSelectedStyleThemeColorBlack</item>
+    </style>
+    <style name="MaterialCalendarYearStyleThemeColorBlack" parent="Widget.Material3.MaterialCalendar.Year">
+        <item name="itemTextColor">@color/md_theme_color_black_onSurfaceVariant</item>
+    </style>
+    <style name="MaterialCalendarYearSelectedStyleThemeColorBlack" parent="Widget.Material3.MaterialCalendar.Year.Selected">
+        <item name="itemFillColor">@color/md_theme_color_black_primaryContainer</item>
+        <item name="itemTextColor">@color/md_theme_color_black_onPrimaryContainer</item>
     </style>
 
     <style name="MaterialCalendarThemeColorRed" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="android:theme">@style/ThemeColorRed</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_red_surfaceContainerHigh</item>
+        <item name="materialCalendarStyle">@style/MaterialCalendarStyleThemeColorRed</item>
+    </style>
+    <style name="MaterialCalendarStyleThemeColorRed" parent="Widget.Material3.MaterialCalendar">
+        <item name="yearStyle">@style/MaterialCalendarYearStyleThemeColorRed</item>
+        <item name="yearSelectedStyle">@style/MaterialCalendarYearSelectedStyleThemeColorRed</item>
+    </style>
+    <style name="MaterialCalendarYearStyleThemeColorRed" parent="Widget.Material3.MaterialCalendar.Year">
+        <item name="itemTextColor">@color/md_theme_color_red_onSurfaceVariant</item>
+    </style>
+    <style name="MaterialCalendarYearSelectedStyleThemeColorRed" parent="Widget.Material3.MaterialCalendar.Year.Selected">
+        <item name="itemFillColor">@color/md_theme_color_red_primaryContainer</item>
+        <item name="itemTextColor">@color/md_theme_color_red_onPrimaryContainer</item>
     </style>
 
     <style name="MaterialCalendarThemeColorBlue" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="android:theme">@style/ThemeColorBlue</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_blue_surfaceContainerHigh</item>
+        <item name="materialCalendarStyle">@style/MaterialCalendarStyleThemeColorBlue</item>
+    </style>
+    <style name="MaterialCalendarStyleThemeColorBlue" parent="Widget.Material3.MaterialCalendar">
+        <item name="yearStyle">@style/MaterialCalendarYearStyleThemeColorBlue</item>
+        <item name="yearSelectedStyle">@style/MaterialCalendarYearSelectedStyleThemeColorBlue</item>
+    </style>
+    <style name="MaterialCalendarYearStyleThemeColorBlue" parent="Widget.Material3.MaterialCalendar.Year">
+        <item name="itemTextColor">@color/md_theme_color_blue_onSurfaceVariant</item>
+    </style>
+    <style name="MaterialCalendarYearSelectedStyleThemeColorBlue" parent="Widget.Material3.MaterialCalendar.Year.Selected">
+        <item name="itemFillColor">@color/md_theme_color_blue_primaryContainer</item>
+        <item name="itemTextColor">@color/md_theme_color_blue_onPrimaryContainer</item>
     </style>
 
     <style name="MaterialCalendarThemeColorGreen" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="android:theme">@style/ThemeColorGreen</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_green_surfaceContainerHigh</item>
+        <item name="materialCalendarStyle">@style/MaterialCalendarStyleThemeColorGreen</item>
+    </style>
+    <style name="MaterialCalendarStyleThemeColorGreen" parent="Widget.Material3.MaterialCalendar">
+        <item name="yearStyle">@style/MaterialCalendarYearStyleThemeColorGreen</item>
+        <item name="yearSelectedStyle">@style/MaterialCalendarYearSelectedStyleThemeColorGreen</item>
+    </style>
+    <style name="MaterialCalendarYearStyleThemeColorGreen" parent="Widget.Material3.MaterialCalendar.Year">
+        <item name="itemTextColor">@color/md_theme_color_green_onSurfaceVariant</item>
+    </style>
+    <style name="MaterialCalendarYearSelectedStyleThemeColorGreen" parent="Widget.Material3.MaterialCalendar.Year.Selected">
+        <item name="itemFillColor">@color/md_theme_color_green_primaryContainer</item>
+        <item name="itemTextColor">@color/md_theme_color_green_onPrimaryContainer</item>
     </style>
 
     <style name="MaterialCalendarThemeColorYellow" parent="ThemeOverlay.Material3.MaterialCalendar">
         <item name="android:theme">@style/ThemeColorYellow</item>
         <item name="colorSurfaceContainerHigh">@color/md_theme_color_yellow_surfaceContainerHigh</item>
+        <item name="materialCalendarStyle">@style/MaterialCalendarStyleThemeColorYellow</item>
+    </style>
+    <style name="MaterialCalendarStyleThemeColorYellow" parent="Widget.Material3.MaterialCalendar">
+        <item name="yearStyle">@style/MaterialCalendarYearStyleThemeColorYellow</item>
+        <item name="yearSelectedStyle">@style/MaterialCalendarYearSelectedStyleThemeColorYellow</item>
+    </style>
+    <style name="MaterialCalendarYearStyleThemeColorYellow" parent="Widget.Material3.MaterialCalendar.Year">
+        <item name="itemTextColor">@color/md_theme_color_yellow_onSurfaceVariant</item>
+    </style>
+    <style name="MaterialCalendarYearSelectedStyleThemeColorYellow" parent="Widget.Material3.MaterialCalendar.Year.Selected">
+        <item name="itemFillColor">@color/md_theme_color_yellow_primaryContainer</item>
+        <item name="itemTextColor">@color/md_theme_color_yellow_onPrimaryContainer</item>
     </style>
     <!-- endregion -->
 
