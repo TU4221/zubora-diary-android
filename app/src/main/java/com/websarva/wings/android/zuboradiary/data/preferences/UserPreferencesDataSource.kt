@@ -58,10 +58,6 @@ internal class UserPreferencesDataSource @Inject constructor(
     private val reminderNotificationTimePreferenceKey =
         stringPreferencesKey("reminder_notification_time")
 
-    private val isEnabledPasscodeLockPreferenceKey =
-        booleanPreferencesKey("is_enabled_passcode_lock")
-    private val passcodePreferenceKey = stringPreferencesKey("passcode")
-
     private val isEnabledWeatherInfoFetchPreferenceKey =
         booleanPreferencesKey("is_enabled_weather_info_fetch")
 
@@ -235,40 +231,6 @@ internal class UserPreferencesDataSource @Inject constructor(
     }
 
     /**
-     * パスコードロック設定 ([PasscodeLockPreference]) をFlowとして読み込む。
-     *
-     * [userPreferencesResultFlow] から取得した [UserPreferencesLoadResult] をもとに設定オブジェクトを生成する。
-     *
-     * @return パスコードロック設定 ([PasscodeLockPreference]) を放出するFlow。
-     *         対応するデータが存在しない場合は`null`を放出する。
-     * @throws DataStoreReadException データストアへの読み込み(アクセス)に失敗した場合。([Flow] 内部で発生)
-     */
-    fun loadPasscodeLockPreference(): Flow<PasscodeLockPreference?> {
-        return userPreferencesResultFlow.map { result ->
-            when (result) {
-                is UserPreferencesLoadResult.Success -> createPasscodeLockPreference(result.preferences)
-                is UserPreferencesLoadResult.Failure -> throw result.cause
-            }
-        }
-    }
-
-    /**
-     * [Preferences] オブジェクトから [PasscodeLockPreference] を生成する。
-     *
-     * @param preferences DataStoreから読み込まれたPreferencesオブジェクト。
-     * @return 生成された [PasscodeLockPreference]。対応するデータが存在しない場合は`null`。
-     */
-    private fun createPasscodeLockPreference(preferences: Preferences): PasscodeLockPreference? {
-        val isEnabled = preferences[isEnabledPasscodeLockPreferenceKey]
-        val passCode = preferences[passcodePreferenceKey]
-        return if (isEnabled != null && passCode != null) {
-            PasscodeLockPreference(isEnabled, passCode)
-        } else {
-            null
-        }
-    }
-
-    /**
      * 天気情報取得設定 ([WeatherInfoFetchPreference]) をFlowとして読み込む。
      *
      * [userPreferencesResultFlow] から取得した [UserPreferencesLoadResult] をもとに設定オブジェクトを生成する。
@@ -356,22 +318,6 @@ internal class UserPreferencesDataSource @Inject constructor(
             executeDataStoreEditOperation { preferences ->
                 preferences[isEnabledReminderNotificationPreferenceKey] = value.isEnabled
                 preferences[reminderNotificationTimePreferenceKey] = value.notificationTimeString
-            }
-        }
-    }
-
-    /**
-     * パスコードロック設定 ([PasscodeLockPreference]) を更新する。
-     *
-     * @param value 更新するパスコードロック設定。
-     * @throws DataStoreWriteException データストアへの書き込みに失敗した場合。
-     * @throws DataStoreInsufficientStorageException ストレージの空き容量が不足した場合。
-     */
-    suspend fun updatePasscodeLockPreference(value: PasscodeLockPreference) {
-        withContext(dispatcher) {
-            executeDataStoreEditOperation { preferences ->
-                preferences[isEnabledPasscodeLockPreferenceKey] = value.isEnabled
-                preferences[passcodePreferenceKey] = value.passcode
             }
         }
     }

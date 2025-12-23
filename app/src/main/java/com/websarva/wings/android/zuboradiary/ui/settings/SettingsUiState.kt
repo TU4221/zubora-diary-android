@@ -14,8 +14,6 @@ import java.time.LocalTime
  * @property calendarStartDayOfWeek カレンダーの週の開始曜日。
  * @property isReminderEnabled リマインダー通知が有効かを示す。
  * @property reminderNotificationTime リマインダーの通知時刻。
- * @property isPasscodeLockEnabled パスコードロックが有効かを示す。
- * @property passcode 設定されているパスコード。
  * @property isWeatherFetchEnabled 天気情報取得が有効かを示す。
  *
  * @property hasSettingsLoadFailure 設定の読み込みに失敗したかを示す。
@@ -30,8 +28,6 @@ data class SettingsUiState(
     val calendarStartDayOfWeek: DayOfWeek? = null,
     val isReminderEnabled: Boolean? = null,
     val reminderNotificationTime: LocalTime? = null,
-    val isPasscodeLockEnabled: Boolean? = null,
-    val passcode: String? = null,
     val isWeatherFetchEnabled: Boolean? = null,
 
     // UiState

@@ -137,25 +137,6 @@
                             tools:ignore="DuplicateIncludedIds" />
 
                         <com.google.android.material.divider.MaterialDivider
-                            android:id="@+id/material_divider_passcode_lock_setting"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content" />
-
-                        <!-- HACK:指定layoutファイル内で"tools:ignore="DuplicateIncludedIds""と記述して対応しているのにもかかわらず、
-                                  警告"DuplicateIncludedIds"が表示される為、"tools:ignore="DuplicateIncludedIds""記述。
-                                  (指定layoutファイル内で警告対象となっているID名を使用している別ファイル(layout_settings_item.xml)を
-                                  layoutとして指定しているincludeタグは警告が表示されていない。) -->
-                        <include
-                            layout="@layout/layout_settings_item_switch"
-                            android:id="@+id/include_passcode_lock_setting"
-                            app:settingIcon="@{@drawable/ic_lock_24px}"
-                            app:settingTitle="@{@string/fragment_settings_item_title_passcode_lock}"
-                            app:settingValueVisibility="@{View.GONE}"
-                            app:settingValueSwitch="@{viewModel.uiState.isPasscodeLockEnabled}"
-                            app:onCheckedChangeListener="@{(_, isChecked) -> viewModel.onPasscodeLockSettingCheckedChange(isChecked)}"
-                            tools:ignore="DuplicateIncludedIds" />
-
-                        <com.google.android.material.divider.MaterialDivider
                             android:id="@+id/material_divider_weather_info_fetch_setting"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content" />

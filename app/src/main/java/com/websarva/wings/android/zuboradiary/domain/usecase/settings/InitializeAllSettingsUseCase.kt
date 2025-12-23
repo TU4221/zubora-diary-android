@@ -3,13 +3,11 @@ package com.websarva.wings.android.zuboradiary.domain.usecase.settings
 import android.util.Log
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PassCodeSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
-import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
@@ -29,7 +27,6 @@ import javax.inject.Inject
  * @property updateThemeColorSettingUseCase テーマカラー設定を更新するユースケース。
  * @property updateCalendarStartDayOfWeekSettingUseCase カレンダーの週の開始曜日設定を更新するユースケース。
  * @property updateReminderNotificationSettingUseCase リマインダー通知設定を更新するユースケース。
- * @property updatePasscodeLockSettingUseCase パスコードロック設定を更新するユースケース。
  * @property updateWeatherInfoFetchSettingUseCase 天気情報取得設定を更新するユースケース。
  *
  */
@@ -37,7 +34,6 @@ internal class InitializeAllSettingsUseCase @Inject constructor(
     private val updateThemeColorSettingUseCase: UpdateThemeColorSettingUseCase,
     private val updateCalendarStartDayOfWeekSettingUseCase: UpdateCalendarStartDayOfWeekSettingUseCase,
     private val updateReminderNotificationSettingUseCase: UpdateReminderNotificationSettingUseCase,
-    private val updatePasscodeLockSettingUseCase: UpdatePasscodeLockSettingUseCase,
     private val updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase
 ) {
 
@@ -56,7 +52,6 @@ internal class InitializeAllSettingsUseCase @Inject constructor(
             initializeThemeColorSetting()
             initializeCalendarStartDayOfWeekSetting()
             initializeReminderNotificationSetting()
-            initializePasscodeLockSetting()
             initializeWeatherInfoFetchSetting()
             Log.i(logTag, "${logMsg}完了")
             UseCaseResult.Success(Unit)
@@ -123,27 +118,6 @@ internal class InitializeAllSettingsUseCase @Inject constructor(
                     )
                 }
             }
-        } catch (e: PassCodeSettingUpdateException) {
-            when (e) {
-                is PassCodeSettingUpdateException.UpdateFailure -> {
-                    Log.e(logTag, "${logMsg}失敗_パスコードロック設定保存エラー", e)
-                    UseCaseResult.Failure(
-                        AllSettingsInitializationException.InitializationFailure(e)
-                    )
-                }
-                is PassCodeSettingUpdateException.InsufficientStorage -> {
-                    Log.e(logTag, "${logMsg}失敗_ストレージ容量不足", e)
-                    UseCaseResult.Failure(
-                        AllSettingsInitializationException.InsufficientStorage(e)
-                    )
-                }
-                is PassCodeSettingUpdateException.Unknown -> {
-                    Log.e(logTag, "${logMsg}失敗_原因不明", e)
-                    UseCaseResult.Failure(
-                        AllSettingsInitializationException.Unknown(e)
-                    )
-                }
-            }
         } catch (e: WeatherInfoFetchSettingUpdateException) {
             when (e) {
                 is WeatherInfoFetchSettingUpdateException.UpdateFailure -> {
@@ -199,18 +173,6 @@ internal class InitializeAllSettingsUseCase @Inject constructor(
      */
     private suspend fun initializeReminderNotificationSetting() {
         when (val result = updateReminderNotificationSettingUseCase(ReminderNotificationSetting.default())) {
-            is UseCaseResult.Success -> { /*処理なし*/ }
-            is UseCaseResult.Failure -> throw result.exception
-        }
-    }
-
-    /**
-     * パスコードロック設定を初期化する。
-     *
-     * @throws PassCodeSettingUpdateException パスコードロック設定の初期化に失敗した場合。
-     */
-    private suspend fun initializePasscodeLockSetting() {
-        when (val result = updatePasscodeLockSettingUseCase(PasscodeLockSetting.default())) {
             is UseCaseResult.Success -> { /*処理なし*/ }
             is UseCaseResult.Failure -> throw result.exception
         }

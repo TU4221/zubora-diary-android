@@ -24,12 +24,6 @@ sealed interface SettingsUiEvent : UiEvent {
     data class TurnReminderNotificationSettingSwitch(val isChecked: Boolean) : SettingsUiEvent
 
     /**
-     * パスコードロック設定のスイッチの状態を変更することを示すイベント。
-     * @property isChecked スイッチをONにする場合は`true`。
-     */
-    data class TurnPasscodeLockSettingSwitch(val isChecked: Boolean) : SettingsUiEvent
-
-    /**
      * 天気情報取得設定のスイッチの状態を変更することを示すイベント。
      * @property isChecked スイッチをONにする場合は`true`。
      */

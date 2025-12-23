@@ -4,7 +4,6 @@ import com.websarva.wings.android.zuboradiary.data.mapper.settings.SettingsRepos
 import com.websarva.wings.android.zuboradiary.data.mapper.settings.toDataModel
 import com.websarva.wings.android.zuboradiary.data.mapper.settings.toDomainModel
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
-import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.data.preferences.UserPreferencesDataSource
@@ -72,19 +71,6 @@ internal class SettingsRepositoryImpl @Inject constructor(
             }
     }
 
-    override fun loadPasscodeLockSetting(): Flow<PasscodeLockSetting?> {
-        return userPreferencesDataSource.loadPasscodeLockPreference()
-            .map { preference ->
-                preference?.toDomainModel()
-            }.catch { cause ->
-                throw if (cause is Exception) {
-                    SettingsRepositoryExceptionMapper.toDomainException(cause)
-                } else {
-                    cause
-                }
-            }
-    }
-
     override fun loadWeatherInfoFetchSetting(): Flow<WeatherInfoFetchSetting?> {
         return userPreferencesDataSource.loadWeatherInfoFetchPreference()
             .map { preference ->
@@ -129,15 +115,6 @@ internal class SettingsRepositoryImpl @Inject constructor(
         try {
             val preference = setting.toDataModel()
             userPreferencesDataSource.updateReminderNotificationPreference(preference)
-        } catch (e: Exception) {
-            throw SettingsRepositoryExceptionMapper.toDomainException(e)
-        }
-    }
-
-    override suspend fun updatePasscodeLockSetting(setting: PasscodeLockSetting) {
-        try {
-            val preference = setting.toDataModel()
-            userPreferencesDataSource.updatePasscodeLockPreference(preference)
         } catch (e: Exception) {
             throw SettingsRepositoryExceptionMapper.toDomainException(e)
         }

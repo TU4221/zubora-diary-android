@@ -2,7 +2,6 @@ package com.websarva.wings.android.zuboradiary.domain.repository
 
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
-import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.WeatherInfoFetchSetting
@@ -52,14 +51,6 @@ internal interface SettingsRepository {
     fun loadReminderNotificationSetting(): Flow<ReminderNotificationSetting?>
 
     /**
-     * パスコードロック設定を読み込む。
-     *
-     * @return パスコードロック設定 ([PasscodeLockSetting]) を放出するFlow。未設定の場合は`null`を放出する。
-     * @throws DataStorageException 設定の読み込みに失敗した場合。([Flow] 内部で発生する可能性がある)
-     */
-    fun loadPasscodeLockSetting(): Flow<PasscodeLockSetting?>
-
-    /**
      * 天気情報取得設定を読み込む。
      *
      * @return 天気情報取得設定 ([WeatherInfoFetchSetting]) を放出するFlow。未設定の場合は`null`を放出する。
@@ -102,15 +93,6 @@ internal interface SettingsRepository {
      * @throws InsufficientStorageException ストレージ容量が不足している場合。
      */
     suspend fun updateReminderNotificationSetting(setting: ReminderNotificationSetting)
-
-    /**
-     * パスコードロック設定を更新する。
-     *
-     * @param setting 更新するパスコードロック設定。
-     * @throws DataStorageException パスコードロック設定の更新に失敗した場合。
-     * @throws InsufficientStorageException ストレージ容量が不足している場合。
-     */
-    suspend fun updatePasscodeLockSetting(setting: PasscodeLockSetting)
 
     /**
      * 天気情報取得設定を更新する。

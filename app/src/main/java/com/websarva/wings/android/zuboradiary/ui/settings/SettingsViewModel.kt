@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.settings.CalendarStartDayOfWeekSetting
-import com.websarva.wings.android.zuboradiary.domain.model.settings.PasscodeLockSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ReminderNotificationSetting
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColor
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
@@ -18,19 +17,16 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.All
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.DeleteAllDataUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.InitializeAllSettingsUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadPasscodeLockSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadReminderNotificationSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateCalendarStartDayOfWeekSettingUseCase
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdatePasscodeLockSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateReminderNotificationSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateThemeColorSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.UpdateWeatherInfoFetchSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllDataDeleteException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.AllSettingsInitializationException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingUpdateException
-import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.PassCodeSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ReminderNotificationSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.ThemeColorSettingUpdateException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.WeatherInfoFetchSettingUpdateException
@@ -67,12 +63,10 @@ class SettingsViewModel @Inject internal constructor(
     private val loadThemeColorSettingUseCase: LoadThemeColorSettingUseCase,
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
     private val loadReminderNotificationSettingUseCase: LoadReminderNotificationSettingUseCase,
-    private val loadPasscodeLockSettingUseCase: LoadPasscodeLockSettingUseCase,
     private val loadWeatherInfoFetchSettingUseCase: LoadWeatherInfoFetchSettingUseCase,
     private val updateThemeColorSettingUseCase: UpdateThemeColorSettingUseCase,
     private val updateCalendarStartDayOfWeekSettingUseCase: UpdateCalendarStartDayOfWeekSettingUseCase,
     private val updateReminderNotificationSettingUseCase: UpdateReminderNotificationSettingUseCase,
-    private val updatePasscodeLockSettingUseCase: UpdatePasscodeLockSettingUseCase,
     private val updateWeatherInfoFetchSettingUseCase: UpdateWeatherInfoFetchSettingUseCase,
     private val deleteAllDiariesUseCase: DeleteAllDiariesUseCase,
     private val deleteAllDataUseCase: DeleteAllDataUseCase,
@@ -104,7 +98,6 @@ class SettingsViewModel @Inject internal constructor(
         collectThemeColorSetting()
         collectCalendarStartDayOfWeekSetting()
         collectReminderNotificationSetting()
-        collectPasscodeLockSetting()
         collectWeatherInfoFetchSetting()
     }
 
@@ -164,28 +157,6 @@ class SettingsViewModel @Inject internal constructor(
             }.launchIn(viewModelScope)
     }
 
-    /** パスコードロック設定の変更を監視し、UIに反映させる。 */
-    private fun collectPasscodeLockSetting() {
-        loadPasscodeLockSettingUseCase()
-            .onEach {
-                handleSettingLoadResult(it)
-            }.map {
-                when (it) {
-                    is UseCaseResult.Success -> it.value
-                    is UseCaseResult.Failure -> it.exception.fallbackSetting
-                }
-            }.catchUnexpectedError(
-                PasscodeLockSetting.default()
-            ).distinctUntilChanged().onEach {
-                when (it) {
-                    is PasscodeLockSetting.Enabled -> {
-                        updateToPasscodeEnabledState(it.passcode)
-                    }
-                    PasscodeLockSetting.Disabled -> updateToPasscodeDisabledState()
-                }
-            }.launchIn(viewModelScope)
-    }
-
     /** 天気情報取得設定の変更を監視し、UIに反映させる。 */
     private fun collectWeatherInfoFetchSetting() {
         loadWeatherInfoFetchSettingUseCase()
@@ -237,7 +208,6 @@ class SettingsViewModel @Inject internal constructor(
             it.themeColor != null
                     && it.calendarStartDayOfWeek != null
                     && it.isReminderEnabled != null
-                    && it.isPasscodeLockEnabled != null
                     && it.isWeatherFetchEnabled != null
         }.first { allAreReady ->
             allAreReady
@@ -300,29 +270,6 @@ class SettingsViewModel @Inject internal constructor(
 
         launchWithUnexpectedErrorHandler {
             startReminderNotificationSettingSaveProcess(isChecked)
-        }
-    }
-
-    /**
-     * パスコードロック設定のスイッチが切り替えられた時に呼び出される事を想定。
-     * 設定値を保存する。
-     * @param isChecked スイッチがONになった場合はtrue
-     */
-    fun onPasscodeLockSettingCheckedChange(isChecked: Boolean) {
-        // DateSourceからの初回読込時の値がtrueの場合、本メソッドが呼び出される。
-        // 初回読込時は処理不要のため下記条件追加。
-        val settingValue = currentUiState.isPasscodeLockEnabled
-        if (isChecked == settingValue) return
-
-        if (settingValue == null || !canExecuteOperation()) {
-            launchWithUnexpectedErrorHandler {
-                changePasscodeLockSettingSwitch(!isChecked)
-            }
-            return
-        }
-
-        launchWithUnexpectedErrorHandler {
-            savePasscodeLockSetting(isChecked)
         }
     }
 
@@ -780,56 +727,6 @@ class SettingsViewModel @Inject internal constructor(
     }
     //endregion
 
-    //region Passcode Lock Setting Operation
-    /**
-     * パスコードロック設定スイッチの状態を変更する（イベント発行）。
-     * @param isChecked 有効状態にする場合はtrue
-     */
-    private suspend fun changePasscodeLockSettingSwitch(isChecked: Boolean) {
-        emitUiEvent(
-            SettingsUiEvent.TurnPasscodeLockSettingSwitch(isChecked)
-        )
-    }
-
-    /**
-     * パスコードロック設定を保存する。
-     * @param value パスコードロックを有効にする場合はtrue
-     */
-    private suspend fun savePasscodeLockSetting(value: Boolean) {
-        val passcode = if (value) {
-            "0000" // TODO:仮
-        } else {
-            ""
-        }
-
-        val setting =
-            if (value) {
-                PasscodeLockSetting.Enabled(passcode)
-            } else {
-                PasscodeLockSetting.Disabled
-            }
-        when (val result = updatePasscodeLockSettingUseCase(setting)) {
-            is UseCaseResult.Success -> {
-                // 処理なし
-            }
-            is UseCaseResult.Failure -> {
-                emitUiEvent(SettingsUiEvent.TurnPasscodeLockSettingSwitch(!value))
-                when (result.exception) {
-                    is PassCodeSettingUpdateException.UpdateFailure -> {
-                        showAppMessageDialog(SettingsAppMessage.SettingUpdateFailure)
-                    }
-                    is PassCodeSettingUpdateException.InsufficientStorage -> {
-                        showAppMessageDialog(SettingsAppMessage.SettingUpdateInsufficientStorageFailure)
-                    }
-                    is PassCodeSettingUpdateException.Unknown -> {
-                        showUnexpectedAppMessageDialog(result.exception)
-                    }
-                }
-            }
-        }
-    }
-    //endregion
-
     //region Weather Info Fetch Setting Operation
     /**
      * 天気情報取得設定スイッチの状態を変更する（イベント発行）。
@@ -1153,29 +1050,6 @@ class SettingsViewModel @Inject internal constructor(
             it.copy(
                 isReminderEnabled = false,
                 reminderNotificationTime = null
-            )
-        }
-    }
-
-    /**
-     * パスコードロックを有効な状態に更新する。
-     * @param passcode パスコード文字列
-     */
-    private fun updateToPasscodeEnabledState(passcode: String) {
-        updateUiState {
-            it.copy(
-                isPasscodeLockEnabled = true,
-                passcode = passcode
-            )
-        }
-    }
-
-    /** パスコードロックを無効な状態に更新する。 */
-    private fun updateToPasscodeDisabledState() {
-        updateUiState {
-            it.copy(
-                isPasscodeLockEnabled = false,
-                passcode = null
             )
         }
     }

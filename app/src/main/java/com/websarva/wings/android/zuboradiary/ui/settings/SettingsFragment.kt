@@ -289,9 +289,6 @@ class SettingsFragment : BaseFragment<
             is SettingsUiEvent.TurnReminderNotificationSettingSwitch -> {
                 binding.includeReminderNotificationSetting.materialSwitch.isChecked = event.isChecked
             }
-            is SettingsUiEvent.TurnPasscodeLockSettingSwitch -> {
-                binding.includePasscodeLockSetting.materialSwitch.isChecked = event.isChecked
-            }
             is SettingsUiEvent.TurnWeatherInfoFetchSettingSwitch -> {
                 binding.includeWeatherInfoFetchSetting.materialSwitch.isChecked = event.isChecked
             }
@@ -375,7 +372,6 @@ class SettingsFragment : BaseFragment<
                     includeThemeColorSetting.textTitle,
                     includeCalendarStartDaySetting.textTitle,
                     includeReminderNotificationSetting.textTitle,
-                    includePasscodeLockSetting.textTitle,
                     includeWeatherInfoFetchSetting.textTitle,
                     includeAllDiariesDeleteSetting.textTitle,
                     includeAllSettingsInitializationSetting.textTitle,
@@ -395,7 +391,6 @@ class SettingsFragment : BaseFragment<
                     includeCalendarStartDaySetting.textValue,
                     includeReminderNotificationSetting.textTitle,
                     includeReminderNotificationSetting.textValue,
-                    includePasscodeLockSetting.textTitle,
                     includeWeatherInfoFetchSetting.textTitle,
                     includeOpenSourceLicensesSetting.textTitle
                 )
@@ -418,7 +413,6 @@ class SettingsFragment : BaseFragment<
             binding.run {
                 listOf(
                     includeReminderNotificationSetting.materialSwitch,
-                    includePasscodeLockSetting.materialSwitch,
                     includeWeatherInfoFetchSetting.materialSwitch
                 )
             },
@@ -433,7 +427,6 @@ class SettingsFragment : BaseFragment<
                     materialDividerSectionSetting,
                     materialDividerCalendarStartDaySetting,
                     materialDividerReminderNotificationSetting,
-                    materialDividerPasscodeLockSetting,
                     materialDividerWeatherInfoFetchSetting,
                     materialDividerSectionData,
                     materialDividerAllDiariesDeleteSetting,
