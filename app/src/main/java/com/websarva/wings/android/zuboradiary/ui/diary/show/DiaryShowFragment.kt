@@ -193,7 +193,8 @@ class DiaryShowFragment : BaseFragment<
             messageText = getString(
                 R.string.dialog_diary_load_failure_message,
                 date.formatDateString(requireContext())
-            )
+            ),
+            negativeButtonRes = null
         )
         return MobileNavigationDirections.actionGlobalToConfirmationDialog(params)
     }
