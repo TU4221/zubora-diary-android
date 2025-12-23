@@ -730,6 +730,7 @@ class DiaryEditFragment : BaseFragment<
      * @param numVisibleItems 表示すべき日記項目の総数。
      */
     private fun renderItemLayouts(numVisibleItems: Int) {
+        Log.d(logTag, "日記項目レイアウト描画（項目数：${numVisibleItems}）")
         checkNotNull(itemMotionLayouts).forEachIndexed { index, _ ->
             val itemNumber = index + 1
             if (itemNumber <= numVisibleItems) {
