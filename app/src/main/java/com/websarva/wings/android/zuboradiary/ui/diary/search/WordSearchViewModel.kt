@@ -103,7 +103,6 @@ class WordSearchViewModel @Inject internal constructor(
     /** UI状態を[SavedStateHandle]に保存する。 */
     private fun collectUiState() {
         uiState.onEach {
-            Log.d(logTag, it.toString())
             handle[SAVED_STATE_UI_KEY] = it
         }.launchIn(viewModelScope)
     }

@@ -1,9 +1,7 @@
 package com.websarva.wings.android.zuboradiary.ui.main
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
-import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.domain.model.settings.ThemeColorSetting
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.PrepareSampleDiariesUseCase
@@ -113,7 +111,6 @@ class MainActivityViewModel @Inject internal constructor(
     /** UI状態を[SavedStateHandle]に保存する。 */
     private fun collectUiState() {
         uiState.onEach {
-            Log.d(logTag, it.toString())
             handle[SAVED_STATE_UI_KEY] = it
         }.launchIn(viewModelScope)
     }

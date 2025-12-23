@@ -172,7 +172,11 @@ abstract class BaseViewModel<
      * @param function 現在の状態を受け取り、新しい状態を返す関数。
      */
     protected fun updateUiState(function: (US) -> US) {
-        _uiState.update{ function(it) }
+        _uiState.update{
+            function(it).also { newState ->
+                Log.d(logTag, "UI状態更新: $newState")
+            }
+        }
     }
     //endregion
 
