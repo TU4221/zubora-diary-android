@@ -14,7 +14,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.fragment.app.viewModels
 import androidx.navigation.NavDirections
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.websarva.wings.android.zuboradiary.MobileNavigationDirections
 import com.websarva.wings.android.zuboradiary.R
@@ -930,28 +929,14 @@ class DiaryEditFragment : BaseFragment<
      * @param date 表示する日記の日付
      */
     private fun createDiaryShowFragmentNavDirections(id: String, date: LocalDate): NavDirections {
-        // 循環型画面遷移を成立させるためにPopup対象Fragmentが異なるdirectionsを切り替える。
-        val containsDiaryShowFragment =
-            try {
-                findNavController().getBackStackEntry(R.id.navigation_diary_show_fragment)
-                true
-            } catch (_: IllegalArgumentException) {
-                false
-            }
-
         val params = DiaryShowScreenParams(
             navArgs.params.resultKey,
             id,
             date,
             navArgs.params.launchSource
         )
-        return if (containsDiaryShowFragment) {
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryShowFragmentPopUpToInclusiveDiaryShow(params)
-        } else {
-            DiaryEditFragmentDirections
-                .actionDiaryEditFragmentToDiaryShowFragmentPopUpToInclusiveDiaryEdit(params)
-        }
+        return DiaryEditFragmentDirections
+            .actionDiaryEditFragmentToDiaryShowFragment(params)
     }
 
     /**

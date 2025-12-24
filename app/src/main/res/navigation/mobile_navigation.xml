@@ -137,20 +137,11 @@
                 app:destination="@id/navigation_diary_item_title_edit_dialog"/>
 
             <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pop_up_to_inclusive_diary_show"
+                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment"
                 app:destination="@id/nested_navigation_diary_show"
-                app:popUpTo="@id/navigation_diary_show_fragment"
-                app:popUpToInclusive="true">
-                <argument
-                    android:name="params"
-                    app:argType="com.websarva.wings.android.zuboradiary.ui.diary.show.DiaryShowScreenParams" />
-            </action>
-
-            <action
-                android:id="@+id/action_diary_edit_fragment_to_diary_show_fragment_pop_up_to_inclusive_diary_edit"
-                app:destination="@id/nested_navigation_diary_show"
-                app:popUpTo="@id/navigation_diary_edit_fragment"
-                app:popUpToInclusive="true">
+                app:popUpTo="@id/nested_navigation_diary_edit"
+                app:popUpToInclusive="true"
+                app:launchSingleTop="true">
                 <argument
                     android:name="params"
                     app:argType="com.websarva.wings.android.zuboradiary.ui.diary.show.DiaryShowScreenParams" />
