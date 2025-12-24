@@ -175,7 +175,8 @@ class DiaryShowFragment : BaseFragment<
         val params = DiaryEditScreenParams(
             navArgs.params.resultKey,
             id,
-            date
+            date,
+            navArgs.params.launchSource
         )
         return DiaryShowFragmentDirections
             .actionNavigationDiaryShowFragmentToDiaryEditFragment(params)

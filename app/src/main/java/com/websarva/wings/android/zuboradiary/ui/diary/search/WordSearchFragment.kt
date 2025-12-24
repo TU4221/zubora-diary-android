@@ -14,6 +14,7 @@ import com.websarva.wings.android.zuboradiary.ui.common.fragment.BaseFragment
 import com.websarva.wings.android.zuboradiary.ui.diary.common.model.DiaryListItemContainerUi
 import com.websarva.wings.android.zuboradiary.ui.diary.common.model.DiaryListUi
 import com.websarva.wings.android.zuboradiary.ui.common.navigation.event.DummyNavBackDestination
+import com.websarva.wings.android.zuboradiary.ui.diary.common.navigation.DiaryFlowLaunchSource
 import com.websarva.wings.android.zuboradiary.ui.diary.show.DiaryShowScreenParams
 import com.websarva.wings.android.zuboradiary.ui.diary.common.recyclerview.DiaryListSetupHelper
 import dagger.hilt.android.AndroidEntryPoint
@@ -230,7 +231,8 @@ class WordSearchFragment : BaseFragment<
         val params = DiaryShowScreenParams(
             RESULT_KEY_DIARY,
             id,
-            date
+            date,
+            DiaryFlowLaunchSource.WordSearch
         )
         return WordSearchFragmentDirections
                 .actionNavigationWordSearchFragmentToDiaryShowFragment(params)

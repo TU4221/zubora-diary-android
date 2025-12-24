@@ -34,6 +34,7 @@ import com.websarva.wings.android.zuboradiary.ui.diary.edit.itemtitle.DiaryItemT
 import com.websarva.wings.android.zuboradiary.ui.diary.show.DiaryShowScreenParams
 import com.websarva.wings.android.zuboradiary.ui.common.navigation.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.common.navigation.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.diary.common.navigation.DiaryFlowLaunchSource
 import com.websarva.wings.android.zuboradiary.ui.diary.edit.itemtitle.DiaryItemTitleSelectionUi
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -57,10 +58,11 @@ class DiaryEditFragment : BaseFragment<
         DiaryEditNavBackDestination
         >() {
 
+    //region Properties
+
     /** 画面遷移時に渡された引数。 */
     private val navArgs: DiaryEditFragmentArgs by navArgs()
 
-    //region Properties
     // MEMO:委譲プロパティの委譲先(viewModels())の遅延初期化により"Field is never assigned."と警告が表示される。
     //      委譲プロパティによるViewModel生成は公式が推奨する方法の為、警告を無視する。その為、@Suppressを付与する。
     //      この警告に対応するSuppressネームはなく、"unused"のみでは不要Suppressとなる為、"RedundantSuppression"も追記する。
@@ -912,20 +914,11 @@ class DiaryEditFragment : BaseFragment<
     override fun toNavDestinationId(destination: DiaryEditNavBackDestination): Int {
         return when (destination) {
             DiaryEditNavBackDestination.ExitDiaryFlow -> {
-                val navController = findNavController()
-                val diaryFlowDestinationIds = listOf(
-                    R.id.nested_navigation_diary_show,
-                    R.id.navigation_diary_show_fragment,
-                    R.id.nested_navigation_diary_edit,
-                    R.id.navigation_diary_edit_fragment
-                )
-
-                val targetEntry =
-                    navController.currentBackStack.value.reversed().firstOrNull { entry ->
-                        entry.destination.id !in diaryFlowDestinationIds
-                                && entry.destination.id != navController.graph.id
-                    }
-                targetEntry?.destination?.id ?: R.id.navigation_diary_list_fragment
+                when (navArgs.params.launchSource) {
+                    DiaryFlowLaunchSource.DiaryList -> R.id.navigation_diary_list_fragment
+                    DiaryFlowLaunchSource.WordSearch -> R.id.navigation_word_search_fragment
+                    DiaryFlowLaunchSource.Calendar -> R.id.navigation_calendar_fragment
+                }
             }
         }
     }
@@ -949,7 +942,8 @@ class DiaryEditFragment : BaseFragment<
         val params = DiaryShowScreenParams(
             navArgs.params.resultKey,
             id,
-            date
+            date,
+            navArgs.params.launchSource
         )
         return if (containsDiaryShowFragment) {
             DiaryEditFragmentDirections

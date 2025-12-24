@@ -27,6 +27,7 @@ import com.websarva.wings.android.zuboradiary.ui.common.fragment.dialog.sheet.Li
 import com.websarva.wings.android.zuboradiary.ui.common.navigation.result.DialogResult
 import com.websarva.wings.android.zuboradiary.ui.diary.common.recyclerview.DiaryListSetupHelper
 import com.websarva.wings.android.zuboradiary.ui.common.recyclerview.helper.SwipeBackgroundButtonInteractionHelper
+import com.websarva.wings.android.zuboradiary.ui.diary.common.navigation.DiaryFlowLaunchSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -320,7 +321,8 @@ class DiaryListFragment : BaseFragment<
         val params = DiaryEditScreenParams(
             RESULT_KEY_DIARY,
             id,
-            date
+            date,
+            DiaryFlowLaunchSource.DiaryList
         )
         return DiaryListFragmentDirections
                 .actionNavigationDiaryListFragmentToDiaryEditFragment(params)
@@ -336,7 +338,8 @@ class DiaryListFragment : BaseFragment<
         val params = DiaryShowScreenParams(
             RESULT_KEY_DIARY,
             id,
-            date
+            date,
+                    DiaryFlowLaunchSource.DiaryList
         )
         return DiaryListFragmentDirections
             .actionNavigationDiaryListFragmentToDiaryShowFragment(params)

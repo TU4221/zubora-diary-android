@@ -25,6 +25,7 @@ import com.websarva.wings.android.zuboradiary.ui.common.theme.ThemeColorUi
 import com.websarva.wings.android.zuboradiary.ui.common.navigation.event.DummyNavBackDestination
 import com.websarva.wings.android.zuboradiary.ui.diary.edit.DiaryEditScreenParams
 import com.websarva.wings.android.zuboradiary.ui.common.navigation.result.FragmentResult
+import com.websarva.wings.android.zuboradiary.ui.diary.common.navigation.DiaryFlowLaunchSource
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
@@ -617,7 +618,8 @@ class CalendarFragment :
         val params = DiaryEditScreenParams(
             RESULT_KEY_DIARY,
             id,
-            date
+            date,
+            DiaryFlowLaunchSource.Calendar
         )
         return CalendarFragmentDirections
                 .actionNavigationCalendarFragmentToDiaryEditFragment(params)
