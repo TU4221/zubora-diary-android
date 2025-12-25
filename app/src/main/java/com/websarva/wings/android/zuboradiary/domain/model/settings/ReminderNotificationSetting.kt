@@ -25,8 +25,7 @@ internal sealed class ReminderNotificationSetting(
     /**
      * リマインダー通知が無効な状態を表すデータオブジェクト。
      */
-    data object Disabled : ReminderNotificationSetting(false) {
-    }
+    data object Disabled : ReminderNotificationSetting(false)
 
     companion object {
         /**
