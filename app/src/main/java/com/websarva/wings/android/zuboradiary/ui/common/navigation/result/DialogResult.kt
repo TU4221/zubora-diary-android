@@ -26,8 +26,16 @@ sealed interface DialogResult<out T> : NavigationResult, Serializable {
      * 否定的な選択（「いいえ」、「キャンセル」ボタンなど）がなされた状態。
      */
     data object Negative : DialogResult<Nothing> {
-        // HACK: Serializable実装時にreadResolveの記述が推奨されるが、未使用のため警告を抑制
-        @Suppress("unused")
+        // HACK: Serializable実装時にreadResolveの記述が推奨されるが、未使用のため警告を抑制。
+        //       抑制すると「冗長」と警告がでてくるので、それも抑制
+        /**
+         * このオブジェクトがデシリアライズされる際に、新しいインスタンスが生成されるのを防ぎ、
+         * 常にシングルトンインスタンス `Negative` を返すことを保証する。
+         *
+         * このメソッドはシリアライズの仕組みによって内部的にのみ呼び出されるため、
+         * IDEからは「未使用」と警告されるが、意図したものである。
+         */
+        @Suppress("unused", "RedundantSuppression")
         private fun readResolve(): Any = Negative
     }
 
@@ -35,8 +43,16 @@ sealed interface DialogResult<out T> : NavigationResult, Serializable {
      * 操作が中断（ダイアログ外タップ、戻るボタンなど）された状態。
      */
     data object Cancel : DialogResult<Nothing> {
-        // HACK: Serializable実装時にreadResolveの記述が推奨されるが、未使用のため警告を抑制
-        @Suppress("unused")
+        // HACK: Serializable実装時にreadResolveの記述が推奨されるが、未使用のため警告を抑制。
+        //       抑制すると「冗長」と警告がでてくるので、それも抑制。
+        /**
+         * このオブジェクトがデシリアライズされる際に、新しいインスタンスが生成されるのを防ぎ、
+         * 常にシングルトンインスタンス `Cancel` を返すことを保証する。
+         *
+         * このメソッドはシリアライズの仕組みによって内部的にのみ呼び出されるため、
+         * IDEからは「未使用」と警告されるが、意図したものである。
+         */
+        @Suppress("unused", "RedundantSuppression")
         private fun readResolve(): Any = Cancel
     }
 }

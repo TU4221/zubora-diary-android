@@ -24,8 +24,16 @@ sealed interface FragmentResult<out T> : NavigationResult, Serializable {
      * 結果データが存在しない状態。
      */
     data object None : FragmentResult<Nothing> {
-        // HACK:Serializable実装すると下記を記述するように促されるが、未使用の為、下記アノテーションで警告抑制
-        @Suppress("unused")
+        // HACK:Serializable実装すると下記を記述するように促されるが、未使用の為、下記アノテーションで警告抑制。
+        //       抑制すると「冗長」と警告がでてくるので、それも抑制
+        /**
+         * このオブジェクトがデシリアライズされる際に、新しいインスタンスが生成されるのを防ぎ、
+         * 常にシングルトンインスタンス `None` を返すことを保証する。
+         *
+         * このメソッドはシリアライズの仕組みによって内部的にのみ呼び出されるため、
+         * IDEからは「未使用」と警告されるが、意図したものである。
+         */
+        @Suppress("unused", "RedundantSuppression")
         private fun readResolve(): Any = None
     }
 }
