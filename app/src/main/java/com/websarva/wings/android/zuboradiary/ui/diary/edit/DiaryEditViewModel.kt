@@ -1929,11 +1929,11 @@ class DiaryEditViewModel @Inject internal constructor(
     }
 
     /**
-     * 日記項目削除処理に必要なパラメータを保持するデータクラス。
-     * @property itemNumber 削除する項目の番号
+     * 前画面遷移処理に必要なパラメータを保持するデータクラス。
+     * @property originalDiaryDate 元の日記の日付
      */
-    private data class DiaryItemDeleteParameters(
-        val itemNumber: DiaryItemNumber
+    private data class PreviousNavigationParameters(
+        val originalDiaryDate: LocalDate
     )
     //endregion
 
@@ -1952,10 +1952,12 @@ class DiaryEditViewModel @Inject internal constructor(
     }
 
     /**
-     * 日記画像更新処理に必要なパラメータを保持するデータクラス。
-     * @property id 対象の日記ID
+     * 天気情報取得処理に必要なパラメータを保持するデータクラス。
+     * @property date 取得対象の日付
      */
-    private data class DiaryImageUpdateParameters(val id: DiaryId)
+    private data class WeatherInfoFetchParameters(
+        val date: LocalDate
+    )
     //endregion
 
     //region Diary Item Delete Parameters
@@ -1973,11 +1975,11 @@ class DiaryEditViewModel @Inject internal constructor(
     }
 
     /**
-     * 天気情報取得処理に必要なパラメータを保持するデータクラス。
-     * @property date 取得対象の日付
+     * 日記項目削除処理に必要なパラメータを保持するデータクラス。
+     * @property itemNumber 削除する項目の番号
      */
-    private data class WeatherInfoFetchParameters(
-        val date: LocalDate
+    private data class DiaryItemDeleteParameters(
+        val itemNumber: DiaryItemNumber
     )
     //endregion
 
@@ -1996,12 +1998,10 @@ class DiaryEditViewModel @Inject internal constructor(
     }
 
     /**
-     * 前画面遷移処理に必要なパラメータを保持するデータクラス。
-     * @property originalDiaryDate 元の日記の日付
+     * 日記画像更新処理に必要なパラメータを保持するデータクラス。
+     * @property id 対象の日記ID
      */
-    private data class PreviousNavigationParameters(
-        val originalDiaryDate: LocalDate
-    )
+    private data class DiaryImageUpdateParameters(val id: DiaryId)
     //endregion
 
     //endregion
