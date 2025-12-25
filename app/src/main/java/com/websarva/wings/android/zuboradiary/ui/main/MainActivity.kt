@@ -96,11 +96,7 @@ class MainActivity : LoggingActivity(), ActivityNavigationEventHandler<MainActiv
     //      また、本プロパティはUIスレッド専用のため同期ロックは不要。
     //      意図しないバックグラウンドアクセスが発生した際のロック競合(UIフリーズ)を回避するため、
     //      明示的にNONEを指定する。
-    private val navController by lazy(LazyThreadSafetyMode.NONE) {
-        val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment_nav_host) as NavHostFragment
-        navHostFragment.navController
-    }
+    private lateinit var navController: NavController
 
     /** 追加処理として、スプラッシュスクリーンの表示、エッジツーエッジのセットアップ、UIの初期設定を行う。 */
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -278,6 +274,9 @@ class MainActivity : LoggingActivity(), ActivityNavigationEventHandler<MainActiv
         // Navigation設定
         // 参考:https://inside.luchegroup.com/entry/2023/05/08/113236
         val bottomNavigationView = binding.bottomNavigation
+        val navHostFragment =
+            supportFragmentManager.findFragmentById(R.id.fragment_nav_host) as NavHostFragment
+        navController = navHostFragment.navController
         setupWithNavController(bottomNavigationView, navController)
         bottomNavigationView.apply {
             // MEMO:setupWithNavController()で設定したOnItemSelectedListenerを下記で上書き
