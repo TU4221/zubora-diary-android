@@ -272,11 +272,22 @@ class CalendarViewModel @Inject internal constructor(
 
     /**
      * 日記表示・編集画面から戻ってきた時に呼び出される事を想定。
-     * 選択された日付を更新する。
+     *
+     * 日記表示・編集画面の表示されていた日記の日付と選択された日付が同じ場合は、表示している日記のリフレッシュを行う。
+     * そうでない場合は、選択された日付を更新する。
+     *
      * @param date 日記表示・編集画面の表示されていた日記の日付
      */
     internal fun onDiaryShowFragmentResultReceived(date: LocalDate) {
-        updateSelectedDate(date)
+        if (date == currentUiState.selectedDate) {
+            // リフレッシュ
+            launchWithUnexpectedErrorHandler {
+                prepareDiary(date)
+            }
+        } else {
+            // 日付変更
+            updateSelectedDate(date)
+        }
     }
     //endregion
 
