@@ -264,7 +264,7 @@ internal class WeatherApiDataSource @Inject constructor(
     ) {
         try {
             require(
-                numPastDays >= MIN_PAST_DAYS && numPastDays <= MAX_PAST_DAYS
+                numPastDays in MIN_PAST_DAYS..MAX_PAST_DAYS
             ) { "過去日数 `$numPastDays` が不正値" }
         } catch (e: IllegalArgumentException) {
             throw InvalidNetworkRequestParameterException( e)
