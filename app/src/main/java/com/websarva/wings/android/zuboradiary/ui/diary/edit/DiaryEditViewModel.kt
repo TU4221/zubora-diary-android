@@ -564,7 +564,7 @@ class DiaryEditViewModel @Inject internal constructor(
         val parameters = checkNotNull(pendingDiaryDateUpdateParameters)
         clearPendingDiaryDateUpdateParameters()
         launchWithUnexpectedErrorHandler {
-            handleDatePickcerDialogResult(date, parameters.originalDate, parameters.isNewDiary)
+            handleDatePickerDialogResult(date, parameters.originalDate, parameters.isNewDiary)
         }
     }
 
@@ -1104,7 +1104,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param originalDate 元の日付
      * @param isNewDiary 新規日記の場合はtrue
      */
-    private suspend fun handleDatePickcerDialogResult(
+    private suspend fun handleDatePickerDialogResult(
         date: LocalDate,
         originalDate: LocalDate,
         isNewDiary: Boolean
