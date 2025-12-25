@@ -9,6 +9,8 @@ import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseResult
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.DoesDiaryExistUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.LoadDiaryByDateUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.diary.exception.DiaryExistenceCheckException
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.list.LoadExistingDiaryDateListUseCase
+import com.websarva.wings.android.zuboradiary.domain.usecase.diary.list.exception.ExistingDiaryDateListLoadException
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.LoadCalendarStartDayOfWeekSettingUseCase
 import com.websarva.wings.android.zuboradiary.domain.usecase.settings.exception.CalendarStartDayOfWeekSettingLoadException
 import com.websarva.wings.android.zuboradiary.ui.diary.common.mapper.toUiModel
@@ -47,6 +49,7 @@ class CalendarViewModel @Inject internal constructor(
     private val handle: SavedStateHandle,
     private val diaryUiStateHelper: DiaryUiStateHelper,
     private val loadCalendarStartDayOfWeekSettingUseCase: LoadCalendarStartDayOfWeekSettingUseCase,
+    private val loadExistingDiaryDateListUseCase: LoadExistingDiaryDateListUseCase,
     private val doesDiaryExistUseCase: DoesDiaryExistUseCase,
     private val loadDiaryByDateUseCase: LoadDiaryByDateUseCase
 ) : BaseFragmentViewModel<
@@ -86,6 +89,7 @@ class CalendarViewModel @Inject internal constructor(
     private fun collectUiStates() {
         collectUiStateForSaveStateToHandle()
         collectCalendarStartDayOfWeekSetting()
+        collectExistingDiaryDates()
         collectSelectedDate()
         collectWeather2Visible()
         collectNumVisibleDiaryItems()
@@ -127,6 +131,32 @@ class CalendarViewModel @Inject internal constructor(
             ).distinctUntilChanged().onEach { setting ->
                 updateCalendarStartDayOfWeek(setting.dayOfWeek)
             }.launchIn(viewModelScope)
+    }
+
+    /** 日記が存在する日付のリストの変更を監視し、UIに反映させる。 */
+    private fun collectExistingDiaryDates() {
+        loadExistingDiaryDateListUseCase().onEach {
+            when (it) {
+                is UseCaseResult.Success -> { /*処理なし*/ }
+                is UseCaseResult.Failure -> {
+                    when (it.exception) {
+                        is ExistingDiaryDateListLoadException.LoadFailure -> {
+                            showAppMessageDialog(CalendarAppMessage.DiaryInfoLoadFailure)
+                        }
+                        is ExistingDiaryDateListLoadException.Unknown -> {
+                            showUnexpectedAppMessageDialog(it.exception)
+                        }
+                    }
+                }
+            }
+        }.map {
+            when (it) {
+                is UseCaseResult.Success -> it.value
+                is UseCaseResult.Failure -> emptyList()
+            }.toSet()
+        }.distinctUntilChanged().onEach {
+            updateExistingDiaryDates(it)
+        }.launchIn(viewModelScope)
     }
 
     /** 選択された日付の変更を監視し、対応する日記の準備を行う。 */
@@ -194,17 +224,6 @@ class CalendarViewModel @Inject internal constructor(
      */
     internal fun onCalendarDayClick(date: LocalDate) {
         updateSelectedDate(date)
-    }
-
-    /**
-     * カレンダーの日付に日記有無のドットを表示する必要があるか確認する時に呼び出される事を想定。
-     * 日記の有無を確認し、ドットの表示状態を更新する。
-     * @param date 確認対象の日付
-     */
-    internal fun onCalendarDayDotVisibilityCheck(date: LocalDate) {
-        launchWithUnexpectedErrorHandler {
-            refreshCalendarDayDot(date)
-        }
     }
 
     /**
@@ -304,16 +323,6 @@ class CalendarViewModel @Inject internal constructor(
     }
 
     /**
-     * 指定された日付のドット表示を、日記の有無に応じて更新する（イベント発行）。
-     * @param date 更新対象の日付
-     */
-    private suspend fun refreshCalendarDayDot(date: LocalDate) {
-        emitUiEvent(
-            CalendarUiEvent.RefreshCalendarDayDotVisibility(date, existsSavedDiary(date))
-        )
-    }
-
-    /**
      * 指定された日付に日記が存在するかどうかを確認する。
      * @param date 確認対象の日付
      * @return 日記が存在する場合はtrue
@@ -403,6 +412,15 @@ class CalendarViewModel @Inject internal constructor(
      */
     private fun updateCalendarStartDayOfWeek(dayOfWeek: DayOfWeek) {
         updateUiState { it.copy(calendarStartDayOfWeek = dayOfWeek) }
+    }
+
+    /**
+     * 日記が存在する日付のセットを更新する。
+     *
+     * @param dates 日記が存在する日付のセット
+     */
+    private fun updateExistingDiaryDates(dates: Set<LocalDate>) {
+        updateUiState { it.copy(existingDiaryDates = dates) }
     }
 
     /**

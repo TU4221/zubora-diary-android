@@ -127,9 +127,6 @@ class CalendarFragment :
             is CalendarUiEvent.SmoothScrollCalendar -> {
                 smoothScrollCalendar(event.date)
             }
-            is CalendarUiEvent.RefreshCalendarDayDotVisibility -> {
-                updateCalendarDayDotVisibility(event.date, event.isVisible)
-            }
         }
     }
 
@@ -146,6 +143,7 @@ class CalendarFragment :
 
         observeSelectedDate()
         observeCalendarStartDayOfWeek()
+        observeExistingDiaryDates()
     }
 
     override fun setupUiEventObservers() {
@@ -178,6 +176,19 @@ class CalendarFragment :
             }.collect {
                 // 週の開始曜日が変わった場合は、カレンダー全体を再構成する必要がある
                 binding.calendar.notifyCalendarChanged()
+            }
+        }
+    }
+
+    /** 日記が存在する日付の変更を監視し、カレンダーを再描画する。 */
+    private fun observeExistingDiaryDates() {
+        launchAndRepeatOnViewLifeCycleStarted {
+            mainViewModel.uiState.distinctUntilChanged { old, new ->
+                old.existingDiaryDates == new.existingDiaryDates
+            }.map {
+                it.existingDiaryDates
+            }.collect {
+                updateCalendarDayDotVisibility(it)
             }
         }
     }
@@ -259,13 +270,9 @@ class CalendarFragment :
                 CalendarMonthHeaderFooterBinder(daysOfWeek, themeColor, format)
 
             dayBinder =
-                CalendarMonthDayBinder(
-                    themeColor,
-                    { date: LocalDate -> mainViewModel.onCalendarDayClick(date) },
-                    { date: LocalDate ->
-                        mainViewModel.onCalendarDayDotVisibilityCheck(date)
-                    }
-                )
+                CalendarMonthDayBinder(themeColor) { date: LocalDate ->
+                    mainViewModel.onCalendarDayClick(date)
+                }
         }
     }
 
@@ -374,19 +381,17 @@ class CalendarFragment :
      * カレンダーの日付セルの描画を担うBinder。
      * @property themeColor 現在のテーマカラー
      * @property onDateClick 日付クリック時のコールバック
-     * @property checkDiaryExists 日記の存在確認を行うコールバック
      */
     private class CalendarMonthDayBinder(
         private val themeColor: ThemeColorUi,
-        private val onDateClick: (date: LocalDate) -> Unit,
-        private val checkDiaryExists: (date: LocalDate) -> Unit
+        private val onDateClick: (date: LocalDate) -> Unit
     ) : MonthDayBinder<DayViewContainer> {
 
         /** 現在選択されている日付。 */
         private var selectedDate: LocalDate = LocalDate.now()
 
-        /** 日付ごとのドット表示状態をキャッシュするマップ。 */
-        private val dayDotVisibilityCache = mutableMapOf<LocalDate, Boolean>()
+        /** ドットを表示する日付。 */
+        private var datesWithDots: Set<LocalDate> = emptySet()
 
         /** 日付セルのViewContainerを生成する。 */
         override fun create(view: View): DayViewContainer {
@@ -411,16 +416,7 @@ class CalendarFragment :
                     else -> DayViewContainer.DayState.WEEKDAY
                 }
 
-            val cachedVisibility = dayDotVisibilityCache[calendarDay.date]
-            val dotIsVisible =
-                if (cachedVisibility == null) {
-                    if (calendarDay.position == DayPosition.MonthDate) {
-                        checkDiaryExists(calendarDay.date)
-                    }
-                    false // 初回は非表示にしておき、データ取得後に更新
-                } else {
-                    cachedVisibility
-                }
+            val dotIsVisible = datesWithDots.contains(calendarDay.date)
 
             container.bind(
                 calendarDay,
@@ -435,9 +431,9 @@ class CalendarFragment :
             selectedDate = date
         }
 
-        /** 日付のドット表示状態のキャッシュを更新する。 */
-        fun updateDayDotVisibilityCache(date: LocalDate, isVisible: Boolean) {
-            dayDotVisibilityCache[date] = isVisible
+        /** ドットを表示する日付を更新する。 */
+        fun updateDatesWithDots(dates: Set<LocalDate>) {
+            datesWithDots = dates
         }
     }
 
@@ -559,19 +555,14 @@ class CalendarFragment :
     }
 
     /**
-     * 特定の日付のドット表示を更新する。
-     * @param date ドット表示を更新する日付
-     * @param isVisible ドットを表示する場合はtrue
+     * カレンダーの日付のドットのUIを更新する。
+     * @param dates ドットを表示する日付
      */
-    private fun updateCalendarDayDotVisibility(date: LocalDate, isVisible: Boolean) {
-        val calendarMonthDayBinder = binding.calendar.dayBinder as CalendarMonthDayBinder
-        calendarMonthDayBinder.updateDayDotVisibilityCache(date, isVisible)
-        // TODO:CalendarViewのBind処理中に日記既存確認を開始し、
-        //      処理途中に結果（Event）を受け取りnotifyDateChanged()を呼び出すと、例外が発生。一時的措置としてpost()処理追加。
-        //      MonthScrollListenerで対応する日記既存確認を開始し、一日単位ではなく、月単位で既存確認をすることを検討。
-        binding.calendar.post {
-            binding.calendar.notifyDateChanged(date)
-        }
+    private fun updateCalendarDayDotVisibility(dates: Set<LocalDate>) {
+        val calendar = binding.calendar
+        val calendarMonthDayBinder = calendar.dayBinder as CalendarMonthDayBinder
+        calendarMonthDayBinder.updateDatesWithDots(dates)
+        calendar.notifyCalendarChanged()
     }
 
     /**

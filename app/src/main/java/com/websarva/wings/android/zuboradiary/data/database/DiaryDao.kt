@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
+import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
 
 /**
@@ -75,6 +76,16 @@ internal interface DiaryDao {
      */
     @Query("SELECT * FROM diaries ORDER BY date ASC LIMIT 1 OFFSET 0")
     suspend fun selectOldestDiary(): DiaryEntity?
+
+    /**
+     * 日記が存在する日付のリストを取得する。
+     *
+     * 結果はFlowとして監視可能。
+     *
+     * @return 日付のリストをFlowでラップしたものを返す。
+     */
+    @Query("SELECT DISTINCT date FROM diaries")
+    fun selectExistingDiaryDateList(): Flow<List<LocalDate>>
 
     /**
      * 日記リストのデータを日付の降順で指定された件数・オフセットで取得する。

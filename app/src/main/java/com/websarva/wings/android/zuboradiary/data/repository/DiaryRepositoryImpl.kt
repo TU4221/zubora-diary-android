@@ -75,6 +75,19 @@ internal class DiaryRepositoryImpl @Inject constructor(
         }
     }
 
+    override fun loadExistingDiaryDateList(): Flow<List<LocalDate>> {
+        return diaryDataSource
+            .selectExistingDiaryDateList()
+            .catch {
+                // Flowストリーム内で発生した例外をDataStorageExceptionにラップ
+                throw if (it is Exception) {
+                    DiaryRepositoryExceptionMapper.toDomainException(it)
+                } else {
+                    it // その他の予期せぬ例外はそのままスロー
+                }
+            }
+    }
+
     override suspend fun loadDiaryList(
         num: Int,
         offset: Int,

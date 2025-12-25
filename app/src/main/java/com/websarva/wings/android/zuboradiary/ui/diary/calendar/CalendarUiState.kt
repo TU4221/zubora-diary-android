@@ -14,6 +14,7 @@ import java.time.LocalDate
  * カレンダー画面のUI状態を表すデータクラス。
  *
  * @property calendarStartDayOfWeek カレンダーの週の開始曜日。
+ * @property existingDiaryDates 日記が存在する日付。高速検索用として [Set] で保持。
  * @property selectedDate ユーザーによって選択されている日付。
  * @property previousSelectedDate 以前（一つ前）に選択されていた日付。
  * @property diaryLoadState 日記データの読み込み状態。
@@ -29,6 +30,7 @@ import java.time.LocalDate
 data class CalendarUiState(
     // UiData
     val calendarStartDayOfWeek: DayOfWeek = DayOfWeek.SUNDAY,
+    val existingDiaryDates: Set<LocalDate> = emptySet(),
     val selectedDate: LocalDate = LocalDate.now(),
     val previousSelectedDate: LocalDate? = null,
     override val diaryLoadState: LoadState<DiaryUi> = LoadState.Idle,

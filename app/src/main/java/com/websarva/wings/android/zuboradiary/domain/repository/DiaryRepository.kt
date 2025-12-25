@@ -1,6 +1,5 @@
 package com.websarva.wings.android.zuboradiary.domain.repository
 
-import com.websarva.wings.android.zuboradiary.data.database.exception.InvalidDatabaseOperationParameterException
 import com.websarva.wings.android.zuboradiary.domain.usecase.UseCaseException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
@@ -83,6 +82,16 @@ internal interface DiaryRepository {
      * @throws ResourceNotFoundException 該当の日記データが見つからなかった場合。
      */
     suspend fun loadOldestDiary(): Diary
+
+    /**
+     * 日記が存在する日付のリストを読み込む。
+     *
+     * このメソッドは Flow を返し、日記が存在する日付のリストの変更を継続的に監視することができる。
+     *
+     * @return 日記が存在する日付のリストを放出する Flow。
+     * @throws DataStorageException 日記データの読み込みアクセスに失敗した場合。 ([Flow] 内部で発生する可能性がある)
+     */
+    fun loadExistingDiaryDateList(): Flow<List<LocalDate>>
 
     /**
      * 日記リストを読み込む。

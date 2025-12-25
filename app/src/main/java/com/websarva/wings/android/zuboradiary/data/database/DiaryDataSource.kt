@@ -154,6 +154,20 @@ internal class DiaryDataSource @Inject constructor(
     }
 
     /**
+     * 日記が存在する日付のリストを取得する。
+     *
+     * 結果はFlowとして監視可能であり、データベース関連の例外はラップされる。
+     *
+     * @return 日付のリストをFlowでラップしたものを返す。
+     * @throws RecordReadException データベースからのレコードの読み込みに失敗した場合。
+     * @throws DatabaseCorruptionException データベースが破損している場合。
+     * @throws DatabaseStateException データベースの状態が不正だった場合。
+     */
+    fun selectExistingDiaryDateList(): Flow<List<LocalDate>> {
+        return diaryDao.selectExistingDiaryDateList().wrapDatabaseExceptions()
+    }
+
+    /**
      * 日記リストのデータを日付の降順で指定された件数・オフセットで取得する。
      *
      * 開始日が指定されていない場合は、全ての日記を対象とする。
