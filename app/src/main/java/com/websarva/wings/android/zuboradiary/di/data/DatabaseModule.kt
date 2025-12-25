@@ -30,7 +30,6 @@ internal object DatabaseModule {
     @Provides
     fun provideDiaryDatabase(@ApplicationContext context: Context): DiaryDatabase =
         databaseBuilder(context, DiaryDatabase::class.java, "diary_db")
-            .fallbackToDestructiveMigration() // TODO:最終的に削除
             .build()
 
     @Singleton
