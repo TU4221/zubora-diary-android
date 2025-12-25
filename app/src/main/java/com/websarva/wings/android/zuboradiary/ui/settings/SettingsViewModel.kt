@@ -444,6 +444,17 @@ class SettingsViewModel @Inject internal constructor(
     }
 
     /**
+     * 通知権限の確認で永続的に許可されなかった時に呼び出される事を想定。
+     * リマインダー通知設定スイッチをOff状態に切り換え、通知権限要求の理由説明ダイアログを表示する。
+     */
+    internal fun onPostNotificationsPermissionPermanentDenied() {
+        launchWithUnexpectedErrorHandler {
+            changeReminderSettingSwitch(false)
+            showNotificationPermissionRationaleDialog()
+        }
+    }
+
+    /**
      * 通知権限要求の理由説明が必要とされる時に呼び出される事を想定。
      * 通知権限要求の理由説明ダイアログを表示する。
      */
@@ -486,6 +497,17 @@ class SettingsViewModel @Inject internal constructor(
     internal fun onAccessLocationPermissionDenied() {
         launchWithUnexpectedErrorHandler {
             changeWeatherInfoFetchSettingSwitch(false)
+        }
+    }
+
+    /**
+     * 位置情報権限の確認で永続的に許可されなかった時に呼び出される事を想定。
+     * 天気情報取得設定スイッチをOff状態に切り換え、位置情報権限要求の理由説明ダイアログを表示する。
+     */
+    internal fun onAccessLocationPermissionPermanentDenied() {
+        launchWithUnexpectedErrorHandler {
+            changeWeatherInfoFetchSettingSwitch(false)
+            showLocationPermissionRationaleDialog()
         }
     }
 
@@ -967,15 +989,6 @@ class SettingsViewModel @Inject internal constructor(
 
     override suspend fun showUnexpectedAppMessageDialog(e: Exception) {
         showAppMessageDialog(SettingsAppMessage.Unexpected(e))
-    }
-
-    // TODO:不要だが残しておく(最終的に削除)
-    /**
-     * アプリケーションの詳細設定画面を表示する（イベント発行）。
-     */
-    private suspend fun showApplicationDetailsSettings() {
-        emitUiEvent(
-            SettingsUiEvent.ShowApplicationDetailsSettingsScreen)
     }
     //endregion
 

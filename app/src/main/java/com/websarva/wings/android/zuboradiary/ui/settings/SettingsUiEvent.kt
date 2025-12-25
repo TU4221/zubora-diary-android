@@ -7,10 +7,6 @@ import com.websarva.wings.android.zuboradiary.ui.common.event.UiEvent
  */
 sealed interface SettingsUiEvent : UiEvent {
 
-    // TODO:不要だが残しておく(最終的に削除)
-    /** アプリケーションの詳細設定画面を表示することを示すイベント。 */
-    data object ShowApplicationDetailsSettingsScreen : SettingsUiEvent
-
     /** 通知権限を確認することを示すイベント。 */
     data object CheckPostNotificationsPermission : SettingsUiEvent
 

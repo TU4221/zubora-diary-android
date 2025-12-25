@@ -70,7 +70,7 @@ class SettingsFragment : BaseFragment<
 
     override val resultKey: String? get() = null
 
-    /** 通知権限のリクエスト結果を処理するランチャー。 */
+    /** 通知権限の要求結果を処理するランチャー。 */
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     private val requestPostNotificationsPermissionLauncher: ActivityResultLauncher<String> =
         registerForActivityResult(
@@ -79,7 +79,13 @@ class SettingsFragment : BaseFragment<
             onPostNotificationsPermissionResult(isGranted)
         }
 
-    /** 位置情報権限のリクエスト結果を処理するランチャー。 */
+    /** 通知権限の要求理由説明表示が必要かどうか。 */
+    private val shouldShowRequestPostNotificationPermissionRationale
+        get() = ActivityCompat.shouldShowRequestPermissionRationale(
+            requireActivity(), Manifest.permission.POST_NOTIFICATIONS
+        )
+
+    /** 位置情報権限の要求結果を処理するランチャー。 */
     private val requestAccessLocationPermissionLauncher: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
@@ -89,6 +95,14 @@ class SettingsFragment : BaseFragment<
             val isAllGranted = isAccessFineLocationGranted && isAccessCoarseLocationGranted
             onAccessLocationPermissionResult(isAllGranted)
         }
+
+    /** 位置情報権限の要求理由説明表示が必要かどうか。 */
+    private val shouldShowRequestAccessLocationPermissionRationale
+        get() = ActivityCompat.shouldShowRequestPermissionRationale(
+            requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION
+        ) && ActivityCompat.shouldShowRequestPermissionRationale(
+            requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION
+        )
 
     /** テーマカラー選択ダイアログで使用するピッカーリスト。 */
     private val themeColorPickerList = ThemeColorUi.entries
@@ -205,10 +219,21 @@ class SettingsFragment : BaseFragment<
         observeDialogResult<Unit>(
             RESULT_KEY_POST_NOTIFICATIONS_PERMISSION_RATIONALE
         ) { result ->
-            when (result) {
-                is DialogResult.Positive -> requestPostNotificationsPermission()
-                DialogResult.Negative,
-                DialogResult.Cancel -> mainViewModel.onPostNotificationsPermissionDenied()
+            // 初回の理由説明(2回目の権限確認前)
+            if (shouldShowRequestPostNotificationPermissionRationale) {
+                when (result) {
+                    is DialogResult.Positive -> requestPostNotificationsPermission()
+                    DialogResult.Negative,
+                    DialogResult.Cancel -> mainViewModel.onPostNotificationsPermissionDenied()
+                }
+
+            // 初回以降の理由説明(2回目の権限確認拒否後)
+            } else {
+                when (result) {
+                    is DialogResult.Positive -> showApplicationDetailsSettings()
+                    DialogResult.Negative,
+                    DialogResult.Cancel -> { /* 処理なし */ }
+                }
             }
         }
     }
@@ -218,10 +243,21 @@ class SettingsFragment : BaseFragment<
         observeDialogResult<Unit>(
             RESULT_KEY_ACCESS_LOCATION_PERMISSION_RATIONALE
         ) { result ->
-            when (result) {
-                is DialogResult.Positive -> requestAccessLocationPermission()
-                DialogResult.Negative,
-                DialogResult.Cancel -> mainViewModel.onAccessLocationPermissionDenied()
+            // 初回の理由説明(2回目の権限確認前)
+            if (shouldShowRequestAccessLocationPermissionRationale) {
+                when (result) {
+                    is DialogResult.Positive -> requestAccessLocationPermission()
+                    DialogResult.Negative,
+                    DialogResult.Cancel -> mainViewModel.onAccessLocationPermissionDenied()
+                }
+
+                // 初回以降の理由説明(2回目の権限確認拒否後)
+            } else {
+                when (result) {
+                    is DialogResult.Positive -> showApplicationDetailsSettings()
+                    DialogResult.Negative,
+                    DialogResult.Cancel -> { /* 処理なし */ }
+                }
             }
         }
     }
@@ -275,9 +311,6 @@ class SettingsFragment : BaseFragment<
     //region UI Observation Setup
     override fun onMainUiEventReceived(event: SettingsUiEvent) {
         when (event) {
-            is SettingsUiEvent.ShowApplicationDetailsSettingsScreen -> {
-                showApplicationDetailsSettings()
-            }
             is SettingsUiEvent.CheckPostNotificationsPermission -> {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     checkPostNotificationsPermission()
@@ -606,7 +639,6 @@ class SettingsFragment : BaseFragment<
             .actionNavigationSettingsFragmentToOpenSourceSoftwareLicensesDialog()
     }
 
-    // TODO:不要だが残しておく(最終的に削除)
     /** アプリケーション詳細設定画面へ遷移する。 */
     private fun showApplicationDetailsSettings() {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
@@ -617,7 +649,7 @@ class SettingsFragment : BaseFragment<
     //endregion
 
     //region Permission Handling - Post Notifications
-    /** 通知権限の有無を確認し、権限がない場合はRationale表示または権限要求を行う。 */
+    /** 通知権限の有無を確認し、権限がない場合は理由説明表示または権限要求を行う。 */
     @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private fun checkPostNotificationsPermission() {
         val logPrefix = "位置情報権限"
@@ -628,10 +660,8 @@ class SettingsFragment : BaseFragment<
                 mainViewModel.onPostNotificationsPermissionGranted()
             }
 
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(), Manifest.permission.POST_NOTIFICATIONS
-            ) -> {
-                Log.d(logTag, "${logPrefix}: Rationale表示が必要。")
+            shouldShowRequestPostNotificationPermissionRationale -> {
+                Log.d(logTag, "${logPrefix}: 理由説明表示が必要。")
                 mainViewModel.onPostNotificationsPermissionRationaleRequired()
             }
 
@@ -655,7 +685,14 @@ class SettingsFragment : BaseFragment<
         if (isGranted) {
             mainViewModel.onPostNotificationsPermissionGranted()
         } else {
-            mainViewModel.onPostNotificationsPermissionDenied()
+            // 初回拒否
+            if (shouldShowRequestPostNotificationPermissionRationale) {
+                mainViewModel.onPostNotificationsPermissionDenied()
+
+            // 初回以降の拒否
+            } else {
+                mainViewModel.onPostNotificationsPermissionPermanentDenied()
+            }
         }
     }
 
@@ -671,7 +708,7 @@ class SettingsFragment : BaseFragment<
     //endregion
 
     //region Permission Handling - Access Location
-    /** 位置情報権限の有無を確認し、権限がない場合はRationale表示または権限要求を行う。 */
+    /** 位置情報権限の有無を確認し、権限がない場合は理由説明表示または権限要求を行う。 */
     private fun checkAccessLocationPermission() {
         val logPrefix = "位置情報権限"
         Log.d(logTag, "${logPrefix}の確認を開始。")
@@ -681,12 +718,8 @@ class SettingsFragment : BaseFragment<
                 mainViewModel.onAccessLocationPermissionGranted()
             }
 
-            ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION
-            ) && ActivityCompat.shouldShowRequestPermissionRationale(
-                requireActivity(), Manifest.permission.ACCESS_COARSE_LOCATION
-            ) -> {
-                Log.d(logTag, "${logPrefix}: Rationale表示が必要。")
+            shouldShowRequestAccessLocationPermissionRationale -> {
+                Log.d(logTag, "${logPrefix}: 理由説明表示が必要。")
                 mainViewModel.onAccessLocationPermissionRationaleRequired()
             }
 
@@ -713,7 +746,14 @@ class SettingsFragment : BaseFragment<
         if (isGranted) {
             mainViewModel.onAccessLocationPermissionGranted()
         } else {
-            mainViewModel.onAccessLocationPermissionDenied()
+            // 初回拒否
+            if (shouldShowRequestAccessLocationPermissionRationale) {
+                mainViewModel.onAccessLocationPermissionDenied()
+
+            // 初回以降の拒否
+            } else {
+                mainViewModel.onAccessLocationPermissionPermanentDenied()
+            }
         }
     }
 
