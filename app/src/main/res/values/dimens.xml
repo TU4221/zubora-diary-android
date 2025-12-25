@@ -118,7 +118,6 @@
 
     <!-- region layout_diary_edit_item -->
     <dimen name="layout_diary_edit_item_text_size">@dimen/fragment_diary_edit_text_size</dimen>
-    <dimen name="layout_diary_edit_item_content_spacing_horizontal">@dimen/fragment_diary_edit_content_spacing_horizontal</dimen>
     <dimen name="layout_diary_edit_item_content_spacing_vertical">@dimen/fragment_diary_edit_content_spacing_vertical</dimen>
     <dimen name="layout_diary_edit_item_image_button_layout_width">@dimen/fragment_diary_edit_image_button_layout_width</dimen>
     <dimen name="layout_diary_edit_item_image_button_layout_height">@dimen/fragment_diary_edit_image_button_layout_height</dimen>
