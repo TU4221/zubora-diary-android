@@ -11,6 +11,14 @@ package com.websarva.wings.android.zuboradiary.data.network.exception
 internal class HttpException(
     statusCode: Int,
     message: String,
-    errorBody: String? = null, // RetrofitのerrorBody()から取得した文字列など
+    errorBody: String? = null,
     cause: Throwable? = null
-) : NetworkOperationException("HTTP $statusCode: $message", cause)
+) : NetworkOperationException(
+    "HTTP $statusCode: $message" +
+            if (!errorBody.isNullOrBlank()) {
+                ". Error Body: $errorBody"
+            } else {
+                ""
+            },
+    cause
+)
