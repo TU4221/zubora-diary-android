@@ -51,20 +51,13 @@ class ImageFileDataSource @Inject constructor(
 
     private val imageDirName = "images"
 
-    private val imageCacheDir: File by lazy {
-        File(cacheDir, imageDirName)
-            .apply { mkdir() } // 指定ディレクトリ作成
-    }
+    private val imageCacheDir: File =
+        File(cacheDir, imageDirName).apply { mkdir() } // 指定ディレクトリ作成
 
-    private val imagePermanentDir: File by lazy {
-        File(permanentDir, imageDirName)
-            .apply { mkdir() }
-    }
+    private val imagePermanentDir: File =
+        File(permanentDir, imageDirName).apply { mkdir() }
 
-    private val imageBackupDir: File by lazy {
-        File(imageCacheDir, "backup")
-            .apply { mkdir() }
-    }
+    private val imageBackupDir: File = File(imageCacheDir, "backup").apply { mkdir() }
 
     /**
      * 指定された画像ファイルから、キャッシュ画像ディレクトリ絶対パスを構築する。
