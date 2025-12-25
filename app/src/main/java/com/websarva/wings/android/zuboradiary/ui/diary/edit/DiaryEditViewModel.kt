@@ -1148,7 +1148,7 @@ class DiaryEditViewModel @Inject internal constructor(
         updateToInputDisabledState()
         val numVisibleItems = currentUiState.numVisibleDiaryItems
         val additionItemNumber = numVisibleItems + 1
-        emitUiEvent(DiaryEditUiEvent.startDiaryItemAdditionAnimation(additionItemNumber))
+        emitUiEvent(DiaryEditUiEvent.StartDiaryItemAdditionAnimation(additionItemNumber))
     }
 
     /**
@@ -1196,7 +1196,7 @@ class DiaryEditViewModel @Inject internal constructor(
             deleteItem(itemNumber)
         } else {
             emitUiEvent(
-                DiaryEditUiEvent.startDiaryItemDeleteAnimation(itemNumber.value)
+                DiaryEditUiEvent.StartDiaryItemDeleteAnimation(itemNumber.value)
             )
         }
     }
