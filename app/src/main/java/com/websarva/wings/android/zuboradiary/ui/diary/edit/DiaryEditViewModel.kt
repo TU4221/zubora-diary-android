@@ -1224,14 +1224,13 @@ class DiaryEditViewModel @Inject internal constructor(
         val currentNumVisibleItems = currentUiState.numVisibleDiaryItems
         if (itemNumber.value < currentNumVisibleItems) {
             for (i in itemNumber.value until currentNumVisibleItems) {
-                val targetItemNumber = i
-                val nextItemNumber = targetItemNumber.inc()
+                val nextItemNumber = i.inc()
 
-                updateItemTitles[targetItemNumber] = updateItemTitles[nextItemNumber]
+                updateItemTitles[i] = updateItemTitles[nextItemNumber]
                 updateItemTitles[nextItemNumber] = null
-                updateItemComments[targetItemNumber] = updateItemComments[nextItemNumber]
+                updateItemComments[i] = updateItemComments[nextItemNumber]
                 updateItemComments[nextItemNumber] = null
-                updateHistories[targetItemNumber] = updateHistories[nextItemNumber]
+                updateHistories[i] = updateHistories[nextItemNumber]
                 updateHistories[nextItemNumber] = null
             }
         }
