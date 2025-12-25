@@ -723,7 +723,7 @@ class DiaryEditViewModel @Inject internal constructor(
         if (id == null) {
             prepareNewDiaryEntry(date)
         } else {
-            prepareExsistsDiaryEntry(id, date)
+            prepareExistingDiaryEntry(id, date)
         }
     }
 
@@ -749,7 +749,7 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param id 既存の日記ID
      * @param date 対象の日付
      */
-    private suspend fun prepareExsistsDiaryEntry(id: DiaryId, date: LocalDate) {
+    private suspend fun prepareExistingDiaryEntry(id: DiaryId, date: LocalDate) {
         loadDiaryById(id, date)
     }
 
