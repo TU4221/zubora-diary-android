@@ -42,12 +42,12 @@
             app:viewModel="@{viewModel}"
             app:layout_constraintHorizontal_weight="1"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toStartOf="@id/material_divider_toolbar"
+            app:layout_constraintEnd_toStartOf="@id/material_divider_vertical_center"
             app:layout_constraintTop_toBottomOf="@id/include_toolbar"
             app:layout_constraintBottom_toBottomOf="parent" />
 
         <com.google.android.material.divider.MaterialDivider
-            android:id="@+id/material_divider_toolbar"
+            android:id="@+id/material_divider_vertical_center"
             android:layout_width="1dp"
             android:layout_height="0dp"
             android:layout_marginTop="@dimen/screen_spacing_vertical"
@@ -68,7 +68,7 @@
             android:layout_marginEnd="@dimen/screen_spacing_horizontal"
             app:viewModel="@{viewModel}"
             app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toEndOf="@id/material_divider_toolbar"
+            app:layout_constraintStart_toEndOf="@id/material_divider_vertical_center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/include_toolbar"
             app:layout_constraintBottom_toBottomOf="parent" />
