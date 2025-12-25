@@ -266,7 +266,7 @@ class CalendarViewModel @Inject internal constructor(
 
         val selectedDate = currentUiState.selectedDate
         launchWithUnexpectedErrorHandler {
-            foucusOnToday(selectedDate)
+            focusOnToday(selectedDate)
         }
     }
 
@@ -349,12 +349,13 @@ class CalendarViewModel @Inject internal constructor(
      * 既に今日が選択されている場合は、スクロールのみを行う。
      * @param selectedDate 現在選択されている日付。
      */
-    private suspend fun foucusOnToday(selectedDate: LocalDate) {
+    private suspend fun focusOnToday(selectedDate: LocalDate) {
         val today = LocalDate.now()
         emitUiEvent(
             CalendarUiEvent.SmoothScrollCalendar(today)
         )
         if (selectedDate == today) return
+
 
         updateSuppressNextScroll(true) // MEMO:日記読込準備時のスクロールを無効化
         updateSelectedDate(today)
