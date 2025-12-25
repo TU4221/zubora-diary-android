@@ -1,6 +1,7 @@
 package com.websarva.wings.android.zuboradiary.domain.model.diary
 
 import com.websarva.wings.android.zuboradiary.domain.model.common.FileName
+import java.util.UUID
 
 /**
  * ファイル名を表すデータクラス。
@@ -16,5 +17,16 @@ internal data class DiaryImageFileName(
 
     init {
         validate()
+    }
+
+    companion object {
+        /**
+         * 画像ファイルのベース名（拡張子なし）として使用するための、ランダムなUUID文字列を生成する。
+         *
+         * @return UUID形式の文字列。
+         */
+        fun generateRandomBaseName(): String {
+            return UUID.randomUUID().toString()
+        }
     }
 }

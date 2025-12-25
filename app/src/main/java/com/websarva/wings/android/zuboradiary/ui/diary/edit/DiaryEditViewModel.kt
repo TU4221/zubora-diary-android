@@ -126,9 +126,6 @@ class DiaryEditViewModel @Inject internal constructor(
     /** 日記項目の削除が保留中であることを示すためのパラメータキャッシュ。 */
     private var pendingDiaryItemDeleteParameters: DiaryItemDeleteParameters? = null
 
-    /** 日記画像の更新が保留中であることを示すためのパラメータキャッシュ。 */
-    private var pendingDiaryImageUpdateParameters: DiaryImageUpdateParameters? = null
-
     /** 天気情報の取得が保留中であることを示すためのパラメータキャッシュ。 */
     private var pendingWeatherInfoFetchParameters: WeatherInfoFetchParameters? = null
 
@@ -453,9 +450,8 @@ class DiaryEditViewModel @Inject internal constructor(
     fun onAttachedImageClick() {
         if (!isReadyForOperation) return
 
-        val diaryId = DiaryId(currentUiState.editingDiary.id)
         launchWithUnexpectedErrorHandler {
-            showImageSelectionGallery(diaryId)
+            showImageSelectionGallery()
         }
     }
 
@@ -687,10 +683,8 @@ class DiaryEditViewModel @Inject internal constructor(
      * @param uri 選択された画像のURI（未選択の場合はnull）
      */
     internal fun onOpenDocumentImageUriResultReceived(uri: Uri?) {
-        val parameters = checkNotNull(pendingDiaryImageUpdateParameters)
-        clearPendingDiaryImageUpdateParameters()
         launchWithUnexpectedErrorHandler {
-            cacheDiaryImage(uri, parameters.id)
+            cacheDiaryImage(uri)
         }
     }
     //endregion
@@ -1260,22 +1254,18 @@ class DiaryEditViewModel @Inject internal constructor(
      * 画像を選択するギャラリーを表示する（イベント発行）。
      */
     // MEMO:画像選択完了時のUi更新(編集中)は画像選択完了イベントメソッドにて処理
-    private suspend fun showImageSelectionGallery(diaryId: DiaryId) {
-        cachePendingDiaryImageUpdateParameters(diaryId)
+    private suspend fun showImageSelectionGallery() {
         emitUiEvent(DiaryEditUiEvent.ShowImageSelectionGallery)
     }
 
     /**
      * 選択された画像をキャッシュし、ファイル名をUI状態に保存する。
      * @param uri 選択された画像のURI
-     * @param diaryId 対象の日記ID
      */
-    private suspend fun cacheDiaryImage(uri: Uri?, diaryId: DiaryId) {
+    private suspend fun cacheDiaryImage(uri: Uri?) {
         updateToProcessingState()
         if (uri != null) {
-            val result =
-                cacheDiaryImageUseCase(uri.toString(), diaryId)
-            when (result) {
+            when (val result = cacheDiaryImageUseCase(uri.toString())) {
                 is UseCaseResult.Success -> {
                     updateImageFileName(result.value.fullName)
                 }
@@ -1981,27 +1971,6 @@ class DiaryEditViewModel @Inject internal constructor(
     private data class DiaryItemDeleteParameters(
         val itemNumber: DiaryItemNumber
     )
-    //endregion
-
-    //region Diary Image Update Parameters
-    /**
-     * 保留中の日記画像更新パラメータを更新する。
-     * @param diaryId 対象の日記ID
-     */
-    private fun cachePendingDiaryImageUpdateParameters(diaryId: DiaryId) {
-        pendingDiaryImageUpdateParameters = DiaryImageUpdateParameters(diaryId)
-    }
-
-    /** 保留中の日記画像更新パラメータをクリアする。 */
-    private fun clearPendingDiaryImageUpdateParameters() {
-        pendingDiaryImageUpdateParameters = null
-    }
-
-    /**
-     * 日記画像更新処理に必要なパラメータを保持するデータクラス。
-     * @property id 対象の日記ID
-     */
-    private data class DiaryImageUpdateParameters(val id: DiaryId)
     //endregion
 
     //endregion
