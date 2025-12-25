@@ -81,6 +81,7 @@ class SettingsFragment : BaseFragment<
 
     /** 通知権限の要求理由説明表示が必要かどうか。 */
     private val shouldShowRequestPostNotificationPermissionRationale
+        @RequiresApi(Build.VERSION_CODES.TIRAMISU)
         get() = ActivityCompat.shouldShowRequestPermissionRationale(
             requireActivity(), Manifest.permission.POST_NOTIFICATIONS
         )
@@ -680,6 +681,7 @@ class SettingsFragment : BaseFragment<
     }
 
     /** 通知権限要求のランチャー結果を処理する。 */
+    @RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
     private fun onPostNotificationsPermissionResult(isGranted: Boolean) {
         Log.d(logTag, "システムの通知権限ダイアログの結果: ${if (isGranted) "許可" else "拒否"}")
         if (isGranted) {
