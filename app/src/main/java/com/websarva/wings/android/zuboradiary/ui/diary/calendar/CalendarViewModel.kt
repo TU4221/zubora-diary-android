@@ -278,7 +278,7 @@ class CalendarViewModel @Inject internal constructor(
      *
      * @param date 日記表示・編集画面の表示されていた日記の日付
      */
-    internal fun onDiaryShowFragmentResultReceived(date: LocalDate) {
+    internal fun onDiaryFragmentResultReceived(date: LocalDate) {
         if (date == currentUiState.selectedDate) {
             // リフレッシュ
             launchWithUnexpectedErrorHandler {

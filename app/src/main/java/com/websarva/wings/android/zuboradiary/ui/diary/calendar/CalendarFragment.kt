@@ -110,7 +110,7 @@ class CalendarFragment :
         ) { result ->
             when (result) {
                 is FragmentResult.Some -> {
-                    mainViewModel.onDiaryShowFragmentResultReceived(result.data)
+                    mainViewModel.onDiaryFragmentResultReceived(result.data)
                 }
                 is FragmentResult.None -> { /*処理なし*/ }
             }
