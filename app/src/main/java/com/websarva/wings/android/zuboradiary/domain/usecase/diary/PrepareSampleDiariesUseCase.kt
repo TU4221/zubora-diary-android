@@ -127,7 +127,7 @@ internal class PrepareSampleDiariesUseCase @Inject constructor(
             weather1 = Weather.UNKNOWN,
             weather2 = Weather.UNKNOWN,
             condition = Condition.UNKNOWN,
-            title = DiaryTitle("ようこそ！箇条書き日記へ"),
+            title = DiaryTitle("ようこそ！ズボラ日記へ"),
             itemTitles = itemTitles,
             itemComments = itemComments,
             imageFileName = null
