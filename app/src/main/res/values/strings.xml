@@ -180,8 +180,8 @@
     <string name="fragment_settings_item_title_theme_color">テーマカラー</string>
 
     <string name="fragment_settings_section_title_setting">設定</string>
-    <string name="fragment_settings_item_title_calendar_start_day">カレンダーの開始曜日</string>
-    <string name="fragment_settings_item_title_reminder_notification">リマインダーの通知</string>
+    <string name="fragment_settings_item_title_calendar_start_day">カレンダー開始曜日</string>
+    <string name="fragment_settings_item_title_reminder_notification">リマインダー</string>
     <string name="fragment_settings_item_title_weather_info_fetch">天気情報取得</string>
 
     <string name="fragment_settings_section_title_data">データ</string>
