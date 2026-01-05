@@ -20,17 +20,6 @@
     <th width="33%">安全管理 (Safety)</th>
   </tr>
   <tr>
-    <td align="center">
-      <img src="./docs/images/demo_create.gif" width="200" alt="Create & Edit Demo">
-    </td>
-    <td align="center">
-      <img src="./docs/images/demo_view.gif" width="200" alt="View & Search Demo">
-    </td>
-    <td align="center">
-      <img src="./docs/images/demo_safety.gif" width="200" alt="Safety Demo">
-    </td>
-  </tr>
-  <tr>
     <td valign="top">
       <strong>入力履歴アシスト & 天気自動記録</strong><br>
       過去の入力履歴からワンタップで入力可能。<br>
@@ -45,6 +34,29 @@
       <strong>インターロック機能</strong><br>
       重複データの作成や、意図しない上書きを<br>
       論理的に防ぐ制御を実装。
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <details>
+        <summary><strong>▶ デモを再生</strong></summary>
+        <br>
+        <img src="./docs/images/demo_create.gif" width="200" alt="Create & Edit Demo">
+      </details>
+    </td>
+    <td align="center">
+      <details>
+        <summary><strong>▶ デモを再生</strong></summary>
+        <br>
+        <img src="./docs/images/demo_view.gif" width="200" alt="View & Search Demo">
+      </details>
+    </td>
+    <td align="center">
+      <details>
+        <summary><strong>▶ デモを再生</strong></summary>
+        <br>
+        <img src="./docs/images/demo_safety.gif" width="200" alt="Safety Demo">
+      </details>
     </td>
   </tr>
 </table>
