@@ -55,7 +55,6 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:paddingHorizontal="@dimen/screen_spacing_horizontal"
                     android:paddingTop="@dimen/screen_spacing_vertical"
                     android:paddingBottom="@dimen/screen_bottom_spacing_for_fab"
                     android:orientation="vertical">
@@ -66,6 +65,12 @@
                         android:layout_height="wrap_content"
                         app:cv_dayViewResource="@layout/layout_calendar_day"
                         app:cv_monthHeaderResource="@layout/layout_calendar_header" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingHorizontal="@dimen/screen_spacing_horizontal"
+                    android:orientation="vertical">
 
                     <com.google.android.material.divider.MaterialDivider
                         android:layout_width="match_parent"
@@ -110,6 +115,8 @@
                             android:visibility="@{viewModel.uiState.diaryLoadState instanceof LoadState.Empty || viewModel.uiState.diaryLoadState instanceof LoadState.Error ? View.VISIBLE : View.GONE}" />
 
                     </FrameLayout>
+
+                </LinearLayout>
 
                 </LinearLayout>
 
