@@ -25,7 +25,7 @@ import javax.net.ssl.SSLException
  * 天気情報APIへのデータアクセスを行うデータソースクラス。
  *
  * このクラスは、[WeatherApiService] を使用してOpen-Meteo APIから天気情報を取得する。
- * APIへのアクセス失敗等で発生する特定の例外を[WeatherApiException] にラップする。
+ * APIへのアクセス失敗等で発生する特定の例外を [NetworkOperationException] のサブクラスにラップする。
  *
  * @property weatherApiService Retrofitサービスインターフェースのインスタンス。
  * @property dispatcher 天気情報の取得を実行するスレッドプール。
