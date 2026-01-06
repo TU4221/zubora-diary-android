@@ -5,6 +5,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.websarva.wings.android.zuboradiary.BuildConfig
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.rethrowIfCancellation
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryId
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryImageFileName
 import com.websarva.wings.android.zuboradiary.domain.model.diary.SavedDiaryDateRange
@@ -45,7 +46,7 @@ import java.time.LocalDate
 import java.time.Year
 import java.time.YearMonth
 import java.time.temporal.TemporalAdjusters
-import java.util.concurrent.CancellationException
+import kotlinx.coroutines.CancellationException
 import javax.inject.Inject
 
 /**
@@ -466,6 +467,8 @@ class DiaryListViewModel @Inject internal constructor(
                     if (BuildConfig.DEBUG) {
                         throw e
                     } else {
+                        e.rethrowIfCancellation()
+
                         FilePathUi.Unavailable
                     }
                 }

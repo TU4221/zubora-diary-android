@@ -158,13 +158,13 @@ internal class UpdateReminderNotificationSettingUseCase @Inject constructor(
         } catch (e: Exception) {
             try {
                 settingsRepository.updateReminderNotificationSetting(backupSetting)
-            } catch(de: Exception) {
-                Log.w(logTag, "${logMsg}警告_ロールバックエラー", e)
+            } catch (re: Exception) {
+                Log.w(logTag, "${logMsg}警告_ロールバックエラー", re)
                 val isEnabledString = if (backupSetting.isEnabled) "有効" else "無効"
                 e.addSuppressed(
                     RollbackException(
                         "通知${isEnabledString}化処理中のエラー後、設定ロールバックに失敗",
-                        de
+                        re
                     )
                 )
             }

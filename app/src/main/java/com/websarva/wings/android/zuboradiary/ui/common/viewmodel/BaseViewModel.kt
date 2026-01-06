@@ -8,6 +8,7 @@ import com.websarva.wings.android.zuboradiary.ui.common.event.ConsumableEvent
 import com.websarva.wings.android.zuboradiary.ui.common.event.UiEvent
 import com.websarva.wings.android.zuboradiary.ui.common.state.UiState
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.rethrowIfCancellation
 import com.websarva.wings.android.zuboradiary.ui.common.navigation.event.NavigationEventCallback
 import com.websarva.wings.android.zuboradiary.ui.common.navigation.event.NavigationEvent
 import kotlinx.coroutines.CoroutineScope
@@ -348,10 +349,8 @@ abstract class BaseViewModel<
         rollbackState: US,
         onError: suspend (e: Exception) -> Unit = { }
     ) {
-        // コルーチンのキャンセルはエラーではないため、再スローして処理を中断させる
-        if (e is CancellationException) {
-            throw e
-        }
+        e.rethrowIfCancellation()
+
         Log.e(logTag, "予期せぬエラーが発生", e)
         updateUiState(rollbackState)
         showUnexpectedAppMessageDialog(e)

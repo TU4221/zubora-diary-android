@@ -15,6 +15,7 @@ import com.websarva.wings.android.zuboradiary.data.database.exception.RecordNotF
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordReadException
 import com.websarva.wings.android.zuboradiary.data.database.exception.RecordUpdateException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.rethrowIfCancellation
 import com.websarva.wings.android.zuboradiary.di.DispatchersIO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -571,6 +572,8 @@ internal class DiaryDataSource @Inject constructor(
         } catch (e: SQLiteException) {
             throw sqliteExceptionMapper(e)
         } catch (e: IllegalStateException) {
+            e.rethrowIfCancellation()
+
             throw DatabaseStateException(e)
         }
     }

@@ -9,6 +9,7 @@ import com.websarva.wings.android.zuboradiary.data.network.exception.NetworkOper
 import com.websarva.wings.android.zuboradiary.data.network.exception.InvalidNetworkRequestParameterException
 import com.websarva.wings.android.zuboradiary.data.network.exception.ResponseParsingException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.rethrowIfCancellation
 import com.websarva.wings.android.zuboradiary.di.DispatchersIO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -228,6 +229,8 @@ internal class WeatherApiDataSource @Inject constructor(
             try {
                 return operation()
             } catch (e: Exception) {
+                e.rethrowIfCancellation()
+
                 val isLastAttempt = attempt == retries
                 // リトライすべきでない、または最後の試行の場合は例外を処理して終了
                 if (!shouldRetry(e) || isLastAttempt) {

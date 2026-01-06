@@ -13,6 +13,7 @@ import com.websarva.wings.android.zuboradiary.data.location.exception.LocationPr
 import com.websarva.wings.android.zuboradiary.data.location.exception.LocationUnavailableException
 import com.websarva.wings.android.zuboradiary.data.location.exception.PermissionDeniedException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.rethrowIfCancellation
 import com.websarva.wings.android.zuboradiary.di.DispatchersIO
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -92,6 +93,8 @@ internal class FusedLocationDataSource @Inject constructor(
                 Log.e(logTag, "${logMsg}_失敗", e)
                 throw PermissionDeniedException(e)
             } catch (e: IllegalStateException) {
+                e.rethrowIfCancellation()
+
                 Log.e(logTag, "${logMsg}_失敗", e)
                 throw LocationAccessException(e)
             } catch (e: TimeoutCancellationException) {

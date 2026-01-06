@@ -18,6 +18,7 @@ import com.websarva.wings.android.zuboradiary.domain.exception.ResourceAlreadyEx
 import com.websarva.wings.android.zuboradiary.domain.exception.RollbackException
 import com.websarva.wings.android.zuboradiary.domain.exception.UnknownException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.rethrowIfCancellation
 import java.time.LocalDate
 import javax.inject.Inject
 
@@ -360,6 +361,8 @@ internal class SaveDiaryUseCase @Inject constructor(
                 diaryRepository.saveDiary(originalDiary)
             }
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
+
             throw RollbackException(cause = e)
         }
     }
@@ -401,6 +404,8 @@ internal class SaveDiaryUseCase @Inject constructor(
                 }
             }
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
+
             throw RollbackException(cause = e)
         }
     }

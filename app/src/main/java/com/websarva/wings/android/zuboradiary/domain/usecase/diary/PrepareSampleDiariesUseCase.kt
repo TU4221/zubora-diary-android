@@ -7,6 +7,7 @@ import com.websarva.wings.android.zuboradiary.domain.model.diary.Diary
 import com.websarva.wings.android.zuboradiary.domain.model.diary.DiaryItemTitleSelectionHistory
 import com.websarva.wings.android.zuboradiary.domain.exception.InsufficientStorageException
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
+import com.websarva.wings.android.zuboradiary.core.utils.rethrowIfCancellation
 import com.websarva.wings.android.zuboradiary.domain.exception.DataStorageException
 import com.websarva.wings.android.zuboradiary.domain.exception.InvalidParameterException
 import com.websarva.wings.android.zuboradiary.domain.model.diary.Condition
@@ -74,6 +75,8 @@ internal class PrepareSampleDiariesUseCase @Inject constructor(
         } catch (e: DataStorageException) {
             Log.e(logTag, "${logMsg}失敗_保存エラー", e)
         } catch (e: Exception) {
+            e.rethrowIfCancellation()
+
             Log.e(logTag, "${logMsg}失敗_原因不明", e)
         } finally {
             if (isFirstLaunch) {
@@ -83,6 +86,8 @@ internal class PrepareSampleDiariesUseCase @Inject constructor(
                     )
                     Log.i(logTag, "${logMsg}初回起動フラグを更新")
                 } catch (e: Exception) {
+                    e.rethrowIfCancellation()
+
                     Log.e(logTag, "${logMsg}初回起動フラグの更新失敗", e)
                 }
                 Log.i(logTag, "${logMsg}完了")
