@@ -68,7 +68,7 @@
 
 | カテゴリ (Category)               | 使用技術 (Tech)                     | 説明 (Description)             |
 |:------------------------------|:--------------------------------|:-----------------------------|
-| **言語 (Language)**             | Kotlin                          |                              |
+| **言語 (Language)**             | Kotlin                          | 公式推奨言語                       |
 | **設計 (Architecture)**         | MVVM + Clean Architecture       | UI / Domain / Data の3層構造     |
 | **UI (User Interface)**       | XML / DataBinding & ViewBinding | 責務分離のためのハイブリッド構成 (一部Compose) |
 | **DI (Dependency Injection)** | Hilt                            | 依存性の注入                       |
