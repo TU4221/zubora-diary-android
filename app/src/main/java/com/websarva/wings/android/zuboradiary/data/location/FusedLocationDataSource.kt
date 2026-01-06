@@ -36,8 +36,6 @@ internal class FusedLocationDataSource @Inject constructor(
     @param:DispatchersIO private val dispatcher: CoroutineDispatcher = Dispatchers.IO
 ) {
 
-    // MEMO:fusedLocationProviderClient.lastLocation()を記述する時、Permission確認コードが必須となるが、
-    //      Permission確認はプロパティで管理する為、@SuppressLintで警告抑制。
     /**
      * デバイスの現在位置を取得する。
      *
@@ -50,6 +48,8 @@ internal class FusedLocationDataSource @Inject constructor(
      * @throws LocationUnavailableException 指定時間内に位置情報を取得できない、または現在地が特定できない場合。
      * @throws InvalidLocationRequestParameterException 引数が不正な場合。
      */
+    // MEMO:FusedLocationProviderClient#getCurrentLocationを記述する時、Permission確認コードが必須となるが、
+    //      Permission確認はUIで管理する為、@SuppressLintで警告抑制。
     @SuppressLint("MissingPermission")
     suspend fun fetchCurrentLocation(
         timeoutMillis: Long = 10000L
@@ -70,7 +70,7 @@ internal class FusedLocationDataSource @Inject constructor(
                         CurrentLocationRequest.Builder()
                             // MEMO:"PRIORITY_BALANCED_POWER_ACCURACY"だとnullが返ってくることがある為、
                             //      "PRIORITY_HIGH_ACCURACY"とする。
-                            .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+                            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
                             .setDurationMillis(timeoutMillis)
                             .build()
                     val location =
@@ -78,11 +78,12 @@ internal class FusedLocationDataSource @Inject constructor(
                             locationRequest,
                             cancellationTokenSource.token
                         ).await()
-
-                    if (location == null) {
-                        Log.w(logTag, "${logMsg}_失敗_位置情報:null")
-                        throw LocationUnavailableException()
-                    }
+                            ?: fusedLocationProviderClient.lastLocation.await().also {
+                            Log.w(logTag, "${logMsg}_最新取得失敗_キャッシュ確認")
+                            }
+                            ?: throw LocationUnavailableException().also {
+                                Log.w(logTag, "${logMsg}_失敗_位置情報:null")
+                            }
 
                     Log.i(logTag, "${logMsg}_完了_位置情報:$location")
                     return@withTimeout location
