@@ -11,6 +11,7 @@ import com.websarva.wings.android.zuboradiary.data.network.exception.ResponsePar
 import com.websarva.wings.android.zuboradiary.core.utils.logTag
 import com.websarva.wings.android.zuboradiary.di.DispatchersIO
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import retrofit2.Response
 import java.net.ConnectException
@@ -195,41 +196,92 @@ internal class WeatherApiDataSource @Inject constructor(
     }
 
     /**
-     * Web API操作を実行し、一般的なネットワーク関連の例外をラップする。
+     * リトライ機能付きでWeb API操作を実行し、一般的なネットワーク関連の例外をラップする。
      *
-     * [UnknownHostException] (DNS解決失敗など)、
-     * [ConnectException] (サーバー接続失敗など)、
-     * [SocketTimeoutException] (タイムアウト)、
-     * [SSLException] (SSL/TLSハンドシェイクエラー)、
-     * またはその他の [IOException] (予期せぬ接続切断など) が発生した場合、
-     * それを [NetworkOperationException] 、またはそのサブクラスでラップして再スローする。
+     * 以下の例外が発生した場合、[NetworkConnectivityException] や [NetworkOperationException] にラップして再スローします：
+     * - [SocketTimeoutException]: タイムアウト (読み取りタイムアウト)
+     * - [UnknownHostException]: DNS解決失敗など (インターネット接続なし、ホスト名間違い)
+     * - [ConnectException]: サーバー接続失敗など (サーバーダウン、ポートが開いていない)
+     * - [SSLException]: SSL/TLSハンドシェイクエラー
+     * - [IOException]: その他の予期せぬ接続切断など
      *
      * @param R 操作の結果の型。
+     * @param retries 最大リトライ回数 (デフォルト: 3回)。
+     * @param initialDelayMillis 初回リトライまでの待機時間 (デフォルト: 1000ms)。
+     * @param factor バックオフ係数。2.0なら待機時間が倍々になる (1s, 2s, 4s...)。
      * @param operation 実行するsuspend関数形式のWeb API操作。
      * @return Web API操作の結果。
      * @throws NetworkConnectivityException ネットワーク接続に問題がある場合。
      * @throws NetworkOperationException ネットワーク操作中に問題が発生した場合 (タイムアウト、SSLエラー、一般的なI/Oエラーなど)。
+     * @throws IllegalStateException 全てのリトライが失敗し、かつ例外ハンドリングも漏れた場合（理論上到達しない）。
      */
     private suspend fun <R> executeWebApiOperation(
+        retries: Int = 3,
+        initialDelayMillis: Long = 1000,
+        factor: Double = 2.0,
         operation: suspend () -> R
     ): R {
-        return try {
-            operation()
-        } catch (e: UnknownHostException) {
-            // DNS解決に失敗した場合 (例: インターネット接続なし、ホスト名間違い)
-            throw NetworkConnectivityException(e)
-        } catch (e: ConnectException) {
-            // サーバーへのTCP接続に失敗した場合 (例: サーバーダウン、ポートが開いていない)
-            throw NetworkConnectivityException(e)
-        } catch (e: SocketTimeoutException) {
-            // 読み取りタイムアウト
-            throw NetworkOperationException("読み取りタイムアウトエラー", e)
-        } catch (e: SSLException) {
-            // SSL/TLS ハンドシェイクエラー
-            throw NetworkOperationException("SSL/TLS ハンドシェイクエラー", e)
-        } catch (e: IOException) {
-            // 上記以外の一般的なI/Oエラー (例: 予期せぬ接続切断など)
-            throw NetworkOperationException("ネットワークエラー", e)
+        var currentDelay = initialDelayMillis
+
+        // 指定回数分ループ (+1は初回実行分)
+        repeat(retries + 1) { attempt ->
+            try {
+                return operation()
+            } catch (e: Exception) {
+                val isLastAttempt = attempt == retries
+                // リトライすべきでない、または最後の試行の場合は例外を処理して終了
+                if (!shouldRetry(e) || isLastAttempt) {
+                    handleNetworkException(e)
+                }
+
+                Log.d("Retry", "API通信に失敗。${currentDelay}ミリ秒後に再試行。(試行回数: ${attempt + 1}) ")
+
+                delay(currentDelay)
+
+                // 次回の待機時間を計算 (指数バックオフ)
+                currentDelay = (currentDelay * factor).toLong()
+            }
+        }
+        // ここに来ることはロジック上ないが、コンパイラを通すためにthrowしておく
+        throw IllegalStateException("予期せぬエラー（リトライロジック通過）。")
+    }
+
+    /**
+     * 発生した例外に基づいて、リトライを実行すべきかどうかを判定する。
+     *
+     * @param e 発生した例外。
+     * @return リトライすべき場合は true、即時エラーとすべき場合は false。
+     */
+    private fun shouldRetry(e: Exception): Boolean {
+        return when (e) {
+            is SocketTimeoutException -> true // タイムアウトは一時的な可能性が高いためリトライする
+            is UnknownHostException -> false  // オフライン等は即時通知すべきためリトライしない
+            is ConnectException -> false      // 接続拒否は回復の見込みが薄いためリトライしない
+            is SSLException -> false          // 証明書エラー等は自動回復しないためリトライしない
+            is IOException -> true            // その他の不明なIOエラーは念のためリトライする
+            else -> false                     // 通信以外のエラー（パースエラー等）はリトライしない
+        }
+    }
+
+    /**
+     * ネットワーク関連の例外を適切なカスタム例外に変換してスローする。
+     *
+     * 発生した例外 [e] を [executeWebApiOperation] の仕様に基づき、
+     * [NetworkConnectivityException] または [NetworkOperationException] に変換します。
+     *
+     * @param e 発生した例外。
+     * @return この関数は常に例外を投げるため、値を返しません。
+     * @throws NetworkConnectivityException 接続確立に関連するエラーの場合。
+     * @throws NetworkOperationException 通信中の操作エラーの場合。
+     */
+    private fun handleNetworkException(e: Exception): Nothing {
+        throw when (e) {
+            is SocketTimeoutException -> NetworkOperationException("読み取りタイムアウトエラー", e)
+            is UnknownHostException -> NetworkConnectivityException(e)
+            is ConnectException -> NetworkConnectivityException(e)
+            is SSLException -> NetworkOperationException("SSL/TLS ハンドシェイクエラー", e)
+            is IOException -> NetworkOperationException("ネットワークエラー", e)
+            else -> e
         }
     }
 
