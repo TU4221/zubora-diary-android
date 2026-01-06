@@ -388,12 +388,13 @@ class ImageFileDataSource @Inject constructor(
                     // 不完全な移動先ファイルを削除する
                     try {
                         if (destinationFile.exists()) destinationFile.delete()
-                    } catch (e: Exception) {
-                        // 削除失敗のログは残しても良いが、元の例外を優先してスローする
+                    } catch (cleanupException: Exception) {
+                        e.addSuppressed(cleanupException)
+
                         Log.w(
                             logTag,
                             "移動先の不完全ファイルの削除に失敗 (パス: ${destinationFile.absolutePath})。",
-                            e
+                            cleanupException
                         )
                     }
 
