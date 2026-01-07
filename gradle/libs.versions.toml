@@ -26,7 +26,7 @@ room = "2.8.0"
 
 datastorePreferences = "1.1.7"
 
-workManager = "2.10.4"
+workManager = "2.11.0"
 
 retrofit = "3.0.0"
 moshiKotlin = "1.15.2"
