@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import com.mikepenz.aboutlibraries.ui.compose.LibraryDefaults
-import com.mikepenz.aboutlibraries.ui.compose.android.rememberLibraries
+import com.mikepenz.aboutlibraries.ui.compose.android.produceLibraries
 import com.mikepenz.aboutlibraries.ui.compose.chipColors
 import com.mikepenz.aboutlibraries.ui.compose.libraryColors
 import com.mikepenz.aboutlibraries.ui.compose.m3.LibrariesContainer
@@ -64,7 +64,7 @@ class OpenSourceSoftwareLicensesDialogFragment
 
             setContent {
                 // ライブラリ情報を読み込み、インスタンス化
-                val libraries = rememberLibraries()
+                val libraries = produceLibraries()
                 // 新しい LibrariesContainer のシグネチャに合わせて修正
                 LibrariesContainer(
                     libraries = libraries.value, // Libs オブジェクトを渡す
@@ -73,10 +73,10 @@ class OpenSourceSoftwareLicensesDialogFragment
                     // 色の設定
                     colors = LibraryDefaults.libraryColors(
                         // ダイアログ背景色
-                        backgroundColor = Color(themeColor.asSurfaceColorInt(resources)),
+                        dialogBackgroundColor = Color(themeColor.asSurfaceColorInt(resources)),
 
                         // リストアイテム、ダイアログ文字
-                        contentColor = Color(themeColor.asOnSurfaceColorInt(resources)),
+                        dialogContentColor = Color(themeColor.asOnSurfaceColorInt(resources)),
 
                         // バージョンチップ
                         versionChipColors = LibraryDefaults.chipColors(
