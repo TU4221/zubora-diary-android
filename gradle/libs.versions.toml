@@ -24,7 +24,7 @@ lifecycle = "2.10.0"
 
 room = "2.8.4"
 
-datastorePreferences = "1.1.7"
+datastorePreferences = "1.2.0"
 
 workManager = "2.11.0"
 
