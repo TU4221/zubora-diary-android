@@ -45,7 +45,6 @@ coil = "3.3.0"
 aboutLibraries = "13.2.1"
 
 leakcanaryAndroid = "2.14"
-playServicesContextmanager = "9.4.0"
 
 [libraries]
 androidx-navigation-safe-args-gradle-plugin = { module = "androidx.navigation:navigation-safe-args-gradle-plugin", version.ref = "navigation" }
@@ -154,7 +153,6 @@ aboutlibraries-compose-view = { module = "com.mikepenz:aboutlibraries", version.
 # https://square.github.io/leakcanary/getting_started/
 # debugImplementation because LeakCanary should only run in debug builds.
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
-play-services-contextmanager = { group = "com.google.android.gms", name = "play-services-contextmanager", version.ref = "playServicesContextmanager" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
