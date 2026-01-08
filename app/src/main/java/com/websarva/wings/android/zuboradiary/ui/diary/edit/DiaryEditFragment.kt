@@ -740,7 +740,7 @@ class DiaryEditFragment : BaseFragment<
      * @param isJump trueの場合はアニメーションなし（ジャンプ）、falseの場合はアニメーションあり（スムーズ）で遷移する。
      */
     private fun transitionDiaryItemToInvisible(itemNumber: Int, isJump: Boolean) {
-        Log.d("logTag", "transitionDiaryItemToInvisible()_itemNumber = $itemNumber, isJump = $isJump")
+        Log.d(logTag, "transitionDiaryItemToInvisible()_itemNumber = $itemNumber, isJump = $isJump")
         val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber) ?: return
         val itemMotionLayout = selectItemMotionLayout(itemNumber) ?: return
         if (isJump) {
@@ -770,7 +770,7 @@ class DiaryEditFragment : BaseFragment<
      * @param isJump trueの場合はアニメーションなし（ジャンプ）、falseの場合はアニメーションあり（スムーズ）で遷移する。
      */
     private fun transitionDiaryItemToVisible(itemNumber: Int, isJump: Boolean) {
-        Log.d("logTag", "transitionDiaryItemToVisible()_itemNumber = $itemNumber, isJump = $isJump")
+        Log.d(logTag, "transitionDiaryItemToVisible()_itemNumber = $itemNumber, isJump = $isJump")
         val itemMotionLayoutListener = selectItemMotionLayoutListener(itemNumber) ?: return
         val itemMotionLayout = selectItemMotionLayout(itemNumber) ?: return
         if (isJump) {

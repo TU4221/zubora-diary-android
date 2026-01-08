@@ -237,7 +237,7 @@ internal class WeatherApiDataSource @Inject constructor(
                     handleNetworkException(e)
                 }
 
-                Log.d("Retry", "API通信に失敗。${currentDelay}ミリ秒後に再試行。(試行回数: ${attempt + 1}) ")
+                Log.d(logTag, "API通信に失敗。${currentDelay}ミリ秒後に再試行。(試行回数: ${attempt + 1}) ")
 
                 delay(currentDelay)
 
