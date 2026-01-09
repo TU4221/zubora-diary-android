@@ -141,7 +141,19 @@ graph TD
 単なる定時通知ではなく、`WorkManager` 起動時に「アプリが起動中か？」「既に日記を書いたか？」を判定。
 ユーザーの体験を阻害しない、必要なタイミングだけの通知を実現しています。
 
-## 🚀 セットアップ (Setup)
+## 📱 アプリのインストール (Install)
+
+Android端末をお持ちの方は、以下のリンクからAPKファイルをダウンロードし、直接インストールして動作確認ができます。
+
+<a href="https://github.com/TU4221/zubora-diary-android/releases">
+  <img src="https://img.shields.io/badge/Download-APK-3DDC84?style=for-the-badge&logo=android&logoColor=white" alt="Download APK">
+</a>
+
+1. 上記ボタンから **Releases** ページへ移動します。
+2. 最新バージョンの `Assets` を展開し、`app-release.apk` をタップしてダウンロードします。
+3. 端末の指示に従ってインストールしてください。
+
+## 🚀 開発環境セットアップ (Development Setup)
 
 このプロジェクトをビルドするには、**Android Studio Otter** 以降が必要です。
 
